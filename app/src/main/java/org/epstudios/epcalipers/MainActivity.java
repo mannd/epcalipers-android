@@ -1,17 +1,34 @@
 package org.epstudios.epcalipers;
 
+import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.method.Touch;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
+import android.widget.Toast;
+
+import com.ortiz.touch.TouchImageView;
 
 
 public class MainActivity extends ActionBarActivity {
+    private Activity activity;
+    private TouchImageView image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        activity = this;
+
+        image = (TouchImageView) findViewById(R.id.img);
+
+
+
+
     }
 
 
