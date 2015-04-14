@@ -4,4 +4,10 @@
 /.idea/libraries
 .DS_Store
 /build
-*/build/*
+/*/out
+/*/build
+/*/*/production
+*.iws
+*.ipr
+*~
+*.swp
