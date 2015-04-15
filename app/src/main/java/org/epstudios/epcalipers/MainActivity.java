@@ -1,7 +1,7 @@
 package org.epstudios.epcalipers;
 
-import android.app.Activity;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -11,8 +11,6 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.ortiz.touch.TouchImageView;
@@ -21,36 +19,23 @@ import com.ortiz.touch.TouchImageView;
 public class MainActivity extends ActionBarActivity {
     private TouchImageView imageView;
     private View calipersView;
-    private ToggleButton toggleButton;
+    private Toolbar menuToolbar;
+    private Toolbar actionBar;
+    private boolean calipersMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         imageView = (TouchImageView) findViewById(R.id.img);
         calipersView = findViewById(R.id.calipersView);
-        toggleButton = (ToggleButton) findViewById(R.id.toggle_button);
 
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        actionBar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(actionBar);
 
-        toggleButton.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                if (toggleButton.isChecked()) {
-                    Log.d("EPS", "ON");
-                } else {
-                    Log.d("EPS", "OFF");
-                }
-            }
-        });
-
-
+        menuToolbar = (Toolbar)findViewById(R.id.menu_toolbar);
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -59,6 +44,8 @@ public class MainActivity extends ActionBarActivity {
         int height = size.y;
 
         Log.d("EPS", "width = " + width + " height = " + height);
+
+        calipersMode = true;
     }
 
 
@@ -78,9 +65,31 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            changeSettings();
+            return true;
+        }
+        if (id == R.id.action_switch) {
+            toggleMode();
             return true;
         }
 
+
         return super.onOptionsItemSelected(item);
     }
+
+    private void toggleMode() {
+        calipersMode = !calipersMode;
+        if (calipersMode) {
+            actionBar.setTitle("EP Calipers");
+
+        }
+        else
+            actionBar.setTitle("Image Mode");
+    }
+
+    private void changeSettings() {
+
+    }
 }
+
+
