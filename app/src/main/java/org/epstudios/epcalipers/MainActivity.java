@@ -1,34 +1,42 @@
 package org.epstudios.epcalipers;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
+
 import android.os.Bundle;
-import android.text.method.Touch;
+import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.Toast;
+import android.view.ViewTreeObserver;
 
 import com.ortiz.touch.TouchImageView;
 
 
 public class MainActivity extends ActionBarActivity {
-    private Activity activity;
-    private TouchImageView image;
+    private TouchImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        activity = this;
 
-        image = (TouchImageView) findViewById(R.id.img);
+        imageView = (TouchImageView) findViewById(R.id.img);
+
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
 
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
 
-
+        Log.d("EPS", "width = " + width + " height = " + height);
     }
 
 
