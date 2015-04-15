@@ -10,13 +10,18 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewTreeObserver;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.ortiz.touch.TouchImageView;
 
 
 public class MainActivity extends ActionBarActivity {
     private TouchImageView imageView;
+    private View calipersView;
+    private ToggleButton toggleButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,9 +30,26 @@ public class MainActivity extends ActionBarActivity {
 
 
         imageView = (TouchImageView) findViewById(R.id.img);
+        calipersView = findViewById(R.id.calipersView);
+        toggleButton = (ToggleButton) findViewById(R.id.toggle_button);
+
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        toggleButton.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                if (toggleButton.isChecked()) {
+                    Log.d("EPS", "ON");
+                } else {
+                    Log.d("EPS", "OFF");
+                }
+            }
+        });
+
 
 
         Display display = getWindowManager().getDefaultDisplay();

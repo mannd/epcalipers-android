@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".MainActivity">
 
     <android.support.v7.widget.Toolbar
@@ -19,11 +19,35 @@
         tools:ignore="UnusedAttribute" />
 
 
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
     <com.ortiz.touch.TouchImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/imageView"
         android:src="@drawable/normal_12_lead_ecg"
         android:scaleType="center"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/calipersView" />
+
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/toggle_button"
+        android:textOff="Calipers"
+        android:textOn="Image"
+        android:layout_gravity="bottom|right"
+        android:text="Test"/>
+
+    </FrameLayout>
+
+
+
 
 </LinearLayout>
