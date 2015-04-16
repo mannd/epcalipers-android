@@ -1,6 +1,8 @@
 package org.epstudios.epcalipers;
 
 import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Rect;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -24,6 +26,8 @@ import android.graphics.Color;
  * along with EP Mobile.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Caliper {
+    static int differential = 0;
+
     public int getBar1Position() {
         return bar1Position;
     }
@@ -82,17 +86,75 @@ public class Caliper {
     private int bar2Position;
     private int crossBarPosition;
     private Direction direction;
-    private Color color;
-    private Color unselectedColor;
-    private Color selectedColor;
+    private int color;
+    private int unselectedColor;
+    private int selectedColor;
     private int lineWidth;
     private int valueInPoints;
     private boolean selected;
-    // private Calibration calibration;
+
+    public Calibration getCalibration() {
+        return calibration;
+    }
+
+    public void setCalibration(Calibration calibration) {
+        this.calibration = calibration;
+    }
+
+    private Calibration calibration;
 
 
+    public Caliper(Direction direction, int bar1Position, int bar2Position,
+                   int crossBarPosition) {
+        this.direction = direction;
+        this.bar1Position = bar1Position;
+        this.bar2Position = bar2Position;
+        this.crossBarPosition = crossBarPosition;
+        this.unselectedColor = Color.BLUE;
+        this.selectedColor = Color.RED;
+        this.color = Color.BLUE;
+        this.lineWidth = 2;
+        this.selected = false;
+    }
 
+    public Caliper() {
+        this(Direction.HORIZONTAL, 0, 0, 100);
+    }
 
+    public void setInitialPosition(Rect rect) {
+        if (direction == Direction.HORIZONTAL) {
+            bar1Position = (rect.width()/3) + differential;
+            bar2Position = (2 * rect.width()/3) + differential;
+            crossBarPosition = (rect.height()/2) + differential;
+        }
+        else {
+            bar1Position = (rect.height()/3) + differential;
+            bar2Position = ((2 * rect.height())/3) + differential;
+            crossBarPosition = (rect.width()/2) + differential;
+        }
+        differential += 15;
+        if (differential > 80) {
+            differential = 0;
+        }
+    }
 
+    public void drawWithContext() {
+        // TODO big procedure here
+    }
+
+    public int barCoord(Point p) {
+        return (direction == Direction.HORIZONTAL ? p.x : p.y);
+    }
+
+    public Rect containerRect() {
+        // TODO
+        return new Rect();
+    }
+
+    public String measurement() {
+        // TODO
+    }
+
+    // TODO more methods
 
 }

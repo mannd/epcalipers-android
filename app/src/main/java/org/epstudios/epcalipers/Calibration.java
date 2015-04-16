@@ -24,7 +24,7 @@ import android.content.Context;
  * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Calibration {
-    private Context con;
+    private Context context;
 
     public Caliper.Direction getDirection() {
         return direction;
@@ -70,14 +70,14 @@ public class Calibration {
 
     private boolean calibrated;
 
-    public Calibration(Context con, Caliper.Direction direction) {
-        this.con = con;
+    public Calibration(Context context, Caliper.Direction direction) {
+        this.context = context;
         this.direction = direction;
         reset();
     }
 
-    public Calibration(Context con) {
-        this(con, Caliper.Direction.HORIZONTAL);
+    public Calibration(Context context) {
+        this(context, Caliper.Direction.HORIZONTAL);
     }
 
     private void reset() {
@@ -95,12 +95,12 @@ public class Calibration {
     public String getUnits() {
         if (calibrated) {
             if (displayRate) {
-                return con.getString(R.string.bpm);
+                return context.getString(R.string.bpm);
             } else {
                 return units;
             }
         } else {
-            return con.getString(R.string.points);
+            return context.getString(R.string.points);
         }
     }
 

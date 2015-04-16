@@ -3,6 +3,8 @@ package org.epstudios.epcalipers;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.test.ApplicationTestCase;
 
 /**
@@ -55,5 +57,27 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(cal.getCurrentCalFactor(), 0.25f);
     }
 
+    public void testInitialCaliperPosition() {
+        Caliper c = new Caliper();
+        c.setInitialPosition(new Rect(0, 0, 600, 600));
+        assertEquals(c.getBar1Position(), 200);
+        assertEquals(c.getBar2Position(), 400);
+        assertEquals(c.getCrossBarPosition(), 300);
+        c.setInitialPosition(new Rect(0, 0, 600, 600));
+        c.setDirection(Caliper.Direction.VERTICAL);
+        assertEquals(c.getBar1Position(), 215);
+        assertEquals(c.getBar2Position(), 415);
+        assertEquals(c.getCrossBarPosition(), 315);
+    }
 
+    public void testBarCoord() {
+        Caliper c = new Caliper();
+        assertEquals(c.getBar1Position(), 0);
+        assertEquals(c.getBar2Position(), 0);
+        assertEquals(c.getCrossBarPosition(), 100);
+        Point p = new Point(100, 50);
+        assertEquals(c.barCoord(p), 100);
+        c.setDirection(Caliper.Direction.VERTICAL);
+        assertEquals(c.barCoord(p),50);
+    }
 }
