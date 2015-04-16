@@ -153,6 +153,7 @@ public class Caliper {
 
     public String measurement() {
         // TODO
+        return "";
     }
 
     // TODO more methods
