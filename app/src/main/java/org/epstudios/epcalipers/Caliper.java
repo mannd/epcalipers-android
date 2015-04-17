@@ -1,8 +1,12 @@
 package org.epstudios.epcalipers;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.util.Log;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -27,6 +31,7 @@ import android.graphics.Rect;
  */
 public class Caliper {
     static int differential = 0;
+    static final int DELTA = 0;
 
     public int getBar1Position() {
         return bar1Position;
@@ -122,6 +127,9 @@ public class Caliper {
     }
 
     public void setInitialPosition(Rect rect) {
+        Log.d("EPS", "Left = " + rect.left + " Right = " + rect.right +
+                " Top = " + rect.top + " Bottom = " + rect.bottom);
+        Log.d("EPS", "Width = " + rect.width() + "Height = " + rect.height());
         if (direction == Direction.HORIZONTAL) {
             bar1Position = (rect.width()/3) + differential;
             bar2Position = (2 * rect.width()/3) + differential;
@@ -138,8 +146,44 @@ public class Caliper {
         }
     }
 
-    public void drawWithContext() {
-        // TODO big procedure here
+    public void draw(Canvas canvas) {
+        Paint paint = new Paint();
+        paint.setColor(color);
+        paint.setStrokeWidth(lineWidth);
+        if (direction == Direction.HORIZONTAL) {
+            crossBarPosition = Math.min(crossBarPosition, canvas.getHeight() - DELTA);
+            crossBarPosition = Math.max(crossBarPosition, DELTA);
+            bar1Position = Math.min(bar1Position, canvas.getWidth() - DELTA);
+            bar2Position = Math.max(bar2Position, DELTA);
+            canvas.drawLine(bar1Position, 0, bar1Position, canvas.getHeight(), paint);
+            canvas.drawLine(bar2Position, 0, bar2Position, canvas.getHeight(), paint);
+            canvas.drawLine(bar2Position, crossBarPosition, bar1Position, crossBarPosition, paint);
+        }
+        else {  // draw vertical caliper
+            crossBarPosition = Math.min(crossBarPosition, canvas.getWidth() - DELTA);
+            crossBarPosition = Math.max(crossBarPosition, DELTA);
+            bar1Position = Math.min(bar1Position, canvas.getHeight() - DELTA);
+            bar2Position = Math.max(bar2Position, DELTA);
+            canvas.drawLine(0, bar1Position, canvas.getWidth(), bar1Position, paint);
+            canvas.drawLine(0, bar2Position, canvas.getWidth(), bar2Position, paint);
+            canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
+        }
+        String text = measurement();
+        paint.setAntiAlias(true);
+        paint.setTypeface(Typeface.DEFAULT);
+        paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
+                Paint.Align.LEFT);
+
+        paint.setTextSize(18.0f);
+       // paint.setTextScaleX(0.8f);
+        if (direction == Direction.HORIZONTAL) {
+            canvas.drawText(text, 200, 300, paint);
+
+        }
+        else {
+
+        }
+
     }
 
     public int barCoord(Point p) {
@@ -153,7 +197,7 @@ public class Caliper {
 
     public String measurement() {
         // TODO
-        return "";
+        return "Test";
     }
 
     // TODO more methods

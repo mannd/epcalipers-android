@@ -33,10 +33,10 @@
         android:src="@drawable/normal_12_lead_ecg"
         android:scaleType="center"/>
 
-    <View
+    <org.epstudios.epcalipers.CaliperView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/calipersView" />
+        android:id="@+id/caliperView" />
 
     </FrameLayout>
 

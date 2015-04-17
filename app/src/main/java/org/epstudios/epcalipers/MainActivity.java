@@ -1,7 +1,6 @@
 package org.epstudios.epcalipers;
 
 import android.graphics.Point;
-import android.graphics.PorterDuff;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -10,15 +9,13 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ToggleButton;
 
 import com.ortiz.touch.TouchImageView;
 
 
 public class MainActivity extends ActionBarActivity {
     private TouchImageView imageView;
-    private View calipersView;
+    private CaliperView caliperView;
     private Toolbar menuToolbar;
     private Toolbar actionBar;
     private boolean calipersMode;
@@ -29,7 +26,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         imageView = (TouchImageView) findViewById(R.id.img);
-        calipersView = findViewById(R.id.calipersView);
+        caliperView = (CaliperView) findViewById(R.id.caliperView);
 
 
         actionBar = (Toolbar)findViewById(R.id.toolbar);
