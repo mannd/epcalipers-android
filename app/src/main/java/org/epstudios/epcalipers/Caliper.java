@@ -1,5 +1,6 @@
 package org.epstudios.epcalipers;
 
+import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,26 +9,28 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.util.Log;
 
+import java.text.DecimalFormat;
+
 /**
  * Copyright (C) 2015 EP Studios, Inc.
  * www.epstudiossoftware.com
  * <p/>
  * Created by mannd on 4/16/15.
  * <p/>
- * This file is part of EP Mobile.
+ * This file is part of EP Calipers.
  * <p/>
- * EP Mobile is free software: you can redistribute it and/or modify
+ * EP Calipers is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * <p/>
- * EP Mobile is distributed in the hope that it will be useful,
+ * EP Calipers is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * <p/>
  * You should have received a copy of the GNU General Public License
- * along with EP Mobile.  If not, see <http://www.gnu.org/licenses/>.
+ * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Caliper {
     static int differential = 0;
@@ -174,14 +177,15 @@ public class Caliper {
         paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
                 Paint.Align.LEFT);
 
-        paint.setTextSize(18.0f);
+        paint.setTextSize(32.0f);
        // paint.setTextScaleX(0.8f);
         if (direction == Direction.HORIZONTAL) {
-            canvas.drawText(text, 200, 300, paint);
-
+            canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
+                    crossBarPosition - 20, paint);
         }
         else {
-
+            canvas.drawText(text, crossBarPosition + 5,
+                    bar1Position + ((bar2Position - bar1Position) / 2), paint);
         }
 
     }
@@ -196,10 +200,58 @@ public class Caliper {
     }
 
     public String measurement() {
-        // TODO
-        return "Test";
+        String pattern = "%.4g";
+        DecimalFormat formatter = new DecimalFormat(pattern);
+        String result = formatter.format(calibratedResult());
+        result += " " + calibration.getUnits();
+        return result;
     }
 
     // TODO more methods
 
+    private double calibratedResult() {
+        double result = intervalResult();
+        if (result != 0 && calibration.canDisplayRate() && calibration.getDisplayRate()) {
+            result = rateResult(result);
+        }
+        return result;
+    }
+
+    private double intervalResult() {
+        return points() * calibration.multiplier();
+    }
+
+    private int points() {
+        return bar2Position - bar1Position;
+    }
+
+    private double rateResult(double interval) {
+        if (interval != 0) {
+            if (calibration.unitsAreMsec()) {
+                interval = 60000.0 / interval;
+            }
+            if (calibration.unitsAreSeconds()) {
+                interval = 60.0 / interval;
+            }
+        }
+        return interval;
+    }
+
+    private double intervalInSecs(double interval) {
+        if (calibration.unitsAreSeconds()) {
+            return interval;
+        }
+        else {
+            return interval / 1000;
+        }
+    }
+
+    private double intervalInMsec(double interval) {
+        if (calibration.unitsAreMsec()) {
+            return interval;
+        }
+        else {
+            return 1000 * interval;
+        }
+    }
 }

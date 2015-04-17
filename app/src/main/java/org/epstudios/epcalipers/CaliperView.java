@@ -1,5 +1,6 @@
 package org.epstudios.epcalipers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
@@ -57,6 +58,8 @@ public class CaliperView extends View {
         c.setBar1Position(300);
         c.setBar2Position(800);
         c.setCrossBarPosition(400);
+        Calibration calibration = new Calibration();
+        c.setCalibration(calibration);
         calipers.add(c);
     }
 

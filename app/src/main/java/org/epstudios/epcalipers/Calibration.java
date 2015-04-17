@@ -24,8 +24,6 @@ import android.content.Context;
  * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Calibration {
-    private Context context;
-
     public Caliper.Direction getDirection() {
         return direction;
     }
@@ -37,6 +35,11 @@ public class Calibration {
     private Caliper.Direction direction;
     private String units;
     private String calibrationString;
+
+    public boolean getDisplayRate() {
+        return displayRate;
+    }
+
     private boolean displayRate;
 
     public float getOriginalZoom() {
@@ -70,14 +73,13 @@ public class Calibration {
 
     private boolean calibrated;
 
-    public Calibration(Context context, Caliper.Direction direction) {
-        this.context = context;
+    public Calibration(Caliper.Direction direction) {
         this.direction = direction;
         reset();
     }
 
-    public Calibration(Context context) {
-        this(context, Caliper.Direction.HORIZONTAL);
+    public Calibration() {
+        this(Caliper.Direction.HORIZONTAL);
     }
 
     private void reset() {
@@ -95,12 +97,12 @@ public class Calibration {
     public String getUnits() {
         if (calibrated) {
             if (displayRate) {
-                return context.getString(R.string.bpm);
+                return "bpm";
             } else {
                 return units;
             }
         } else {
-            return context.getString(R.string.points);
+            return "points";
         }
     }
 
