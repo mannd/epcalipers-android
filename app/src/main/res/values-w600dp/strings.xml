@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_caliper_button_title">Add Caliper</string>
+    <string name="calibrate_button_title">Calibrate</string>
+
+</resources>
