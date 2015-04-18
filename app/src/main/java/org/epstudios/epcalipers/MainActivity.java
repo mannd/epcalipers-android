@@ -1,7 +1,11 @@
 package org.epstudios.epcalipers;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -13,12 +17,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
+import android.widget.ActionMenuView;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import com.ortiz.touch.TouchImageView;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements View.OnClickListener {
     static final String EPS = "EPS";
     private TouchImageView imageView;
     private CaliperView caliperView;
@@ -29,6 +37,9 @@ public class MainActivity extends ActionBarActivity {
     // Buttons
     Button addCaliperButton;
     Button calibrateButton;
+    Button intervalRateButton;
+    Button meanRateButton;
+    Button qtcButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,34 +71,55 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    @Override
+    public void onClick(View v) {
+        if (v == addCaliperButton) {
+            selectCaliperMenu();
+        }
+        else if (v == calibrateButton) {
+            calibrate();;
+        }
+    }
+
     private void createButtons() {
         addCaliperButton = new Button(this);
         createButton(addCaliperButton, getString(R.string.add_caliper_button_title));
-        addCaliperButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectCaliperMenu();
-            }
-        });
         calibrateButton = new Button(this);
         createButton(calibrateButton, getString(R.string.calibrate_button_title));
-        calibrateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calibrate();
-            }
-        });
-
+        intervalRateButton = new Button(this);
+        createButton(intervalRateButton, "I/R");
+        meanRateButton = new Button(this);
+        createButton(meanRateButton, "mRR");
+        qtcButton = new Button(this);
+        createButton(qtcButton, "QTc");
     }
 
     private void createButton(Button button, String text) {
+        button.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
         button.setText(text);
-        button.setTextColor(Color.WHITE);
+        //button.setTextColor(Color.WHITE);
+
+
+        //button.setTextColor(Color.WHITE);
     }
 
     private void createMainToolbar() {
-        menuToolbar.addView(addCaliperButton);
-        menuToolbar.addView(calibrateButton);
+        HorizontalScrollView scrollView = new HorizontalScrollView(this);
+        HorizontalScrollView.LayoutParams layoutParams = new HorizontalScrollView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        scrollView.setLayoutParams(layoutParams);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.setLayoutParams(layoutParams);
+        layout.addView(addCaliperButton);
+        layout.addView(calibrateButton);
+        layout.addView(intervalRateButton);
+        layout.addView(meanRateButton);
+        layout.addView(qtcButton);
+        scrollView.addView(layout);
+        menuToolbar.addView(scrollView);
+
     }
 
     private void selectCaliperMenu() {
