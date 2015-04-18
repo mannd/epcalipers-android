@@ -10,6 +10,9 @@ import android.graphics.Typeface;
 import android.util.Log;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.Format;
+import java.util.Locale;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -100,6 +103,8 @@ public class Caliper {
     private int lineWidth;
     private int valueInPoints;
     private boolean selected;
+    private DecimalFormat decimalFormat;
+    private Paint paint;
 
     public Calibration getCalibration() {
         return calibration;
@@ -123,6 +128,18 @@ public class Caliper {
         this.color = Color.BLUE;
         this.lineWidth = 2;
         this.selected = false;
+        // below uses default local decimal separator
+        decimalFormat = new DecimalFormat("@@@##");
+        paint = new Paint();
+        paint.setColor(color);
+        paint.setStrokeWidth(lineWidth);
+        paint.setAntiAlias(true);
+        paint.setTypeface(Typeface.DEFAULT);
+        paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
+                Paint.Align.LEFT);
+
+        paint.setTextSize(32.0f);
+        // paint.setTextScaleX(0.8f);
     }
 
     public Caliper() {
@@ -150,9 +167,6 @@ public class Caliper {
     }
 
     public void draw(Canvas canvas) {
-        Paint paint = new Paint();
-        paint.setColor(color);
-        paint.setStrokeWidth(lineWidth);
         if (direction == Direction.HORIZONTAL) {
             crossBarPosition = Math.min(crossBarPosition, canvas.getHeight() - DELTA);
             crossBarPosition = Math.max(crossBarPosition, DELTA);
@@ -172,13 +186,6 @@ public class Caliper {
             canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
         }
         String text = measurement();
-        paint.setAntiAlias(true);
-        paint.setTypeface(Typeface.DEFAULT);
-        paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
-                Paint.Align.LEFT);
-
-        paint.setTextSize(32.0f);
-       // paint.setTextScaleX(0.8f);
         if (direction == Direction.HORIZONTAL) {
             canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
                     crossBarPosition - 20, paint);
@@ -194,15 +201,13 @@ public class Caliper {
         return (direction == Direction.HORIZONTAL ? p.x : p.y);
     }
 
-    public Rect containerRect() {
-        // TODO
-        return new Rect();
-    }
+//    public Rect containerRect() {
+//        // TODO
+//        return new Rect();
+//    }
 
     public String measurement() {
-        String pattern = "%.4g";
-        DecimalFormat formatter = new DecimalFormat(pattern);
-        String result = formatter.format(calibratedResult());
+        String result = decimalFormat.format(calibratedResult());
         result += " " + calibration.getUnits();
         return result;
     }
@@ -253,5 +258,32 @@ public class Caliper {
         else {
             return 1000 * interval;
         }
+    }
+
+    public boolean pointNearBar(Point p, int barPosition) {
+        return barCoord(p) > barPosition - DELTA && barCoord(p) < barPosition + DELTA;
+    }
+
+    public boolean pointNearCrossBar(Point p) {
+        boolean nearBar = false;
+        int delta = DELTA + 5;  // cross bar delta a little bigger
+        if (direction == Direction.HORIZONTAL) {
+            nearBar = (p.x > Math.min(bar1Position, bar2Position) + delta
+                    && p.x < Math.max(bar2Position, bar1Position) - delta
+                    && p.y > crossBarPosition - delta
+                    && p.y < crossBarPosition + delta);
+        } else {
+            nearBar = (p.y > Math.min(bar1Position, bar2Position) + delta
+                    && p.y < Math.max(bar2Position, bar1Position) - delta
+                    && p.x > crossBarPosition - delta
+                    && p.x < crossBarPosition + delta);
+        }
+        return nearBar;
+    }
+
+    public boolean pointNearCaliper(Point p) {
+        return pointNearCrossBar(p)
+                || pointNearBar(p, bar1Position)
+                || pointNearBar(p, bar2Position);
     }
 }
