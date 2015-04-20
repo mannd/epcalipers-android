@@ -23,7 +23,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testCanDisplayRate() {
         Context context = new Activity();
-        Calibration cal = new Calibration(context);
+        Calibration cal = new Calibration();
         cal.setCalibrated(true);
         cal.setUnits("msec");
         assertTrue(cal.canDisplayRate());
@@ -48,7 +48,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void testCurrentHorizontalCalFactor() {
         Context context = new Activity();
-        Calibration cal = new Calibration(context);
+        Calibration cal = new Calibration();
         cal.setOriginalZoom(1.0f);
         cal.setOriginalCalFactor(0.5f);
         cal.setCurrentZoom(1.0f);
