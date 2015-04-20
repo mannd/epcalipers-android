@@ -19,11 +19,13 @@ import android.widget.LinearLayout;
 
 import com.ortiz.touch.TouchImageView;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
     static final String EPS = "EPS";
     private TouchImageView imageView;
-    private CalipersView caliperView;
+    private CalipersView calipersView;
     private Toolbar menuToolbar;
     private Toolbar actionBar;
     private boolean calipersMode;
@@ -34,6 +36,41 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     Button intervalRateButton;
     Button meanRateButton;
     Button qtcButton;
+    Button cameraButton;
+    Button selectImageButton;
+    Button adjustImageButton;
+    Button rotateImageRightButton;
+    Button rotateImageLeftButton;
+    Button tweakRightButton;
+    Button tweakLeftButton;
+    Button flipImageButton;
+    Button resetImageButton;
+    Button backToImageMenuButton;
+    Button horizontalCaliperButton;
+    Button verticalCaliperButton;
+    Button cancelButton;
+    Button setCalibrationButton;
+    Button clearCalibrationButton;
+    Button measureRRButton;
+    Button measureQTButton;
+
+    Calibration horizontalCalibration;
+    Calibration verticalCalibration;
+    // Settings settings;
+
+    double rrIntervalForQTc;
+    boolean isFirstRun;
+
+    float sizeDiffWidth;
+    float sizeDiffHeight;
+
+    float lastZoomFactor;
+    boolean isRotatedImage;
+
+    float portraitWidth;
+    float portraitHeight;
+    float landscapeWidth;
+    float landscapeHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +78,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         imageView = (TouchImageView) findViewById(R.id.imageView);
-        caliperView = (CalipersView) findViewById(R.id.caliperView);
+        calipersView = (CalipersView) findViewById(R.id.caliperView);
 
 
         actionBar = (Toolbar)findViewById(R.id.action_bar);
@@ -166,7 +203,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void setMode() {
         imageView.setEnabled(!calipersMode);
-        caliperView.setEnabled(calipersMode);
+        calipersView.setEnabled(calipersMode);
         actionBar.setTitle(calipersMode ? getString(R.string.ep_calipers_title) : getString(R.string.image_mode_title));
     }
 
@@ -178,6 +215,80 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         rotateAnimation.setFillAfter(true);
         imageView.startAnimation(rotateAnimation);
     }
+
+    private void showHelp() {
+        // TODO load help activity
+    }
+
+    private void toggleIntervalRate() {
+        horizontalCalibration.setDisplayRate(!horizontalCalibration.getDisplayRate());
+        // TODO force redisplay
+    }
+
+    private void meanRR() {
+        if (calipersCount() < 1) {
+            showNoCalipersAlert();
+            // select main toolbar;
+            return;
+        }
+        Caliper singleHorizontalCaliper = getLoneTimeCaliper();
+    }
+
+    private int calipersCount() {
+        return calipersView.calipersCount();
+    }
+
+    private ArrayList<Caliper> getCalipers() {
+        return calipersView.getCalipers();
+    }
+
+    private void showNoCalipersAlert() {
+        // TODO
+    }
+
+    private Caliper getLoneTimeCaliper() {
+        Caliper c = null;
+        int n = 0;
+        if (calipersCount() > 0) {
+            for (Caliper caliper : getCalipers()) {
+                if (caliper.getDirection() == Caliper.Direction.HORIZONTAL) {
+                    c = caliper;
+                    n++;
+                }
+            }
+        }
+        return (n == 1) ? c : null;
+    }
+
+    private void unselectCalipersExcept(Caliper c) {
+        // if only one caliper, no others can be selected
+        if (calipersCount() > 1) {
+            for (Caliper caliper : getCalipers()) {
+                if (caliper != c) {
+                    calipersView.unselectCaliper(c);
+                }
+            }
+        }
+    }
+
+    private void addCaliperWithDirection(Caliper.Direction direction) {
+        Caliper c = new Caliper();
+        // TODO set up calper per settings
+        // c.linewidth = settings.linewidht;
+        // etc.
+        c.setDirection(direction);
+        if (direction == Caliper.Direction.HORIZONTAL) {
+            c.setCalibration(horizontalCalibration);
+        }
+        else {
+            c.setCalibration(verticalCalibration);
+        }
+        // c.setInitialPosition(caliperView bounds);
+        // TODO force redisplay
+        // back to main toolbar
+    }
+
+
 }
 
 

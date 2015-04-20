@@ -31,7 +31,24 @@ import java.util.ArrayList;
  */
 public class CalipersView extends View {
 
+    public ArrayList<Caliper> getCalipers() {
+        return calipers;
+    }
+
+    public void setCalipers(ArrayList<Caliper> calipers) {
+        this.calipers = calipers;
+    }
+
     private ArrayList<Caliper> calipers;
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
     boolean locked;
 
 
@@ -73,13 +90,13 @@ public class CalipersView extends View {
         }
     }
 
-    private void selectCaliper(Caliper c) {
+    public void selectCaliper(Caliper c) {
         c.setColor(c.getSelectedColor());
         c.setSelected(true);
         // TODO force redisplay
     }
 
-    private void unselectCaliper(Caliper c) {
+    public void unselectCaliper(Caliper c) {
         c.setColor(c.getUnselectedColor());
         c.setSelected(false);
         // TODO force redisplay
@@ -112,6 +129,18 @@ public class CalipersView extends View {
             }
         }
         return c;
+    }
+
+    public int calipersCount() {
+        return calipers.size();
+    }
+
+    public void addCaliper(Caliper c) {
+        calipers.add(c);
+    }
+
+    public void removeCaliper(Caliper c) {
+        calipers.remove(c);
     }
 
     // TODO private void singleTap(), dragging(),
