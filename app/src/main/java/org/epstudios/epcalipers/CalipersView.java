@@ -29,34 +29,34 @@ import java.util.ArrayList;
  * You should have received a copy of the GNU General Public License
  * along with org.epstudios.epcalipers.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class CaliperView extends View {
+public class CalipersView extends View {
 
     private ArrayList<Caliper> calipers;
     boolean locked;
 
 
-    public CaliperView(Context context) {
+    public CalipersView(Context context) {
         super(context);
         init();
 
     }
 
-    public CaliperView(Context context, AttributeSet attrs) {
+    public CalipersView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public CaliperView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CalipersView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
 
     private void init() {
         locked = false;
-        calipers = new ArrayList<>();
+        calipers = new ArrayList<Caliper>();
         Caliper c = new Caliper();
         c.setBar1Position(300);
-        c.setBar2Position(800);
+        c.setBar2Position(600);
         c.setCrossBarPosition(400);
         Calibration calibration = new Calibration();
         c.setCalibration(calibration);
@@ -72,4 +72,49 @@ public class CaliperView extends View {
             c.draw(canvas);
         }
     }
+
+    private void selectCaliper(Caliper c) {
+        c.setColor(c.getSelectedColor());
+        c.setSelected(true);
+        // TODO force redisplay
+    }
+
+    private void unselectCaliper(Caliper c) {
+        c.setColor(c.getUnselectedColor());
+        c.setSelected(false);
+        // TODO force redisplay
+    }
+
+    private void selectCaliperIfNoneSelected() {
+        if (calipers.size() > 0 && noCaliperIsSelected()) {
+            selectCaliper(calipers.get(calipers.size() - 1));
+        }
+    }
+
+    private boolean noCaliperIsSelected() {
+        boolean noneSelected = true;
+        for (int i = calipers.size() - 1; i >= 0; i--) {
+            if (calipers.get(i).isSelected()) {
+                noneSelected = false;
+            }
+        }
+        return noneSelected;
+    }
+
+    private Caliper activeCaliper() {
+        if (calipers.size() <= 0) {
+            return null;
+        }
+        Caliper c = null;
+        for (int i = calipers.size() - 1; i >= 0; i--) {
+            if (calipers.get(i).isSelected()) {
+                c = calipers.get(i);
+            }
+        }
+        return c;
+    }
+
+    // TODO private void singleTap(), dragging(),
+
+
 }

@@ -33,7 +33,7 @@
         android:src="@drawable/normal_12_lead_ecg"
         android:scaleType="center"/>
 
-    <org.epstudios.epcalipers.CaliperView
+    <org.epstudios.epcalipers.CalipersView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/caliperView" />
@@ -50,7 +50,8 @@
         android:layout_height="wrap_content"
         android:elevation="4dp"
         android:background="@color/primary"
-
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         tools:ignore="UnusedAttribute" />
 
 
@@ -59,5 +60,3 @@
 </RelativeLayout>
 
 
-    <!--app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"-->
-    <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light"-->

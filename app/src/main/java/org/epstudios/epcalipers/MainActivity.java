@@ -1,11 +1,7 @@
 package org.epstudios.epcalipers;
 
-import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -17,11 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
-import android.widget.ActionMenuView;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import com.ortiz.touch.TouchImageView;
 
@@ -29,7 +23,7 @@ import com.ortiz.touch.TouchImageView;
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
     static final String EPS = "EPS";
     private TouchImageView imageView;
-    private CaliperView caliperView;
+    private CalipersView caliperView;
     private Toolbar menuToolbar;
     private Toolbar actionBar;
     private boolean calipersMode;
@@ -47,7 +41,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         imageView = (TouchImageView) findViewById(R.id.imageView);
-        caliperView = (CaliperView) findViewById(R.id.caliperView);
+        caliperView = (CalipersView) findViewById(R.id.caliperView);
 
 
         actionBar = (Toolbar)findViewById(R.id.action_bar);
@@ -98,10 +92,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         button.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         button.setText(text);
-        //button.setTextColor(Color.WHITE);
 
+        // buttons won't flash, but will behave similarly to iOS buttons,
+        // alternative is ugly colors.
+        button.setTextColor(Color.WHITE);
+        button.setBackgroundColor(getResources().getColor(R.color.primary));
 
-        //button.setTextColor(Color.WHITE);
     }
 
     private void createMainToolbar() {

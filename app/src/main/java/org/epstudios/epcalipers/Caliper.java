@@ -97,8 +97,35 @@ public class Caliper {
     private int bar2Position;
     private int crossBarPosition;
     private Direction direction;
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
     private int color;
+
+    public int getUnselectedColor() {
+        return unselectedColor;
+    }
+
+    public void setUnselectedColor(int unselectedColor) {
+        this.unselectedColor = unselectedColor;
+    }
+
     private int unselectedColor;
+
+    public int getSelectedColor() {
+        return selectedColor;
+    }
+
+    public void setSelectedColor(int selectedColor) {
+        this.selectedColor = selectedColor;
+    }
+
     private int selectedColor;
     private int lineWidth;
     private int valueInPoints;
