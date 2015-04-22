@@ -80,6 +80,8 @@ public class CalipersView extends View {
         calipers.add(c);
     }
 
+
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -144,6 +146,8 @@ public class CalipersView extends View {
     }
 
     // TODO private void singleTap(), dragging(),
+
+
 
 
 }

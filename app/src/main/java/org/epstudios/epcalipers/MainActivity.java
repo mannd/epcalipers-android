@@ -80,7 +80,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         imageView = (TouchImageView) findViewById(R.id.imageView);
         calipersView = (CalipersView) findViewById(R.id.caliperView);
 
-
         actionBar = (Toolbar)findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
 
@@ -192,6 +191,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             toggleMode();
             return true;
         }
+        if (id == R.id.help) {
+            showHelp();
+            return true;
+        }
+        if (id == R.id.about) {
+            about();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -218,6 +225,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void showHelp() {
         // TODO load help activity
+    }
+
+    private void about() {
+        // TODO
     }
 
     private void toggleIntervalRate() {
