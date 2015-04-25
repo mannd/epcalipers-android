@@ -56,6 +56,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     Button cancelAddCaliperButton;
     Button setCalibrationButton;
     Button clearCalibrationButton;
+    Button doneCalibrationButton;
     Button measureRRButton;
     Button measureQTButton;
 
@@ -63,6 +64,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     HorizontalScrollView imageMenu;
     HorizontalScrollView addCaliperMenu;
     HorizontalScrollView adjustImageMenu;
+    HorizontalScrollView calibrationMenu;
 
     Calibration horizontalCalibration;
     Calibration verticalCalibration;
@@ -104,7 +106,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Log.d(EPS, "width = " + width + " height = " + height);
 
         createButtons();
-        createMenus();
 
         calipersMode = true;
         setMode();
@@ -118,9 +119,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (v == addCaliperButton) {
             selectAddCaliperMenu();
         }
-        else if (v == calibrateButton) {
-            calibrate();
-        }
         else if (v == cancelAddCaliperButton) {
             selectMainMenu();
         }
@@ -129,6 +127,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         else if (v == backToImageMenuButton) {
             selectImageMenu();
+        }
+        else if (v == calibrateButton) {
+            selectCalibrationMenu();
+        }
+        else if (v == doneCalibrationButton) {
+            selectMainMenu();
         }
     }
 
@@ -158,6 +162,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         flipImageButton = createButton(getString(R.string.flip_image_button_title));
         resetImageButton = createButton(getString(R.string.reset_image_button_title));
         backToImageMenuButton = createButton(getString(R.string.done_button_title));
+        // Calibration menu
+        setCalibrationButton = createButton(getString(R.string.set_calibration_button_title));
+        clearCalibrationButton = createButton(getString(R.string.clear_calibration_button_title));
+        doneCalibrationButton = createButton(getString(R.string.done_button_title));
 
     }
 
@@ -211,30 +219,49 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         buttons.add(resetImageButton);
         buttons.add(backToImageMenuButton);
         adjustImageMenu = createMenu(buttons);
-
     }
 
-    private void createMenus() {
-        createMainMenu();
-        createImageMenu();
-        createAddCaliperMenu();
-        createAdjustImageMenu();
+    private void createCalibrationMenu() {
+        ArrayList<Button> buttons = new ArrayList<Button>();
+        buttons.add(setCalibrationButton);
+        buttons.add(clearCalibrationButton);
+        buttons.add(doneCalibrationButton);
+        calibrationMenu = createMenu(buttons);
     }
 
     private void selectMainMenu() {
+        if (mainMenu == null) {
+            createMainMenu();
+        }
         selectMenu(mainMenu);
     }
 
     private void selectImageMenu() {
+        if (imageMenu == null) {
+            createImageMenu();
+        }
         selectMenu(imageMenu);
     }
 
     private void selectAddCaliperMenu() {
+        if (addCaliperMenu == null) {
+            createAddCaliperMenu();
+        }
         selectMenu(addCaliperMenu);
     }
 
     private void selectAdjustImageMenu() {
+        if (adjustImageMenu == null) {
+            createAdjustImageMenu();
+        }
         selectMenu(adjustImageMenu);
+    }
+
+    private void selectCalibrationMenu() {
+        if (calibrationMenu == null) {
+            createCalibrationMenu();
+        }
+        selectMenu(calibrationMenu);
     }
 
     private void selectMenu(HorizontalScrollView menu) {
@@ -261,11 +288,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // remove all buttons
         menuToolbar.removeAllViews();
     }
-
-    private void calibrate() {
-
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
