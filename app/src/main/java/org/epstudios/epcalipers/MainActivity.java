@@ -54,6 +54,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     Button measureRRButton;
     Button measureQTButton;
 
+    HorizontalScrollView mainMenu;
+    HorizontalScrollView imageMenu;
+    HorizontalScrollView addCaliperMenu;
+
     Calibration horizontalCalibration;
     Calibration verticalCalibration;
     // Settings settings;
@@ -93,38 +97,46 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         Log.d(EPS, "width = " + width + " height = " + height);
 
+        createButtons();
+        createMenus();
+
         calipersMode = true;
         setMode();
-
-        createButtons();
-        createMainToolbar();
 
     }
 
     @Override
     public void onClick(View v) {
         if (v == addCaliperButton) {
-            selectCaliperMenu();
+            selectAddCaliperMenu();
         }
         else if (v == calibrateButton) {
-            calibrate();;
+            calibrate();
+        }
+        // TODO need multiple cancel buttons
+        else if (v == cancelButton) {
+            selectMainMenu();
         }
     }
 
     private void createButtons() {
-        addCaliperButton = new Button(this);
-        createButton(addCaliperButton, getString(R.string.add_caliper_button_title));
-        calibrateButton = new Button(this);
-        createButton(calibrateButton, getString(R.string.calibrate_button_title));
-        intervalRateButton = new Button(this);
-        createButton(intervalRateButton, "I/R");
-        meanRateButton = new Button(this);
-        createButton(meanRateButton, "mRR");
-        qtcButton = new Button(this);
-        createButton(qtcButton, "QTc");
+        // Main/Caliper menu
+        addCaliperButton = createButton(getString(R.string.add_caliper_button_title));
+        calibrateButton = createButton(getString(R.string.calibrate_button_title));
+        intervalRateButton = createButton(getString(R.string.interval_rate_button_title));
+        meanRateButton = createButton(getString(R.string.mean_rate_button_title));
+        qtcButton = createButton(getString(R.string.qtc_button_title));
+        // Image menu
+        cameraButton = createButton(getString(R.string.camera_button_title));
+        selectImageButton = createButton(getString(R.string.select_image_button_title));
+        adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
+        horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
+        verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
+        cancelButton = createButton(getString(R.string.cancel_button_title));
     }
 
-    private void createButton(Button button, String text) {
+    private Button createButton(String text) {
+        Button button = new Button(this);
         button.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         button.setText(text);
@@ -133,10 +145,58 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // alternative is ugly colors.
         button.setTextColor(Color.WHITE);
         button.setBackgroundColor(getResources().getColor(R.color.primary));
-
+        return button;
     }
 
-    private void createMainToolbar() {
+    private void createMainMenu() {
+        ArrayList<Button> buttons = new ArrayList<Button>();
+        buttons.add(addCaliperButton);
+        buttons.add(calibrateButton);
+        buttons.add(intervalRateButton);
+        buttons.add(meanRateButton);
+        buttons.add(qtcButton);
+        mainMenu = createMenu(buttons);
+    }
+
+    private void createImageMenu() {
+        ArrayList<Button> buttons = new ArrayList<Button>();
+        buttons.add(cameraButton);
+        buttons.add(selectImageButton);
+        buttons.add(adjustImageButton);
+        imageMenu = createMenu(buttons);
+    }
+
+    private void createAddCaliperMenu() {
+        ArrayList<Button> buttons = new ArrayList<Button>();
+        buttons.add(horizontalCaliperButton);
+        buttons.add(verticalCaliperButton);
+        buttons.add(cancelButton);
+        addCaliperMenu = createMenu(buttons);
+    }
+
+    private void createMenus() {
+        createMainMenu();
+        createImageMenu();
+    }
+
+    private void selectMainMenu() {
+        selectMenu(mainMenu);
+    }
+
+    private void selectImageMenu() {
+        selectMenu(imageMenu);
+    }
+
+    private void selectAddCaliperMenu() {
+        selectMenu(addCaliperMenu);
+    }
+
+    private void selectMenu(HorizontalScrollView menu) {
+        clearToolbar();
+        menuToolbar.addView(menu);
+    }
+
+    private HorizontalScrollView createMenu(ArrayList<Button> buttons) {
         HorizontalScrollView scrollView = new HorizontalScrollView(this);
         HorizontalScrollView.LayoutParams layoutParams = new HorizontalScrollView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -144,18 +204,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.HORIZONTAL);
         layout.setLayoutParams(layoutParams);
-        layout.addView(addCaliperButton);
-        layout.addView(calibrateButton);
-        layout.addView(intervalRateButton);
-        layout.addView(meanRateButton);
-        layout.addView(qtcButton);
+        for (Button button : buttons) {
+            layout.addView(button);
+        }
         scrollView.addView(layout);
-        menuToolbar.addView(scrollView);
-
-    }
-
-    private void selectCaliperMenu() {
-        clearToolbar();
+        return scrollView;
     }
 
     private void clearToolbar() {
@@ -211,7 +264,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void setMode() {
         imageView.setEnabled(!calipersMode);
         calipersView.setEnabled(calipersMode);
-        actionBar.setTitle(calipersMode ? getString(R.string.ep_calipers_title) : getString(R.string.image_mode_title));
+        if (calipersMode) {
+            actionBar.setTitle(getString(R.string.ep_calipers_title));
+            selectMainMenu();
+        }
+        else {
+            actionBar.setTitle(getString(R.string.image_mode_title));
+            selectImageMenu();
+        }
     }
 
     private void changeSettings() {
