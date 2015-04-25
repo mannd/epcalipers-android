@@ -2,14 +2,17 @@ package org.epstudios.epcalipers;
 
 import android.graphics.Color;
 import android.graphics.Point;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
@@ -30,6 +33,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Toolbar actionBar;
     private boolean calipersMode;
 
+    private GestureDetectorCompat gestureDetector;
+
     // Buttons
     Button addCaliperButton;
     Button calibrateButton;
@@ -41,14 +46,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     Button adjustImageButton;
     Button rotateImageRightButton;
     Button rotateImageLeftButton;
-    Button tweakRightButton;
-    Button tweakLeftButton;
+    Button tweakImageRightButton;
+    Button tweakImageLeftButton;
     Button flipImageButton;
     Button resetImageButton;
     Button backToImageMenuButton;
     Button horizontalCaliperButton;
     Button verticalCaliperButton;
-    Button cancelButton;
+    Button cancelAddCaliperButton;
     Button setCalibrationButton;
     Button clearCalibrationButton;
     Button measureRRButton;
@@ -57,6 +62,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     HorizontalScrollView mainMenu;
     HorizontalScrollView imageMenu;
     HorizontalScrollView addCaliperMenu;
+    HorizontalScrollView adjustImageMenu;
 
     Calibration horizontalCalibration;
     Calibration verticalCalibration;
@@ -103,6 +109,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         calipersMode = true;
         setMode();
 
+        gestureDetector = new GestureDetectorCompat(this, new MyGestureListener());
+
     }
 
     @Override
@@ -113,9 +121,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         else if (v == calibrateButton) {
             calibrate();
         }
-        // TODO need multiple cancel buttons
-        else if (v == cancelButton) {
+        else if (v == cancelAddCaliperButton) {
             selectMainMenu();
+        }
+        else if (v == adjustImageButton) {
+            selectAdjustImageMenu();
+        }
+        else if (v == backToImageMenuButton) {
+            selectImageMenu();
         }
     }
 
@@ -132,7 +145,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
-        cancelButton = createButton(getString(R.string.cancel_button_title));
+        cancelAddCaliperButton = createButton(getString(R.string.cancel_button_title));
+        // Add Caliper menu
+        horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
+        verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
+        cancelAddCaliperButton = createButton(getString(R.string.cancel_button_title));
+        // Adjust Image menu
+        rotateImageRightButton = createButton(getString(R.string.rotate_image_right_button_title));
+        rotateImageLeftButton = createButton(getString(R.string.rotate_image_left_button_title));
+        tweakImageRightButton = createButton(getString(R.string.tweak_image_right_button_title));
+        tweakImageLeftButton = createButton(getString(R.string.tweak_image_left_button_title));
+        flipImageButton = createButton(getString(R.string.flip_image_button_title));
+        resetImageButton = createButton(getString(R.string.reset_image_button_title));
+        backToImageMenuButton = createButton(getString(R.string.done_button_title));
+
     }
 
     private Button createButton(String text) {
@@ -145,6 +171,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // alternative is ugly colors.
         button.setTextColor(Color.WHITE);
         button.setBackgroundColor(getResources().getColor(R.color.primary));
+        button.setOnClickListener(this);
         return button;
     }
 
@@ -170,13 +197,28 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         ArrayList<Button> buttons = new ArrayList<Button>();
         buttons.add(horizontalCaliperButton);
         buttons.add(verticalCaliperButton);
-        buttons.add(cancelButton);
+        buttons.add(cancelAddCaliperButton);
         addCaliperMenu = createMenu(buttons);
+    }
+
+    private void createAdjustImageMenu() {
+        ArrayList<Button> buttons = new ArrayList<Button>();
+        buttons.add(rotateImageLeftButton);
+        buttons.add(rotateImageRightButton);
+        buttons.add(tweakImageLeftButton);
+        buttons.add(tweakImageRightButton);
+        buttons.add(flipImageButton);
+        buttons.add(resetImageButton);
+        buttons.add(backToImageMenuButton);
+        adjustImageMenu = createMenu(buttons);
+
     }
 
     private void createMenus() {
         createMainMenu();
         createImageMenu();
+        createAddCaliperMenu();
+        createAdjustImageMenu();
     }
 
     private void selectMainMenu() {
@@ -189,6 +231,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void selectAddCaliperMenu() {
         selectMenu(addCaliperMenu);
+    }
+
+    private void selectAdjustImageMenu() {
+        selectMenu(adjustImageMenu);
     }
 
     private void selectMenu(HorizontalScrollView menu) {
@@ -358,6 +404,43 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // TODO force redisplay
         // back to main toolbar
     }
+
+    // Gestures
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        this.gestureDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            // must be implemented and return true;
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent event) {
+            Log.d(EPS, "onSingleTapUp: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent event) {
+            Log.d(EPS, "onSingleTapConfirmed: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+                                float distanceY) {
+            Log.d(EPS, "onScroll: " + e1.toString() + e2.toString());
+            return true;
+        }
+    }
+
+
 
 
 }

@@ -16,4 +16,12 @@
     <string name="horizontal_caliper_button_title">Time</string>
     <string name="vertical_caliper_button_title">Amplitude</string>
     <string name="cancel_button_title">Cancel</string>
+    <string name="rotate_image_right_button_title">90°R</string>
+    <string name="rotate_image_left_button_title">90°L</string>
+    <string name="tweak_image_right_button_title">1°R</string>
+    <string name="tweak_image_left_button_title">1°L</string>
+    <string name="flip_image_button_title">Flip</string>
+    <string name="reset_image_button_title">Reset</string>
+    <string name="done_button_title">Done</string>
+
 </resources>

@@ -3,7 +3,12 @@ package org.epstudios.epcalipers;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -148,6 +153,12 @@ public class CalipersView extends View {
     // TODO private void singleTap(), dragging(),
 
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int action = MotionEventCompat.getActionMasked(event);
 
 
+
+        return super.onTouchEvent(event);
+    }
 }
