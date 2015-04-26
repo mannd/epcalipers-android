@@ -35,6 +35,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private boolean calipersMode;
 
     private GestureDetectorCompat gestureDetector;
+    private View.OnTouchListener gestureListener;
 
     // Buttons
     Button addCaliperButton;
@@ -93,10 +94,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         imageView = (TouchImageView) findViewById(R.id.imageView);
         calipersView = (CalipersView) findViewById(R.id.caliperView);
 
-        actionBar = (Toolbar)findViewById(R.id.action_bar);
+        actionBar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
 
-        menuToolbar = (Toolbar)findViewById(R.id.menu_toolbar);
+        menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -112,29 +113,41 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setMode();
 
         gestureDetector = new GestureDetectorCompat(this, new MyGestureListener());
+        gestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                    return gestureDetector.onTouchEvent(event);
+            }
+        };
 
+        calipersView.setOnTouchListener(gestureListener);
     }
 
     @Override
     public void onClick(View v) {
         if (v == addCaliperButton) {
             selectAddCaliperMenu();
-        }
-        else if (v == cancelAddCaliperButton) {
+        } else if (v == cancelAddCaliperButton) {
             selectMainMenu();
-        }
-        else if (v == adjustImageButton) {
+        } else if (v == adjustImageButton) {
             selectAdjustImageMenu();
-        }
-        else if (v == backToImageMenuButton) {
+        } else if (v == backToImageMenuButton) {
+            selectImageMenu();
+        } else if (v == calibrateButton) {
+            selectCalibrationMenu();
+        } else if (v == doneCalibrationButton) {
+            selectMainMenu();
+        } else if (v == rotateImageLeftButton) {
+            rotateImage(-90.0f);
+        } else if (v == rotateImageRightButton) {
+            rotateImage(90.0f);
+        } else if (v == tweakImageLeftButton) {
+            rotateImage(-1.0f);
+        } else if (v == tweakImageRightButton) {
+            rotateImage(1.0f);
+        } else if (v == backToImageMenuButton) {
             selectImageMenu();
         }
-        else if (v == calibrateButton) {
-            selectCalibrationMenu();
-        }
-        else if (v == doneCalibrationButton) {
-            selectMainMenu();
-        }
+
     }
 
     private void createButtons() {
@@ -328,7 +341,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void toggleMode() {
         calipersMode = !calipersMode;
         setMode();
-   }
+    }
 
     private void setMode() {
         imageView.setEnabled(!calipersMode);
@@ -336,16 +349,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (calipersMode) {
             actionBar.setTitle(getString(R.string.ep_calipers_title));
             selectMainMenu();
-        }
-        else {
+        } else {
             actionBar.setTitle(getString(R.string.image_mode_title));
             selectImageMenu();
         }
     }
 
     private void changeSettings() {
-        // test rotation
-        RotateAnimation rotateAnimation = new RotateAnimation(0.0f, 90.0f, RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+      // TODO
+    }
+
+    private void rotateImage(float degrees) {
+        RotateAnimation rotateAnimation = new RotateAnimation(0.0f, degrees,
+                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
                 RotateAnimation.RELATIVE_TO_SELF, 0.5f);
         rotateAnimation.setDuration(500L);
         rotateAnimation.setFillAfter(true);
@@ -413,14 +429,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void addCaliperWithDirection(Caliper.Direction direction) {
         Caliper c = new Caliper();
-        // TODO set up calper per settings
+        // TODO set up caliper per settings
         // c.linewidth = settings.linewidht;
         // etc.
         c.setDirection(direction);
         if (direction == Caliper.Direction.HORIZONTAL) {
             c.setCalibration(horizontalCalibration);
-        }
-        else {
+        } else {
             c.setCalibration(verticalCalibration);
         }
         // c.setInitialPosition(caliperView bounds);
@@ -429,17 +444,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     // Gestures
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        this.gestureDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
+
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
         public boolean onDown(MotionEvent event) {
             // must be implemented and return true;
+            Log.d(EPS, "onDown: " + event.toString());
             return true;
         }
 
@@ -462,10 +474,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             return true;
         }
     }
-
-
-
-
 }
+
 
 

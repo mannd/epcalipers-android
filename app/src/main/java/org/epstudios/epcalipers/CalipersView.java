@@ -152,13 +152,4 @@ public class CalipersView extends View {
 
     // TODO private void singleTap(), dragging(),
 
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int action = MotionEventCompat.getActionMasked(event);
-
-
-
-        return super.onTouchEvent(event);
-    }
 }
