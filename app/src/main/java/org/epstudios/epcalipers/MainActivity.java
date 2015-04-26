@@ -1,5 +1,6 @@
 package org.epstudios.epcalipers;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.support.v4.view.GestureDetectorCompat;
@@ -352,11 +353,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void showHelp() {
-        // TODO load help activity
+        startActivity(new Intent(this, Help.class));
     }
 
     private void about() {
-        // TODO
+        startActivity(new Intent(this, About.class));
     }
 
     private void toggleIntervalRate() {

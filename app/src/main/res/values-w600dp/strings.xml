@@ -4,4 +4,6 @@
     <string name="calibrate_button_title">Calibrate</string>
     <string name="interval_rate_button_title">Interval/Rate</string>
     <string name="mean_rate_button_title">MeanRR</string>
+    <string name="switch_mode_title">Switch Mode</string>
+
 </resources>
