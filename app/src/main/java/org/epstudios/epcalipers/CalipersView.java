@@ -3,6 +3,7 @@ package org.epstudios.epcalipers;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
@@ -100,13 +101,13 @@ public class CalipersView extends View {
     public void selectCaliper(Caliper c) {
         c.setColor(c.getSelectedColor());
         c.setSelected(true);
-        // TODO force redisplay
+        invalidate();
     }
 
     public void unselectCaliper(Caliper c) {
         c.setColor(c.getUnselectedColor());
         c.setSelected(false);
-        // TODO force redisplay
+        invalidate();
     }
 
     private void selectCaliperIfNoneSelected() {
@@ -151,5 +152,38 @@ public class CalipersView extends View {
     }
 
     // TODO private void singleTap(), dragging(),
+    public void singleTap(PointF pointF) {
+        boolean selectionMade = false;
+        for (int i = calipersCount() - 1; i >= 0; i--) {
+            if (calipers.get(i).pointNearCaliper(pointF)
+                    && !selectionMade) {
+                if (calipers.get(i).isSelected() &&
+                        !isLocked()) {
+                    calipers.remove(i);
+                    invalidate();
+                    return;
+                } else {
+                    selectCaliper(calipers.get(i));
+                    selectionMade = true;
+                }
+            }
+            else {
+                unselectCaliper(calipers.get(i));
+            }
+        }
+    }
 
+    // Need a separate procedure for doubleTap, unlike in iOS,
+    // since two fast taps won't count as two singleTaps.
+    public void doubleTap(PointF pointF) {
+        for (int i = calipersCount() - 1; i >= 0; i--) {
+            if (calipers.get(i).pointNearCaliper(pointF)) {
+                if (!isLocked()) {
+                    calipers.remove(i);
+                    invalidate();
+                    return;
+                }
+            }
+        }
+    }
 }

@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.util.Log;
@@ -37,29 +38,29 @@ import java.util.Locale;
  */
 public class Caliper {
     static int differential = 0;
-    static final int DELTA = 0;
+    static final float DELTA = 20.0f;
 
-    public int getBar1Position() {
+    public float getBar1Position() {
         return bar1Position;
     }
 
-    public void setBar1Position(int bar1Position) {
+    public void setBar1Position(float bar1Position) {
         this.bar1Position = bar1Position;
     }
 
-    public int getBar2Position() {
+    public float getBar2Position() {
         return bar2Position;
     }
 
-    public void setBar2Position(int bar2Position) {
+    public void setBar2Position(float bar2Position) {
         this.bar2Position = bar2Position;
     }
 
-    public int getCrossBarPosition() {
+    public float getCrossBarPosition() {
         return crossBarPosition;
     }
 
-    public void setCrossBarPosition(int crossBarPosition) {
+    public void setCrossBarPosition(float crossBarPosition) {
         this.crossBarPosition = crossBarPosition;
     }
 
@@ -71,11 +72,11 @@ public class Caliper {
         this.direction = direction;
     }
 
-    public int getLineWidth() {
+    public float getLineWidth() {
         return lineWidth;
     }
 
-    public void setLineWidth(int lineWidth) {
+    public void setLineWidth(float lineWidth) {
         this.lineWidth = lineWidth;
     }
 
@@ -93,9 +94,9 @@ public class Caliper {
 
     public enum Direction { HORIZONTAL, VERTICAL };
 
-    private int bar1Position;
-    private int bar2Position;
-    private int crossBarPosition;
+    private float bar1Position;
+    private float bar2Position;
+    private float crossBarPosition;
     private Direction direction;
 
     public int getColor() {
@@ -127,7 +128,7 @@ public class Caliper {
     }
 
     private int selectedColor;
-    private int lineWidth;
+    private float lineWidth;
     private int valueInPoints;
     private boolean selected;
     private DecimalFormat decimalFormat;
@@ -153,7 +154,7 @@ public class Caliper {
         this.unselectedColor = Color.BLUE;
         this.selectedColor = Color.RED;
         this.color = Color.BLUE;
-        this.lineWidth = 2;
+        this.lineWidth = 2.0f;
         this.selected = false;
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
@@ -194,6 +195,8 @@ public class Caliper {
     }
 
     public void draw(Canvas canvas) {
+        paint.setColor(getColor());
+        paint.setStrokeWidth(lineWidth);
         if (direction == Direction.HORIZONTAL) {
             crossBarPosition = Math.min(crossBarPosition, canvas.getHeight() - DELTA);
             crossBarPosition = Math.max(crossBarPosition, DELTA);
@@ -224,7 +227,7 @@ public class Caliper {
 
     }
 
-    public int barCoord(Point p) {
+    public float barCoord(PointF p) {
         return (direction == Direction.HORIZONTAL ? p.x : p.y);
     }
 
@@ -253,7 +256,7 @@ public class Caliper {
         return points() * calibration.multiplier();
     }
 
-    private int points() {
+    private float points() {
         return bar2Position - bar1Position;
     }
 
@@ -287,13 +290,13 @@ public class Caliper {
         }
     }
 
-    public boolean pointNearBar(Point p, int barPosition) {
+    public boolean pointNearBar(PointF p, float barPosition) {
         return barCoord(p) > barPosition - DELTA && barCoord(p) < barPosition + DELTA;
     }
 
-    public boolean pointNearCrossBar(Point p) {
+    public boolean pointNearCrossBar(PointF p) {
         boolean nearBar = false;
-        int delta = DELTA + 5;  // cross bar delta a little bigger
+        float delta = DELTA + 5.0f;  // cross bar delta a little bigger
         if (direction == Direction.HORIZONTAL) {
             nearBar = (p.x > Math.min(bar1Position, bar2Position) + delta
                     && p.x < Math.max(bar2Position, bar1Position) - delta
@@ -308,7 +311,7 @@ public class Caliper {
         return nearBar;
     }
 
-    public boolean pointNearCaliper(Point p) {
+    public boolean pointNearCaliper(PointF p) {
         return pointNearCrossBar(p)
                 || pointNearBar(p, bar1Position)
                 || pointNearBar(p, bar2Position);

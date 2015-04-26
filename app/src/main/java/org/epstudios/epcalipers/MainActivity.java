@@ -3,6 +3,7 @@ package org.epstudios.epcalipers;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -458,12 +459,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         @Override
         public boolean onSingleTapUp(MotionEvent event) {
             Log.d(EPS, "onSingleTapUp: " + event.toString());
+            calipersView.singleTap(new PointF(event.getX(), event.getY()));
             return true;
         }
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent event) {
             Log.d(EPS, "onSingleTapConfirmed: " + event.toString());
+            return true;
+        }
+        
+        @Override
+        public boolean onDoubleTap(MotionEvent event) {
+            Log.d(EPS, "onDoubleTap: " + event.toString());
+            calipersView.doubleTap(new PointF(event.getX(), event.getY()));
             return true;
         }
 
