@@ -1,13 +1,9 @@
 package org.epstudios.epcalipers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PointF;
-import android.graphics.Rect;
-import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -40,6 +36,8 @@ import java.util.ArrayList;
 public class CalipersView extends View {
     private GestureDetectorCompat gestureDetector;
     private final static String EPS = "EPS";
+
+    private Caliper touchedCaliper;
 
     public ArrayList<Caliper> getCalipers() {
         return calipers;
@@ -81,8 +79,10 @@ public class CalipersView extends View {
     private void init(Context context) {
         locked = false;
         calipers = new ArrayList<Caliper>();
+        touchedCaliper = null;
         MyGestureListener listener = new MyGestureListener();
         gestureDetector = new GestureDetectorCompat(context, listener);
+        gestureDetector.setIsLongpressEnabled(false);
         View.OnTouchListener gestureListener = new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                     return gestureDetector.onTouchEvent(event);
@@ -99,26 +99,24 @@ public class CalipersView extends View {
         @Override
         public boolean onDown(MotionEvent event) {
             // must be implemented and return true;
-            Log.d(EPS, "onDown: " + event.toString());
+            setTouchedCaliper(event);
             return true;
         }
 
         @Override
         public boolean onSingleTapUp(MotionEvent event) {
-            Log.d(EPS, "onSingleTapUp: " + event.toString());
             singleTap(new PointF(event.getX(), event.getY()));
             return true;
         }
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent event) {
-            Log.d(EPS, "onSingleTapConfirmed: " + event.toString());
             return true;
         }
 
+
         @Override
         public boolean onDoubleTap(MotionEvent event) {
-            Log.d(EPS, "onDoubleTap: " + event.toString());
             doubleTap(new PointF(event.getX(), event.getY()));
             return true;
         }
@@ -126,10 +124,10 @@ public class CalipersView extends View {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                                 float distanceY) {
-            Log.d(EPS, "onScroll: " + e1.toString() + e2.toString());
             move(-distanceX, -distanceY);
             return true;
         }
+
     }
 
 
@@ -141,6 +139,30 @@ public class CalipersView extends View {
             return;
         for (Caliper c : calipers) {
             c.draw(canvas);
+        }
+    }
+
+    private void setTouchedCaliper(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+        touchedCaliper = null;
+        PointF p = new PointF(x, y);
+        for (int i = calipersCount() - 1; i >= 0; i--) {
+            if (calipers.get(i).pointNearCaliper(p) && touchedCaliper == null) {
+                touchedCaliper = calipers.get(i);
+                touchedCaliper.setCrossbarTouched(false);
+                touchedCaliper.setBar1Touched(false);
+                touchedCaliper.setBar2Touched(false);
+                if (touchedCaliper.pointNearCrossBar(p)) {
+                    touchedCaliper.setCrossbarTouched(true);
+                }
+                else if (touchedCaliper.pointNearBar(p, touchedCaliper.getBar1Position())) {
+                    touchedCaliper.setBar1Touched(true);
+                }
+                else if (touchedCaliper.pointNearBar(p, touchedCaliper.getBar2Position())) {
+                    touchedCaliper.setBar2Touched(true);
+                }
+            }
         }
     }
 
@@ -234,6 +256,25 @@ public class CalipersView extends View {
     }
 
     public void move(float distanceX, float distanceY) {
-
+        if (touchedCaliper == null) {
+            return;
+        }
+        if (touchedCaliper.getDirection() == Caliper.Direction.VERTICAL) {
+            float tmp = distanceX;
+            distanceX = distanceY;
+            distanceY = tmp;
+        }
+        if (touchedCaliper.isCrossbarTouched()) {
+            touchedCaliper.setBar1Position(touchedCaliper.getBar1Position() + distanceX);
+            touchedCaliper.setBar2Position(touchedCaliper.getBar2Position() + distanceX);
+            touchedCaliper.setCrossbarPosition(touchedCaliper.getCrossbarPosition() + distanceY);
+        }
+        else if (touchedCaliper.isBar1Touched()) {
+            touchedCaliper.setBar1Position(touchedCaliper.getBar1Position() + distanceX);
+        }
+        else if (touchedCaliper.isBar2Touched()) {
+            touchedCaliper.setBar2Position(touchedCaliper.getBar2Position() + distanceX);
+        }
+        invalidate();
     }
 }

@@ -62,19 +62,19 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         c.setInitialPosition(new Rect(0, 0, 600, 600));
         assertEquals(c.getBar1Position(), 200);
         assertEquals(c.getBar2Position(), 400);
-        assertEquals(c.getCrossBarPosition(), 300);
+        assertEquals(c.getCrossbarPosition(), 300);
         c.setInitialPosition(new Rect(0, 0, 600, 600));
         c.setDirection(Caliper.Direction.VERTICAL);
         assertEquals(c.getBar1Position(), 215);
         assertEquals(c.getBar2Position(), 415);
-        assertEquals(c.getCrossBarPosition(), 315);
+        assertEquals(c.getCrossbarPosition(), 315);
     }
 
     public void testBarCoord() {
         Caliper c = new Caliper();
         assertEquals(c.getBar1Position(), 0);
         assertEquals(c.getBar2Position(), 0);
-        assertEquals(c.getCrossBarPosition(), 100);
+        assertEquals(c.getCrossbarPosition(), 100);
         Point p = new Point(100, 50);
         assertEquals(c.barCoord(p), 100);
         c.setDirection(Caliper.Direction.VERTICAL);

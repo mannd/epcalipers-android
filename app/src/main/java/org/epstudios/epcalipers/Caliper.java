@@ -40,6 +40,35 @@ public class Caliper {
     static int differential = 0;
     static final float DELTA = 20.0f;
 
+    private boolean crossbarTouched;
+
+    public boolean isBar1Touched() {
+        return bar1Touched;
+    }
+
+    public void setBar1Touched(boolean bar1Touched) {
+        this.bar1Touched = bar1Touched;
+    }
+
+    public boolean isBar2Touched() {
+        return bar2Touched;
+    }
+
+    public void setBar2Touched(boolean bar2Touched) {
+        this.bar2Touched = bar2Touched;
+    }
+
+    public boolean isCrossbarTouched() {
+        return crossbarTouched;
+    }
+
+    public void setCrossbarTouched(boolean crossbarTouched) {
+        this.crossbarTouched = crossbarTouched;
+    }
+
+    private boolean bar1Touched;
+    private boolean bar2Touched;
+
     public float getBar1Position() {
         return bar1Position;
     }
@@ -56,11 +85,11 @@ public class Caliper {
         this.bar2Position = bar2Position;
     }
 
-    public float getCrossBarPosition() {
+    public float getCrossbarPosition() {
         return crossBarPosition;
     }
 
-    public void setCrossBarPosition(float crossBarPosition) {
+    public void setCrossbarPosition(float crossBarPosition) {
         this.crossBarPosition = crossBarPosition;
     }
 
@@ -156,6 +185,9 @@ public class Caliper {
         this.color = Color.BLUE;
         this.lineWidth = 2.0f;
         this.selected = false;
+        this.crossbarTouched = false;
+        this.bar1Touched = false;
+        this.bar2Touched = false;
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
@@ -231,19 +263,12 @@ public class Caliper {
         return (direction == Direction.HORIZONTAL ? p.x : p.y);
     }
 
-//    public Rect containerRect() {
-//        // TODO
-//        return new Rect();
-//    }
-
     public String measurement() {
         String result = decimalFormat.format(calibratedResult());
         result += " " + calibration.getUnits();
         return result;
     }
-
-    // TODO more methods
-
+    
     private double calibratedResult() {
         double result = intervalResult();
         if (result != 0 && calibration.canDisplayRate() && calibration.getDisplayRate()) {
