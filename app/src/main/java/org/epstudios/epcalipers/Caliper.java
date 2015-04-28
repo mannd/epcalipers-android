@@ -183,7 +183,7 @@ public class Caliper {
         this.unselectedColor = Color.BLUE;
         this.selectedColor = Color.RED;
         this.color = Color.BLUE;
-        this.lineWidth = 2.0f;
+        this.lineWidth = 3.0f;
         this.selected = false;
         this.crossbarTouched = false;
         this.bar1Touched = false;
@@ -199,7 +199,7 @@ public class Caliper {
                 Paint.Align.LEFT);
 
         paint.setTextSize(32.0f);
-        // paint.setTextScaleX(0.8f);
+       // paint.setTextScaleX(0.8f);
     }
 
     public Caliper() {
@@ -250,7 +250,7 @@ public class Caliper {
         String text = measurement();
         if (direction == Direction.HORIZONTAL) {
             canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
-                    crossBarPosition - 20, paint);
+                    crossBarPosition - 10, paint);
         }
         else {
             canvas.drawText(text, crossBarPosition + 5,
@@ -268,7 +268,7 @@ public class Caliper {
         result += " " + calibration.getUnits();
         return result;
     }
-    
+
     private double calibratedResult() {
         double result = intervalResult();
         if (result != 0 && calibration.canDisplayRate() && calibration.getDisplayRate()) {

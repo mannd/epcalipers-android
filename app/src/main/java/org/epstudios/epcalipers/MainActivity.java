@@ -104,6 +104,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         int width = size.x;
         int height = size.y;
 
+
         Log.d(EPS, "width = " + width + " height = " + height);
 
         createButtons();
@@ -113,6 +114,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         calipersMode = true;
         setMode();
+
+
     }
 
     // handle rotation
