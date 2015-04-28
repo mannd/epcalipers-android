@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -34,9 +35,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Toolbar menuToolbar;
     private Toolbar actionBar;
     private boolean calipersMode;
-
-    private GestureDetectorCompat gestureDetector;
-    private View.OnTouchListener gestureListener;
 
     // Buttons
     Button addCaliperButton;
@@ -110,17 +108,30 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         createButtons();
 
+        horizontalCalibration = new Calibration(Caliper.Direction.HORIZONTAL);
+        verticalCalibration = new Calibration(Caliper.Direction.VERTICAL);
+
         calipersMode = true;
         setMode();
+    }
 
-        gestureDetector = new GestureDetectorCompat(this, new MyGestureListener());
-        gestureListener = new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                    return gestureDetector.onTouchEvent(event);
-            }
-        };
+    // handle rotation
 
-        calipersView.setOnTouchListener(gestureListener);
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("calipersMode", calipersMode);
+        // TODO all the others
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        calipersMode = savedInstanceState.getBoolean("calipersMode");
+        // TODO more stuff
+        setMode();
+        calipersView.invalidate();
     }
 
     @Override
@@ -147,6 +158,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             rotateImage(1.0f);
         } else if (v == backToImageMenuButton) {
             selectImageMenu();
+        } else if (v == horizontalCaliperButton) {
+            addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
+        } else if (v == verticalCaliperButton) {
+            addCaliperWithDirection(Caliper.Direction.VERTICAL);
         }
 
     }
@@ -439,49 +454,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         } else {
             c.setCalibration(verticalCalibration);
         }
-        // c.setInitialPosition(caliperView bounds);
-        // TODO force redisplay
-        // back to main toolbar
-    }
-
-    // Gestures
-
-
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
-
-        @Override
-        public boolean onDown(MotionEvent event) {
-            // must be implemented and return true;
-            Log.d(EPS, "onDown: " + event.toString());
-            return true;
-        }
-
-        @Override
-        public boolean onSingleTapUp(MotionEvent event) {
-            Log.d(EPS, "onSingleTapUp: " + event.toString());
-            calipersView.singleTap(new PointF(event.getX(), event.getY()));
-            return true;
-        }
-
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent event) {
-            Log.d(EPS, "onSingleTapConfirmed: " + event.toString());
-            return true;
-        }
-        
-        @Override
-        public boolean onDoubleTap(MotionEvent event) {
-            Log.d(EPS, "onDoubleTap: " + event.toString());
-            calipersView.doubleTap(new PointF(event.getX(), event.getY()));
-            return true;
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-                                float distanceY) {
-            Log.d(EPS, "onScroll: " + e1.toString() + e2.toString());
-            return true;
-        }
+        c.setInitialPosition(new Rect(0, 0, calipersView.getWidth(),
+                calipersView.getHeight()));
+        getCalipers().add(c);
+        calipersView.invalidate();
+        selectMainMenu();
     }
 }
 

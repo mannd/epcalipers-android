@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,6 +38,8 @@ import java.util.ArrayList;
  * along with org.epstudios.epcalipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class CalipersView extends View {
+    private GestureDetectorCompat gestureDetector;
+    private final static String EPS = "EPS";
 
     public ArrayList<Caliper> getCalipers() {
         return calipers;
@@ -60,30 +64,72 @@ public class CalipersView extends View {
 
     public CalipersView(Context context) {
         super(context);
-        init();
+        init(context);
 
     }
 
     public CalipersView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public CalipersView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
-    private void init() {
+    private void init(Context context) {
         locked = false;
         calipers = new ArrayList<Caliper>();
-        Caliper c = new Caliper();
-        c.setBar1Position(300);
-        c.setBar2Position(600);
-        c.setCrossBarPosition(400);
-        Calibration calibration = new Calibration();
-        c.setCalibration(calibration);
-        calipers.add(c);
+        MyGestureListener listener = new MyGestureListener();
+        gestureDetector = new GestureDetectorCompat(context, listener);
+        View.OnTouchListener gestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                    return gestureDetector.onTouchEvent(event);
+            }
+        };
+
+        setOnTouchListener(gestureListener);
+
+
+    }
+
+    private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            // must be implemented and return true;
+            Log.d(EPS, "onDown: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent event) {
+            Log.d(EPS, "onSingleTapUp: " + event.toString());
+            singleTap(new PointF(event.getX(), event.getY()));
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent event) {
+            Log.d(EPS, "onSingleTapConfirmed: " + event.toString());
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent event) {
+            Log.d(EPS, "onDoubleTap: " + event.toString());
+            doubleTap(new PointF(event.getX(), event.getY()));
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+                                float distanceY) {
+            Log.d(EPS, "onScroll: " + e1.toString() + e2.toString());
+            move(-distanceX, -distanceY);
+            return true;
+        }
     }
 
 
@@ -185,5 +231,9 @@ public class CalipersView extends View {
                 }
             }
         }
+    }
+
+    public void move(float distanceX, float distanceY) {
+
     }
 }
