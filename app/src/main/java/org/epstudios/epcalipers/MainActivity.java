@@ -1,16 +1,25 @@
 package org.epstudios.epcalipers;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ScaleDrawable;
+import android.os.Build;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -19,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
@@ -76,7 +86,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     // Settings settings;
 
     double rrIntervalForQTc;
-    boolean isFirstRun;
 
     float sizeDiffWidth;
     float sizeDiffHeight;
@@ -102,21 +111,16 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
 
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int width = size.x;
-        int height = size.y;
-
-
-        Log.d(EPS, "width = " + width + " height = " + height);
-        Log.d(EPS, "CalipersView width = " + calipersView.getWidth() +
-                "CalipersView height = " + calipersView.getHeight());
+        imageView.setMaxZoom(5.0f);
+        imageView.setMinZoom(1.0f);
+        lastZoomFactor = imageView.getCurrentZoom();
 
         createButtons();
 
         horizontalCalibration = new Calibration(Caliper.Direction.HORIZONTAL);
         verticalCalibration = new Calibration(Caliper.Direction.VERTICAL);
+
+        rrIntervalForQTc = 0.0;
 
         calipersMode = true;
         setMode();
@@ -124,13 +128,85 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         layout = (RelativeLayout)findViewById(R.id.activity_main_id);
         ViewTreeObserver viewTreeObserver = layout.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @SuppressLint("NewApi")
+            @SuppressWarnings("deprecation")
             @Override
             public void onGlobalLayout() {
-                layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int androidVersion = Build.VERSION.SDK_INT;
+                if (androidVersion >= Build.VERSION_CODES.JELLY_BEAN) {
+                    layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+                else {
+                    layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+                //scaleImageForImageView();
                 addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
             }
         });
 
+    }
+
+    private void scaleImageForImageView() {
+        float ratio = 1.0f;
+        Drawable image = imageView.getDrawable();
+        float imageWidth = image.getIntrinsicWidth();
+        float imageHeight = image.getIntrinsicHeight();
+        float actionBarHeight = actionBar.getHeight();
+        float toolbarHeight = menuToolbar.getHeight();
+        float statusBarHeight = getStatusBarHeight();
+        Pair<Integer, Integer> screenDimensions = getScreenDimensions();
+        float screenWidth = (float) screenDimensions.first;
+        float screenHeight = (float) screenDimensions.second;
+        float verticalSpace = statusBarHeight + actionBarHeight + toolbarHeight;
+
+        float portraitWidth = Math.min(screenHeight, screenWidth);
+        float landscapeWidth = Math.max(screenHeight, screenWidth);
+        float portraitHeight = Math.max(screenHeight, screenWidth) - verticalSpace;
+        float landscapeHeight = Math.min(screenHeight, screenWidth) - verticalSpace;
+
+        Log.d(EPS, "ActionBar height = " + actionBarHeight + " Toolbar height = " +
+                toolbarHeight + " StatusBar height = " + statusBarHeight);
+        Log.d(EPS, "ImageView height = " + imageView.getHeight());
+        Log.d(EPS, "Screen height = " + screenHeight);
+
+        if (imageWidth > imageHeight) {
+            ratio = portraitWidth / imageWidth;
+        }
+        else {
+            ratio = landscapeHeight / imageHeight;
+        }
+        Bitmap bitmap = ((BitmapDrawable)image).getBitmap();
+        int bitmapWidth = bitmap.getWidth();
+        int bitmapHeight = bitmap.getHeight();
+        Log.d(EPS, "imageWidth = " + imageWidth + " imageHeight = " + imageHeight);
+        Log.d(EPS, "bitmapWidth = " + bitmapWidth + " bitmapHeight = " +
+                bitmapHeight);
+        Matrix matrix = new Matrix();
+        matrix.postScale(1.0f - ratio, 1.0f - ratio);
+        Log.d(EPS, "ratio = " + ratio);
+        Bitmap scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth,
+                bitmapHeight, matrix, true);
+        BitmapDrawable result = new BitmapDrawable(scaledBitmap);
+        imageView.setImageDrawable(result);
+
+
+    }
+
+    private Pair<Integer, Integer> getScreenDimensions () {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int height = size.y;
+        int width = size.x;
+        return new Pair<Integer, Integer>(width, height);
+    }
+
+    private float getStatusBarHeight() {
+        Rect rect = new Rect();
+        Window window = getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(rect);
+        int statusBarHeight = rect.top;
+        return statusBarHeight;
     }
 
     // handle rotation

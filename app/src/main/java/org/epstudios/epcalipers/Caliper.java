@@ -202,9 +202,6 @@ public class Caliper {
     }
 
     public void setInitialPosition(Rect rect) {
-        Log.d("EPS", "Left = " + rect.left + " Right = " + rect.right +
-                " Top = " + rect.top + " Bottom = " + rect.bottom);
-        Log.d("EPS", "Width = " + rect.width() + "Height = " + rect.height());
         if (direction == Direction.HORIZONTAL) {
             bar1Position = (rect.width()/3) + differential;
             bar2Position = (2 * rect.width()/3) + differential;
