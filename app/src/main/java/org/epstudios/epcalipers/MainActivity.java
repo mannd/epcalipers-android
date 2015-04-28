@@ -18,10 +18,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.ortiz.touch.TouchImageView;
 
@@ -35,6 +37,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Toolbar menuToolbar;
     private Toolbar actionBar;
     private boolean calipersMode;
+
+    RelativeLayout layout;
 
     // Buttons
     Button addCaliperButton;
@@ -106,6 +110,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
         Log.d(EPS, "width = " + width + " height = " + height);
+        Log.d(EPS, "CalipersView width = " + calipersView.getWidth() +
+                "CalipersView height = " + calipersView.getHeight());
 
         createButtons();
 
@@ -115,6 +121,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         calipersMode = true;
         setMode();
 
+        layout = (RelativeLayout)findViewById(R.id.activity_main_id);
+        ViewTreeObserver viewTreeObserver = layout.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
+            }
+        });
 
     }
 
@@ -447,6 +462,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void addCaliperWithDirection(Caliper.Direction direction) {
+        addCaliperWithDirectionAtRect(direction, new Rect(0, 0, calipersView.getWidth(),
+                calipersView.getHeight()));
+        calipersView.invalidate();
+        selectMainMenu();
+    }
+
+    private void addCaliperWithDirectionAtRect(Caliper.Direction direction,
+                                               Rect rect) {
         Caliper c = new Caliper();
         // TODO set up caliper per settings
         // c.linewidth = settings.linewidht;
@@ -457,11 +480,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         } else {
             c.setCalibration(verticalCalibration);
         }
-        c.setInitialPosition(new Rect(0, 0, calipersView.getWidth(),
-                calipersView.getHeight()));
+        c.setInitialPosition(rect);
         getCalipers().add(c);
-        calipersView.invalidate();
-        selectMainMenu();
     }
 }
 

@@ -101,14 +101,6 @@ public class Caliper {
         this.direction = direction;
     }
 
-    public float getLineWidth() {
-        return lineWidth;
-    }
-
-    public void setLineWidth(float lineWidth) {
-        this.lineWidth = lineWidth;
-    }
-
     public int getValueInPoints() {
         return valueInPoints;
     }
@@ -127,16 +119,6 @@ public class Caliper {
     private float bar2Position;
     private float crossBarPosition;
     private Direction direction;
-
-    public int getColor() {
-        return color;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
-    }
-
-    private int color;
 
     public int getUnselectedColor() {
         return unselectedColor;
@@ -157,7 +139,6 @@ public class Caliper {
     }
 
     private int selectedColor;
-    private float lineWidth;
     private int valueInPoints;
     private boolean selected;
     private DecimalFormat decimalFormat;
@@ -182,8 +163,6 @@ public class Caliper {
         this.crossBarPosition = crossBarPosition;
         this.unselectedColor = Color.BLUE;
         this.selectedColor = Color.RED;
-        this.color = Color.BLUE;
-        this.lineWidth = 3.0f;
         this.selected = false;
         this.crossbarTouched = false;
         this.bar1Touched = false;
@@ -191,8 +170,8 @@ public class Caliper {
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
-        paint.setColor(color);
-        paint.setStrokeWidth(lineWidth);
+        paint.setColor(this.unselectedColor);
+        paint.setStrokeWidth(3.0f);
         paint.setAntiAlias(true);
         paint.setTypeface(Typeface.DEFAULT);
         paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
@@ -204,6 +183,22 @@ public class Caliper {
 
     public Caliper() {
         this(Direction.HORIZONTAL, 0, 0, 100);
+    }
+
+    public void setColor(int color) {
+        paint.setColor(color);
+    }
+
+    public int getColor() {
+        return paint.getColor();
+    }
+
+    public void setLineWidth(float lineWidth) {
+        paint.setStrokeWidth(lineWidth);
+    }
+
+    public float getLineWidth() {
+        return paint.getStrokeWidth();
     }
 
     public void setInitialPosition(Rect rect) {
@@ -227,8 +222,6 @@ public class Caliper {
     }
 
     public void draw(Canvas canvas) {
-        paint.setColor(getColor());
-        paint.setStrokeWidth(lineWidth);
         if (direction == Direction.HORIZONTAL) {
             crossBarPosition = Math.min(crossBarPosition, canvas.getHeight() - DELTA);
             crossBarPosition = Math.max(crossBarPosition, DELTA);
