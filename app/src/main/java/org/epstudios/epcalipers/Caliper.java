@@ -37,37 +37,20 @@ import java.util.Locale;
  * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Caliper {
-    static int differential = 0;
-    static final float DELTA = 20.0f;
+    private static int differential = 0;
+    private static final float DELTA = 20.0f;
 
-    private boolean crossbarTouched;
+    public enum TouchedBar {NONE, BAR1, BAR2, CROSSBAR};
 
-    public boolean isBar1Touched() {
-        return bar1Touched;
+    public TouchedBar getTouchedBar() {
+        return touchedBar;
     }
 
-    public void setBar1Touched(boolean bar1Touched) {
-        this.bar1Touched = bar1Touched;
+    public void setTouchedBar(TouchedBar touchedBar) {
+        this.touchedBar = touchedBar;
     }
 
-    public boolean isBar2Touched() {
-        return bar2Touched;
-    }
-
-    public void setBar2Touched(boolean bar2Touched) {
-        this.bar2Touched = bar2Touched;
-    }
-
-    public boolean isCrossbarTouched() {
-        return crossbarTouched;
-    }
-
-    public void setCrossbarTouched(boolean crossbarTouched) {
-        this.crossbarTouched = crossbarTouched;
-    }
-
-    private boolean bar1Touched;
-    private boolean bar2Touched;
+    private TouchedBar touchedBar;
 
     public float getBar1Position() {
         return bar1Position;
@@ -164,9 +147,7 @@ public class Caliper {
         this.unselectedColor = Color.BLUE;
         this.selectedColor = Color.RED;
         this.selected = false;
-        this.crossbarTouched = false;
-        this.bar1Touched = false;
-        this.bar2Touched = false;
+        this.touchedBar = TouchedBar.NONE;
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
