@@ -32,6 +32,7 @@ import android.view.Window;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -63,7 +64,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     Button rotateImageLeftButton;
     Button tweakImageRightButton;
     Button tweakImageLeftButton;
-    Button flipImageButton;
     Button resetImageButton;
     Button backToImageMenuButton;
     Button horizontalCaliperButton;
@@ -111,9 +111,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
 
+        imageView.setScaleType(ImageView.ScaleType.CENTER);
         imageView.setMaxZoom(5.0f);
-        imageView.setMinZoom(1.0f);
+        imageView.setMinZoom(0.25f);
+        imageView.setZoom(1.0f);
         lastZoomFactor = imageView.getCurrentZoom();
+
 
         createButtons();
 
@@ -250,6 +253,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             rotateImage(-1.0f);
         } else if (v == tweakImageRightButton) {
             rotateImage(1.0f);
+        } else if (v == resetImageButton) {
+            resetImage();
         } else if (v == backToImageMenuButton) {
             selectImageMenu();
         } else if (v == horizontalCaliperButton) {
@@ -283,7 +288,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         rotateImageLeftButton = createButton(getString(R.string.rotate_image_left_button_title));
         tweakImageRightButton = createButton(getString(R.string.tweak_image_right_button_title));
         tweakImageLeftButton = createButton(getString(R.string.tweak_image_left_button_title));
-        flipImageButton = createButton(getString(R.string.flip_image_button_title));
         resetImageButton = createButton(getString(R.string.reset_image_button_title));
         backToImageMenuButton = createButton(getString(R.string.done_button_title));
         // Calibration menu
@@ -339,7 +343,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         buttons.add(rotateImageRightButton);
         buttons.add(tweakImageLeftButton);
         buttons.add(tweakImageRightButton);
-        buttons.add(flipImageButton);
         buttons.add(resetImageButton);
         buttons.add(backToImageMenuButton);
         adjustImageMenu = createMenu(buttons);
@@ -470,12 +473,24 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void rotateImage(float degrees) {
-        RotateAnimation rotateAnimation = new RotateAnimation(0.0f, degrees,
-                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
-                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
-        rotateAnimation.setDuration(500L);
-        rotateAnimation.setFillAfter(true);
-        imageView.startAnimation(rotateAnimation);
+//        RotateAnimation rotateAnimation = new RotateAnimation(0.0f, degrees,
+//                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+//                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+//        rotateAnimation.setDuration(500L);
+//        rotateAnimation.setFillAfter(true);
+//        imageView.startAnimation(rotateAnimation);
+
+//        Matrix matrix = new Matrix();
+//        imageView.setScaleType(ImageView.ScaleType.MATRIX);
+//        matrix.postRotate(degrees, imageView.getDrawable().getBounds().width()/2,
+//                imageView.getDrawable().getBounds().height()/2);
+//        imageView.setImageMatrix(matrix);
+
+        imageView.rotateImage(degrees);
+    }
+
+    private void resetImage() {
+        imageView.resetImage();
     }
 
     private void showHelp() {

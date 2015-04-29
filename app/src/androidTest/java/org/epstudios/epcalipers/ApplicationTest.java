@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.test.ApplicationTestCase;
 
@@ -65,9 +66,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(c.getCrossbarPosition(), 300);
         c.setInitialPosition(new Rect(0, 0, 600, 600));
         c.setDirection(Caliper.Direction.VERTICAL);
-        assertEquals(c.getBar1Position(), 215);
-        assertEquals(c.getBar2Position(), 415);
-        assertEquals(c.getCrossbarPosition(), 315);
+        assertEquals(c.getBar1Position(), 215.0f);
+        assertEquals(c.getBar2Position(), 415.0f);
+        assertEquals(c.getCrossbarPosition(), 315.0f);
     }
 
     public void testBarCoord() {
@@ -75,9 +76,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(c.getBar1Position(), 0);
         assertEquals(c.getBar2Position(), 0);
         assertEquals(c.getCrossbarPosition(), 100);
-        Point p = new Point(100, 50);
-        assertEquals(c.barCoord(p), 100);
+        PointF p = new PointF(100, 50);
+        assertEquals(c.barCoord(p), 100.0f);
         c.setDirection(Caliper.Direction.VERTICAL);
-        assertEquals(c.barCoord(p),50);
+        assertEquals(c.barCoord(p),50.0f);
     }
 }

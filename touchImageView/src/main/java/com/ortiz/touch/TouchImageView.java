@@ -950,7 +950,7 @@ public class TouchImageView extends ImageView {
         matrix.postScale((float) deltaScale, (float) deltaScale, focusX, focusY);
         fixScaleTrans();
     }
-    
+
     /**
      * DoubleTapZoom calls a series of runnables which apply
      * an animated zoom in/out graphic to the image.
@@ -1272,5 +1272,18 @@ public class TouchImageView extends ImageView {
     	float[] n = new float[9];
     	matrix.getValues(n);
     	Log.d(DEBUG, "Scale: " + n[Matrix.MSCALE_X] + " TransX: " + n[Matrix.MTRANS_X] + " TransY: " + n[Matrix.MTRANS_Y]);
+    }
+
+    //////////////////////////////////////////////////////////
+    // Methods add by manndmd@gmail.com to allow rotation
+    //////////////////////////////////////////////////////////
+
+    public void rotateImage(float degrees) {
+        matrix.postRotate(degrees, viewWidth/2, viewHeight/2);
+        setImageMatrix(matrix);
+    }
+
+    public void resetImage() {
+        resetZoom();
     }
 }

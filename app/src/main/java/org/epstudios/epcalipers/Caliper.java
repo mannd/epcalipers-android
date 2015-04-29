@@ -38,7 +38,7 @@ import java.util.Locale;
  */
 public class Caliper {
     private static int differential = 0;
-    private static final float DELTA = 20.0f;
+    private static final float DELTA = 30.0f;
 
     public enum TouchedBar {NONE, BAR1, BAR2, CROSSBAR};
 
