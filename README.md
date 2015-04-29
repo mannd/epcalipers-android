@@ -7,6 +7,8 @@ QT intervals can be performed directly in the app.
 EP Calipers is open source, and licensed under the 
 [GNU GPL v3 license.](http://www.gnu.org/licenses/gpl.html)
 
+EP Calipers uses the [TouchImageView library](https://github.com/MikeOrtiz/TouchImageView) created by Mike Ortiz.
+
 ## Copyright
 Copyright © 2015 [EP Studios, Inc.](http://www.epstudiossoftware.com)
 
