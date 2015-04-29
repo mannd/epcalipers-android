@@ -34,6 +34,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
@@ -924,32 +926,6 @@ public class TouchImageView extends ImageView {
         	}
         }
     }
-    
-    private void scaleImage(double deltaScale, float focusX, float focusY, boolean stretchImageToSuper) {
-    	
-    	float lowerScale, upperScale;
-    	if (stretchImageToSuper) {
-    		lowerScale = superMinScale;
-    		upperScale = superMaxScale;
-    		
-    	} else {
-    		lowerScale = minScale;
-    		upperScale = maxScale;
-    	}
-    	
-    	float origScale = normalizedScale;
-        normalizedScale *= deltaScale;
-        if (normalizedScale > upperScale) {
-            normalizedScale = upperScale;
-            deltaScale = upperScale / origScale;
-        } else if (normalizedScale < lowerScale) {
-            normalizedScale = lowerScale;
-            deltaScale = lowerScale / origScale;
-        }
-        
-        matrix.postScale((float) deltaScale, (float) deltaScale, focusX, focusY);
-        fixScaleTrans();
-    }
 
     /**
      * DoubleTapZoom calls a series of runnables which apply
@@ -958,102 +934,128 @@ public class TouchImageView extends ImageView {
      *
      */
     private class DoubleTapZoom implements Runnable {
-    	
-    	private long startTime;
-    	private static final float ZOOM_TIME = 500;
-    	private float startZoom, targetZoom;
-    	private float bitmapX, bitmapY;
-    	private boolean stretchImageToSuper;
-    	private AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
-    	private PointF startTouch;
-    	private PointF endTouch;
 
-    	DoubleTapZoom(float targetZoom, float focusX, float focusY, boolean stretchImageToSuper) {
-    		setState(State.ANIMATE_ZOOM);
-    		startTime = System.currentTimeMillis();
-    		this.startZoom = normalizedScale;
-    		this.targetZoom = targetZoom;
-    		this.stretchImageToSuper = stretchImageToSuper;
-    		PointF bitmapPoint = transformCoordTouchToBitmap(focusX, focusY, false);
-    		this.bitmapX = bitmapPoint.x;
-    		this.bitmapY = bitmapPoint.y;
-    		
-    		//
-    		// Used for translating image during scaling
-    		//
-    		startTouch = transformCoordBitmapToTouch(bitmapX, bitmapY);
-    		endTouch = new PointF(viewWidth / 2, viewHeight / 2);
-    	}
+        private long startTime;
+        private static final float ZOOM_TIME = 500;
+        private float startZoom, targetZoom;
+        private float bitmapX, bitmapY;
+        private boolean stretchImageToSuper;
+        private AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
+        private PointF startTouch;
+        private PointF endTouch;
 
-		@Override
-		public void run() {
-			float t = interpolate();
-			double deltaScale = calculateDeltaScale(t);
-			scaleImage(deltaScale, bitmapX, bitmapY, stretchImageToSuper);
-			translateImageToCenterTouchPosition(t);
-			fixScaleTrans();
-			setImageMatrix(matrix);
-			
-			//
-			// OnTouchImageViewListener is set: double tap runnable updates listener
-			// with every frame.
-			//
-			if (touchImageViewListener != null) {
-				touchImageViewListener.onMove();
-			}
-			
-			if (t < 1f) {
-				//
-				// We haven't finished zooming
-				//
-				compatPostOnAnimation(this);
-				
-			} else {
-				//
-				// Finished zooming
-				//
-				setState(State.NONE);
-			}
-		}
-		
-		/**
-		 * Interpolate between where the image should start and end in order to translate
-		 * the image so that the point that is touched is what ends up centered at the end
-		 * of the zoom.
-		 * @param t
-		 */
-		private void translateImageToCenterTouchPosition(float t) {
-			float targetX = startTouch.x + t * (endTouch.x - startTouch.x);
-			float targetY = startTouch.y + t * (endTouch.y - startTouch.y);
-			PointF curr = transformCoordBitmapToTouch(bitmapX, bitmapY);
-			matrix.postTranslate(targetX - curr.x, targetY - curr.y);
-		}
-		
-		/**
-		 * Use interpolator to get t
-		 * @return
-		 */
-		private float interpolate() {
-			long currTime = System.currentTimeMillis();
-			float elapsed = (currTime - startTime) / ZOOM_TIME;
-			elapsed = Math.min(1f, elapsed);
-			return interpolator.getInterpolation(elapsed);
-		}
-		
-		/**
-		 * Interpolate the current targeted zoom and get the delta
-		 * from the current zoom.
-		 * @param t
-		 * @return
-		 */
-		private double calculateDeltaScale(float t) {
-			double zoom = startZoom + t * (targetZoom - startZoom);
-			return zoom / normalizedScale;
-		}
+        DoubleTapZoom(float targetZoom, float focusX, float focusY, boolean stretchImageToSuper) {
+            setState(State.ANIMATE_ZOOM);
+            startTime = System.currentTimeMillis();
+            this.startZoom = normalizedScale;
+            this.targetZoom = targetZoom;
+            this.stretchImageToSuper = stretchImageToSuper;
+            PointF bitmapPoint = transformCoordTouchToBitmap(focusX, focusY, false);
+            this.bitmapX = bitmapPoint.x;
+            this.bitmapY = bitmapPoint.y;
+
+            //
+            // Used for translating image during scaling
+            //
+            startTouch = transformCoordBitmapToTouch(bitmapX, bitmapY);
+            endTouch = new PointF(viewWidth / 2, viewHeight / 2);
+        }
+
+        @Override
+        public void run() {
+            float t = interpolate();
+            double deltaScale = calculateDeltaScale(t);
+            scaleImage(deltaScale, bitmapX, bitmapY, stretchImageToSuper);
+            translateImageToCenterTouchPosition(t);
+            fixScaleTrans();
+            setImageMatrix(matrix);
+
+            //
+            // OnTouchImageViewListener is set: double tap runnable updates listener
+            // with every frame.
+            //
+            if (touchImageViewListener != null) {
+                touchImageViewListener.onMove();
+            }
+
+            if (t < 1f) {
+                //
+                // We haven't finished zooming
+                //
+                compatPostOnAnimation(this);
+
+            } else {
+                //
+                // Finished zooming
+                //
+                setState(State.NONE);
+            }
+        }
+
+        /**
+         * Interpolate between where the image should start and end in order to translate
+         * the image so that the point that is touched is what ends up centered at the end
+         * of the zoom.
+         * @param t
+         */
+        private void translateImageToCenterTouchPosition(float t) {
+            float targetX = startTouch.x + t * (endTouch.x - startTouch.x);
+            float targetY = startTouch.y + t * (endTouch.y - startTouch.y);
+            PointF curr = transformCoordBitmapToTouch(bitmapX, bitmapY);
+            matrix.postTranslate(targetX - curr.x, targetY - curr.y);
+        }
+
+        /**
+         * Use interpolator to get t
+         * @return
+         */
+        private float interpolate() {
+            long currTime = System.currentTimeMillis();
+            float elapsed = (currTime - startTime) / ZOOM_TIME;
+            elapsed = Math.min(1f, elapsed);
+            return interpolator.getInterpolation(elapsed);
+        }
+
+        /**
+         * Interpolate the current targeted zoom and get the delta
+         * from the current zoom.
+         * @param t
+         * @return
+         */
+        private double calculateDeltaScale(float t) {
+            double zoom = startZoom + t * (targetZoom - startZoom);
+            return zoom / normalizedScale;
+        }
     }
-    
+
+    private void scaleImage(double deltaScale, float focusX, float focusY, boolean stretchImageToSuper) {
+
+        float lowerScale, upperScale;
+        if (stretchImageToSuper) {
+            lowerScale = superMinScale;
+            upperScale = superMaxScale;
+
+        } else {
+            lowerScale = minScale;
+            upperScale = maxScale;
+        }
+
+        float origScale = normalizedScale;
+        normalizedScale *= deltaScale;
+        if (normalizedScale > upperScale) {
+            normalizedScale = upperScale;
+            deltaScale = upperScale / origScale;
+        } else if (normalizedScale < lowerScale) {
+            normalizedScale = lowerScale;
+            deltaScale = lowerScale / origScale;
+        }
+
+        matrix.postScale((float) deltaScale, (float) deltaScale, focusX, focusY);
+        fixScaleTrans();
+    }
+
     /**
-     * This function will transform the coordinates in the touch event to the coordinate 
+     * This function will transform the coordinates in the touch event to the coordinate
      * system of the drawable that the imageview contain
      * @param x x-coordinate of touch event
      * @param y y-coordinate of touch event
@@ -1069,15 +1071,15 @@ public class TouchImageView extends ImageView {
          float transY = m[Matrix.MTRANS_Y];
          float finalX = ((x - transX) * origW) / getImageWidth();
          float finalY = ((y - transY) * origH) / getImageHeight();
-         
+
          if (clipToBitmap) {
         	 finalX = Math.min(Math.max(finalX, 0), origW);
         	 finalY = Math.min(Math.max(finalY, 0), origH);
          }
-         
+
          return new PointF(finalX , finalY);
     }
-    
+
     /**
      * Inverse of transformCoordTouchToBitmap. This function will transform the coordinates in the
      * drawable's coordinate system to the view's coordinate system.
@@ -1278,12 +1280,15 @@ public class TouchImageView extends ImageView {
     // Methods add by manndmd@gmail.com to allow rotation
     //////////////////////////////////////////////////////////
 
+    // Unfortunately no animation, but it does the job
+
     public void rotateImage(float degrees) {
-        matrix.postRotate(degrees, viewWidth/2, viewHeight/2);
+        matrix.postRotate(degrees, viewWidth / 2, viewHeight / 2);
         setImageMatrix(matrix);
     }
 
     public void resetImage() {
-        resetZoom();
+        matrix = new Matrix(prevMatrix);
+        setImageMatrix(matrix);
     }
 }
