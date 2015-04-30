@@ -49,6 +49,7 @@ import java.util.ArrayList;
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
     private static final String EPS = "EPS";
     private static final int RESULT_LOAD_IMAGE = 1;
+    private static final int RESULT_CAPTURE_IMAGE = 2;
     private TouchImageView imageView;
     private CalipersView calipersView;
     private Toolbar menuToolbar;
@@ -118,9 +119,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
 
         imageView.setScaleType(ImageView.ScaleType.CENTER);
-        imageView.setMaxZoom(5.0f);
-        imageView.setMinZoom(0.25f);
-        imageView.setZoom(1.0f);
+//        imageView.setMaxZoom(3.0f);
+//        imageView.setMinZoom(0.25f);
+//        imageView.setZoom(1.0f);
         lastZoomFactor = imageView.getCurrentZoom();
 
 
@@ -268,6 +269,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             addCaliperWithDirection(Caliper.Direction.VERTICAL);
         } else if (v == selectImageButton) {
             selectImageFromGallery();
+        } else if (v == cameraButton) {
+            takePhoto();
         }
 
     }
@@ -486,6 +489,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         startActivityForResult(intent, RESULT_LOAD_IMAGE);
     }
 
+    private void takePhoto() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, RESULT_CAPTURE_IMAGE);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -510,23 +518,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             imageView.setImageBitmap(bitmap);
 
         }
+        if (resultCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK && null != data) {
+            imageView.setImageBitmap((Bitmap) data.getExtras().get("data"));
+        }
     }
 
 
     private void rotateImage(float degrees) {
-//        RotateAnimation rotateAnimation = new RotateAnimation(0.0f, degrees,
-//                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
-//                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
-//        rotateAnimation.setDuration(500L);
-//        rotateAnimation.setFillAfter(true);
-//        imageView.startAnimation(rotateAnimation);
-
-//        Matrix matrix = new Matrix();
-//        imageView.setScaleType(ImageView.ScaleType.MATRIX);
-//        matrix.postRotate(degrees, imageView.getDrawable().getBounds().width()/2,
-//                imageView.getDrawable().getBounds().height()/2);
-//        imageView.setImageMatrix(matrix);
-
         imageView.rotateImage(degrees);
     }
 

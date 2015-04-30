@@ -1290,8 +1290,8 @@ public class TouchImageView extends ImageView {
 //        rotateAnimation.setDuration(500L);
 //        rotateAnimation.setFillAfter(false);
 //        startAnimation(rotateAnimation);
-
-        matrix.postRotate(degrees, viewWidth / 2, viewHeight / 2);
+        // FIXME doesn't maintain center of rotation with multiple rotations
+        matrix.postRotate(degrees, getWidth() / 2, getHeight() / 2);
         setImageMatrix(matrix);
 
     }
