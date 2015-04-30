@@ -42,6 +42,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.ortiz.touch.TouchImageView;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,11 +52,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private static final String EPS = "EPS";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
-    private TouchImageView imageView;
+    private ImageView imageView;
     private CalipersView calipersView;
     private Toolbar menuToolbar;
     private Toolbar actionBar;
     private boolean calipersMode;
+    private PhotoViewAttacher attacher;
 
     RelativeLayout layout;
 
@@ -111,7 +113,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        imageView = (TouchImageView) findViewById(R.id.imageView);
+        imageView = (ImageView) findViewById(R.id.imageView);
         calipersView = (CalipersView) findViewById(R.id.caliperView);
 
         actionBar = (Toolbar) findViewById(R.id.action_bar);
@@ -123,7 +125,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 //        imageView.setMaxZoom(3.0f);
 //        imageView.setMinZoom(0.25f);
 //        imageView.setZoom(1.0f);
-        lastZoomFactor = imageView.getCurrentZoom();
+       // lastZoomFactor = imageView.getCurrentZoom();
 
 
         createButtons();
@@ -151,6 +153,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 }
                 //scaleImageForImageView();
                 addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
+                attacher = new PhotoViewAttacher(imageView);
+
             }
         });
 
@@ -529,11 +533,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
     private void rotateImage(float degrees) {
-        imageView.rotateImage(degrees);
+        attacher.setRotationBy(degrees);
+
+        //imageView.rotateImage(degrees);
     }
 
     private void resetImage() {
-        imageView.resetImage();
+        attacher.setRotationTo(0f);
+        //imageView.resetImage();
     }
 
     private void showHelp() {

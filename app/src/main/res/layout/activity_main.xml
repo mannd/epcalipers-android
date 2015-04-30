@@ -27,7 +27,7 @@
     android:layout_above="@+id/menu_toolbar"
     android:layout_below="@+id/action_bar">
 
-    <com.ortiz.touch.TouchImageView
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/imageView"
