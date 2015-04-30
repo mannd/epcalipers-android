@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -316,7 +317,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // buttons won't flash, but will behave similarly to iOS buttons,
         // alternative is ugly colors.
         button.setTextColor(Color.WHITE);
-        button.setBackgroundColor(getResources().getColor(R.color.primary));
+       // button.setBackgroundColor(getResources().getColor(R.color.primary));
+        button.getBackground().setColorFilter(getResources()
+                .getColor(R.color.primary), PorterDuff.Mode.CLEAR);
+       // button.setBackgroundResource(0);
         button.setOnClickListener(this);
         return button;
     }

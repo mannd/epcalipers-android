@@ -1293,7 +1293,6 @@ public class TouchImageView extends ImageView {
         // FIXME doesn't maintain center of rotation with multiple rotations
         matrix.postRotate(degrees, getWidth() / 2, getHeight() / 2);
         setImageMatrix(matrix);
-
     }
 
     public void resetImage() {

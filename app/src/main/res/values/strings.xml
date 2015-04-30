@@ -8,7 +8,7 @@
     <string name="calibrate_button_title">Cal</string>
     <string name="add_caliper_button_title">+</string>
     <string name="interval_rate_button_title">I/R</string>
-    <string name="mean_rate_button_title">mRR</string>
+    <string name="mean_rate_button_title">mRate</string>
     <string name="qtc_button_title">QTc</string>
     <string name="camera_button_title">Camera</string>
     <string name="select_image_button_title">Select</string>
