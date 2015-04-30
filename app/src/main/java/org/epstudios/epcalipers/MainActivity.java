@@ -59,6 +59,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private boolean calipersMode;
     private PhotoViewAttacher attacher;
 
+    private static boolean firstRun = true;
+
     RelativeLayout layout;
 
     // Buttons
@@ -109,7 +111,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     float landscapeHeight;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -121,7 +123,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
 
-        imageView.setScaleType(ImageView.ScaleType.CENTER);
+       // imageView.setScaleType(ImageView.ScaleType.CENTER);
 //        imageView.setMaxZoom(3.0f);
 //        imageView.setMinZoom(0.25f);
 //        imageView.setZoom(1.0f);
@@ -137,6 +139,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         calipersMode = true;
         setMode();
+
 
         layout = (RelativeLayout)findViewById(R.id.activity_main_id);
         ViewTreeObserver viewTreeObserver = layout.getViewTreeObserver();
@@ -154,7 +157,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 //scaleImageForImageView();
                 addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
                 attacher = new PhotoViewAttacher(imageView);
+                attacher.setScaleType(ImageView.ScaleType.CENTER);
+                attacher.setMinimumScale(0.5f);
+                attacher.setMaximumScale(3.0f);
+                attacher.setMediumScale(1.0f);
+                if (firstRun) {
+                    scaleImageForImageView();
+                    firstRun = false;
+                }
+                if (savedInstanceState != null) {
+                    attacher.setScale(savedInstanceState.getFloat("scale"));
+                }
+                Log.d(EPS, "attacher scale = " + attacher.getScale());
 
+                // TODO use saved scale to fix calibration after rotation
             }
         });
 
@@ -196,14 +212,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Log.d(EPS, "bitmapWidth = " + bitmapWidth + " bitmapHeight = " +
                 bitmapHeight);
         Matrix matrix = new Matrix();
-        matrix.postScale(1.0f - ratio, 1.0f - ratio);
+        matrix.postScale(ratio, ratio);
         Log.d(EPS, "ratio = " + ratio);
         Bitmap scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth,
                 bitmapHeight, matrix, true);
-        BitmapDrawable result = new BitmapDrawable(scaledBitmap);
+        BitmapDrawable result = new BitmapDrawable(getResources(), scaledBitmap);
         imageView.setImageDrawable(result);
-
-
+        attacher.update();
     }
 
     private Pair<Integer, Integer> getScreenDimensions () {
@@ -230,8 +245,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("calipersMode", calipersMode);
+        outState.putFloat("scale", attacher.getScale());
         // TODO all the others
+
     }
+
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
