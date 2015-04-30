@@ -3,7 +3,9 @@ package org.epstudios.epcalipers;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -12,7 +14,9 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ScaleDrawable;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -38,11 +42,13 @@ import android.widget.RelativeLayout;
 
 import com.ortiz.touch.TouchImageView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
-    static final String EPS = "EPS";
+    private static final String EPS = "EPS";
+    private static final int RESULT_LOAD_IMAGE = 1;
     private TouchImageView imageView;
     private CalipersView calipersView;
     private Toolbar menuToolbar;
@@ -138,8 +144,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 int androidVersion = Build.VERSION.SDK_INT;
                 if (androidVersion >= Build.VERSION_CODES.JELLY_BEAN) {
                     layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                }
-                else {
+                } else {
                     layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
                 //scaleImageForImageView();
@@ -261,6 +266,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
         } else if (v == verticalCaliperButton) {
             addCaliperWithDirection(Caliper.Direction.VERTICAL);
+        } else if (v == selectImageButton) {
+            selectImageFromGallery();
         }
 
     }
@@ -471,6 +478,40 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void changeSettings() {
       // TODO
     }
+
+    private void selectImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, RESULT_LOAD_IMAGE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+
+
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            Log.d(EPS, "picturePath = " + picturePath);
+            cursor.close();
+
+            Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
+
+            imageView.setImageBitmap(bitmap);
+
+        }
+    }
+
 
     private void rotateImage(float degrees) {
 //        RotateAnimation rotateAnimation = new RotateAnimation(0.0f, degrees,

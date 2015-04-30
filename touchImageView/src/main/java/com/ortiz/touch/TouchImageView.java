@@ -1283,8 +1283,17 @@ public class TouchImageView extends ImageView {
     // Unfortunately no animation, but it does the job
 
     public void rotateImage(float degrees) {
+        // animation doesn't really work
+//        RotateAnimation rotateAnimation = new RotateAnimation(0.0f, degrees,
+//                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+//                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+//        rotateAnimation.setDuration(500L);
+//        rotateAnimation.setFillAfter(false);
+//        startAnimation(rotateAnimation);
+
         matrix.postRotate(degrees, viewWidth / 2, viewHeight / 2);
         setImageMatrix(matrix);
+
     }
 
     public void resetImage() {
