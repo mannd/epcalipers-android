@@ -3,6 +3,7 @@ package org.epstudios.epcalipers;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -325,6 +326,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         qtcButton = createButton(getString(R.string.qtc_button_title));
         // Image menu
         cameraButton = createButton(getString(R.string.camera_button_title));
+        cameraButton.setEnabled(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA));
         selectImageButton = createButton(getString(R.string.select_image_button_title));
         adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
@@ -534,9 +536,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void takePhoto() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // make sure device has a camera
-        if (intent.resolveActivity(getPackageManager()) != null) {
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
             try {
                 photoFile = createImageFile();
@@ -544,9 +546,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 // TODO toast it?
             }
             if (photoFile != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         Uri.fromFile(photoFile));
-                startActivityForResult(intent, RESULT_CAPTURE_IMAGE);
+                startActivityForResult(takePictureIntent, RESULT_CAPTURE_IMAGE);
             }
         }
         // TODO else warning dialog, no camera?
@@ -565,9 +567,17 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 storageDir      /* directory */
         );
 
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = "file:" + image.getAbsolutePath();
+        currentPhotoPath = image.getAbsolutePath();
+       // galleryAddPic();
         return image;
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
     }
 
     @Override
@@ -609,10 +619,24 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
         }
-        if (resultCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK && null != data) {
+        if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
+            int targetWidth = imageView.getWidth();
+            int targetHeight = imageView.getHeight();
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(currentPhotoPath, options);
+            int imageWidth = options.outWidth;
+            int imageHeight = options.outHeight;
 
-
-            imageView.setImageBitmap((Bitmap) data.getExtras().get("data"));
+//            int scaleFactor = Math.min(imageWidth / targetWidth,
+//                    imageHeight / targetHeight);
+             int scaleFactor = calculateInSampleSize(options, targetWidth,
+              targetHeight);
+            Log.d(EPS, "scaleFactor=" + scaleFactor);
+            options.inJustDecodeBounds = false;
+            options.inSampleSize = scaleFactor;
+            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
+            imageView.setImageBitmap(bitmap);
             attacher.update();
         }
     }
