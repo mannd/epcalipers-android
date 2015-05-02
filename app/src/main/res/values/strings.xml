@@ -29,5 +29,14 @@
     <string name="about_label">EP Calipers</string>
     <string name="help_title">Help</string>
     <string name="switch_mode_title">Switch</string>
-
+    <string name="no_time_caliper_selected_title">No Time Caliper Selected</string>
+    <string name="no_time_caliper_selected_message">Use a selected (highlighted) caliper to
+        measure one or more RR intervals.</string>
+    <string name="no_calipers_alert_title">No Calipers To Use</string>
+    <string name="no_calipers_alert_message">Add one or more calipers first
+        before proceeding.</string>
+    <string name="no_caliper_selected_alert_title">No Caliper Selected</string>
+    <string name="no_caliper_selected_alert_message">Selected a
+        caliper by single-tapping it.  Move the caliper to a known
+        interval.  Touch Set to enter the calibration measurement.</string>
 </resources>

@@ -176,13 +176,13 @@ public class CalipersView extends View {
         invalidate();
     }
 
-    private void selectCaliperIfNoneSelected() {
+    public void selectCaliperIfNoneSelected() {
         if (calipers.size() > 0 && noCaliperIsSelected()) {
             selectCaliper(calipers.get(calipers.size() - 1));
         }
     }
 
-    private boolean noCaliperIsSelected() {
+    public boolean noCaliperIsSelected() {
         boolean noneSelected = true;
         for (int i = calipers.size() - 1; i >= 0; i--) {
             if (calipers.get(i).isSelected()) {
@@ -192,7 +192,7 @@ public class CalipersView extends View {
         return noneSelected;
     }
 
-    private Caliper activeCaliper() {
+    public Caliper activeCaliper() {
         if (calipers.size() <= 0) {
             return null;
         }

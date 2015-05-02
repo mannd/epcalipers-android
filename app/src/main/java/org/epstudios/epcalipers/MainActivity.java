@@ -1,50 +1,45 @@
 package org.epstudios.epcalipers;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
-import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ScaleDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
-import android.view.animation.RotateAnimation;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.ortiz.touch.TouchImageView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.File;
@@ -290,7 +285,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         } else if (v == backToImageMenuButton) {
             selectImageMenu();
         } else if (v == calibrateButton) {
-            selectCalibrationMenu();
+            setupCalibration();
         } else if (v == doneCalibrationButton) {
             selectMainMenu();
         } else if (v == rotateImageLeftButton) {
@@ -313,6 +308,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             selectImageFromGallery();
         } else if (v == cameraButton) {
             takePhoto();
+        } else if (v == setCalibrationButton) {
+            setCalibration();
         }
 
     }
@@ -417,6 +414,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             createMainMenu();
         }
         selectMenu(mainMenu);
+        calipersView.setLocked(false);
     }
 
     private void selectImageMenu() {
@@ -684,18 +682,18 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         startActivity(new Intent(this, About.class));
     }
 
-    private void toggleIntervalRate() {
-        horizontalCalibration.setDisplayRate(!horizontalCalibration.getDisplayRate());
-        // TODO force redisplay
-    }
-
     private void meanRR() {
         if (calipersCount() < 1) {
-            showNoCalipersAlert();
+            noCalipersAlert();
             // select main toolbar;
             return;
         }
         Caliper singleHorizontalCaliper = getLoneTimeCaliper();
+    }
+
+    private void toggleIntervalRate() {
+        horizontalCalibration.setDisplayRate(!horizontalCalibration.getDisplayRate());
+        calipersView.invalidate();
     }
 
     private int calipersCount() {
@@ -706,8 +704,92 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return calipersView.getCalipers();
     }
 
-    private void showNoCalipersAlert() {
-        // TODO
+    private void showNoTimeCaliperSelectedAlert() {
+        showSimpleAlert(R.string.no_time_caliper_selected_title,
+                R.string.no_time_caliper_selected_message);
+    }
+
+    private boolean noTimeCaliperSelected() {
+        return calipersCount() < 1 ||
+                calipersView.noCaliperIsSelected() ||
+                calipersView.activeCaliper().getDirection() == Caliper.Direction.VERTICAL;
+    }
+
+    private void noCaliperSelectedAlert() {
+        showSimpleAlert(R.string.no_caliper_selected_alert_title,
+                R.string.no_caliper_selected_alert_message);
+    }
+
+    private void setupCalibration() {
+        if (calipersCount() < 1) {
+            noCalipersAlert();
+        }
+        else {
+            selectCalibrationMenu();
+            calipersView.selectCaliperIfNoneSelected();
+            calipersView.setLocked(true);
+        }
+    }
+
+    private void setCalibration() {
+        if (calipersCount() < 1) {
+            noCalipersAlert();
+            selectMainMenu();
+            return;
+        }
+        if (calipersView.noCaliperIsSelected()) {
+            noCaliperSelectedAlert();
+            return;
+        }
+        Caliper c = calipersView.activeCaliper();
+        if (c == null) {
+            return; // shouldn't happen, but if it does...
+        }
+        String example = "";
+        if (c.getDirection() == Caliper.Direction.VERTICAL) {
+            example = "1 mV";
+        }
+        else {
+            example = "500 msec";
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Title");
+        builder.setMessage("Test Message");
+        String result;
+
+        final EditText input = new EditText(this);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String result = input.getText().toString();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+
+    }
+
+    private void noCalipersAlert() {
+        showSimpleAlert(R.string.no_calipers_alert_title,
+                R.string.no_calipers_alert_message);
+    }
+
+    private void showSimpleAlert(int title, int message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setPositiveButton("OK", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
 
     private Caliper getLoneTimeCaliper() {
