@@ -542,10 +542,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
 
             imageView.setImageBitmap(bitmap);
+            attacher.update();
 
         }
         if (resultCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK && null != data) {
             imageView.setImageBitmap((Bitmap) data.getExtras().get("data"));
+            attacher.update();
         }
     }
 
