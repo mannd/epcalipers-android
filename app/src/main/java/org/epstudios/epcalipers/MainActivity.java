@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -17,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ScaleDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -45,7 +47,10 @@ import com.ortiz.touch.TouchImageView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
@@ -58,6 +63,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Toolbar actionBar;
     private boolean calipersMode;
     private PhotoViewAttacher attacher;
+    private String currentPhotoPath;
 
     private static boolean firstRun = true;
 
@@ -113,9 +119,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            ;
+        }
+        Log.d(EPS, "onCreate");
         setContentView(R.layout.activity_main);
 
         imageView = (ImageView) findViewById(R.id.imageView);
+        attacher = new PhotoViewAttacher(imageView);
         calipersView = (CalipersView) findViewById(R.id.caliperView);
 
         actionBar = (Toolbar) findViewById(R.id.action_bar);
@@ -154,8 +166,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 } else {
                     layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
-                //scaleImageForImageView();
+                scaleImageForImageView();
                 addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
+                if (true)
+                    return;
                 attacher = new PhotoViewAttacher(imageView);
                 attacher.setScaleType(ImageView.ScaleType.CENTER);
                 attacher.setMinimumScale(0.5f);
@@ -177,6 +191,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void scaleImageForImageView() {
+        if (true)
+            return;
         float ratio = 1.0f;
         Drawable image = imageView.getDrawable();
         float imageWidth = image.getIntrinsicWidth();
@@ -243,6 +259,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Log.d(EPS, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putBoolean("calipersMode", calipersMode);
         outState.putFloat("scale", attacher.getScale());
@@ -253,6 +270,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.d(EPS, "onRestoreInstanceState");
         super.onRestoreInstanceState(savedInstanceState);
         calipersMode = savedInstanceState.getBoolean("calipersMode");
         // TODO more stuff
@@ -517,7 +535,39 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void takePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, RESULT_CAPTURE_IMAGE);
+        // make sure device has a camera
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // TODO toast it?
+            }
+            if (photoFile != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photoFile));
+                startActivityForResult(intent, RESULT_CAPTURE_IMAGE);
+            }
+        }
+        // TODO else warning dialog, no camera?
+    }
+
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
     }
 
     @Override
@@ -539,16 +589,55 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             Log.d(EPS, "picturePath = " + picturePath);
             cursor.close();
 
-            Bitmap bitmap = BitmapFactory.decodeFile(picturePath);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(picturePath, options);
+            int imageHeight = options.outHeight;
+            int imageWidth = options.outWidth;
+            Log.d(EPS, "image=" + imageWidth + "x" + imageHeight);
+            int targetWidth = imageView.getWidth();
+            int targetHeight = imageView.getHeight();
+            options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight);
+            options.inJustDecodeBounds = false;
+            Bitmap bitmap = BitmapFactory.decodeFile(picturePath, options);
+            imageHeight = bitmap.getHeight();
+            imageWidth = bitmap.getWidth();
+            Log.d(EPS, "image=" + imageWidth + "x" + imageHeight);
 
             imageView.setImageBitmap(bitmap);
             attacher.update();
 
+
         }
         if (resultCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK && null != data) {
+
+
             imageView.setImageBitmap((Bitmap) data.getExtras().get("data"));
             attacher.update();
         }
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
 
