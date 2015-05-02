@@ -125,10 +125,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             ;
         }
         Log.d(EPS, "onCreate");
+
         setContentView(R.layout.activity_main);
 
         imageView = (ImageView) findViewById(R.id.imageView);
         attacher = new PhotoViewAttacher(imageView);
+        attacher.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
         calipersView = (CalipersView) findViewById(R.id.caliperView);
 
         actionBar = (Toolbar) findViewById(R.id.action_bar);
@@ -136,11 +139,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
 
-       // imageView.setScaleType(ImageView.ScaleType.CENTER);
-//        imageView.setMaxZoom(3.0f);
-//        imageView.setMinZoom(0.25f);
-//        imageView.setZoom(1.0f);
-       // lastZoomFactor = imageView.getCurrentZoom();
+        lastZoomFactor = attacher.getScale();
+        Log.d(EPS, "lastZoomFactor = " + lastZoomFactor);
 
 
         createButtons();
@@ -516,10 +516,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         imageView.setEnabled(!calipersMode);
         calipersView.setEnabled(calipersMode);
         if (calipersMode) {
-            actionBar.setTitle(getString(R.string.ep_calipers_title));
+            getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
             selectMainMenu();
         } else {
-            actionBar.setTitle(getString(R.string.image_mode_title));
+            getSupportActionBar().setTitle(getString(R.string.image_mode_title));
             selectImageMenu();
         }
     }
