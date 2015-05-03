@@ -13,6 +13,7 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -133,6 +134,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         imageView = (ImageView) findViewById(R.id.imageView);
         attacher = new PhotoViewAttacher(imageView);
         attacher.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        attacher.setOnScaleChangeListener(new ScaleChangeListener());
+        attacher.setOnMatrixChangeListener(new MatrixChangeListener());
 
         calipersView = (CalipersView) findViewById(R.id.caliperView);
 
@@ -943,6 +946,38 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         c.setInitialPosition(rect);
         getCalipers().add(c);
     }
+
+    private void scaleChangeAction(float scaleFactor, float focusX, float focusY) {
+        Log.d(EPS, "scaleFactor = " + scaleFactor +
+                " focusX = " + focusX + " focusY = " + focusY);
+        Log.d(EPS, "scale = " + attacher.getScale());
+    }
+
+    private void matrixChangedAction() {
+        Log.d(EPS, "Matrix changed, scale = " + attacher.getScale());
+        horizontalCalibration.setCurrentZoom(attacher.getScale());
+        verticalCalibration.setCurrentZoom(attacher.getScale());
+        calipersView.invalidate();
+    }
+
+    private class ScaleChangeListener implements PhotoViewAttacher.OnScaleChangeListener {
+
+        @Override
+        public void onScaleChange(float scaleFactor, float focusX, float focusY) {
+            scaleChangeAction(scaleFactor, focusX, focusY);
+        }
+    }
+
+    private class MatrixChangeListener implements PhotoViewAttacher.OnMatrixChangedListener {
+
+        @Override
+        public void onMatrixChanged(RectF rect) {
+            matrixChangedAction();
+
+        }
+    }
+
+
 }
 
 
