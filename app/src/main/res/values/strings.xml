@@ -39,4 +39,11 @@
     <string name="no_caliper_selected_alert_message">Selected a
         caliper by single-tapping it.  Move the caliper to a known
         interval.  Touch Set to enter the calibration measurement.</string>
+    <string name="calibration_dialog_message">Enter measurement (e.g. %s):</string>
+    <string name="example_amplitude_measurement">1 mV</string>
+    <string name="example_time_measurement">500 msec</string>
+    <string name="calibrate_dialog_title">Calibrate</string>
+    <string name="ok_title">OK</string>
+    <string name="cancel_title">Cancel</string>
+    <string name="calibration_dialog_hint">Type current measurement here.</string>
 </resources>

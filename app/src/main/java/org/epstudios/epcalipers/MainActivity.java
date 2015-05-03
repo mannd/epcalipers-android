@@ -47,6 +47,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
@@ -63,10 +67,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private static boolean firstRun = true;
 
-    RelativeLayout layout;
+    private RelativeLayout layout;
 
     // Buttons
-    Button addCaliperButton;
+    private Button addCaliperButton;
     Button calibrateButton;
     Button intervalRateButton;
     Button meanRateButton;
@@ -99,7 +103,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     Calibration verticalCalibration;
     // Settings settings;
 
-    double rrIntervalForQTc;
+    private double rrIntervalForQTc;
 
     float sizeDiffWidth;
     float sizeDiffHeight;
@@ -111,6 +115,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     float portraitHeight;
     float landscapeWidth;
     float landscapeHeight;
+
+    private String dialogResult;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -747,26 +753,34 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         String example = "";
         if (c.getDirection() == Caliper.Direction.VERTICAL) {
-            example = "1 mV";
+            example = getString(R.string.example_amplitude_measurement);
         }
         else {
-            example = "500 msec";
+            example = getString(R.string.example_time_measurement);
         }
+        String message = String.format(getString(R.string.calibration_dialog_message),
+                example);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Title");
-        builder.setMessage("Test Message");
-        String result;
+        builder.setTitle(getString(R.string.calibrate_dialog_title));
+        builder.setMessage(message);
 
         final EditText input = new EditText(this);
+        input.setLines(1);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setHint(getString(R.string.calibration_dialog_hint));
+        input.setSelection(0);
+        // TODO set default/last value
+
         builder.setView(input);
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String result = input.getText().toString();
+                dialogResult = input.getText().toString();
+                processCalibration();
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -774,8 +788,30 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         });
 
         builder.show();
+    }
+
+    private void processCalibration() {
+        Log.d(EPS, "process calibration...");
+        if (dialogResult.length() < 1) {
+            return;
+        }
+        float value = 0.0f;
+        List<String> chunks = parse(dialogResult);
+        Log.d(EPS, "chunks = " + chunks);
 
     }
+
+    static final Pattern VALID_PATTERN = Pattern.compile("[0-9]+|[a-zA-Z]+");
+
+    private List<String> parse(String toParse) {
+        List<String> chunks = new LinkedList<String>();
+        Matcher matcher = VALID_PATTERN.matcher(toParse);
+        while (matcher.find()) {
+            chunks.add( matcher.group() );
+        }
+        return chunks;
+    }
+
 
     private void noCalipersAlert() {
         showSimpleAlert(R.string.no_calipers_alert_title,
