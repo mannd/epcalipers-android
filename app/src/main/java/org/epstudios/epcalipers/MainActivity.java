@@ -44,6 +44,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -790,21 +791,88 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         builder.show();
     }
 
+    private class CalibrationResult {
+        public boolean success;
+        public float value;
+        public String units;
+
+        CalibrationResult() {
+            success = false;
+            value = 0.0f;
+            units = "";
+        }
+    }
+
     private void processCalibration() {
         Log.d(EPS, "process calibration...");
         if (dialogResult.length() < 1) {
             return;
         }
-        float value = 0.0f;
-        List<String> chunks = parse(dialogResult);
-        Log.d(EPS, "chunks = " + chunks);
-
+        CalibrationResult calibrationResult = processCalibrationString(dialogResult);
+        if (!calibrationResult.success) {
+            return;
+        }
+        Caliper c = calipersView.activeCaliper();
+        if (c == null || c.getValueInPoints() <= 0) {
+            return;
+        }
+        Calibration cal;
+        if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
+            cal = horizontalCalibration;
+        }
+        else {
+            cal = verticalCalibration;
+        }
+        cal.setCalibrationString(dialogResult);
+        cal.setUnits(calibrationResult.units);
+        if (cal.getDirection() == Caliper.Direction.HORIZONTAL && cal.canDisplayRate()) {
+            cal.setDisplayRate(false);
+        }
+        cal.setOriginalZoom(attacher.getScale());
+        cal.setOriginalCalFactor(calibrationResult.value / c.getValueInPoints());
+        cal.setCurrentZoom(cal.getOriginalZoom());
+        cal.setCalibrated(true);
+        calipersView.invalidate();
+        selectMainMenu();
     }
 
-    static final Pattern VALID_PATTERN = Pattern.compile("[0-9]+|[a-zA-Z]+");
+    // Guarantees outCalFactor is non-negative, non-zero.
+    // outUnits can be zero-length string.
+    private CalibrationResult processCalibrationString(String in) {
+        CalibrationResult calibrationResult = new CalibrationResult();
+        if (in.length() < 1) {
+            return calibrationResult;
+        }
+        List<String> chunks = parse(in);
+        Log.d(EPS, "chunks = " + chunks);
+        if (chunks.size() < 1) {
+            return calibrationResult;
+        }
+        NumberFormat format = NumberFormat.getInstance();
+        try {
+            Number number = format.parse(chunks.get(0));
+            calibrationResult.value = number.floatValue();
+        } catch (Exception ex) {
+            Log.d(EPS, "exception = " + ex.toString());
+            return calibrationResult;
+        }
+        if (chunks.size() > 1) {
+            calibrationResult.units = chunks.get(1);
+        }
+        // all calibration values must be positive
+        calibrationResult.value = Math.abs(calibrationResult.value);
+        // check for other badness
+        if (calibrationResult.value <= 0.0f) {
+            return calibrationResult;
+        }
+        calibrationResult.success = true;
+        return calibrationResult;
+    }
+
+    static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
 
     private List<String> parse(String toParse) {
-        List<String> chunks = new LinkedList<String>();
+        List<String> chunks = new LinkedList<>();
         Matcher matcher = VALID_PATTERN.matcher(toParse);
         while (matcher.find()) {
             chunks.add( matcher.group() );

@@ -84,10 +84,6 @@ public class Caliper {
         this.direction = direction;
     }
 
-    public int getValueInPoints() {
-        return valueInPoints;
-    }
-
     public boolean isSelected() {
         return selected;
     }
@@ -122,7 +118,6 @@ public class Caliper {
     }
 
     private int selectedColor;
-    private int valueInPoints;
     private boolean selected;
     private DecimalFormat decimalFormat;
     private Paint paint;
@@ -254,6 +249,10 @@ public class Caliper {
 
     private float points() {
         return bar2Position - bar1Position;
+    }
+
+    public float getValueInPoints() {
+        return points();
     }
 
     private double rateResult(double interval) {
