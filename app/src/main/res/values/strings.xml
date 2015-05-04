@@ -46,10 +46,8 @@
     <string name="ok_title">OK</string>
     <string name="cancel_title">Cancel</string>
     <string name="calibration_dialog_hint">Type current measurement here.</string>
-    <string name="hide_start_image_key">hide_start_image</string>
-    <string name="hide_start_image_off_summary">Show sample ECG at start</string>
-    <string name="hide_start_image_on_summary">Don\'t show sample ECG at start</string>
-    <string name="hide_start_image_label">Hide sample ECG at start?</string>
+    <string name="show_start_image_key">show_start_image</string>
+    <string name="show_start_image_label">Show sample ECG at start?</string>
     <string name="settings_title">Settings</string>
     <string name="default_time_calibration_key">default_time_calibration</string>
     <string name="default_time_calibration_label">Default Time Calibration</string>
@@ -57,4 +55,12 @@
     <string name="default_amplitude_calibration_value">10 mm</string>
     <string name="default_amplitude_calibration_key">default_amplitude_calibration</string>
     <string name="default_amplitude_calibration_label">Default Amplitude Calibration</string>
+    <string name="default_caliper_color_key">default_caliper_color</string>
+    <string name="default_caliper_color_label">Caliper Color</string>
+    <string name="default_highlight_color_label">Highlight Color</string>
+    <string name="default_highlight_color_key">default_highlight_color</string>
+    <string name="default_line_width_key">default_line_width</string>
+    <string name="default_line_width_label">Line Width</string>
+    <string name="show_start_image_off_summary">Don\'t show ECG</string>
+    <string name="show_start_image_on_summary">Show ECG</string>
 </resources>

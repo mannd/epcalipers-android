@@ -2,9 +2,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="@string/hide_start_image_key"
-        android:title="@string/hide_start_image_label" />
+        android:defaultValue="true"
+        android:key="@string/show_start_image_key"
+        android:title="@string/show_start_image_label"
+        android:summaryOff="@string/show_start_image_off_summary"
+        android:summaryOn="@string/show_start_image_on_summary"
+        />
 
     <EditTextPreference
         android:defaultValue="@string/default_time_calibration_value"
@@ -18,9 +21,28 @@
 
     <ListPreference
         android:defaultValue="Blue"
-        android:entries="@array/verbosity_names"
-        android:entryValues="@array/verbosity_values"
-        android:key="@string/code_verbosity_key"
-        android:title="@string/code_analysis_verbosity_label" />
+        android:entries="@array/caliper_color_names"
+        android:entryValues="@array/caliper_color_values"
+        android:key="@string/default_caliper_color_key"
+        android:title="@string/default_caliper_color_label" />
+
+    <ListPreference
+        android:defaultValue="Red"
+        android:entries="@array/highlight_color_names"
+        android:entryValues="@array/highlight_color_values"
+        android:key="@string/default_highlight_color_key"
+        android:title="@string/default_highlight_color_label" />
+
+    <ListPreference
+        android:defaultValue="2"
+        android:entries="@array/line_width_names"
+        android:entryValues="@array/line_width_values"
+        android:key="@string/default_line_width_key"
+        android:title="@string/default_line_width_label" />
+
+
 
 </PreferenceScreen>
+
+
+

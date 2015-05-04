@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="caliper_color_names">
+    <string-array name="caliper_color_names">
         <item>Black</item>
         <item>Magenta</item>
         <item>Gray</item>
         <item>Blue</item>
         <item>Green</item>
         <item>White</item>
-    </array>
-    <array name="caliper_color_values">
+    </string-array>
+    <string-array name="caliper_color_values">
         <item>Black</item>
         <item>Magenta</item>
         <item>Gray</item>
         <item>Blue</item>
         <item>Green</item>
         <item>White</item>
-    </array>
-    <array name="hightlight_color_names">
+    </string-array>
+    <string-array name="highlight_color_names">
         <item>Red</item>
         <item>Yellow</item>
         <item>Orange</item>
-    </array>
-    <array name="hightlight_color_values">
+    </string-array>
+    <string-array name="highlight_color_values">
         <item>Red</item>
         <item>Yellow</item>
         <item>Orange</item>
-    </array>
-    <array name="line_width_names">
+    </string-array>
+    <string-array name="line_width_names">
         <item>1 point</item>
         <item>2 points</item>
         <item>3 points</item>
-    </array>
-    <array name="line_width_values">
+    </string-array>
+    <string-array name="line_width_values">
         <item>1</item>
         <item>2</item>
         <item>3</item>
-    </array>
+    </string-array>
 </resources>
