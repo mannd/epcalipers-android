@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/hide_start_image_key"
+        android:title="@string/hide_start_image_label" />
+
+    <EditTextPreference
+        android:defaultValue="@string/default_time_calibration_value"
+        android:key="@string/default_time_calibration_key"
+        android:title="@string/default_time_calibration_label" />
+
+    <EditTextPreference
+        android:defaultValue="@string/default_amplitude_calibration_value"
+        android:key="@string/default_amplitude_calibration_key"
+        android:title="@string/default_amplitude_calibration_label" />
+
+    <ListPreference
+        android:defaultValue="Blue"
+        android:entries="@array/verbosity_names"
+        android:entryValues="@array/verbosity_values"
+        android:key="@string/code_verbosity_key"
+        android:title="@string/code_analysis_verbosity_label" />
+
+</PreferenceScreen>

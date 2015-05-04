@@ -526,7 +526,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void changeSettings() {
-      // TODO
+        Intent i = new Intent(this, Prefs.class);
+        startActivity(i);
     }
 
     private void selectImageFromGallery() {
