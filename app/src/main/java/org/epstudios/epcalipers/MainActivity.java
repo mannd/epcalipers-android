@@ -110,7 +110,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     float sizeDiffWidth;
     float sizeDiffHeight;
 
-    float lastZoomFactor;
     boolean isRotatedImage;
 
     float portraitWidth;
@@ -134,7 +133,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         imageView = (ImageView) findViewById(R.id.imageView);
         attacher = new PhotoViewAttacher(imageView);
         attacher.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        attacher.setOnScaleChangeListener(new ScaleChangeListener());
+        // We need to use MatrixChangeListener and not ScaleChangeListener
+        // since the former only fires when scale has completely changed and
+        // the latter fires while the scale is changing, so is inaccurate.
         attacher.setOnMatrixChangeListener(new MatrixChangeListener());
 
         calipersView = (CalipersView) findViewById(R.id.caliperView);
@@ -143,10 +144,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setSupportActionBar(actionBar);
 
         menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
-
-        lastZoomFactor = attacher.getScale();
-        Log.d(EPS, "lastZoomFactor = " + lastZoomFactor);
-
 
         createButtons();
 
@@ -199,7 +196,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void scaleImageForImageView() {
         if (true)
             return;
-        float ratio = 1.0f;
         Drawable image = imageView.getDrawable();
         float imageWidth = image.getIntrinsicWidth();
         float imageHeight = image.getIntrinsicHeight();
@@ -220,7 +216,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 toolbarHeight + " StatusBar height = " + statusBarHeight);
         Log.d(EPS, "ImageView height = " + imageView.getHeight());
         Log.d(EPS, "Screen height = " + screenHeight);
-
+        float ratio;
         if (imageWidth > imageHeight) {
             ratio = portraitWidth / imageWidth;
         }
@@ -256,8 +252,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Rect rect = new Rect();
         Window window = getWindow();
         window.getDecorView().getWindowVisibleDisplayFrame(rect);
-        int statusBarHeight = rect.top;
-        return statusBarHeight;
+        return rect.top;
     }
 
     // handle rotation
@@ -308,8 +303,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             rotateImage(1.0f);
         } else if (v == resetImageButton) {
             resetImage();
-        } else if (v == backToImageMenuButton) {
-            selectImageMenu();
         } else if (v == horizontalCaliperButton) {
             addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
         } else if (v == verticalCaliperButton) {
@@ -375,7 +368,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void createMainMenu() {
-        ArrayList<Button> buttons = new ArrayList<Button>();
+        ArrayList<Button> buttons = new ArrayList<>();
         buttons.add(addCaliperButton);
         buttons.add(calibrateButton);
         buttons.add(intervalRateButton);
@@ -385,7 +378,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void createImageMenu() {
-        ArrayList<Button> buttons = new ArrayList<Button>();
+        ArrayList<Button> buttons = new ArrayList<>();
         buttons.add(cameraButton);
         buttons.add(selectImageButton);
         buttons.add(adjustImageButton);
@@ -393,7 +386,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void createAddCaliperMenu() {
-        ArrayList<Button> buttons = new ArrayList<Button>();
+        ArrayList<Button> buttons = new ArrayList<>();
         buttons.add(horizontalCaliperButton);
         buttons.add(verticalCaliperButton);
         buttons.add(cancelAddCaliperButton);
@@ -401,7 +394,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void createAdjustImageMenu() {
-        ArrayList<Button> buttons = new ArrayList<Button>();
+        ArrayList<Button> buttons = new ArrayList<>();
         buttons.add(rotateImageLeftButton);
         buttons.add(rotateImageRightButton);
         buttons.add(tweakImageLeftButton);
@@ -412,7 +405,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void createCalibrationMenu() {
-        ArrayList<Button> buttons = new ArrayList<Button>();
+        ArrayList<Button> buttons = new ArrayList<>();
         buttons.add(setCalibrationButton);
         buttons.add(clearCalibrationButton);
         buttons.add(doneCalibrationButton);
@@ -755,7 +748,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (c == null) {
             return; // shouldn't happen, but if it does...
         }
-        String example = "";
+        String example;
         if (c.getDirection() == Caliper.Direction.VERTICAL) {
             example = getString(R.string.example_amplitude_measurement);
         }
@@ -947,25 +940,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         getCalipers().add(c);
     }
 
-    private void scaleChangeAction(float scaleFactor, float focusX, float focusY) {
-        Log.d(EPS, "scaleFactor = " + scaleFactor +
-                " focusX = " + focusX + " focusY = " + focusY);
-        Log.d(EPS, "scale = " + attacher.getScale());
-    }
-
     private void matrixChangedAction() {
         Log.d(EPS, "Matrix changed, scale = " + attacher.getScale());
-        horizontalCalibration.setCurrentZoom(attacher.getScale());
-        verticalCalibration.setCurrentZoom(attacher.getScale());
+        adjustCalibrationForScale(attacher.getScale());
         calipersView.invalidate();
     }
 
-    private class ScaleChangeListener implements PhotoViewAttacher.OnScaleChangeListener {
-
-        @Override
-        public void onScaleChange(float scaleFactor, float focusX, float focusY) {
-            scaleChangeAction(scaleFactor, focusX, focusY);
-        }
+    private void adjustCalibrationForScale(float scale) {
+        horizontalCalibration.setCurrentZoom(scale);
+        verticalCalibration.setCurrentZoom(scale);
     }
 
     private class MatrixChangeListener implements PhotoViewAttacher.OnMatrixChangedListener {
@@ -976,7 +959,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         }
     }
-
 
 }
 
