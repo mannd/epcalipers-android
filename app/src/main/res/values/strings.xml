@@ -63,4 +63,7 @@
     <string name="default_line_width_label">Line Width</string>
     <string name="show_start_image_off_summary">Don\'t show ECG</string>
     <string name="show_start_image_on_summary">Show ECG</string>
+    <string name="default_caliper_color">Blue</string>
+    <string name="default_highlight_color">Red</string>
+    <string name="default_line_width">2 points</string>
 </resources>

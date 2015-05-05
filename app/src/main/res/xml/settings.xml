@@ -12,22 +12,28 @@
     <EditTextPreference
         android:defaultValue="@string/default_time_calibration_value"
         android:key="@string/default_time_calibration_key"
-        android:title="@string/default_time_calibration_label" />
+        android:title="@string/default_time_calibration_label"
+        android:lines="1"
+        android:maxLines="1"
+        android:singleLine="true" />
 
     <EditTextPreference
         android:defaultValue="@string/default_amplitude_calibration_value"
         android:key="@string/default_amplitude_calibration_key"
-        android:title="@string/default_amplitude_calibration_label" />
+        android:title="@string/default_amplitude_calibration_label"
+        android:lines="1"
+        android:maxLines="1"
+        android:singleLine="true" />
 
     <ListPreference
-        android:defaultValue="Blue"
+        android:defaultValue="-16776961"
         android:entries="@array/caliper_color_names"
         android:entryValues="@array/caliper_color_values"
         android:key="@string/default_caliper_color_key"
         android:title="@string/default_caliper_color_label" />
 
     <ListPreference
-        android:defaultValue="Red"
+        android:defaultValue="-65536"
         android:entries="@array/highlight_color_names"
         android:entryValues="@array/highlight_color_values"
         android:key="@string/default_highlight_color_key"

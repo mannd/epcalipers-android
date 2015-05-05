@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -78,7 +77,7 @@ public class CalipersView extends View {
 
     private void init(Context context) {
         locked = false;
-        calipers = new ArrayList<Caliper>();
+        calipers = new ArrayList<>();
         touchedCaliper = null;
         MyGestureListener listener = new MyGestureListener();
         gestureDetector = new GestureDetectorCompat(context, listener);
@@ -217,7 +216,6 @@ public class CalipersView extends View {
         calipers.remove(c);
     }
 
-    // TODO private void singleTap(), dragging(),
     public void singleTap(PointF pointF) {
         boolean selectionMade = false;
         for (int i = calipersCount() - 1; i >= 0; i--) {

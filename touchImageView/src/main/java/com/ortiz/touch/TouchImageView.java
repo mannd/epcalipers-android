@@ -1278,9 +1278,8 @@ public class TouchImageView extends ImageView {
 
     //////////////////////////////////////////////////////////
     // Methods add by manndmd@gmail.com to allow rotation
+    // ABANDONED
     //////////////////////////////////////////////////////////
-
-    // Unfortunately no animation, but it does the job
 
     public void rotateImage(float degrees) {
         // animation doesn't really work
@@ -1290,7 +1289,7 @@ public class TouchImageView extends ImageView {
 //        rotateAnimation.setDuration(500L);
 //        rotateAnimation.setFillAfter(false);
 //        startAnimation(rotateAnimation);
-        // FIXME doesn't maintain center of rotation with multiple rotations
+        // doesn't maintain center of rotation with multiple rotations
         matrix.postRotate(degrees, getWidth() / 2, getHeight() / 2);
         setImageMatrix(matrix);
     }

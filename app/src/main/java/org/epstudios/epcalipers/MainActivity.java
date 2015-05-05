@@ -539,8 +539,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void takePhoto() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // make sure device has a camera
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+        if (deviceHasCamera(takePictureIntent)) {
             File photoFile = null;
             try {
                 photoFile = createImageFile();
@@ -554,6 +553,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             }
         }
         // TODO else warning dialog, no camera?
+    }
+
+    private boolean deviceHasCamera(Intent takePictureIntent) {
+        return takePictureIntent.resolveActivity(getPackageManager()) != null;
     }
 
 
@@ -764,6 +767,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         final EditText input = new EditText(this);
         input.setLines(1);
+        input.setMaxLines(1);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setHint(getString(R.string.calibration_dialog_hint));
         input.setSelection(0);
