@@ -243,7 +243,7 @@ public class Caliper {
         return result;
     }
 
-    private double intervalResult() {
+    public double intervalResult() {
         return points() * calibration.multiplier();
     }
 
@@ -255,7 +255,7 @@ public class Caliper {
         return points();
     }
 
-    private double rateResult(double interval) {
+    public double rateResult(double interval) {
         if (interval != 0) {
             if (calibration.unitsAreMsec()) {
                 interval = 60000.0 / interval;

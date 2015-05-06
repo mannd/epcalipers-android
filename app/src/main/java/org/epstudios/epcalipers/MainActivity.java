@@ -173,6 +173,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
                 if (true)
                     return;
+                ////////////////////////////////////////// TODO
                 attacher = new PhotoViewAttacher(imageView);
                 attacher.setScaleType(ImageView.ScaleType.CENTER);
                 attacher.setMinimumScale(0.5f);
@@ -313,6 +314,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             takePhoto();
         } else if (v == setCalibrationButton) {
             setCalibration();
+        } else if (v == intervalRateButton) {
+            toggleIntervalRate();
+        } else if (v == meanRateButton) {
+            meanRR();
         }
 
     }
@@ -362,7 +367,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
        // button.setBackgroundColor(getResources().getColor(R.color.primary));
         button.getBackground().setColorFilter(getResources()
                 .getColor(R.color.primary), PorterDuff.Mode.CLEAR);
-       // button.setBackgroundResource(0);
         button.setOnClickListener(this);
         return button;
     }
@@ -559,7 +563,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return takePictureIntent.resolveActivity(getPackageManager()) != null;
     }
 
-
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -592,7 +595,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
 
-
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
             Cursor cursor = getContentResolver().query(selectedImage,
@@ -621,8 +623,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
             imageView.setImageBitmap(bitmap);
             attacher.update();
-
-
         }
         if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
             int targetWidth = imageView.getWidth();
@@ -672,13 +672,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void rotateImage(float degrees) {
         attacher.setRotationBy(degrees);
-
-        //imageView.rotateImage(degrees);
     }
 
     private void resetImage() {
         attacher.setRotationTo(0f);
-        //imageView.resetImage();
     }
 
     private void showHelp() {
@@ -692,10 +689,79 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void meanRR() {
         if (calipersCount() < 1) {
             noCalipersAlert();
-            // select main toolbar;
+            selectMainMenu();
             return;
         }
         Caliper singleHorizontalCaliper = getLoneTimeCaliper();
+        if (singleHorizontalCaliper != null) {
+            calipersView.selectCaliper(singleHorizontalCaliper);
+            unselectCalipersExcept(singleHorizontalCaliper);
+        }
+        if (calipersView.noCaliperIsSelected()) {
+            noCaliperSelectedAlert();
+            return;
+        }
+        Caliper c = calipersView.activeCaliper();
+        if (c.getDirection() == Caliper.Direction.VERTICAL) {
+            showNoTimeCaliperSelectedAlert(); // TODO reword this dialog
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.number_of_intervals_dialog_title));
+        builder.setMessage(getString(R.string.number_of_intervals_dialog_message));
+        final EditText input = new EditText(this);
+        // not sure I need ALL of the below!
+        input.setLines(1);
+        input.setMaxLines(1);
+        input.setSingleLine(true);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setHint(getString(R.string.mean_rr_dialog_hint));
+        input.setSelection(0);
+        // TODO set default/last value
+
+        builder.setView(input);
+        builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialogResult = input.getText().toString();
+                processMeanRR();
+            }
+        });
+        builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void processMeanRR() {
+        int divisor;
+        try {
+            divisor = Integer.parseInt(dialogResult);
+        } catch (Exception ex) {
+            return;
+        }
+        if (divisor > 0) {
+            Caliper c = calipersView.activeCaliper();
+            if (c == null) {
+                return;
+            }
+            double intervalResult = Math.abs(c.intervalResult());
+            double meanRR = intervalResult / divisor;
+            double meanRate = c.rateResult(meanRR);
+            // TODO reuse above for QTc
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.mean_rr_result_dialog_title));
+            // TODO format the results
+            builder.setMessage("Mean interval = " + meanRR + " " +
+                c.getCalibration().rawUnits() + "\nMean rate = " +
+                meanRate + " bpm");
+             builder.show();
+        }
     }
 
     private void toggleIntervalRate() {
@@ -766,8 +832,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         builder.setMessage(message);
 
         final EditText input = new EditText(this);
+        // not sure I need ALL of the below!
         input.setLines(1);
         input.setMaxLines(1);
+        input.setSingleLine(true);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setHint(getString(R.string.calibration_dialog_hint));
         input.setSelection(0);

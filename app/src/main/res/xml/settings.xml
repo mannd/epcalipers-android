@@ -13,6 +13,7 @@
         android:defaultValue="@string/default_time_calibration_value"
         android:key="@string/default_time_calibration_key"
         android:title="@string/default_time_calibration_label"
+        android:inputType="text"
         android:lines="1"
         android:maxLines="1"
         android:singleLine="true" />
@@ -21,6 +22,7 @@
         android:defaultValue="@string/default_amplitude_calibration_value"
         android:key="@string/default_amplitude_calibration_key"
         android:title="@string/default_amplitude_calibration_label"
+        android:inputType="text"
         android:lines="1"
         android:maxLines="1"
         android:singleLine="true" />

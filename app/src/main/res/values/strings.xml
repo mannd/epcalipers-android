@@ -50,20 +50,25 @@
     <string name="show_start_image_label">Show sample ECG at start?</string>
     <string name="settings_title">Settings</string>
     <string name="default_time_calibration_key">default_time_calibration</string>
-    <string name="default_time_calibration_label">Default Time Calibration</string>
+    <string name="default_time_calibration_label">Default time calibration</string>
     <string name="default_time_calibration_value">1000 msec</string>
     <string name="default_amplitude_calibration_value">10 mm</string>
     <string name="default_amplitude_calibration_key">default_amplitude_calibration</string>
-    <string name="default_amplitude_calibration_label">Default Amplitude Calibration</string>
+    <string name="default_amplitude_calibration_label">Default amplitude calibration</string>
     <string name="default_caliper_color_key">default_caliper_color</string>
-    <string name="default_caliper_color_label">Caliper Color</string>
-    <string name="default_highlight_color_label">Highlight Color</string>
+    <string name="default_caliper_color_label">Caliper color</string>
+    <string name="default_highlight_color_label">Highlight color</string>
     <string name="default_highlight_color_key">default_highlight_color</string>
     <string name="default_line_width_key">default_line_width</string>
-    <string name="default_line_width_label">Line Width</string>
+    <string name="default_line_width_label">Line width</string>
     <string name="show_start_image_off_summary">Don\'t show ECG</string>
     <string name="show_start_image_on_summary">Show ECG</string>
     <string name="default_caliper_color">Blue</string>
     <string name="default_highlight_color">Red</string>
     <string name="default_line_width">2 points</string>
+    <string name="number_of_intervals_dialog_title">Enter Number of Intervals</string>
+    <string name="number_of_intervals_dialog_message">How many intervals is this caliper measuring?</string>
+    <string name="mean_rr_dialog_hint">Number of intervals measured</string>
+    <string name="mean_rr_result_dialog_title">Mean Interval and Rate</string>
+    <string name="mean_rr_result_dialog_message">Mean interval = %%s %%s\\nMean rate = %%s bpm</string>
 </resources>
