@@ -45,6 +45,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -364,9 +365,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // buttons won't flash, but will behave similarly to iOS buttons,
         // alternative is ugly colors.
         button.setTextColor(Color.WHITE);
-       // button.setBackgroundColor(getResources().getColor(R.color.primary));
-        button.getBackground().setColorFilter(getResources()
-                .getColor(R.color.primary), PorterDuff.Mode.CLEAR);
+ //       button.setBackgroundColor(getResources().getColor(R.color.primary));
+//        button.getBackground().setColorFilter(getResources()
+//                .getColor(R.color.primary), PorterDuff.Mode.CLEAR);
         button.setOnClickListener(this);
         return button;
     }
@@ -421,6 +422,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             createMainMenu();
         }
         selectMenu(mainMenu);
+        boolean enable = horizontalCalibration.canDisplayRate();
+        intervalRateButton.setEnabled(enable);
+        meanRateButton.setEnabled(enable);
+        qtcButton.setEnabled(enable);
         calipersView.setLocked(false);
     }
 
@@ -714,7 +719,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         input.setLines(1);
         input.setMaxLines(1);
         input.setSingleLine(true);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
         input.setHint(getString(R.string.mean_rr_dialog_hint));
         input.setSelection(0);
         // TODO set default/last value
@@ -756,10 +761,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.mean_rr_result_dialog_title));
-            // TODO format the results
-            builder.setMessage("Mean interval = " + meanRR + " " +
+            DecimalFormat decimalFormat = new DecimalFormat("@@@##");
+
+            builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
                 c.getCalibration().rawUnits() + "\nMean rate = " +
-                meanRate + " bpm");
+                decimalFormat.format(meanRate) + " bpm");
              builder.show();
         }
     }
@@ -839,7 +845,26 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setHint(getString(R.string.calibration_dialog_hint));
         input.setSelection(0);
+        String calibrationString = "";
         // TODO set default/last value
+        if (horizontalCalibration.getCalibrationString().length() < 1) {
+//            horizontalCalibration.setCalibrationString(getSharedPreferences()
+//                    .getString(
+//                    getString(R.string.default_time_calibration_value), ""));
+        }
+        if (verticalCalibration.getCalibrationString().length() < 1) {
+//            verticalCalibration.setCalibrationString(getSharedPreferences().get);
+        }
+        input.setText(calibrationString);
+        if (c != null) {
+            Caliper.Direction direction = c.getDirection();
+            if (direction == Caliper.Direction.HORIZONTAL) {
+                calibrationString = horizontalCalibration.getCalibrationString();
+            } else {
+                calibrationString = verticalCalibration.getCalibrationString();
+            }
+        }
+        input.setText(calibrationString);
 
         builder.setView(input);
 

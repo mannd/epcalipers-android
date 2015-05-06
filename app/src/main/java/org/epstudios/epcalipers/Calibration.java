@@ -88,6 +88,7 @@ public class Calibration {
         originalZoom = 1.0f;
         currentZoom = 1.0f;
         calibrated = false;
+        calibrationString = "";
     }
 
     public void setDisplayRate(boolean value) {
