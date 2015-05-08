@@ -63,6 +63,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private static final String EPS = "EPS";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
+    private static final int DEFAULT_CALIPER_COLOR = Color.BLUE;
+    private static final int DEFAULT_HIGHLIGHT_COLOR = Color.RED;
+    private static final int DEFAULT_LINE_WIDTH = 2;
+
     private ImageView imageView;
     private CalipersView calipersView;
     private Toolbar menuToolbar;
@@ -121,6 +125,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private float landscapeWidth;
     private float landscapeHeight;
 
+    private boolean showStartImage;
+    private int currentCaliperColor;
+    private int currentHighlightColor;
+    private int currentLineWidth;
+    private String defaultTimeCalibration;
+    private String defaultAmplitudeCalibration;
+
     private String dialogResult;
 
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
@@ -161,10 +172,71 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         calipersMode = true;
         setMode();
 
+        currentCaliperColor = DEFAULT_CALIPER_COLOR;
+        currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
+        currentLineWidth = DEFAULT_LINE_WIDTH;
+
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                Log.d(EPS, "prefs changed");
+                Log.d(EPS, "pref changed " + key);
+                // show start image only has effect with restart
+                if (key.equals(getString(R.string.show_start_image_key))) {
+                    return;
+                }
+                if (key.equals(getString(R.string.default_time_calibration_key))) {
+                    defaultTimeCalibration = sharedPreferences.getString(key,
+                            getString(R.string.default_time_calibration_value));
+                    return; // no need to invalidate calpersView.
+                }
+                if (key.equals(getString(R.string.default_amplitude_calibration_key))) {
+                    defaultAmplitudeCalibration = sharedPreferences.getString(key,
+                            getString(R.string.default_amplitude_calibration_value));
+                    return; // no need to invalidate calpersView.
+                }
+                if (key.equals(getString(R.string.default_caliper_color_key))) {
+                    try {
+                        int color = Integer.parseInt(sharedPreferences.getString(key,
+                                getString(R.string.default_caliper_color)));
+                        currentCaliperColor = color;
+                        for (Caliper c : calipersView.getCalipers()) {
+                            c.setUnselectedColor(color);
+                            if (!c.isSelected()) {
+                                c.setColor(color);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        return;
+                    }
+                }
+                if (key.equals(getString(R.string.default_highlight_color_key))) {
+                    try {
+                        int color = Integer.parseInt(sharedPreferences.getString(key,
+                                getString(R.string.default_highlight_color)));
+                        currentHighlightColor = color;
+                        for (Caliper c : calipersView.getCalipers()) {
+                            c.setSelectedColor(color);
+                            if (c.isSelected()) {
+                                c.setColor(color);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        return;
+                    }
+                }
+                if (key.equals(getString(R.string.default_line_width_key))) {
+                    try {
+                        int lineWidth = Integer.parseInt(sharedPreferences.getString(key,
+                                getString(R.string.default_line_width)));
+                        currentLineWidth = lineWidth;
+                        for (Caliper c : calipersView.getCalipers()) {
+                            c.setLineWidth(lineWidth);
+                        }
+                    } catch (Exception ex) {
+                        return;
+                    }
+                }
+                calipersView.invalidate();
             }
         };
 
@@ -216,17 +288,32 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     void loadSettings() {
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
-        // plusShownInDisplay = sharedPreferences.getBoolean(
-        // "show_plus_code_display", true);
-        // allowChangingPrimaryCodes = sharedPreferences.getBoolean(
-        // "allow_changing_primary_codes", false);
+        showStartImage = sharedPreferences.getBoolean(
+                getString(R.string.show_start_image_key), true);
+        defaultTimeCalibration = sharedPreferences.getString(getString(
+                R.string.default_time_calibration_key), defaultTimeCalibration);
+        defaultAmplitudeCalibration = sharedPreferences.getString(
+                getString(R.string.default_amplitude_calibration_key), defaultAmplitudeCalibration);
+        try {
+            currentCaliperColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_caliper_color_key),
+                    new Integer(DEFAULT_CALIPER_COLOR).toString()));
+            currentHighlightColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_highlight_color_key),
+                    new Integer(DEFAULT_HIGHLIGHT_COLOR).toString()));
+            currentLineWidth = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_line_width_key),
+                    new Integer(DEFAULT_LINE_WIDTH).toString()));
+        } catch (Exception ex) {
+            currentCaliperColor = DEFAULT_CALIPER_COLOR;
+            currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
+            currentLineWidth = DEFAULT_LINE_WIDTH;
+        }
+
+//        calipersView.invalidate();
 
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        //loadSettings();
         Log.d(EPS, "onResume");
 
 
@@ -883,14 +970,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         input.setHint(getString(R.string.calibration_dialog_hint));
         input.setSelection(0);
         String calibrationString = "";
-        // TODO set default/last value
         if (horizontalCalibration.getCalibrationString().length() < 1) {
-//            horizontalCalibration.setCalibrationString(getSharedPreferences()
-//                    .getString(
-//                    getString(R.string.default_time_calibration_value), ""));
+            horizontalCalibration.setCalibrationString(defaultTimeCalibration);
         }
         if (verticalCalibration.getCalibrationString().length() < 1) {
-//            verticalCalibration.setCalibrationString(getSharedPreferences().get);
+            verticalCalibration.setCalibrationString(defaultAmplitudeCalibration);
         }
         input.setText(calibrationString);
         if (c != null) {
@@ -1063,9 +1147,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void addCaliperWithDirectionAtRect(Caliper.Direction direction,
                                                Rect rect) {
         Caliper c = new Caliper();
-        // TODO set up caliper per settings
-        // c.linewidth = settings.linewidht;
-        // etc.
+        c.setUnselectedColor(currentCaliperColor);
+        c.setSelectedColor(currentHighlightColor);
+        c.setColor(currentCaliperColor);
+        c.setLineWidth(currentLineWidth);
         c.setDirection(direction);
         if (direction == Caliper.Direction.HORIZONTAL) {
             c.setCalibration(horizontalCalibration);

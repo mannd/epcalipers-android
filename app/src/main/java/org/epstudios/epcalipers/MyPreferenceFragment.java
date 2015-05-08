@@ -15,18 +15,18 @@ import java.util.Map;
 public class MyPreferenceFragment extends PreferenceFragment implements
         OnSharedPreferenceChangeListener {
 
-    private final static Map<Integer, String> colors = createMap();
+    private final static Map<Integer, String> names = createMap();
 
     private static Map<Integer, String> createMap() {
         Map<Integer, String> map = new HashMap<>();
-        // caliper colors
+        // caliper names
         map.put(-16777216, "Black");
         map.put(-65281, "Magenta");
         map.put(-3355444, "Light Gray");
         map.put(-16776961, "Blue");
         map.put(-16711936, "Green");
         map.put(-1, "White");
-        // highlight colors
+        // highlight names
         map.put(-65536, "Red");
         map.put(-256, "Yellow");
         map.put(-12303292, "Dark Gray");
@@ -85,21 +85,21 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         String defaultCaliperColorValue = getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultCaliperColorKey, defaultCaliperColor);
-        String defaultCaliperColorName = colors.get(Integer.parseInt(defaultCaliperColorValue));
+        String defaultCaliperColorName = names.get(Integer.parseInt(defaultCaliperColorValue));
         defaultCaliperColorPreference.setSummary(defaultCaliperColorName);
 
         Preference defaultHighlightColorPreference = findPreference(defaultHighlightColorKey);
         String defaultHighlightColorValue = getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultHighlightColorKey, defaultHighlightColor);
-        String defaultHighlightColorName = colors.get(Integer.parseInt(defaultHighlightColorValue));
+        String defaultHighlightColorName = names.get(Integer.parseInt(defaultHighlightColorValue));
         defaultHighlightColorPreference.setSummary(defaultHighlightColorName);
 
         Preference defaultLineWidthPreference = findPreference(defaultLineWidthKey);
         String defaultLineWidthValue = getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultLineWidthKey, defaultLineWidth);
-        String defaultLineWidthName = colors.get(Integer.parseInt(defaultLineWidthValue));
+        String defaultLineWidthName = names.get(Integer.parseInt(defaultLineWidthValue));
         defaultLineWidthPreference.setSummary(defaultLineWidthName);
 
 
@@ -116,13 +116,22 @@ public class MyPreferenceFragment extends PreferenceFragment implements
             pref.setSummary(sharedPreferences.getString(key, defaultTimeCalibration));
         }
         else if (key.equals(defaultCaliperColorKey)) {
-            pref.setSummary(colors.get(Integer.parseInt(sharedPreferences.getString(key, defaultCaliperColor))));
+            pref.setSummary(getNameFromKey(sharedPreferences, key, defaultCaliperColor));
         }
         else if (key.equals(defaultHighlightColorKey)) {
-            pref.setSummary(colors.get(Integer.parseInt(sharedPreferences.getString(key, defaultHighlightColor))));
+            pref.setSummary(getNameFromKey(sharedPreferences, key, defaultHighlightColor));
         }
         else if (key.equals(defaultLineWidthKey)) {
-            pref.setSummary(colors.get(Integer.parseInt(sharedPreferences.getString(key, defaultLineWidth))));
+            pref.setSummary(getNameFromKey(sharedPreferences, key, defaultLineWidth));
+        }
+    }
+
+    private String getNameFromKey(SharedPreferences sharedPreferences, String key, String defaultName) {
+        try {
+            Integer value = Integer.parseInt(sharedPreferences.getString(key, defaultName));
+            return names.get(value);
+        } catch (Exception ex) {
+            return names.get(defaultName);
         }
     }
 
