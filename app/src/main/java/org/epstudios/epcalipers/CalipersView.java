@@ -129,6 +129,17 @@ public class CalipersView extends View {
 
     }
 
+    public void setPaint(int caliperColor, int highlightColor, int lineWidth) {
+        if (calipersCount() <= 0) {
+            return;
+        }
+        for (Caliper c : calipers) {
+            c.setUnselectedColor(caliperColor);
+            c.setSelectedColor(highlightColor);
+            c.setLineWidth(lineWidth);
+        }
+    }
+
 
 
     @Override

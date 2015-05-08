@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -19,6 +20,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -52,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -108,17 +111,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private double rrIntervalForQTc;
 
-    float sizeDiffWidth;
-    float sizeDiffHeight;
+    private float sizeDiffWidth;
+    private float sizeDiffHeight;
 
-    boolean isRotatedImage;
+    private boolean isRotatedImage;
 
-    float portraitWidth;
-    float portraitHeight;
-    float landscapeWidth;
-    float landscapeHeight;
+    private float portraitWidth;
+    private float portraitHeight;
+    private float landscapeWidth;
+    private float landscapeHeight;
 
     private String dialogResult;
+
+    private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -156,6 +161,17 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         calipersMode = true;
         setMode();
 
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                Log.d(EPS, "prefs changed");
+            }
+        };
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        prefs.registerOnSharedPreferenceChangeListener(listener);
+
 
         layout = (RelativeLayout)findViewById(R.id.activity_main_id);
         ViewTreeObserver viewTreeObserver = layout.getViewTreeObserver();
@@ -171,6 +187,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
                 scaleImageForImageView();
+                loadSettings();
                 addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
                 if (true)
                     return;
@@ -192,6 +209,26 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 // TODO use saved scale to fix calibration after rotation
             }
         });
+    }
+
+
+
+    void loadSettings() {
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        // plusShownInDisplay = sharedPreferences.getBoolean(
+        // "show_plus_code_display", true);
+        // allowChangingPrimaryCodes = sharedPreferences.getBoolean(
+        // "allow_changing_primary_codes", false);
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //loadSettings();
+        Log.d(EPS, "onResume");
+
 
     }
 
@@ -989,6 +1026,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         dialog.show();
 
     }
+
 
     private Caliper getLoneTimeCaliper() {
         Caliper c = null;
