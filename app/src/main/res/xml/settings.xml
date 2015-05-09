@@ -6,8 +6,7 @@
         android:key="@string/show_start_image_key"
         android:title="@string/show_start_image_label"
         android:summaryOff="@string/show_start_image_off_summary"
-        android:summaryOn="@string/show_start_image_on_summary"
-        />
+        android:summaryOn="@string/show_start_image_on_summary" />
 
     <EditTextPreference
         android:defaultValue="@string/default_time_calibration_value"

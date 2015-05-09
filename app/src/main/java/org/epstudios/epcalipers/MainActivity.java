@@ -152,6 +152,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         loadSettings();
 
         imageView = (ImageView) findViewById(R.id.imageView);
+        if (!showStartImage) {
+            imageView.setVisibility(View.INVISIBLE);
+        }
         attacher = new PhotoViewAttacher(imageView);
         attacher.setScaleType(ImageView.ScaleType.CENTER);
         // We need to use MatrixChangeListener and not ScaleChangeListener
@@ -649,9 +652,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         calipersView.setEnabled(calipersMode);
         if (calipersMode) {
             getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
+            unfadeCalipersView();
             selectMainMenu();
         } else {
             getSupportActionBar().setTitle(getString(R.string.image_mode_title));
+            fadeCalipersView();
             selectImageMenu();
         }
     }
@@ -747,8 +752,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             imageHeight = bitmap.getHeight();
             imageWidth = bitmap.getWidth();
             Log.d(EPS, "image=" + imageWidth + "x" + imageHeight);
-
             imageView.setImageBitmap(bitmap);
+            imageView.setVisibility(View.VISIBLE);
             attacher.update();
         }
         if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
@@ -769,6 +774,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             options.inSampleSize = scaleFactor;
             Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
             imageView.setImageBitmap(bitmap);
+            imageView.setVisibility(View.VISIBLE);
             attacher.update();
         }
     }
@@ -1134,6 +1140,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                         super.onAnimationEnd(animation);
                     }
                 });
+    }
+
+    private void fadeCalipersView() {
+        calipersView.setAlpha(0.5f);
+    }
+
+    private void unfadeCalipersView() {
+        calipersView.setAlpha(1.0f);
     }
 
 
