@@ -489,7 +489,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         // buttons won't flash, but will behave similarly to iOS buttons,
         // alternative is ugly colors.
-        button.setTextColor(Color.WHITE);
+  //     button.setTextColor(Color.WHITE);
  //       button.setBackgroundColor(getResources().getColor(R.color.primary));
 //        button.getBackground().setColorFilter(getResources()
 //                .getColor(R.color.primary), PorterDuff.Mode.CLEAR);
