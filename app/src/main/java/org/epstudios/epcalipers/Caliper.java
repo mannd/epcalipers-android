@@ -40,7 +40,7 @@ public class Caliper {
     private static int differential = 0;
     private static final float DELTA = 30.0f;
 
-    public enum TouchedBar {NONE, BAR1, BAR2, CROSSBAR};
+    public enum TouchedBar {NONE, BAR1, BAR2, CROSSBAR}
 
     public TouchedBar getTouchedBar() {
         return touchedBar;
@@ -92,7 +92,7 @@ public class Caliper {
         this.selected = selected;
     }
 
-    public enum Direction { HORIZONTAL, VERTICAL };
+    public enum Direction { HORIZONTAL, VERTICAL }
 
     private float bar1Position;
     private float bar2Position;

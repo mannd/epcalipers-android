@@ -144,15 +144,16 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            ;
         }
         Log.d(EPS, "onCreate");
 
         setContentView(R.layout.activity_main);
 
+        loadSettings();
+
         imageView = (ImageView) findViewById(R.id.imageView);
         attacher = new PhotoViewAttacher(imageView);
-        attacher.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        attacher.setScaleType(ImageView.ScaleType.CENTER);
         // We need to use MatrixChangeListener and not ScaleChangeListener
         // since the former only fires when scale has completely changed and
         // the latter fires while the scale is changing, so is inaccurate.
@@ -264,16 +265,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
                 scaleImageForImageView();
-                loadSettings();
                 addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
-                if (true)
-                    return;
-                ////////////////////////////////////////// TODO
-                attacher = new PhotoViewAttacher(imageView);
-                attacher.setScaleType(ImageView.ScaleType.CENTER);
-                attacher.setMinimumScale(0.5f);
-                attacher.setMaximumScale(3.0f);
-                attacher.setMediumScale(1.0f);
+
                 if (firstRun) {
                     scaleImageForImageView();
                     firstRun = false;
@@ -325,8 +318,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void scaleImageForImageView() {
-        if (true)
-            return;
         Drawable image = imageView.getDrawable();
         float imageWidth = image.getIntrinsicWidth();
         float imageHeight = image.getIntrinsicHeight();
