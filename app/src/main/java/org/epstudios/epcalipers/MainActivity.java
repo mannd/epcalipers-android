@@ -1,5 +1,7 @@
 package org.epstudios.epcalipers;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -12,7 +14,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
@@ -54,7 +55,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -136,6 +136,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
+    private int shortAnimationDuration;
+
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,6 +159,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         attacher.setOnMatrixChangeListener(new MatrixChangeListener());
 
         calipersView = (CalipersView) findViewById(R.id.caliperView);
+        shortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
 
         actionBar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
@@ -439,6 +444,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             takePhoto();
         } else if (v == setCalibrationButton) {
             setCalibration();
+        } else if (v == clearCalibrationButton) {
+            clearCalibration();
         } else if (v == intervalRateButton) {
             toggleIntervalRate();
         } else if (v == meanRateButton) {
@@ -1108,7 +1115,34 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         builder.setPositiveButton("OK", null);
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
 
+    private void clearCalibration() {
+        resetCalibration();
+    }
+
+    private void resetCalibration() {
+        if (horizontalCalibration.isCalibrated() || verticalCalibration.isCalibrated()) {
+            flashCalipers();
+            horizontalCalibration.reset();
+            verticalCalibration.reset();
+        }
+    }
+
+    private void flashCalipers() {
+        final float originalAlpha = calipersView.getAlpha();
+        calipersView.setAlpha(1.0f);
+        calipersView.animate()
+                .alphaBy(-0.8f)
+                .setDuration(shortAnimationDuration)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        calipersView.setAlpha(originalAlpha);
+                        calipersView.invalidate();
+                        super.onAnimationEnd(animation);
+                    }
+                });
     }
 
 

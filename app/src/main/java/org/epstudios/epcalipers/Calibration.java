@@ -82,7 +82,7 @@ public class Calibration {
         this(Caliper.Direction.HORIZONTAL);
     }
 
-    private void reset() {
+    public void reset() {
         units = "points";
         displayRate = false;
         originalZoom = 1.0f;
