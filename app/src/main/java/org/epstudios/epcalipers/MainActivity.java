@@ -43,6 +43,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -57,7 +58,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
     private static final String EPS = "EPS";
@@ -101,6 +101,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     Button clearCalibrationButton;
     Button doneCalibrationButton;
     Button measureRRButton;
+    Button cancelQTcButton;
     Button measureQTButton;
 
     HorizontalScrollView mainMenu;
@@ -108,6 +109,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     HorizontalScrollView addCaliperMenu;
     HorizontalScrollView adjustImageMenu;
     HorizontalScrollView calibrationMenu;
+    HorizontalScrollView qtcStep1Menu;
 
     Calibration horizontalCalibration;
     Calibration verticalCalibration;
@@ -137,7 +139,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     private int shortAnimationDuration;
-
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -253,7 +254,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         prefs.registerOnSharedPreferenceChangeListener(listener);
 
-
         layout = (RelativeLayout)findViewById(R.id.activity_main_id);
         ViewTreeObserver viewTreeObserver = layout.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -284,8 +284,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         });
     }
 
-
-
     void loadSettings() {
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
@@ -307,17 +305,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
             currentLineWidth = DEFAULT_LINE_WIDTH;
         }
-
-//        calipersView.invalidate();
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
         Log.d(EPS, "onResume");
-
-
     }
 
     private void scaleImageForImageView() {
@@ -380,9 +373,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return rect.top;
     }
 
-    // handle rotation
-
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(EPS, "onSaveInstanceState");
@@ -392,7 +382,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // TODO all the others
 
     }
-
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -444,6 +433,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             toggleIntervalRate();
         } else if (v == meanRateButton) {
             meanRR();
+        } else if (v == qtcButton) {
+            calculateQTc();
+        } else if (v == cancelQTcButton) {
+            selectMainMenu();
         }
 
     }
@@ -478,7 +471,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setCalibrationButton = createButton(getString(R.string.set_calibration_button_title));
         clearCalibrationButton = createButton(getString(R.string.clear_calibration_button_title));
         doneCalibrationButton = createButton(getString(R.string.done_button_title));
-
+        // QTc menu
+        measureRRButton = createButton(getString(R.string.qtc_measure_rr_button_label));
+        cancelQTcButton = createButton(getString(R.string.cancel_button_title));
     }
 
     private Button createButton(String text) {
@@ -486,19 +481,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         button.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         button.setText(text);
-
-        // buttons won't flash, but will behave similarly to iOS buttons,
-        // alternative is ugly colors.
-  //     button.setTextColor(Color.WHITE);
- //       button.setBackgroundColor(getResources().getColor(R.color.primary));
-//        button.getBackground().setColorFilter(getResources()
-//                .getColor(R.color.primary), PorterDuff.Mode.CLEAR);
         button.setOnClickListener(this);
         return button;
     }
 
     private void createMainMenu() {
-        ArrayList<Button> buttons = new ArrayList<>();
+        ArrayList<TextView> buttons = new ArrayList<>();
         buttons.add(addCaliperButton);
         buttons.add(calibrateButton);
         buttons.add(intervalRateButton);
@@ -508,7 +496,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void createImageMenu() {
-        ArrayList<Button> buttons = new ArrayList<>();
+        ArrayList<TextView> buttons = new ArrayList<>();
         buttons.add(cameraButton);
         buttons.add(selectImageButton);
         buttons.add(adjustImageButton);
@@ -516,7 +504,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void createAddCaliperMenu() {
-        ArrayList<Button> buttons = new ArrayList<>();
+        ArrayList<TextView> buttons = new ArrayList<>();
         buttons.add(horizontalCaliperButton);
         buttons.add(verticalCaliperButton);
         buttons.add(cancelAddCaliperButton);
@@ -524,7 +512,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void createAdjustImageMenu() {
-        ArrayList<Button> buttons = new ArrayList<>();
+        ArrayList<TextView> buttons = new ArrayList<>();
         buttons.add(rotateImageLeftButton);
         buttons.add(rotateImageRightButton);
         buttons.add(tweakImageLeftButton);
@@ -535,11 +523,21 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void createCalibrationMenu() {
-        ArrayList<Button> buttons = new ArrayList<>();
+        ArrayList<TextView> buttons = new ArrayList<>();
         buttons.add(setCalibrationButton);
         buttons.add(clearCalibrationButton);
         buttons.add(doneCalibrationButton);
         calibrationMenu = createMenu(buttons);
+    }
+
+    private void createQTcStep1Menu() {
+        ArrayList<TextView> items = new ArrayList<>();
+        TextView textView = new TextView(this);
+        textView.setText(getString(R.string.select_rr_intervals_message));
+        items.add(textView);
+        items.add(measureRRButton);
+        items.add(cancelQTcButton);
+        qtcStep1Menu = createMenu(items);
     }
 
     private void selectMainMenu() {
@@ -582,12 +580,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         selectMenu(calibrationMenu);
     }
 
+    private void selectQTcStep1Menu() {
+        if (qtcStep1Menu == null) {
+            createQTcStep1Menu();
+        }
+        selectMenu(qtcStep1Menu);
+    }
+
     private void selectMenu(HorizontalScrollView menu) {
         clearToolbar();
         menuToolbar.addView(menu);
     }
 
-    private HorizontalScrollView createMenu(ArrayList<Button> buttons) {
+    private HorizontalScrollView createMenu(ArrayList<TextView> buttons) {
         HorizontalScrollView scrollView = new HorizontalScrollView(this);
         HorizontalScrollView.LayoutParams layoutParams = new HorizontalScrollView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -595,7 +600,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.HORIZONTAL);
         layout.setLayoutParams(layoutParams);
-        for (Button button : buttons) {
+        for (TextView button : buttons) {
             layout.addView(button);
         }
         scrollView.addView(layout);
@@ -895,6 +900,24 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 c.getCalibration().rawUnits() + "\nMean rate = " +
                 decimalFormat.format(meanRate) + " bpm");
              builder.show();
+        }
+    }
+
+    private void calculateQTc() {
+        horizontalCalibration.setDisplayRate(false);
+        Caliper singleHorizontalCaliper = getLoneTimeCaliper();
+        if (singleHorizontalCaliper != null) {
+            calipersView.selectCaliper(singleHorizontalCaliper);
+            unselectCalipersExcept(singleHorizontalCaliper);
+        }
+        if (noTimeCaliperSelected()) {
+            showNoTimeCaliperSelectedAlert();
+            calipersView.setLocked(true);
+        }
+        else {
+            rrIntervalForQTc = 0.0;
+            selectQTcStep1Menu();
+            calipersView.setLocked(true);
         }
     }
 

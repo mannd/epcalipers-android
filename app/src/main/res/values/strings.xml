@@ -71,4 +71,6 @@
     <string name="mean_rr_dialog_hint">Number of intervals measured</string>
     <string name="mean_rr_result_dialog_title">Mean Interval and Rate</string>
     <string name="mean_rr_result_dialog_message">Mean interval = %%s %%s\\nMean rate = %%s bpm</string>
+    <string name="select_rr_intervals_message">RR interval(s)?</string>
+    <string name="qtc_measure_rr_button_label">Measure</string>
 </resources>
