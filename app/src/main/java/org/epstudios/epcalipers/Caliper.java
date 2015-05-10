@@ -267,7 +267,7 @@ public class Caliper {
         return interval;
     }
 
-    private double intervalInSecs(double interval) {
+    public double intervalInSecs(double interval) {
         if (calibration.unitsAreSeconds()) {
             return interval;
         }

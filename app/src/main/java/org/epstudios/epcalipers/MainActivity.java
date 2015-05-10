@@ -104,6 +104,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     Button measureRRButton;
     Button cancelQTcButton;
     Button measureQTButton;
+    Button cancelQTcMeasurementButton;
 
     HorizontalScrollView mainMenu;
     HorizontalScrollView imageMenu;
@@ -111,6 +112,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     HorizontalScrollView adjustImageMenu;
     HorizontalScrollView calibrationMenu;
     HorizontalScrollView qtcStep1Menu;
+    HorizontalScrollView qtcStep2Menu;
 
     Calibration horizontalCalibration;
     Calibration verticalCalibration;
@@ -440,6 +442,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             calculateQTc();
         } else if (v == cancelQTcButton) {
             selectMainMenu();
+        } else if (v == measureRRButton) {
+            qtcMeasureRR();
+        } else if (v == measureQTButton) {
+            doQTcCalculation();
+        } else if (v == cancelQTcMeasurementButton) {
+            selectMainMenu();
         }
 
     }
@@ -475,8 +483,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         clearCalibrationButton = createButton(getString(R.string.clear_calibration_button_title));
         doneCalibrationButton = createButton(getString(R.string.done_button_title));
         // QTc menu
-        measureRRButton = createButton(getString(R.string.qtc_measure_rr_button_label));
+        measureRRButton = createButton(getString(R.string.measure_button_label));
         cancelQTcButton = createButton(getString(R.string.cancel_button_title));
+        measureQTButton = createButton(getString(R.string.measure_button_label));
+        cancelQTcMeasurementButton = createButton(getString(R.string.cancel_button_title));
     }
 
     private Button createButton(String text) {
@@ -543,6 +553,16 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         qtcStep1Menu = createMenu(items);
     }
 
+    private void createQTcStep2Menu() {
+        ArrayList<TextView> items = new ArrayList<>();
+        TextView textView = new TextView(this);
+        textView.setText(getString(R.string.qt_interval_query));
+        items.add(textView);
+        items.add(measureQTButton);
+        items.add(cancelQTcMeasurementButton);
+        qtcStep2Menu = createMenu(items);
+    }
+
     private void selectMainMenu() {
         if (mainMenu == null) {
             createMainMenu();
@@ -588,6 +608,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             createQTcStep1Menu();
         }
         selectMenu(qtcStep1Menu);
+    }
+
+    private void selectQTcStep2Menu() {
+        if (qtcStep2Menu == null) {
+            createQTcStep2Menu();
+        }
+        selectMenu(qtcStep2Menu);
     }
 
     private void selectMenu(HorizontalScrollView menu) {
@@ -904,8 +931,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             DecimalFormat decimalFormat = new DecimalFormat("@@@##");
 
             builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
-                c.getCalibration().rawUnits() + "\nMean rate = " +
-                decimalFormat.format(meanRate) + " bpm");
+                    c.getCalibration().rawUnits() + "\nMean rate = " +
+                    decimalFormat.format(meanRate) + " bpm");
              builder.show();
         }
     }
@@ -913,7 +940,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void calculateQTc() {
         horizontalCalibration.setDisplayRate(false);
         Caliper singleHorizontalCaliper = getLoneTimeCaliper();
-        if (singleHorizontalCaliper != null) {
+        if (singleHorizontalCaliper != null && !singleHorizontalCaliper.isSelected()) {
             calipersView.selectCaliper(singleHorizontalCaliper);
             unselectCalipersExcept(singleHorizontalCaliper);
         }
@@ -925,6 +952,96 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             rrIntervalForQTc = 0.0;
             selectQTcStep1Menu();
             calipersView.setLocked(true);
+        }
+    }
+
+    private void qtcMeasureRR() {
+        if (noTimeCaliperSelected()) {
+            showNoTimeCaliperSelectedAlert();
+        }
+        else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.number_of_intervals_dialog_title));
+            builder.setMessage(getString(R.string.number_of_intervals_dialog_message));
+            final EditText input = new EditText(this);
+            // not sure I need ALL of the below!
+            input.setLines(1);
+            input.setMaxLines(1);
+            input.setSingleLine(true);
+            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+            input.setHint(getString(R.string.mean_rr_dialog_hint));
+            input.setText(getString(R.string.default_number_rr_intervals));
+            input.setSelection(0);
+            // TODO set default/last value
+
+            builder.setView(input);
+            builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Caliper c = calipersView.activeCaliper();
+                    if (c == null) {
+                        dialog.cancel();
+                        return;
+                    }
+                    dialogResult = input.getText().toString();
+                    int divisor;
+                    try {
+                        divisor = Integer.parseInt(dialogResult);
+                    } catch (Exception ex) {
+                        dialog.cancel();
+                        return;
+                    }
+                    double intervalResult = Math.abs(c.intervalResult());
+                    double meanRR = intervalResult / divisor;
+                    rrIntervalForQTc = c.intervalInSecs(meanRR);
+                    selectQTcStep2Menu();
+                }
+            });
+            builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+        }
+    }
+
+    private void doQTcCalculation() {
+        if (noTimeCaliperSelected()) {
+            showNoTimeCaliperSelectedAlert();
+        }
+        else {
+            Caliper c = calipersView.activeCaliper();
+            if (c == null) {
+                return;
+            }
+            double qt = Math.abs(c.intervalInSecs(c.intervalResult()));
+            double meanRR = Math.abs(rrIntervalForQTc);
+            String result;
+            if (meanRR > 0) {
+                double sqrtRR = Math.sqrt(meanRR);
+                double qtc = qt / sqrtRR;
+                if (c.getCalibration().unitsAreMsec()) {
+                    meanRR *= 1000;
+                    qt *= 1000;
+                    qtc *= 1000;
+                }
+                DecimalFormat decimalFormat = new DecimalFormat("@@@##");
+                result = "Mean interval = " + decimalFormat.format(meanRR) + " " +
+                        c.getCalibration().getUnits() + "\nQT = " +
+                        decimalFormat.format(qt) + " " +
+                        c.getCalibration().getUnits() +
+                        "\nQTc = " + decimalFormat.format(qtc) + " " +
+                        c.getCalibration().getUnits() +
+                        "\n(Bazett's formula)";
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(getString(R.string.calculated_qtc_dialog_title));
+                builder.setMessage(result);
+                builder.show();
+                selectMainMenu();
+            }
         }
     }
 
