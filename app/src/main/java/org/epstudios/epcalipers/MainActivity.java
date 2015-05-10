@@ -147,8 +147,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState != null) {
-        }
+
         Log.d(EPS, "onCreate");
 
         setContentView(R.layout.activity_main);
@@ -160,7 +159,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         loadSettings();
 
         imageView = (ImageView) findViewById(R.id.imageView);
-        if (!showStartImage) {
+        if (!showStartImage && savedInstanceState == null) {
             imageView.setVisibility(View.INVISIBLE);
         }
         attacher = new PhotoViewAttacher(imageView);
@@ -272,16 +271,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 } else {
                     layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
-                scaleImageForImageView();
+                //scaleImageForImageView();
                 addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
 
-                if (firstRun) {
+                if (savedInstanceState == null) {
                     scaleImageForImageView();
-                    firstRun = false;
                 }
-                if (savedInstanceState != null) {
-                    attacher.setScale(savedInstanceState.getFloat("scale"));
-                }
+//                if (savedInstanceState != null) {
+//                    attacher.setScale(savedInstanceState.getFloat("scale"));
+//                }
                 Log.d(EPS, "attacher scale = " + attacher.getScale());
 
                 // TODO use saved scale to fix calibration after rotation
@@ -384,6 +382,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onSaveInstanceState(outState);
         outState.putBoolean("calipersMode", calipersMode);
         outState.putFloat("scale", attacher.getScale());
+        outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
         // TODO all the others
 
     }
@@ -396,6 +395,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // TODO more stuff
         setMode();
         calipersView.invalidate();
+        Bitmap image = (Bitmap) savedInstanceState.getParcelable("Image");
+        imageView.setImageBitmap(image);
+        attacher.update();
+        attacher.setScale(savedInstanceState.getFloat("scale"));
     }
 
     @Override
@@ -791,6 +794,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             imageWidth = bitmap.getWidth();
             Log.d(EPS, "image=" + imageWidth + "x" + imageHeight);
             imageView.setImageBitmap(bitmap);
+            scaleImageForImageView();
             imageView.setVisibility(View.VISIBLE);
             attacher.update();
         }
@@ -812,6 +816,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             options.inSampleSize = scaleFactor;
             Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
             imageView.setImageBitmap(bitmap);
+            scaleImageForImageView();
             imageView.setVisibility(View.VISIBLE);
             attacher.update();
         }
