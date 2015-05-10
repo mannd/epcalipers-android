@@ -61,13 +61,46 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
+    static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
     private static final String EPS = "EPS";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
     private static final int DEFAULT_CALIPER_COLOR = Color.BLUE;
     private static final int DEFAULT_HIGHLIGHT_COLOR = Color.RED;
     private static final int DEFAULT_LINE_WIDTH = 2;
-
+    private Button addCaliperButton;
+    private Button calibrateButton;
+    private Button intervalRateButton;
+    private Button meanRateButton;
+    private Button qtcButton;
+    private Button cameraButton;
+    private Button selectImageButton;
+    private Button adjustImageButton;
+    private Button rotateImageRightButton;
+    private Button rotateImageLeftButton;
+    private Button tweakImageRightButton;
+    private Button tweakImageLeftButton;
+    private Button resetImageButton;
+    private Button backToImageMenuButton;
+    private Button horizontalCaliperButton;
+    private Button verticalCaliperButton;
+    private Button cancelAddCaliperButton;
+    private Button setCalibrationButton;
+    private Button clearCalibrationButton;
+    private Button doneCalibrationButton;
+    private Button measureRRButton;
+    private Button cancelQTcButton;
+    private Button measureQTButton;
+    private Button cancelQTcMeasurementButton;
+    private HorizontalScrollView mainMenu;
+    private HorizontalScrollView imageMenu;
+    private HorizontalScrollView addCaliperMenu;
+    private HorizontalScrollView adjustImageMenu;
+    private HorizontalScrollView calibrationMenu;
+    private HorizontalScrollView qtcStep1Menu;
+    private HorizontalScrollView qtcStep2Menu;
+    private Calibration horizontalCalibration;
+    private Calibration verticalCalibration;
     private ImageView imageView;
     private CalipersView calipersView;
     private Toolbar menuToolbar;
@@ -75,73 +108,48 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private boolean calipersMode;
     private PhotoViewAttacher attacher;
     private String currentPhotoPath;
-
-    private static boolean firstRun = true;
-
     private RelativeLayout layout;
-
-    // Buttons
-    private Button addCaliperButton;
-    Button calibrateButton;
-    Button intervalRateButton;
-    Button meanRateButton;
-    Button qtcButton;
-    Button cameraButton;
-    Button selectImageButton;
-    Button adjustImageButton;
-    Button rotateImageRightButton;
-    Button rotateImageLeftButton;
-    Button tweakImageRightButton;
-    Button tweakImageLeftButton;
-    Button resetImageButton;
-    Button backToImageMenuButton;
-    Button horizontalCaliperButton;
-    Button verticalCaliperButton;
-    Button cancelAddCaliperButton;
-    Button setCalibrationButton;
-    Button clearCalibrationButton;
-    Button doneCalibrationButton;
-    Button measureRRButton;
-    Button cancelQTcButton;
-    Button measureQTButton;
-    Button cancelQTcMeasurementButton;
-
-    HorizontalScrollView mainMenu;
-    HorizontalScrollView imageMenu;
-    HorizontalScrollView addCaliperMenu;
-    HorizontalScrollView adjustImageMenu;
-    HorizontalScrollView calibrationMenu;
-    HorizontalScrollView qtcStep1Menu;
-    HorizontalScrollView qtcStep2Menu;
-
-    Calibration horizontalCalibration;
-    Calibration verticalCalibration;
-    // Settings settings;
-
     private double rrIntervalForQTc;
-
     private float sizeDiffWidth;
     private float sizeDiffHeight;
-
     private boolean isRotatedImage;
-
     private float portraitWidth;
     private float portraitHeight;
     private float landscapeWidth;
     private float landscapeHeight;
-
     private boolean showStartImage;
     private int currentCaliperColor;
     private int currentHighlightColor;
     private int currentLineWidth;
     private String defaultTimeCalibration;
     private String defaultAmplitudeCalibration;
-
     private String dialogResult;
-
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
-
     private int shortAnimationDuration;
+    private boolean noSavedInstance;
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -149,6 +157,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
         Log.d(EPS, "onCreate");
+        noSavedInstance = (savedInstanceState == null);
 
         setContentView(R.layout.activity_main);
 
@@ -186,9 +195,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         rrIntervalForQTc = 0.0;
 
         calipersMode = true;
-        setMode();
-
-
 
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -274,15 +280,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 //scaleImageForImageView();
                 addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
 
-                if (savedInstanceState == null) {
+                if (noSavedInstance) {
+                    Log.d(EPS, "ScaleImageForImageView()");
                     scaleImageForImageView();
                 }
-//                if (savedInstanceState != null) {
-//                    attacher.setScale(savedInstanceState.getFloat("scale"));
-//                }
-                Log.d(EPS, "attacher scale = " + attacher.getScale());
-
-                // TODO use saved scale to fix calibration after rotation
             }
         });
     }
@@ -384,6 +385,22 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         outState.putFloat("scale", attacher.getScale());
         outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
         // TODO all the others
+        // Calibration
+        outState.putString("hcalUnits", horizontalCalibration.getUnits());
+        outState.putString("hcalCalibrationString", horizontalCalibration.getCalibrationString());
+        outState.putBoolean("hcalDisplayRate", horizontalCalibration.getDisplayRate());
+        outState.putFloat("hcalOriginalZoom", horizontalCalibration.getOriginalZoom());
+        outState.putFloat("hcalCurrentZoom", horizontalCalibration.getCurrentZoom());
+        outState.putBoolean("hcalCalibrated", horizontalCalibration.isCalibrated());
+        outState.putFloat(("hcalOriginalCalFactor"), horizontalCalibration.getOriginalCalFactor());
+
+                outState.putString("vcalUnits", verticalCalibration.getUnits());
+        outState.putString("vcalCalibrationString", verticalCalibration.getCalibrationString());
+        outState.putBoolean("vcalDisplayRate", verticalCalibration.getDisplayRate());
+        outState.putFloat("vcalOriginalZoom", verticalCalibration.getOriginalZoom());
+        outState.putFloat("vcalCurrentZoom", verticalCalibration.getCurrentZoom());
+        outState.putBoolean("vcalCalibrated", verticalCalibration.isCalibrated());
+        outState.putFloat("vcalOriginalCalFactor", verticalCalibration.getOriginalCalFactor());
 
     }
 
@@ -392,13 +409,42 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Log.d(EPS, "onRestoreInstanceState");
         super.onRestoreInstanceState(savedInstanceState);
         calipersMode = savedInstanceState.getBoolean("calipersMode");
-        // TODO more stuff
         setMode();
         calipersView.invalidate();
+
         Bitmap image = (Bitmap) savedInstanceState.getParcelable("Image");
         imageView.setImageBitmap(image);
         attacher.update();
-        attacher.setScale(savedInstanceState.getFloat("scale"));
+        // NOTE! appears must set animate for this to work, otherwise
+        // scale goes back to 1.0.
+        Log.d(EPS, "minScale = " + attacher.getMinimumScale() + " maxScale = " +
+            attacher.getMaximumScale());
+        // TODO fix problem with scale > max
+        attacher.setScale(savedInstanceState.getFloat("scale"), true);
+
+        Log.d(EPS, "Restored scale = " + attacher.getScale());
+
+        // TODO more stuff
+
+        // Calibration
+        horizontalCalibration.setUnits(savedInstanceState.getString("hcalUnits"));
+        horizontalCalibration.setCalibrationString(savedInstanceState.getString("hcalCalibrationString"));
+        horizontalCalibration.setDisplayRate(savedInstanceState.getBoolean("hcalDisplayRate"));
+        horizontalCalibration.setOriginalZoom(savedInstanceState.getFloat("hcalOriginalZoom"));
+        horizontalCalibration.setCurrentZoom(savedInstanceState.getFloat("hcalCurrentZoom"));
+        horizontalCalibration.setCalibrated(savedInstanceState.getBoolean("hcalCalibrated"));
+        horizontalCalibration.setOriginalCalFactor(savedInstanceState.getFloat("hcalOriginalCalFactor"));
+
+        verticalCalibration.setUnits(savedInstanceState.getString("vcalUnits"));
+        verticalCalibration.setCalibrationString(savedInstanceState.getString("vcalCalibrationString"));
+        verticalCalibration.setDisplayRate(savedInstanceState.getBoolean("vcalDisplayRate"));
+        verticalCalibration.setOriginalZoom(savedInstanceState.getFloat("vcalOriginalZoom"));
+        verticalCalibration.setCurrentZoom(savedInstanceState.getFloat("vcalCurrentZoom"));
+        verticalCalibration.setCalibrated(savedInstanceState.getBoolean("vcalCalibrated"));
+        verticalCalibration.setOriginalCalFactor(savedInstanceState.getFloat("vcalOriginalCalFactor"));
+
+
+
     }
 
     @Override
@@ -822,30 +868,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
-
-
     private void rotateImage(float degrees) {
         attacher.setRotationBy(degrees);
     }
@@ -1162,18 +1184,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         builder.show();
     }
 
-    private class CalibrationResult {
-        public boolean success;
-        public float value;
-        public String units;
-
-        CalibrationResult() {
-            success = false;
-            value = 0.0f;
-            units = "";
-        }
-    }
-
     private void processCalibration() {
         Log.d(EPS, "process calibration...");
         if (dialogResult.length() < 1) {
@@ -1240,8 +1250,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return calibrationResult;
     }
 
-    static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
-
     private List<String> parse(String toParse) {
         List<String> chunks = new LinkedList<>();
         Matcher matcher = VALID_PATTERN.matcher(toParse);
@@ -1250,7 +1258,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         return chunks;
     }
-
 
     private void noCalipersAlert() {
         showSimpleAlert(R.string.no_calipers_alert_title,
@@ -1301,7 +1308,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void unfadeCalipersView() {
         calipersView.setAlpha(1.0f);
     }
-
 
     private Caliper getLoneTimeCaliper() {
         Caliper c = null;
@@ -1361,6 +1367,18 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void adjustCalibrationForScale(float scale) {
         horizontalCalibration.setCurrentZoom(scale);
         verticalCalibration.setCurrentZoom(scale);
+    }
+
+    private class CalibrationResult {
+        public boolean success;
+        public float value;
+        public String units;
+
+        CalibrationResult() {
+            success = false;
+            value = 0.0f;
+            units = "";
+        }
     }
 
     private class MatrixChangeListener implements PhotoViewAttacher.OnMatrixChangedListener {

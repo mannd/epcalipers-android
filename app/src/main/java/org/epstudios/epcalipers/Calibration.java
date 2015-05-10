@@ -61,6 +61,11 @@ public class Calibration {
     }
 
     private float currentZoom;
+
+    public float getOriginalCalFactor() {
+        return originalCalFactor;
+    }
+
     private float originalCalFactor;
 
     public boolean isCalibrated() {
