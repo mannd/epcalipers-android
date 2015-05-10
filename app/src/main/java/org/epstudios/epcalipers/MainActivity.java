@@ -17,6 +17,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -150,6 +151,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         setContentView(R.layout.activity_main);
 
+        currentCaliperColor = DEFAULT_CALIPER_COLOR;
+        currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
+        currentLineWidth = DEFAULT_LINE_WIDTH;
+
         loadSettings();
 
         imageView = (ImageView) findViewById(R.id.imageView);
@@ -182,9 +187,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         calipersMode = true;
         setMode();
 
-        currentCaliperColor = DEFAULT_CALIPER_COLOR;
-        currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
-        currentLineWidth = DEFAULT_LINE_WIDTH;
+
 
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -592,7 +595,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         menuToolbar.addView(menu);
     }
 
-    private HorizontalScrollView createMenu(ArrayList<TextView> buttons) {
+    private HorizontalScrollView createMenu(ArrayList<TextView> items) {
         HorizontalScrollView scrollView = new HorizontalScrollView(this);
         HorizontalScrollView.LayoutParams layoutParams = new HorizontalScrollView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -600,8 +603,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.HORIZONTAL);
         layout.setLayoutParams(layoutParams);
-        for (TextView button : buttons) {
-            layout.addView(button);
+        for (TextView item : items) {
+            layout.addView(item);
         }
         scrollView.addView(layout);
         return scrollView;
@@ -657,10 +660,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         calipersView.setEnabled(calipersMode);
         if (calipersMode) {
             getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
+            getSupportActionBar().setBackgroundDrawable(
+                    new ColorDrawable(getResources().getColor(R.color.primary)));
             unfadeCalipersView();
             selectMainMenu();
         } else {
             getSupportActionBar().setTitle(getString(R.string.image_mode_title));
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
             fadeCalipersView();
             selectImageMenu();
         }
@@ -854,6 +860,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         input.setSingleLine(true);
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
         input.setHint(getString(R.string.mean_rr_dialog_hint));
+        input.setText(getString(R.string.default_number_rr_intervals));
         input.setSelection(0);
         // TODO set default/last value
 
