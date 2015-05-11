@@ -396,13 +396,30 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         outState.putBoolean("hcalCalibrated", horizontalCalibration.isCalibrated());
         outState.putFloat(("hcalOriginalCalFactor"), horizontalCalibration.getOriginalCalFactor());
 
-                outState.putString("vcalUnits", verticalCalibration.getUnits());
+        outState.putString("vcalUnits", verticalCalibration.getUnits());
         outState.putString("vcalCalibrationString", verticalCalibration.getCalibrationString());
         outState.putBoolean("vcalDisplayRate", verticalCalibration.getDisplayRate());
         outState.putFloat("vcalOriginalZoom", verticalCalibration.getOriginalZoom());
         outState.putFloat("vcalCurrentZoom", verticalCalibration.getCurrentZoom());
         outState.putBoolean("vcalCalibrated", verticalCalibration.isCalibrated());
         outState.putFloat("vcalOriginalCalFactor", verticalCalibration.getOriginalCalFactor());
+        // save calipers
+        for (int i = 0; i < calipersCount(); i++) {
+            Caliper c = calipersView.getCalipers().get(i);
+            outState.putString(i + "CaliperDirection",
+                    c.getDirection() == Caliper.Direction.HORIZONTAL ?
+                            "Horizontal" : "Vertical");
+            // TODO store percentage of position, e.g.
+            // X = 333, calipersView.width = 600: 333/600
+            // then restore by multipying above ratio by new window width
+            outState.putFloat(i + "CaliperBar1Position", c.getBar1Position());
+            outState.putFloat(i + "CaliperBar2Position", c.getBar2Position());
+            outState.putFloat(i + "CaliperCrossbarPosition", c.getCrossbarPosition());
+            outState.putBoolean(i + "CaliperSelected", c.isSelected());
+            // TODO locked?, colors?
+        }
+        outState.putInt("CalipersCount", calipersCount());
+        // TODO more??
 
     }
 
@@ -412,8 +429,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onRestoreInstanceState(savedInstanceState);
         calipersMode = savedInstanceState.getBoolean("calipersMode");
         setMode();
-        // TODO is next step necessary?
-        calipersView.invalidate();
 
         Bitmap image = (Bitmap) savedInstanceState.getParcelable("Image");
         imageView.setImageBitmap(image);
@@ -448,7 +463,24 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         verticalCalibration.setCurrentZoom(savedInstanceState.getFloat("vcalCurrentZoom"));
         verticalCalibration.setCalibrated(savedInstanceState.getBoolean("vcalCalibrated"));
         verticalCalibration.setOriginalCalFactor(savedInstanceState.getFloat("vcalOriginalCalFactor"));
+        // restore calipers
+        int calipersCount = savedInstanceState.getInt("CalipersCount");
+        for (int i = 0; i < calipersCount; i++) {
+            String directionString = savedInstanceState.getString(i + "CaliperDirection");
+            Caliper.Direction direction = directionString.equals("Horizontal") ?
+                    Caliper.Direction.HORIZONTAL : Caliper.Direction.VERTICAL;
+            // TODO translate positions to new view
+            float bar1Position = savedInstanceState.getFloat(i + "CaliperBar1Position");
+            float bar2Position = savedInstanceState.getFloat(i + "CaliperBar2Position");
+            float crossbarPosition = savedInstanceState.getFloat(i + "CaliperCrossbarPosition");
 
+            Caliper c = new Caliper(direction, bar1Position, bar2Position, crossbarPosition);
+            c.setSelected(savedInstanceState.getBoolean(i + "CaliperSelected"));
+            calipersView.getCalipers().add(c);
+
+            // TODO locked?, colors?
+        }
+        calipersView.invalidate();
 
 
     }

@@ -133,8 +133,8 @@ public class Caliper {
     private Calibration calibration;
 
 
-    public Caliper(Direction direction, int bar1Position, int bar2Position,
-                   int crossBarPosition) {
+    public Caliper(Direction direction, float bar1Position, float bar2Position,
+                   float crossBarPosition) {
         this.direction = direction;
         this.bar1Position = bar1Position;
         this.bar2Position = bar2Position;
