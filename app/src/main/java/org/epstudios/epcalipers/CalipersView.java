@@ -17,22 +17,23 @@ import java.util.ArrayList;
  * <p/>
  * Created by mannd on 4/17/15.
  * <p/>
- * This file is part of org.epstudios.epcalipers.
+ * This file is part of EP Calipers.
  * <p/>
- * org.epstudios.epcalipers is free software: you can redistribute it and/or modify
+ * EP Calipers is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * <p/>
- * org.epstudios.epcalipers is distributed in the hope that it will be useful,
+ * EP Calipers is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * <p/>
  * You should have received a copy of the GNU General Public License
- * along with org.epstudios.epcalipers.  If not, see <http://www.gnu.org/licenses/>.
+ * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class CalipersView extends View {
+
     private GestureDetectorCompat gestureDetector;
     private final static String EPS = "EPS";
 
@@ -62,7 +63,6 @@ public class CalipersView extends View {
     public CalipersView(Context context) {
         super(context);
         init(context);
-
     }
 
     public CalipersView(Context context, AttributeSet attrs) {
@@ -284,4 +284,5 @@ public class CalipersView extends View {
         }
         invalidate();
     }
+
 }

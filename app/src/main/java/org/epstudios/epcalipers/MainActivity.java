@@ -195,11 +195,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         rrIntervalForQTc = 0.0;
 
         calipersMode = true;
+        selectMainMenu();
 
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                Log.d(EPS, "pref changed " + key);
                 // show start image only has effect with restart
                 if (key.equals(getString(R.string.show_start_image_key))) {
                     return;
@@ -278,12 +278,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
                 //scaleImageForImageView();
-                addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
+                Log.d(EPS, "onGlobalLayoutListener called");
 
                 if (noSavedInstance) {
+                    addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
                     Log.d(EPS, "ScaleImageForImageView()");
                     scaleImageForImageView();
                 }
+                // TODO else restore calipers (in onRestoreInstanceState?)
             }
         });
     }
@@ -334,10 +336,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         float portraitHeight = Math.max(screenHeight, screenWidth) - verticalSpace;
         float landscapeHeight = Math.min(screenHeight, screenWidth) - verticalSpace;
 
-        Log.d(EPS, "ActionBar height = " + actionBarHeight + " Toolbar height = " +
-                toolbarHeight + " StatusBar height = " + statusBarHeight);
-        Log.d(EPS, "ImageView height = " + imageView.getHeight());
-        Log.d(EPS, "Screen height = " + screenHeight);
+//        Log.d(EPS, "ActionBar height = " + actionBarHeight + " Toolbar height = " +
+//                toolbarHeight + " StatusBar height = " + statusBarHeight);
+//        Log.d(EPS, "ImageView height = " + imageView.getHeight());
+//        Log.d(EPS, "Screen height = " + screenHeight);
         float ratio;
         if (imageWidth > imageHeight) {
             ratio = portraitWidth / imageWidth;
@@ -348,12 +350,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Bitmap bitmap = ((BitmapDrawable)image).getBitmap();
         int bitmapWidth = bitmap.getWidth();
         int bitmapHeight = bitmap.getHeight();
-        Log.d(EPS, "imageWidth = " + imageWidth + " imageHeight = " + imageHeight);
-        Log.d(EPS, "bitmapWidth = " + bitmapWidth + " bitmapHeight = " +
-                bitmapHeight);
+//        Log.d(EPS, "imageWidth = " + imageWidth + " imageHeight = " + imageHeight);
+//        Log.d(EPS, "bitmapWidth = " + bitmapWidth + " bitmapHeight = " +
+//                bitmapHeight);
         Matrix matrix = new Matrix();
         matrix.postScale(ratio, ratio);
-        Log.d(EPS, "ratio = " + ratio);
+//        Log.d(EPS, "ratio = " + ratio);
         Bitmap scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth,
                 bitmapHeight, matrix, true);
         BitmapDrawable result = new BitmapDrawable(getResources(), scaledBitmap);
@@ -410,19 +412,23 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onRestoreInstanceState(savedInstanceState);
         calipersMode = savedInstanceState.getBoolean("calipersMode");
         setMode();
+        // TODO is next step necessary?
         calipersView.invalidate();
 
         Bitmap image = (Bitmap) savedInstanceState.getParcelable("Image");
         imageView.setImageBitmap(image);
+
         attacher.update();
         // NOTE! appears must set animate for this to work, otherwise
         // scale goes back to 1.0.
-        Log.d(EPS, "minScale = " + attacher.getMinimumScale() + " maxScale = " +
-            attacher.getMaximumScale());
-        // TODO fix problem with scale > max
-        attacher.setScale(savedInstanceState.getFloat("scale"), true);
+//        Log.d(EPS, "minScale = " + attacher.getMinimumScale() + " maxScale = " +
+//            attacher.getMaximumScale());
+        // sometimes scale gets larger than max scale, so...
+        float scale = Math.max(savedInstanceState.getFloat("scale"), attacher.getMinimumScale());
+        scale = Math.min(scale, attacher.getMaximumScale());
+        attacher.setScale(scale, true);
 
-        Log.d(EPS, "Restored scale = " + attacher.getScale());
+//        Log.d(EPS, "Restored scale = " + attacher.getScale());
 
         // TODO more stuff
 
@@ -515,11 +521,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
-        cancelAddCaliperButton = createButton(getString(R.string.cancel_button_title));
         // Add Caliper menu
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
-        cancelAddCaliperButton = createButton(getString(R.string.cancel_button_title));
+        cancelAddCaliperButton = createButton(getString(R.string.done_button_title));
         // Adjust Image menu
         rotateImageRightButton = createButton(getString(R.string.rotate_image_right_button_title));
         rotateImageLeftButton = createButton(getString(R.string.rotate_image_left_button_title));
@@ -616,6 +621,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (mainMenu == null) {
             createMainMenu();
         }
+        Log.d(EPS, "selectMainMenu");
         selectMenu(mainMenu);
         boolean enable = horizontalCalibration.canDisplayRate();
         intervalRateButton.setEnabled(enable);
@@ -1338,7 +1344,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         addCaliperWithDirectionAtRect(direction, new Rect(0, 0, calipersView.getWidth(),
                 calipersView.getHeight()));
         calipersView.invalidate();
-        selectMainMenu();
     }
 
     private void addCaliperWithDirectionAtRect(Caliper.Direction direction,
@@ -1359,7 +1364,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void matrixChangedAction() {
-        Log.d(EPS, "Matrix changed, scale = " + attacher.getScale());
+        //Log.d(EPS, "Matrix changed, scale = " + attacher.getScale());
         adjustCalibrationForScale(attacher.getScale());
         calipersView.invalidate();
     }
