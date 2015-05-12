@@ -468,7 +468,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onRestoreInstanceState(savedInstanceState);
         Log.d(EPS, "onRestoreInstanceState");
         calipersMode = savedInstanceState.getBoolean("calipersMode");
-        setMode();
 
         Bitmap image = (Bitmap) savedInstanceState.getParcelable("Image");
         imageView.setImageBitmap(image);
@@ -506,6 +505,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         verticalCalibration.setCurrentZoom(savedInstanceState.getFloat("vcalCurrentZoom"));
         verticalCalibration.setCalibrated(savedInstanceState.getBoolean("vcalCalibrated"));
         verticalCalibration.setOriginalCalFactor(savedInstanceState.getFloat("vcalOriginalCalFactor"));
+
+        setMode();
+
         // restore calipers
         int calipersCount = savedInstanceState.getInt("CalipersCount");
         for (int i = 0; i < calipersCount; i++) {
