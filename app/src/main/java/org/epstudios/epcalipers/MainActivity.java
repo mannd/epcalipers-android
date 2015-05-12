@@ -22,6 +22,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -127,6 +128,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
     private int shortAnimationDuration;
     private boolean noSavedInstance;
+    private float totalRotation;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -173,6 +175,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         attacher = new PhotoViewAttacher(imageView);
         attacher.setScaleType(ImageView.ScaleType.CENTER);
+        attacher.setMaximumScale(5.0f);
         // We need to use MatrixChangeListener and not ScaleChangeListener
         // since the former only fires when scale has completely changed and
         // the latter fires while the scale is changing, so is inaccurate.
@@ -193,6 +196,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         verticalCalibration = new Calibration(Caliper.Direction.VERTICAL);
 
         rrIntervalForQTc = 0.0;
+
+        totalRotation = 0.0f;
 
         calipersMode = true;
         selectMainMenu();
@@ -285,10 +290,38 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     Log.d(EPS, "ScaleImageForImageView()");
                     scaleImageForImageView();
                 }
-                // TODO else restore calipers (in onRestoreInstanceState?)
+                // else adjust the caliper positions, now that calipersView is created
+                else {
+                    for (Caliper c : calipersView.getCalipers()) {
+                        float maxX = c.getDirection() == Caliper.Direction.HORIZONTAL
+                                ? calipersView.getWidth()
+                                : calipersView.getHeight();
+                        float maxY = c.getDirection() == Caliper.Direction.HORIZONTAL
+                                ? calipersView.getHeight()
+                                : calipersView.getWidth();
+                        Log.d(EPS, "calipersView.getWidth() = " + calipersView.getWidth()
+                                + " calipersView.getHeight() = " + calipersView.getHeight());
+                        c.setBar1Position(untransformCoordinate(c.getBar1Position(), maxX));
+                        c.setBar2Position(untransformCoordinate(c.getBar2Position(), maxX));
+                        c.setCrossbarPosition(untransformCoordinate(c.getCrossbarPosition(), maxY));
+                    }
+                    calipersView.invalidate();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            rotateImageView();
+                        }
+                    }, 1000);
+
+                }
+            }
+
+            private void rotateImageView() {
+                attacher.setRotationBy(totalRotation);
             }
         });
     }
+
 
     void loadSettings() {
         SharedPreferences sharedPreferences = PreferenceManager
@@ -385,6 +418,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onSaveInstanceState(outState);
         outState.putBoolean("calipersMode", calipersMode);
         outState.putFloat("scale", attacher.getScale());
+        outState.putFloat("totalRotation", totalRotation);
         outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
         // TODO all the others
         // Calibration
@@ -409,29 +443,37 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             outState.putString(i + "CaliperDirection",
                     c.getDirection() == Caliper.Direction.HORIZONTAL ?
                             "Horizontal" : "Vertical");
-            // TODO store percentage of position, e.g.
-            // X = 333, calipersView.width = 600: 333/600
-            // then restore by multipying above ratio by new window width
-            outState.putFloat(i + "CaliperBar1Position", c.getBar1Position());
-            outState.putFloat(i + "CaliperBar2Position", c.getBar2Position());
-            outState.putFloat(i + "CaliperCrossbarPosition", c.getCrossbarPosition());
+            // maxX normalizes bar and crossbar positions regardless of caliper direction,
+            // i.e. X is direction for bars and Y is direction for crossbars.
+            float maxX = c.getDirection() == Caliper.Direction.HORIZONTAL
+                    ? calipersView.getWidth()
+                    : calipersView.getHeight();
+            float maxY = c.getDirection() == Caliper.Direction.HORIZONTAL
+                    ? calipersView.getHeight()
+                    : calipersView.getWidth();
+            outState.putFloat(i + "CaliperBar1Position",
+                    transformCoordinate(c.getBar1Position(), maxX));
+            outState.putFloat(i + "CaliperBar2Position",
+                    transformCoordinate(c.getBar2Position(), maxX));
+            outState.putFloat(i + "CaliperCrossbarPosition",
+                    transformCoordinate(c.getCrossbarPosition(), maxY));
             outState.putBoolean(i + "CaliperSelected", c.isSelected());
             // TODO locked?, colors?
         }
         outState.putInt("CalipersCount", calipersCount());
-        // TODO more??
-
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        Log.d(EPS, "onRestoreInstanceState");
         super.onRestoreInstanceState(savedInstanceState);
+        Log.d(EPS, "onRestoreInstanceState");
         calipersMode = savedInstanceState.getBoolean("calipersMode");
         setMode();
 
         Bitmap image = (Bitmap) savedInstanceState.getParcelable("Image");
         imageView.setImageBitmap(image);
+
+        totalRotation = savedInstanceState.getFloat("totalRotation");
 
         attacher.update();
         // NOTE! appears must set animate for this to work, otherwise
@@ -442,6 +484,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         float scale = Math.max(savedInstanceState.getFloat("scale"), attacher.getMinimumScale());
         scale = Math.min(scale, attacher.getMaximumScale());
         attacher.setScale(scale, true);
+
 
 //        Log.d(EPS, "Restored scale = " + attacher.getScale());
 
@@ -469,20 +512,42 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             String directionString = savedInstanceState.getString(i + "CaliperDirection");
             Caliper.Direction direction = directionString.equals("Horizontal") ?
                     Caliper.Direction.HORIZONTAL : Caliper.Direction.VERTICAL;
-            // TODO translate positions to new view
+
+
             float bar1Position = savedInstanceState.getFloat(i + "CaliperBar1Position");
             float bar2Position = savedInstanceState.getFloat(i + "CaliperBar2Position");
             float crossbarPosition = savedInstanceState.getFloat(i + "CaliperCrossbarPosition");
+            boolean selected = savedInstanceState.getBoolean(i + "CaliperSelected");
+            Caliper c = new Caliper();
+            c.setDirection(direction);
 
-            Caliper c = new Caliper(direction, bar1Position, bar2Position, crossbarPosition);
-            c.setSelected(savedInstanceState.getBoolean(i + "CaliperSelected"));
+            c.setBar1Position(bar1Position);
+            c.setBar2Position(bar2Position);
+            c.setCrossbarPosition(crossbarPosition);
+            c.setSelected(selected);
+            c.setUnselectedColor(currentCaliperColor);
+            c.setSelectedColor(currentHighlightColor);
+            c.setColor(c.isSelected() ? currentHighlightColor : currentCaliperColor);
+            c.setLineWidth(currentLineWidth);
+            if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
+                c.setCalibration(horizontalCalibration);
+            }
+            else {
+                c.setCalibration(verticalCalibration);
+            }
+
             calipersView.getCalipers().add(c);
 
-            // TODO locked?, colors?
         }
-        calipersView.invalidate();
+    }
 
+    // return coordinate position ratio will be between 0 and 1.0
+    private float transformCoordinate(float coord, float maxDim) {
+        return coord / maxDim;
+    }
 
+    private float untransformCoordinate(float ratio, float maxDim) {
+        return ratio * maxDim;
     }
 
     @Override
@@ -881,6 +946,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             scaleImageForImageView();
             imageView.setVisibility(View.VISIBLE);
             attacher.update();
+            clearCalibration();
         }
         if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
             int targetWidth = imageView.getWidth();
@@ -903,14 +969,17 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             scaleImageForImageView();
             imageView.setVisibility(View.VISIBLE);
             attacher.update();
+            clearCalibration();
         }
     }
 
     private void rotateImage(float degrees) {
+        totalRotation += degrees;
         attacher.setRotationBy(degrees);
     }
 
     private void resetImage() {
+        totalRotation = 0.0f;
         attacher.setRotationTo(0f);
     }
 
