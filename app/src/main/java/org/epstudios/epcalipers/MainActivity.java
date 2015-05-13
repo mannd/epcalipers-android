@@ -1437,7 +1437,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (calipersCount() > 1) {
             for (Caliper caliper : getCalipers()) {
                 if (caliper != c) {
-                    calipersView.unselectCaliper(c);
+                    calipersView.unselectCaliper(caliper);
                 }
             }
         }
