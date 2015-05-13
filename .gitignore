@@ -4,3 +4,11 @@
 /.idea/libraries
 .DS_Store
 /build
+/*/out
+/*/build
+/*/*/production
+*.iws
+*.ipr
+*~
+*.swp
+/sample

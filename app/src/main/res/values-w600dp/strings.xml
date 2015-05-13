@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_caliper_button_title">Add Caliper</string>
+    <string name="calibrate_button_title">Calibrate</string>
+    <string name="interval_rate_button_title">Interval/Rate</string>
+    <string name="mean_rate_button_title">Mean Rate</string>
+    <string name="switch_mode_title">Switch Mode</string>
+
+</resources>

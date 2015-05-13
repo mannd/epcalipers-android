@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="caliper_color_names">
+        <item>Black</item>
+        <item>Magenta</item>
+        <item>Light Gray</item>
+        <item>Blue</item>
+        <item>Green</item>
+        <item>White</item>
+    </string-array>
+    <string-array name="caliper_color_values">
+        <item>-16777216</item>
+        <item>-65281</item>
+        <item>-3355444</item>
+        <item>-16776961</item>
+        <item>-16711936</item>
+        <item>-1</item>
+    </string-array>
+    <string-array name="highlight_color_names">
+        <item>Red</item>
+        <item>Yellow</item>
+        <item>Dark Gray</item>
+    </string-array>
+    <string-array name="highlight_color_values">
+        <item>-65536</item>
+        <item>-256</item>
+        <item>-12303292</item>
+    </string-array>
+    <string-array name="line_width_names">
+        <item>1 point</item>
+        <item>2 points</item>
+        <item>3 points</item>
+    </string-array>
+    <string-array name="line_width_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+</resources>

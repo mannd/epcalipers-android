@@ -1,6 +1,80 @@
 <resources>
     <string name="app_name">EP Calipers</string>
-
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="bpm">bpm</string>
+    <string name="points">points</string>
+    <string name="ep_calipers_title">EP Calipers</string>
+    <string name="image_mode_title">Image Mode</string>
+    <string name="calibrate_button_title">Cal</string>
+    <string name="add_caliper_button_title">+</string>
+    <string name="interval_rate_button_title">I/R</string>
+    <string name="mean_rate_button_title">mRate</string>
+    <string name="qtc_button_title">QTc</string>
+    <string name="camera_button_title">Camera</string>
+    <string name="select_image_button_title">Select</string>
+    <string name="adjust_image_button_title">Adjust</string>
+    <string name="horizontal_caliper_button_title">Time</string>
+    <string name="vertical_caliper_button_title">Amplitude</string>
+    <string name="cancel_button_title">Cancel</string>
+    <string name="rotate_image_right_button_title">90°R</string>
+    <string name="rotate_image_left_button_title">90°L</string>
+    <string name="tweak_image_right_button_title">1°R</string>
+    <string name="tweak_image_left_button_title">1°L</string>
+    <string name="flip_image_button_title">Flip</string>
+    <string name="reset_image_button_title">Reset</string>
+    <string name="done_button_title">Done</string>
+    <string name="set_calibration_button_title">Set</string>
+    <string name="clear_calibration_button_title">Clear</string>
+    <string name="about_text">Copyright \u00a9 2015 EP Studios, Inc.\nAll rights reserved.\n</string>
+    <string name="about_label">EP Calipers</string>
+    <string name="help_title">Help</string>
+    <string name="switch_mode_title">Switch</string>
+    <string name="no_time_caliper_selected_title">No Time Caliper Selected</string>
+    <string name="no_time_caliper_selected_message">Use a selected (highlighted) caliper to
+        measure one or more RR intervals.</string>
+    <string name="no_calipers_alert_title">No Calipers To Use</string>
+    <string name="no_calipers_alert_message">Add one or more calipers first
+        before proceeding.</string>
+    <string name="no_caliper_selected_alert_title">No Caliper Selected</string>
+    <string name="no_caliper_selected_alert_message">Selected a
+        caliper by single-tapping it.  Move the caliper to a known
+        interval.  Touch Set to enter the calibration measurement.</string>
+    <string name="calibration_dialog_message">Enter measurement (e.g. %s):</string>
+    <string name="example_amplitude_measurement">1 mV</string>
+    <string name="example_time_measurement">500 msec</string>
+    <string name="calibrate_dialog_title">Calibrate</string>
+    <string name="ok_title">OK</string>
+    <string name="cancel_title">Cancel</string>
+    <string name="calibration_dialog_hint">Type current measurement here.</string>
+    <string name="show_start_image_key">show_start_image</string>
+    <string name="show_start_image_label">Show sample ECG at start?</string>
+    <string name="settings_title">Settings</string>
+    <string name="default_time_calibration_key">default_time_calibration</string>
+    <string name="default_time_calibration_label">Default time calibration</string>
+    <string name="default_time_calibration_value">1000 msec</string>
+    <string name="default_amplitude_calibration_value">10 mm</string>
+    <string name="default_amplitude_calibration_key">default_amplitude_calibration</string>
+    <string name="default_amplitude_calibration_label">Default amplitude calibration</string>
+    <string name="default_caliper_color_key">default_caliper_color</string>
+    <string name="default_caliper_color_label">Caliper color</string>
+    <string name="default_highlight_color_label">Highlight color</string>
+    <string name="default_highlight_color_key">default_highlight_color</string>
+    <string name="default_line_width_key">default_line_width</string>
+    <string name="default_line_width_label">Line width</string>
+    <string name="show_start_image_off_summary">Don\'t show ECG</string>
+    <string name="show_start_image_on_summary">Show ECG</string>
+    <string name="default_caliper_color">Blue</string>
+    <string name="default_highlight_color">Red</string>
+    <string name="default_line_width">2 points</string>
+    <string name="number_of_intervals_dialog_title">Enter Number of Intervals</string>
+    <string name="number_of_intervals_dialog_message">How many intervals is this caliper measuring?</string>
+    <string name="mean_rr_dialog_hint">Number of intervals measured</string>
+    <string name="mean_rr_result_dialog_title">Mean Interval and Rate</string>
+    <string name="mean_rr_result_dialog_message">Mean interval = %%s %%s\\nMean rate = %%s bpm</string>
+    <string name="select_rr_intervals_message">RR interval(s)?</string>
+    <string name="measure_button_label">Measure</string>
+    <string name="default_number_rr_intervals">3</string>
+    <string name="qt_interval_query">QT interval?</string>
+    <string name="invalid_result_message">Invalid Result</string>
+    <string name="calculated_qtc_dialog_title">Calculated QTc</string>
 </resources>

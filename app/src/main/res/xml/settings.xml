@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/show_start_image_key"
+        android:title="@string/show_start_image_label"
+        android:summaryOff="@string/show_start_image_off_summary"
+        android:summaryOn="@string/show_start_image_on_summary" />
+
+    <EditTextPreference
+        android:defaultValue="@string/default_time_calibration_value"
+        android:key="@string/default_time_calibration_key"
+        android:title="@string/default_time_calibration_label"
+        android:inputType="text"
+        android:lines="1"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+    <EditTextPreference
+        android:defaultValue="@string/default_amplitude_calibration_value"
+        android:key="@string/default_amplitude_calibration_key"
+        android:title="@string/default_amplitude_calibration_label"
+        android:inputType="text"
+        android:lines="1"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+    <ListPreference
+        android:defaultValue="-16776961"
+        android:entries="@array/caliper_color_names"
+        android:entryValues="@array/caliper_color_values"
+        android:key="@string/default_caliper_color_key"
+        android:title="@string/default_caliper_color_label" />
+
+    <ListPreference
+        android:defaultValue="-65536"
+        android:entries="@array/highlight_color_names"
+        android:entryValues="@array/highlight_color_values"
+        android:key="@string/default_highlight_color_key"
+        android:title="@string/default_highlight_color_label" />
+
+    <ListPreference
+        android:defaultValue="2"
+        android:entries="@array/line_width_names"
+        android:entryValues="@array/line_width_values"
+        android:key="@string/default_line_width_key"
+        android:title="@string/default_line_width_label" />
+
+
+
+</PreferenceScreen>
+
+
+
