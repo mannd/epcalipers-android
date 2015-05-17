@@ -320,6 +320,26 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 attacher.setRotationBy(totalRotation);
             }
         });
+
+        if (getFirstRun(prefs)) {
+            Log.d(EPS, "firstRun");
+            setRunned(prefs);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.quick_start_title));
+            builder.setMessage(getString(R.string.quick_start_message));
+            builder.setPositiveButton(getString(R.string.ok_title), null);
+            builder.show();
+        }
+    }
+
+    public boolean getFirstRun(SharedPreferences prefs) {
+      return prefs.getBoolean("firstRun" + About.VERSION, true);
+    }
+
+    public void setRunned(SharedPreferences prefs) {
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putBoolean("firstRun" + About.VERSION, false);
+        edit.commit();
     }
 
 
@@ -420,7 +440,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         outState.putFloat("scale", attacher.getScale());
         outState.putFloat("totalRotation", totalRotation);
         outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
-        // TODO all the others
         // Calibration
         outState.putString("hcalUnits", horizontalCalibration.getUnits());
         outState.putString("hcalCalibrationString", horizontalCalibration.getCalibrationString());
@@ -458,7 +477,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             outState.putFloat(i + "CaliperCrossbarPosition",
                     transformCoordinate(c.getCrossbarPosition(), maxY));
             outState.putBoolean(i + "CaliperSelected", c.isSelected());
-            // TODO locked?, colors?
         }
         outState.putInt("CalipersCount", calipersCount());
     }
@@ -484,10 +502,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         scale = Math.min(scale, attacher.getMaximumScale());
         attacher.setScale(scale, true);
 
-
-//        Log.d(EPS, "Restored scale = " + attacher.getScale());
-
-        // TODO more stuff
 
         // Calibration
         horizontalCalibration.setUnits(savedInstanceState.getString("hcalUnits"));
@@ -1025,7 +1039,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         input.setHint(getString(R.string.mean_rr_dialog_hint));
         input.setText(getString(R.string.default_number_rr_intervals));
         input.setSelection(0);
-        // TODO set default/last value
 
         builder.setView(input);
         builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
@@ -1060,7 +1073,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             double intervalResult = Math.abs(c.intervalResult());
             double meanRR = intervalResult / divisor;
             double meanRate = c.rateResult(meanRR);
-            // TODO reuse above for QTc
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.mean_rr_result_dialog_title));
@@ -1108,7 +1120,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             input.setHint(getString(R.string.mean_rr_dialog_hint));
             input.setText(getString(R.string.default_number_rr_intervals));
             input.setSelection(0);
-            // TODO set default/last value
 
             builder.setView(input);
             builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
