@@ -320,6 +320,26 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 attacher.setRotationBy(totalRotation);
             }
         });
+
+        if (getFirstRun(prefs)) {
+            Log.d(EPS, "firstRun");
+            setRunned(prefs);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.quick_start_title));
+            builder.setMessage(getString(R.string.quick_start_message));
+            builder.setPositiveButton(getString(R.string.ok_title), null);
+            builder.show();
+        }
+    }
+
+    public boolean getFirstRun(SharedPreferences prefs) {
+      return prefs.getBoolean("firstRun" + About.VERSION, true);
+    }
+
+    public void setRunned(SharedPreferences prefs) {
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putBoolean("firstRun" + About.VERSION, false);
+        edit.commit();
     }
 
 
