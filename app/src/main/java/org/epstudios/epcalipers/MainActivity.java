@@ -278,9 +278,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             public void onGlobalLayout() {
                 int androidVersion = Build.VERSION.SDK_INT;
                 if (androidVersion >= Build.VERSION_CODES.JELLY_BEAN) {
-                    layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                } else {
                     layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                } else {
+                    layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
                 //scaleImageForImageView();
                 Log.d(EPS, "onGlobalLayoutListener called");
