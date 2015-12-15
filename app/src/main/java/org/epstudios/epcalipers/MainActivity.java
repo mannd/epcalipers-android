@@ -170,6 +170,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         loadSettings();
 
         imageView = (ImageView) findViewById(R.id.imageView);
+        // imageView always enabled in v2.0+
+        imageView.setEnabled(true);
         if (!showStartImage && savedInstanceState == null) {
             imageView.setVisibility(View.INVISIBLE);
         }
@@ -851,8 +853,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void setMode() {
-        imageView.setEnabled(!calipersMode);
+        // imageView is always enabled now that touch events pass through
+        // imageView.setEnabled(!calipersMode);
         calipersView.setEnabled(calipersMode);
+
         if (calipersMode) {
             getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
             getSupportActionBar().setBackgroundDrawable(

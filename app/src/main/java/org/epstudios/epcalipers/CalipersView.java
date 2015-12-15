@@ -97,9 +97,14 @@ public class CalipersView extends View {
 
         @Override
         public boolean onDown(MotionEvent event) {
-            // must be implemented and return true;
-            setTouchedCaliper(event);
-            return true;
+            // must be implemented and return true for other events to work;
+            for (int i = calipersCount() - 1; i >= 0; i--) {
+                if (calipers.get(i).pointNearCaliper(new PointF(event.getX(), event.getY()))) {
+                    setTouchedCaliper(event);
+                    return true;
+                }
+            }
+            return false;
         }
 
         @Override
