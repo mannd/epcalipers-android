@@ -232,19 +232,19 @@ public class CalipersView extends View {
         calipers.remove(c);
     }
 
+    // Single tap initially highlights (selects) caliper,
+    // second tap unselects it.  Quick double tap is used
+    // to delete caliper.  This is new behavior with v2.0+.
     public void singleTap(PointF pointF) {
-        boolean selectionMade = false;
+        if (isLocked()) {
+            return;
+        }
         for (int i = calipersCount() - 1; i >= 0; i--) {
-            if (calipers.get(i).pointNearCaliper(pointF)
-                    && !selectionMade) {
-                if (calipers.get(i).isSelected() &&
-                        !isLocked()) {
-                    calipers.remove(i);
-                    invalidate();
-                    return;
+            if (calipers.get(i).pointNearCaliper(pointF)) {
+                if (calipers.get(i).isSelected()) {
+                    unselectCaliper(calipers.get(i));
                 } else {
                     selectCaliper(calipers.get(i));
-                    selectionMade = true;
                 }
             }
             else {
@@ -256,13 +256,14 @@ public class CalipersView extends View {
     // Need a separate procedure for doubleTap, unlike in iOS,
     // since two fast taps won't count as two singleTaps.
     public void doubleTap(PointF pointF) {
+        if (isLocked()) {
+            return;
+        }
         for (int i = calipersCount() - 1; i >= 0; i--) {
             if (calipers.get(i).pointNearCaliper(pointF)) {
-                if (!isLocked()) {
-                    calipers.remove(i);
-                    invalidate();
-                    return;
-                }
+                calipers.remove(i);
+                invalidate();
+                return;
             }
         }
     }
