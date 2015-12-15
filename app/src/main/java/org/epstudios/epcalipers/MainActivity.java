@@ -1232,7 +1232,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         else {
             selectCalibrationMenu();
             calipersView.selectCaliperIfNoneSelected();
-            calipersView.setLocked(true);
+            // ok to change selected calipers in this menu
+            calipersView.setLocked(false);
         }
     }
 
