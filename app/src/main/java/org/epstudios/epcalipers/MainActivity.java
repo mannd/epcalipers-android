@@ -129,6 +129,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private int shortAnimationDuration;
     private boolean noSavedInstance;
     private float totalRotation;
+    private boolean externalImageLoad;
+    private Bitmap externalImageBitmap;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -159,6 +161,29 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
         Log.d(EPS, "onCreate");
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        externalImageLoad = false;
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if (type.startsWith("image/")) {
+                try {
+                    handleImage(intent);
+                } catch (IOException e) {
+                    Log.d(EPS, "exception thrown");
+                }
+            }
+        }
+        else if (Intent.ACTION_VIEW.equals(action) && type != null) {
+            if (type.equals("application/pdf")) {
+                handlePDF(intent);
+            }
+        }
+
+        Log.d(EPS, "Action = " + action);
+
         noSavedInstance = (savedInstanceState == null);
 
         setContentView(R.layout.activity_main);
@@ -172,6 +197,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         imageView = (ImageView) findViewById(R.id.imageView);
         // imageView always enabled in v2.0+
         imageView.setEnabled(true);
+        // FIXME: at some point need to load the external image...
+//        if (externalImageLoad) {
+//            imageView.setImageBitmap(externalImageBitmap);
+//        }
         if (!showStartImage && savedInstanceState == null) {
             imageView.setVisibility(View.INVISIBLE);
         }
@@ -332,6 +361,24 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             builder.setPositiveButton(getString(R.string.ok_title), null);
             builder.show();
         }
+
+        if (externalImageLoad) {
+            startActivity(intent);
+        }
+    }
+
+    private void handleImage(Intent intent) throws IOException {
+        Log.d(EPS, "handleImage");
+        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null) {
+            Log.d(EPS, "imageUri = " + imageUri.toString());
+            externalImageLoad = true;
+            externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+        }
+    }
+
+    private void handlePDF(Intent intent) {
+        Log.d(EPS, "handlePDF");
     }
 
     public boolean getFirstRun(SharedPreferences prefs) {
@@ -372,6 +419,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void onResume() {
         super.onResume();
         Log.d(EPS, "onResume");
+
     }
 
     private void scaleImageForImageView() {
@@ -922,13 +970,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return image;
     }
 
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(currentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
-    }
+//    private void galleryAddPic() {
+//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//        File f = new File(currentPhotoPath);
+//        Uri contentUri = Uri.fromFile(f);
+//        mediaScanIntent.setData(contentUri);
+//        this.sendBroadcast(mediaScanIntent);
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -936,32 +984,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
-
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
             Cursor cursor = getContentResolver().query(selectedImage,
                     filePathColumn, null, null, null);
             cursor.moveToFirst();
-
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
-            Log.d(EPS, "picturePath = " + picturePath);
             cursor.close();
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(picturePath, options);
-            int imageHeight = options.outHeight;
-            int imageWidth = options.outWidth;
-            Log.d(EPS, "image=" + imageWidth + "x" + imageHeight);
-            int targetWidth = imageView.getWidth();
-            int targetHeight = imageView.getHeight();
-            options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight);
-            options.inJustDecodeBounds = false;
-            Bitmap bitmap = BitmapFactory.decodeFile(picturePath, options);
-            imageHeight = bitmap.getHeight();
-            imageWidth = bitmap.getWidth();
-            Log.d(EPS, "image=" + imageWidth + "x" + imageHeight);
+            Bitmap bitmap = getScaledBitmap(picturePath);
             imageView.setImageBitmap(bitmap);
             scaleImageForImageView();
             imageView.setVisibility(View.VISIBLE);
@@ -969,28 +1000,25 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             clearCalibration();
         }
         if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
-            int targetWidth = imageView.getWidth();
-            int targetHeight = imageView.getHeight();
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(currentPhotoPath, options);
-            int imageWidth = options.outWidth;
-            int imageHeight = options.outHeight;
-
-//            int scaleFactor = Math.min(imageWidth / targetWidth,
-//                    imageHeight / targetHeight);
-             int scaleFactor = calculateInSampleSize(options, targetWidth,
-              targetHeight);
-            Log.d(EPS, "scaleFactor=" + scaleFactor);
-            options.inJustDecodeBounds = false;
-            options.inSampleSize = scaleFactor;
-            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
+            Bitmap bitmap = getScaledBitmap(currentPhotoPath);
             imageView.setImageBitmap(bitmap);
             scaleImageForImageView();
             imageView.setVisibility(View.VISIBLE);
             attacher.update();
             clearCalibration();
         }
+    }
+
+    private Bitmap getScaledBitmap(String picturePath) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(picturePath, options);
+        int targetWidth = imageView.getWidth();
+        int targetHeight = imageView.getHeight();
+        options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight);
+        options.inJustDecodeBounds = false;
+        Bitmap bitmap = BitmapFactory.decodeFile(picturePath, options);
+        return bitmap;
     }
 
     private void rotateImage(float degrees) {
