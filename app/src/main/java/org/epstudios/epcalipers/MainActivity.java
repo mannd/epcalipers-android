@@ -233,6 +233,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         calipersMode = true;
         selectMainMenu();
 
+        // entry point to load external pics/pdfs
+        if (externalImageLoad) {
+            updateImageView(externalImageBitmap);
+            externalImageLoad = false;
+        }
+
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -946,7 +952,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 startActivityForResult(takePictureIntent, RESULT_CAPTURE_IMAGE);
             }
         }
-        // TODO else warning dialog, no camera?
+        // camera icon inactivate with if no camera present, so no warning here
     }
 
     private boolean deviceHasCamera(Intent takePictureIntent) {
@@ -970,6 +976,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return image;
     }
 
+    // possibly implement save photo to gallery
 //    private void galleryAddPic() {
 //        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 //        File f = new File(currentPhotoPath);
@@ -992,21 +999,24 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
 
-            Bitmap bitmap = getScaledBitmap(picturePath);
-            imageView.setImageBitmap(bitmap);
-            scaleImageForImageView();
-            imageView.setVisibility(View.VISIBLE);
-            attacher.update();
-            clearCalibration();
+            updateImageViewWithPath(picturePath);
         }
         if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
-            Bitmap bitmap = getScaledBitmap(currentPhotoPath);
-            imageView.setImageBitmap(bitmap);
-            scaleImageForImageView();
-            imageView.setVisibility(View.VISIBLE);
-            attacher.update();
-            clearCalibration();
+            updateImageViewWithPath(currentPhotoPath);
         }
+    }
+
+    private void updateImageViewWithPath(String path) {
+        Bitmap bitmap = getScaledBitmap(path);
+        updateImageView(bitmap);
+    }
+
+    private void updateImageView(Bitmap bitmap) {
+        imageView.setImageBitmap(bitmap);
+        scaleImageForImageView();
+        imageView.setVisibility(View.VISIBLE);
+        attacher.update();
+        clearCalibration();
     }
 
     private Bitmap getScaledBitmap(String picturePath) {
