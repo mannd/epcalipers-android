@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +21,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -47,10 +49,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.vudroid.core.DecodeServiceBase;
+import org.vudroid.pdfdroid.codec.PdfContext;
+import org.vudroid.pdfdroid.codec.PdfPage;
+
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -383,8 +394,71 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
+    // FIXME: probably time out error so this fails.  Need to make async task
+    // from http://stackoverflow.com/questions/10698360/how-to-convert-a-pdf-page-to-an-image-in-android
     private void handlePDF(Intent intent) {
         Log.d(EPS, "handlePDF");
+        //Uri pdfUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        Uri pdfUri = intent.getData();
+        Log.d(EPS, "imageUri = " + pdfUri.toString());
+        if (pdfUri != null) {
+            new AsyncLoadPDF().execute(pdfUri);
+            //externalImageLoad = true;
+            //externalImageBitmap = bitmap;
+        }
+    }
+
+    private class AsyncLoadPDF extends AsyncTask<Uri, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Uri... params) {
+            DecodeServiceBase decodeService = new DecodeServiceBase(new PdfContext());
+            decodeService.setContentResolver(getContentResolver());
+            Uri pdfUri = params[0];
+            // Uri is not a file path, need to get InputStream and convert to temporary file
+            ContentResolver cr = getContentResolver();
+            try {
+                // FIXME: copied pdf is corrupt, ? why
+                InputStream is = cr.openInputStream(pdfUri);
+                File pdfFile = convertStreamToFile(is);
+                Log.d(EPS, "pdfFile = " + pdfFile.toURI().toString());
+                URI newUri = pdfFile.toURI();
+                Uri newNewUri = android.net.Uri.parse(newUri.toString());
+                // FIXME: corrupt pdf exception here
+                decodeService.open(newNewUri);
+                // FIXME: uncomment for processing pdf once it is read
+//            PdfPage page = (PdfPage) decodeService.getPage(0);
+//            RectF rectF = new RectF(0, 0, 1, 1);
+//
+//            // not sure where AndroidUtils comes from??
+//            //double scaleBy = Math.min(AndroidUtils.PHOTO_WIDTH_PIXELS / (double) page.getWidth(), //
+//            //        AndroidUtils.PHOTO_HEIGHT_PIXELS / (double) page.getHeight());
+//            int width = (int) (page.getWidth() * 0.5);
+//            int height = (int) (page.getHeight() * 0.5);
+//            Log.d(EPS, "page width = " + width + " page height = " + height);
+//            Bitmap bitmap = page.renderBitmap(width, height, rectF);
+
+                return null;
+            }
+            catch (Exception e) {
+                Log.d(EPS, "Exception caught" + e.getMessage());
+                return null;
+            }
+        }
+
+        protected void onPostExecute() {
+            Log.d(EPS, "Finished AsyncLoadPDF");
+
+        }
+    }
+
+    private File convertStreamToFile(InputStream is) throws IOException {
+        File targetFile = createTmpPdfFile();
+        OutputStream os = new FileOutputStream(targetFile);
+
+        byte[] buffer = new byte[is.available()];
+        os.write(buffer);
+        return targetFile;
     }
 
     public boolean getFirstRun(SharedPreferences prefs) {
@@ -973,6 +1047,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         currentPhotoPath = image.getAbsolutePath();
        // galleryAddPic();
+        return image;
+    }
+
+    private File createTmpPdfFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String pdfFileName = "PDF_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                pdfFileName,  /* prefix */
+                ".pdf",         /* suffix */
+                storageDir      /* directory */
+        );
         return image;
     }
 
