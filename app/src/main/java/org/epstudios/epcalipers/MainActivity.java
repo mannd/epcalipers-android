@@ -208,10 +208,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         imageView = (ImageView) findViewById(R.id.imageView);
         // imageView always enabled in v2.0+
         imageView.setEnabled(true);
-        // FIXME: at some point need to load the external image...
-//        if (externalImageLoad) {
-//            imageView.setImageBitmap(externalImageBitmap);
-//        }
         if (!showStartImage && savedInstanceState == null) {
             imageView.setVisibility(View.INVISIBLE);
         }
@@ -408,37 +404,41 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
-    private class AsyncLoadPDF extends AsyncTask<Uri, Void, Void> {
+    private class AsyncLoadPDF extends AsyncTask<Uri,
+            Void, Bitmap> {
 
         @Override
-        protected Void doInBackground(Uri... params) {
+        protected Bitmap doInBackground(Uri... params) {
             DecodeServiceBase decodeService = new DecodeServiceBase(new PdfContext());
             decodeService.setContentResolver(getContentResolver());
             Uri pdfUri = params[0];
             // Uri is not a file path, need to get InputStream and convert to temporary file
             ContentResolver cr = getContentResolver();
             try {
-                // FIXME: copied pdf is corrupt, ? why
-                InputStream is = cr.openInputStream(pdfUri);
-                File pdfFile = convertStreamToFile(is);
-                Log.d(EPS, "pdfFile = " + pdfFile.toURI().toString());
-                URI newUri = pdfFile.toURI();
-                Uri newNewUri = android.net.Uri.parse(newUri.toString());
-                // FIXME: corrupt pdf exception here
-                decodeService.open(newNewUri);
+//                // FIXME: copied pdf is corrupt, ? why
+//                InputStream is = cr.openInputStream(pdfUri);
+//                File pdfFile = convertStreamToFile(is);
+//                Log.d(EPS, "pdfFile = " + pdfFile.toURI().toString());
+//                URI newUri = pdfFile.toURI();
+//                Uri newNewUri = android.net.Uri.parse(newUri.toString());
+//                // FIXME: corrupt pdf exception here
+                // works with pdf files, but not with email attachments
+                // FIXME: rotation reloads PDF (not selected images and wrongly resets calibration
+//                decodeService.open(newNewUri);
+                decodeService.open(pdfUri);
                 // FIXME: uncomment for processing pdf once it is read
-//            PdfPage page = (PdfPage) decodeService.getPage(0);
-//            RectF rectF = new RectF(0, 0, 1, 1);
-//
-//            // not sure where AndroidUtils comes from??
-//            //double scaleBy = Math.min(AndroidUtils.PHOTO_WIDTH_PIXELS / (double) page.getWidth(), //
-//            //        AndroidUtils.PHOTO_HEIGHT_PIXELS / (double) page.getHeight());
-//            int width = (int) (page.getWidth() * 0.5);
-//            int height = (int) (page.getHeight() * 0.5);
-//            Log.d(EPS, "page width = " + width + " page height = " + height);
-//            Bitmap bitmap = page.renderBitmap(width, height, rectF);
+                PdfPage page = (PdfPage) decodeService.getPage(0);
+                RectF rectF = new RectF(0, 0, 1, 1);
 
-                return null;
+                // not sure where AndroidUtils comes from??
+                //double scaleBy = Math.min(AndroidUtils.PHOTO_WIDTH_PIXELS / (double) page.getWidth(), //
+                //        AndroidUtils.PHOTO_HEIGHT_PIXELS / (double) page.getHeight());
+                int width = (int) (page.getWidth());
+                int height = (int) (page.getHeight());
+                Log.d(EPS, "page width = " + width + " page height = " + height);
+                Bitmap bitmap = page.renderBitmap(width, height, rectF);
+
+                return bitmap;
             }
             catch (Exception e) {
                 Log.d(EPS, "Exception caught" + e.getMessage());
@@ -446,8 +446,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             }
         }
 
-        protected void onPostExecute() {
+        protected void onPostExecute(Bitmap bitmap) {
             Log.d(EPS, "Finished AsyncLoadPDF");
+            updateImageView(bitmap);
+
+
 
         }
     }
