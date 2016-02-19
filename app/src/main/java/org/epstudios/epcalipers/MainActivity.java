@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +21,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -47,10 +49,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.vudroid.core.DecodeServiceBase;
+import org.vudroid.pdfdroid.codec.PdfContext;
+import org.vudroid.pdfdroid.codec.PdfPage;
+
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -129,6 +140,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private int shortAnimationDuration;
     private boolean noSavedInstance;
     private float totalRotation;
+    private boolean externalImageLoad;
+    private Bitmap externalImageBitmap;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -159,6 +172,29 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
         Log.d(EPS, "onCreate");
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        externalImageLoad = false;
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if (type.startsWith("image/")) {
+                try {
+                    handleImage(intent);
+                } catch (IOException e) {
+                    Log.d(EPS, "exception thrown");
+                }
+            }
+        }
+        else if (Intent.ACTION_VIEW.equals(action) && type != null) {
+            if (type.equals("application/pdf")) {
+                handlePDF(intent);
+            }
+        }
+
+        Log.d(EPS, "Action = " + action);
+
         noSavedInstance = (savedInstanceState == null);
 
         setContentView(R.layout.activity_main);
@@ -203,6 +239,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         calipersMode = true;
         selectMainMenu();
+
+        // entry point to load external pics/pdfs
+        if (externalImageLoad) {
+            updateImageView(externalImageBitmap);
+            externalImageLoad = false;
+        }
 
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -332,6 +374,94 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             builder.setPositiveButton(getString(R.string.ok_title), null);
             builder.show();
         }
+
+        if (externalImageLoad) {
+            startActivity(intent);
+        }
+    }
+
+    private void handleImage(Intent intent) throws IOException {
+        Log.d(EPS, "handleImage");
+        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (imageUri != null) {
+            Log.d(EPS, "imageUri = " + imageUri.toString());
+            externalImageLoad = true;
+            externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+        }
+    }
+
+    // FIXME: probably time out error so this fails.  Need to make async task
+    // from http://stackoverflow.com/questions/10698360/how-to-convert-a-pdf-page-to-an-image-in-android
+    private void handlePDF(Intent intent) {
+        Log.d(EPS, "handlePDF");
+        //Uri pdfUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        Uri pdfUri = intent.getData();
+        Log.d(EPS, "imageUri = " + pdfUri.toString());
+        if (pdfUri != null) {
+            new AsyncLoadPDF().execute(pdfUri);
+            //externalImageLoad = true;
+            //externalImageBitmap = bitmap;
+        }
+    }
+
+    private class AsyncLoadPDF extends AsyncTask<Uri,
+            Void, Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(Uri... params) {
+            DecodeServiceBase decodeService = new DecodeServiceBase(new PdfContext());
+            decodeService.setContentResolver(getContentResolver());
+            Uri pdfUri = params[0];
+            // Uri is not a file path, need to get InputStream and convert to temporary file
+            ContentResolver cr = getContentResolver();
+            try {
+//                // FIXME: copied pdf is corrupt, ? why
+//                InputStream is = cr.openInputStream(pdfUri);
+//                File pdfFile = convertStreamToFile(is);
+//                Log.d(EPS, "pdfFile = " + pdfFile.toURI().toString());
+//                URI newUri = pdfFile.toURI();
+//                Uri newNewUri = android.net.Uri.parse(newUri.toString());
+//                // FIXME: corrupt pdf exception here
+                // works with pdf files, but not with email attachments
+                // FIXME: rotation reloads PDF (not selected images and wrongly resets calibration
+//                decodeService.open(newNewUri);
+                decodeService.open(pdfUri);
+                // FIXME: uncomment for processing pdf once it is read
+                PdfPage page = (PdfPage) decodeService.getPage(0);
+                RectF rectF = new RectF(0, 0, 1, 1);
+
+                // not sure where AndroidUtils comes from??
+                //double scaleBy = Math.min(AndroidUtils.PHOTO_WIDTH_PIXELS / (double) page.getWidth(), //
+                //        AndroidUtils.PHOTO_HEIGHT_PIXELS / (double) page.getHeight());
+                int width = (int) (page.getWidth());
+                int height = (int) (page.getHeight());
+                Log.d(EPS, "page width = " + width + " page height = " + height);
+                Bitmap bitmap = page.renderBitmap(width, height, rectF);
+
+                return bitmap;
+            }
+            catch (Exception e) {
+                Log.d(EPS, "Exception caught" + e.getMessage());
+                return null;
+            }
+        }
+
+        protected void onPostExecute(Bitmap bitmap) {
+            Log.d(EPS, "Finished AsyncLoadPDF");
+            updateImageView(bitmap);
+
+
+
+        }
+    }
+
+    private File convertStreamToFile(InputStream is) throws IOException {
+        File targetFile = createTmpPdfFile();
+        OutputStream os = new FileOutputStream(targetFile);
+
+        byte[] buffer = new byte[is.available()];
+        os.write(buffer);
+        return targetFile;
     }
 
     public boolean getFirstRun(SharedPreferences prefs) {
@@ -372,6 +502,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void onResume() {
         super.onResume();
         Log.d(EPS, "onResume");
+
     }
 
     private void scaleImageForImageView() {
@@ -898,7 +1029,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 startActivityForResult(takePictureIntent, RESULT_CAPTURE_IMAGE);
             }
         }
-        // TODO else warning dialog, no camera?
+        // camera icon inactivate with if no camera present, so no warning here
     }
 
     private boolean deviceHasCamera(Intent takePictureIntent) {
@@ -922,13 +1053,27 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return image;
     }
 
-    private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(currentPhotoPath);
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
+    private File createTmpPdfFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String pdfFileName = "PDF_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                pdfFileName,  /* prefix */
+                ".pdf",         /* suffix */
+                storageDir      /* directory */
+        );
+        return image;
     }
+
+    // possibly implement save photo to gallery
+//    private void galleryAddPic() {
+//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//        File f = new File(currentPhotoPath);
+//        Uri contentUri = Uri.fromFile(f);
+//        mediaScanIntent.setData(contentUri);
+//        this.sendBroadcast(mediaScanIntent);
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -936,61 +1081,44 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
-
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
             Cursor cursor = getContentResolver().query(selectedImage,
                     filePathColumn, null, null, null);
             cursor.moveToFirst();
-
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
-            Log.d(EPS, "picturePath = " + picturePath);
             cursor.close();
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(picturePath, options);
-            int imageHeight = options.outHeight;
-            int imageWidth = options.outWidth;
-            Log.d(EPS, "image=" + imageWidth + "x" + imageHeight);
-            int targetWidth = imageView.getWidth();
-            int targetHeight = imageView.getHeight();
-            options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight);
-            options.inJustDecodeBounds = false;
-            Bitmap bitmap = BitmapFactory.decodeFile(picturePath, options);
-            imageHeight = bitmap.getHeight();
-            imageWidth = bitmap.getWidth();
-            Log.d(EPS, "image=" + imageWidth + "x" + imageHeight);
-            imageView.setImageBitmap(bitmap);
-            scaleImageForImageView();
-            imageView.setVisibility(View.VISIBLE);
-            attacher.update();
-            clearCalibration();
+            updateImageViewWithPath(picturePath);
         }
         if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
-            int targetWidth = imageView.getWidth();
-            int targetHeight = imageView.getHeight();
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(currentPhotoPath, options);
-            int imageWidth = options.outWidth;
-            int imageHeight = options.outHeight;
-
-//            int scaleFactor = Math.min(imageWidth / targetWidth,
-//                    imageHeight / targetHeight);
-             int scaleFactor = calculateInSampleSize(options, targetWidth,
-              targetHeight);
-            Log.d(EPS, "scaleFactor=" + scaleFactor);
-            options.inJustDecodeBounds = false;
-            options.inSampleSize = scaleFactor;
-            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
-            imageView.setImageBitmap(bitmap);
-            scaleImageForImageView();
-            imageView.setVisibility(View.VISIBLE);
-            attacher.update();
-            clearCalibration();
+            updateImageViewWithPath(currentPhotoPath);
         }
+    }
+
+    private void updateImageViewWithPath(String path) {
+        Bitmap bitmap = getScaledBitmap(path);
+        updateImageView(bitmap);
+    }
+
+    private void updateImageView(Bitmap bitmap) {
+        imageView.setImageBitmap(bitmap);
+        scaleImageForImageView();
+        imageView.setVisibility(View.VISIBLE);
+        attacher.update();
+        clearCalibration();
+    }
+
+    private Bitmap getScaledBitmap(String picturePath) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(picturePath, options);
+        int targetWidth = imageView.getWidth();
+        int targetHeight = imageView.getHeight();
+        options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight);
+        options.inJustDecodeBounds = false;
+        Bitmap bitmap = BitmapFactory.decodeFile(picturePath, options);
+        return bitmap;
     }
 
     private void rotateImage(float degrees) {

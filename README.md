@@ -15,6 +15,7 @@ and detailed license information.  Note that per
 [the Apache Software Foundation](http://www.apache.org/licenses/GPL-compatibility.html),
 Apache-licensed code can be included in GPLv3 projects such as this
 one.
+EP Calipers also uses the [android-pdfview library](https://github.com/JoanZapata/android-pdfview) of Joan Zapata which is licensed under the [GNU GPL v3 license.](http://www.gnu.org/licenses/gpl.html)
 
 ## Copyright
 Copyright © 2015 [EP Studios, Inc.](http://www.epstudiossoftware.com)
