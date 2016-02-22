@@ -49,6 +49,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.sun.pdfview.PDFFile;
+import com.sun.pdfview.PDFPage;
+
+import org.apache.commons.io.IOUtils;
 import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.pdfdroid.codec.PdfContext;
 import org.vudroid.pdfdroid.codec.PdfPage;
@@ -62,6 +66,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -393,9 +398,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     // FIXME: probably time out error so this fails.  Need to make async task
     // from http://stackoverflow.com/questions/10698360/how-to-convert-a-pdf-page-to-an-image-in-android
     private void handlePDF(Intent intent) {
+        // only allow one pdf per activity
+        //static boolean pdfHandled = false;
         Log.d(EPS, "handlePDF");
         //Uri pdfUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         Uri pdfUri = intent.getData();
+        // FIXME: trying to remove intent so doesn't load pdf each rotation
+        intent.removeExtra(Intent.EXTRA_STREAM);
         Log.d(EPS, "imageUri = " + pdfUri.toString());
         if (pdfUri != null) {
             new AsyncLoadPDF().execute(pdfUri);
@@ -413,8 +422,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             decodeService.setContentResolver(getContentResolver());
             Uri pdfUri = params[0];
             // Uri is not a file path, need to get InputStream and convert to temporary file
-            ContentResolver cr = getContentResolver();
-            try {
+            //ContentResolver cr = getContentResolver();
+         //   try {
 //                // FIXME: copied pdf is corrupt, ? why
 //                InputStream is = cr.openInputStream(pdfUri);
 //                File pdfFile = convertStreamToFile(is);
@@ -424,45 +433,39 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 //                // FIXME: corrupt pdf exception here
                 // works with pdf files, but not with email attachments
                 // FIXME: rotation reloads PDF (not selected images and wrongly resets calibration
+                // Note: asynctask being called with each rotation
 //                decodeService.open(newNewUri);
                 decodeService.open(pdfUri);
                 // FIXME: uncomment for processing pdf once it is read
                 PdfPage page = (PdfPage) decodeService.getPage(0);
-                RectF rectF = new RectF(0, 0, 1, 1);
-
                 // not sure where AndroidUtils comes from??
                 //double scaleBy = Math.min(AndroidUtils.PHOTO_WIDTH_PIXELS / (double) page.getWidth(), //
                 //        AndroidUtils.PHOTO_HEIGHT_PIXELS / (double) page.getHeight());
                 int width = (int) (page.getWidth());
                 int height = (int) (page.getHeight());
+                RectF rectF = new RectF(0, 0, 1, 1);
+
                 Log.d(EPS, "page width = " + width + " page height = " + height);
                 Bitmap bitmap = page.renderBitmap(width, height, rectF);
 
                 return bitmap;
-            }
-            catch (Exception e) {
-                Log.d(EPS, "Exception caught" + e.getMessage());
-                return null;
-            }
         }
 
         protected void onPostExecute(Bitmap bitmap) {
             Log.d(EPS, "Finished AsyncLoadPDF");
             updateImageView(bitmap);
-
-
-
+            externalImageLoad = false;
         }
     }
 
-    private File convertStreamToFile(InputStream is) throws IOException {
-        File targetFile = createTmpPdfFile();
-        OutputStream os = new FileOutputStream(targetFile);
-
-        byte[] buffer = new byte[is.available()];
-        os.write(buffer);
-        return targetFile;
-    }
+//    private File convertStreamToFile(InputStream is) throws IOException {
+//        File targetFile = createTmpPdfFile();
+//        OutputStream os = new FileOutputStream(targetFile);
+//
+//        byte[] buffer = new byte[is.available()];
+//        os.write(buffer);
+//        return targetFile;
+//    }
 
     public boolean getFirstRun(SharedPreferences prefs) {
       return prefs.getBoolean("firstRun" + About.VERSION, true);
@@ -1063,6 +1066,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 ".pdf",         /* suffix */
                 storageDir      /* directory */
         );
+        currentPhotoPath = image.getAbsolutePath();
         return image;
     }
 
