@@ -183,7 +183,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         String type = intent.getType();
         externalImageLoad = false;
 
-        if (Intent.ACTION_SEND.equals(action) && type != null) {
+        if (savedInstanceState == null && Intent.ACTION_SEND.equals(action) && type != null) {
             if (type.startsWith("image/")) {
                 try {
                     handleImage(intent);
@@ -192,7 +192,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 }
             }
         }
-        else if (Intent.ACTION_VIEW.equals(action) && type != null) {
+        else if (savedInstanceState == null && Intent.ACTION_VIEW.equals(action) && type != null) {
             if (type.equals("application/pdf")) {
                 handlePDF(intent);
             }
