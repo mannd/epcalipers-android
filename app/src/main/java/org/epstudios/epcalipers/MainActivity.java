@@ -49,10 +49,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.sun.pdfview.PDFFile;
-import com.sun.pdfview.PDFPage;
-
-import org.apache.commons.io.IOUtils;
 import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.pdfdroid.codec.PdfContext;
 import org.vudroid.pdfdroid.codec.PdfPage;
