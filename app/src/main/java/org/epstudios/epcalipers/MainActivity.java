@@ -183,6 +183,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         String type = intent.getType();
         externalImageLoad = false;
 
+        // Check savedInstanceState to avoid redoing this every time onCreate called,
+        // see http://stackoverflow.com/questions/3148418/how-to-clear-intent-that-started-activity
         if (savedInstanceState == null && Intent.ACTION_SEND.equals(action) && type != null) {
             if (type.startsWith("image/")) {
                 try {
@@ -441,19 +443,41 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 // not sure where AndroidUtils comes from??
                 //double scaleBy = Math.min(AndroidUtils.PHOTO_WIDTH_PIXELS / (double) page.getWidth(), //
                 //        AndroidUtils.PHOTO_HEIGHT_PIXELS / (double) page.getHeight());
+
+//            matrix.postScale(width / getMediaBox().width(), -height / getMediaBox().height());
+//            matrix.postTranslate(0, height);
+//            matrix.postTranslate(-pageSliceBounds.left*width, -pageSliceBounds.top*height);
+//            matrix.postScale(1/pageSliceBounds.width(), 1/pageSliceBounds.height());
+
+
+
+
                 int width = (int) (page.getWidth());
                 int height = (int) (page.getHeight());
-                RectF rectF = new RectF(0, 0, 1, 1);
+
+                Matrix matrix = new Matrix();
+                //matrix.preScale(1, 1);
+                matrix.preTranslate(0, height);
+                matrix.preScale(1, -1);
+
+                //matrix.setScale(1.0f, 1.0f);
+
+
+            //RectF rectF = new RectF(0, 0, 0.5f, 0.5f);
 
                 Log.d(EPS, "page width = " + width + " page height = " + height);
-                Bitmap bitmap = page.renderBitmap(width, height, rectF);
+                //Bitmap bitmap = page.renderBitmap(width * 2, height * 2, rectF);
+                Bitmap bitmap = page.render(new Rect(0, 0, width, height), matrix);
+                Log.d(EPS, "bitmap width = " + bitmap.getWidth() + " bitmap height = " + bitmap.getHeight());
 
                 return bitmap;
         }
 
         protected void onPostExecute(Bitmap bitmap) {
             Log.d(EPS, "Finished AsyncLoadPDF");
-            updateImageView(bitmap);
+            //updateImageView(bitmap);
+            imageView.setImageBitmap(bitmap);
+            attacher.update();
             externalImageLoad = false;
         }
     }
