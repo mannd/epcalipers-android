@@ -46,6 +46,7 @@ import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -179,6 +180,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         String type = intent.getType();
         externalImageLoad = false;
 
+        setContentView(R.layout.activity_main);
+        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+
         // Check savedInstanceState to avoid redoing this every time onCreate called,
         // see http://stackoverflow.com/questions/3148418/how-to-clear-intent-that-started-activity
         if (savedInstanceState == null && Intent.ACTION_SEND.equals(action) && type != null) {
@@ -200,7 +204,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         noSavedInstance = (savedInstanceState == null);
 
-        setContentView(R.layout.activity_main);
 
         currentCaliperColor = DEFAULT_CALIPER_COLOR;
         currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
@@ -415,6 +418,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             Void, Bitmap> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected Bitmap doInBackground(Uri... params) {
             DecodeServiceBase decodeService = new DecodeServiceBase(new PdfContext());
             decodeService.setContentResolver(getContentResolver());
@@ -447,6 +456,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             imageView.setImageBitmap(bitmap);
             attacher.update();
             externalImageLoad = false;
+            findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
     }
 
