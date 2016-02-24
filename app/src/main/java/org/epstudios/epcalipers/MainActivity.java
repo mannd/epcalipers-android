@@ -90,6 +90,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Button cameraButton;
     private Button selectImageButton;
     private Button adjustImageButton;
+    private Button previousPageButton;
+    private Button nextPageButton;
     private Button rotateImageRightButton;
     private Button rotateImageLeftButton;
     private Button tweakImageRightButton;
@@ -144,6 +146,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private float totalRotation;
     private boolean externalImageLoad;
     private Bitmap externalImageBitmap;
+    private Uri currentPdfUri;
+    private int numberOfPdfPages;
+    private int currentPdfPageNumber;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -179,6 +184,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         String action = intent.getAction();
         String type = intent.getType();
         externalImageLoad = false;
+        resetPdf();
 
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -397,24 +403,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
-    // FIXME: probably time out error so this fails.  Need to make async task
     // from http://stackoverflow.com/questions/10698360/how-to-convert-a-pdf-page-to-an-image-in-android
     private void handlePDF(Intent intent) {
-        // only allow one pdf per activity
-        //static boolean pdfHandled = false;
-        Log.d(EPS, "handlePDF");
-        //Uri pdfUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         Uri pdfUri = intent.getData();
-        // FIXME: trying to remove intent so doesn't load pdf each rotation
-        //intent.removeExtra(Intent.EXTRA_STREAM);
-        Log.d(EPS, "imageUri = " + pdfUri.toString());
         if (pdfUri != null) {
             UriPage uriPage = new UriPage();
             uriPage.uri = pdfUri;
             uriPage.pageNumber = 0;
             new AsyncLoadPDF().execute(uriPage);
-            //externalImageLoad = true;
-            //externalImageBitmap = bitmap;
         }
     }
 
@@ -438,10 +434,25 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             decodeService.setContentResolver(getContentResolver());
             UriPage uriPage = params[0];
             Uri pdfUri = uriPage.uri;
-            int pageNumber = uriPage.pageNumber;
+            if (pdfUri == null) {
+                if (currentPdfUri == null) {
+                    // can't do anything if all is null
+                    return null;
+                }
+                else {
+                    // use currently opened PDF
+                    pdfUri = currentPdfUri;
+                }
+            }
+            else {
+                // retain PDF Uri for future page changes
+                currentPdfUri = pdfUri;
+            }
             // Uri is not a file path, need to get InputStream and convert to temporary file
             decodeService.open(pdfUri);
-            PdfPage page = (PdfPage) decodeService.getPage(0);
+            numberOfPdfPages = decodeService.getPageCount();
+            currentPdfPageNumber = uriPage.pageNumber;
+            PdfPage page = (PdfPage) decodeService.getPage(currentPdfPageNumber);
 
             int width = (int) (page.getWidth());
             int height = (int) (page.getHeight());
@@ -458,14 +469,67 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
 
         protected void onPostExecute(Bitmap bitmap) {
-            Log.d(EPS, "Finished AsyncLoadPDF");
-            // Set pdf bitmap directly, scaling screws it up
-            imageView.setImageBitmap(bitmap);
-            attacher.update();
-            attacher.setScale(attacher.getMinimumScale());
-//            externalImageLoad = false;
+            if (bitmap != null) {
+                // Set pdf bitmap directly, scaling screws it up
+                imageView.setImageBitmap(bitmap);
+                attacher.update();
+                attacher.setScale(attacher.getMinimumScale());
+            }
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
+    }
+
+    private void resetPdf() {
+        currentPdfUri = null;
+        numberOfPdfPages = 0;
+        currentPdfPageNumber = 0;
+        enablePageButtons(false);
+    }
+
+//    - (void)gotoPreviousPage {
+//        self.pageNumber--;
+//        if (self.pageNumber < 1) {
+//            self.pageNumber = 1;
+//        }
+//        [self enablePageButtons:YES];
+//        [self openPDFPage:pdfRef atPage:self.pageNumber];
+//    }
+//
+//    - (void)gotoNextPage {
+//        self.pageNumber++;
+//        if (self.pageNumber > self.numberOfPages) {
+//            self.pageNumber = self.numberOfPages;
+//        }
+//        [self enablePageButtons:YES];
+//        [self openPDFPage:pdfRef atPage:self.pageNumber];
+//    }
+
+    private void showPreviousPage() {
+        if (currentPdfUri == null) {
+           return;
+        }
+        if (--currentPdfPageNumber < 0) {
+            currentPdfPageNumber = 0;
+        }
+        enablePageButtons(true);
+        UriPage uriPage = new UriPage();
+        uriPage.uri = null;
+        uriPage.pageNumber = currentPdfPageNumber;
+        new AsyncLoadPDF().execute(uriPage);
+    }
+
+    private void showNextPage() {
+        if (currentPdfUri == null) {
+            return;
+        }
+        if (++currentPdfPageNumber > numberOfPdfPages - 1) {
+            currentPdfPageNumber = numberOfPdfPages -1;
+        }
+        enablePageButtons(true);
+        UriPage uriPage = new UriPage();
+        uriPage.uri = null;
+        uriPage.pageNumber = currentPdfPageNumber;
+        new AsyncLoadPDF().execute(uriPage);
     }
 
 //    private File convertStreamToFile(InputStream is) throws IOException {
@@ -762,6 +826,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             doQTcCalculation();
         } else if (v == cancelQTcMeasurementButton) {
             selectMainMenu();
+        } else if (v == previousPageButton) {
+            showPreviousPage();
+        } else if (v == nextPageButton) {
+            showNextPage();
         }
 
     }
@@ -778,8 +846,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         cameraButton.setEnabled(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA));
         selectImageButton = createButton(getString(R.string.select_image_button_title));
         adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
-        horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
-        verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
+        previousPageButton = createButton("Previous");
+        nextPageButton = createButton("Next");
         // Add Caliper menu
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
@@ -826,6 +894,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         buttons.add(cameraButton);
         buttons.add(selectImageButton);
         buttons.add(adjustImageButton);
+        buttons.add(previousPageButton);
+        buttons.add(nextPageButton);
         imageMenu = createMenu(buttons);
     }
 
@@ -893,7 +963,22 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (imageMenu == null) {
             createImageMenu();
         }
+        boolean enable = (numberOfPdfPages  > 0);
+        enablePageButtons(enable);
         selectMenu(imageMenu);
+    }
+
+    private void enablePageButtons(boolean enable) {
+        previousPageButton.setEnabled(enable);
+        nextPageButton.setEnabled(enable);
+        if (enable) {
+            if (currentPdfPageNumber <= 0) {
+                previousPageButton.setEnabled(false);
+            }
+            if (currentPdfPageNumber >= numberOfPdfPages -1) {
+                nextPageButton.setEnabled(false);
+            }
+        }
     }
 
     private void selectAddCaliperMenu() {
@@ -1121,6 +1206,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         imageView.setVisibility(View.VISIBLE);
         attacher.update();
         clearCalibration();
+        // updateImageView not used for PDFs, so
+        // reset all the PDF variables
+        resetPdf();
     }
 
     private Bitmap getScaledBitmap(String picturePath) {
