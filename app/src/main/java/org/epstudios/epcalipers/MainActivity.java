@@ -462,8 +462,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             // Set pdf bitmap directly, scaling screws it up
             imageView.setImageBitmap(bitmap);
             attacher.update();
-            attacher.setScaleType(ImageView.ScaleType.CENTER);
-            externalImageLoad = false;
+            attacher.setScale(attacher.getMinimumScale());
+//            externalImageLoad = false;
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
     }
