@@ -219,7 +219,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         attacher = new PhotoViewAttacher(imageView);
         attacher.setScaleType(ImageView.ScaleType.CENTER);
-        attacher.setMaximumScale(5.0f);
+        attacher.setMaximumScale(5.5f);
+        attacher.setMinimumScale(0.3f);
         // We need to use MatrixChangeListener and not ScaleChangeListener
         // since the former only fires when scale has completely changed and
         // the latter fires while the scale is changing, so is inaccurate.
@@ -405,16 +406,24 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         //Uri pdfUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
         Uri pdfUri = intent.getData();
         // FIXME: trying to remove intent so doesn't load pdf each rotation
-        intent.removeExtra(Intent.EXTRA_STREAM);
+        //intent.removeExtra(Intent.EXTRA_STREAM);
         Log.d(EPS, "imageUri = " + pdfUri.toString());
         if (pdfUri != null) {
-            new AsyncLoadPDF().execute(pdfUri);
+            UriPage uriPage = new UriPage();
+            uriPage.uri = pdfUri;
+            uriPage.pageNumber = 0;
+            new AsyncLoadPDF().execute(uriPage);
             //externalImageLoad = true;
             //externalImageBitmap = bitmap;
         }
     }
 
-    private class AsyncLoadPDF extends AsyncTask<Uri,
+    private class UriPage {
+        public Uri uri;
+        public int pageNumber;
+    }
+
+    private class AsyncLoadPDF extends AsyncTask<UriPage,
             Void, Bitmap> {
 
         @Override
@@ -424,10 +433,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
 
         @Override
-        protected Bitmap doInBackground(Uri... params) {
+        protected Bitmap doInBackground(UriPage... params) {
             DecodeServiceBase decodeService = new DecodeServiceBase(new PdfContext());
             decodeService.setContentResolver(getContentResolver());
-            Uri pdfUri = params[0];
+            UriPage uriPage = params[0];
+            Uri pdfUri = uriPage.uri;
+            int pageNumber = uriPage.pageNumber;
             // Uri is not a file path, need to get InputStream and convert to temporary file
             decodeService.open(pdfUri);
             PdfPage page = (PdfPage) decodeService.getPage(0);
@@ -435,9 +446,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             int width = (int) (page.getWidth());
             int height = (int) (page.getHeight());
 
-            // use matrix to flix image to proper orientation and then scale it up
-            // FIXME: similar to image loading, may need to schrink image if too large
-            // FIXME: Handle more than page 0!
             Matrix matrix = new Matrix();
             matrix.preTranslate(0, height);
             matrix.preScale(1, -1);
@@ -450,11 +458,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
 
         protected void onPostExecute(Bitmap bitmap) {
-            // FIXME: need UI progress indicator while loading PDF
             Log.d(EPS, "Finished AsyncLoadPDF");
             // Set pdf bitmap directly, scaling screws it up
             imageView.setImageBitmap(bitmap);
             attacher.update();
+            attacher.setScaleType(ImageView.ScaleType.CENTER);
             externalImageLoad = false;
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
