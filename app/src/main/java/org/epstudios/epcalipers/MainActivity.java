@@ -56,6 +56,9 @@ import org.vudroid.pdfdroid.codec.PdfPage;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -184,8 +187,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         String action = intent.getAction();
         String type = intent.getType();
         externalImageLoad = false;
-        resetPdf();
-
+        currentPdfUri = null;
+        numberOfPdfPages = 0;
+        currentPdfPageNumber = 0;
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
 
@@ -407,10 +411,41 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void handlePDF(Intent intent) {
         Uri pdfUri = intent.getData();
         if (pdfUri != null) {
+            Uri tempUri = getTempUri(pdfUri);
+            Log.d(EPS, "tempUri is " + tempUri);
             UriPage uriPage = new UriPage();
-            uriPage.uri = pdfUri;
+            uriPage.uri = tempUri;
             uriPage.pageNumber = 0;
             new AsyncLoadPDF().execute(uriPage);
+        }
+    }
+
+    private Uri getTempUri(Uri uri) {
+        try {
+            InputStream is = getContentResolver().openInputStream(uri);
+            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+            // this is storage overwritten on each iteration with bytes
+            int bufferSize = 1024;
+            byte[] buffer = new byte[bufferSize];
+
+            // we need to know how may bytes were read to write them to the byteBuffer
+            int len = 0;
+            while ((len = is.read(buffer)) != -1) {
+                byteBuffer.write(buffer, 0, len);
+            }
+            byte[] bytes = byteBuffer.toByteArray();
+            Log.d(EPS, "bytes length is " + bytes.length);
+            File file = createTmpPdfFile();
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+            bos.write(bytes);
+            bos.flush();
+            bos.close();
+            return Uri.fromFile(file);
+        }
+        catch (Exception e) {
+            // do something
+            return null;
         }
     }
 
@@ -449,6 +484,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 currentPdfUri = pdfUri;
             }
             // Uri is not a file path, need to get InputStream and convert to temporary file
+            Log.d(EPS, "pdfUri = " + pdfUri.getPath().toString());
+
+
+
+
             decodeService.open(pdfUri);
             numberOfPdfPages = decodeService.getPageCount();
             currentPdfPageNumber = uriPage.pageNumber;
@@ -486,24 +526,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         enablePageButtons(false);
     }
 
-//    - (void)gotoPreviousPage {
-//        self.pageNumber--;
-//        if (self.pageNumber < 1) {
-//            self.pageNumber = 1;
-//        }
-//        [self enablePageButtons:YES];
-//        [self openPDFPage:pdfRef atPage:self.pageNumber];
-//    }
-//
-//    - (void)gotoNextPage {
-//        self.pageNumber++;
-//        if (self.pageNumber > self.numberOfPages) {
-//            self.pageNumber = self.numberOfPages;
-//        }
-//        [self enablePageButtons:YES];
-//        [self openPDFPage:pdfRef atPage:self.pageNumber];
-//    }
-
     private void showPreviousPage() {
         if (currentPdfUri == null) {
            return;
@@ -523,7 +545,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             return;
         }
         if (++currentPdfPageNumber > numberOfPdfPages - 1) {
-            currentPdfPageNumber = numberOfPdfPages -1;
+            currentPdfPageNumber = numberOfPdfPages - 1;
         }
         enablePageButtons(true);
         UriPage uriPage = new UriPage();
@@ -1161,7 +1183,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 ".pdf",         /* suffix */
                 storageDir      /* directory */
         );
-        currentPhotoPath = image.getAbsolutePath();
+        //currentPhotoPath = image.getAbsolutePath();
         return image;
     }
 
