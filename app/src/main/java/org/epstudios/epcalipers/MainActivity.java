@@ -221,11 +221,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         if (noSavedInstance && Intent.ACTION_SEND.equals(action) && type != null) {
             if (type.startsWith("image/")) {
-                try {
-                    handleImage(intent);
-                } catch (IOException e) {
-                    Log.d(EPS, "exception thrown");
-                }
+                handleImage(intent);
             }
         }
         else if (noSavedInstance && Intent.ACTION_VIEW.equals(action) && type != null) {
@@ -395,13 +391,18 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
-    private void handleImage(Intent intent) throws IOException {
+    private void handleImage(Intent intent) {
         Log.d(EPS, "handleImage");
-        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
-        if (imageUri != null) {
-            Log.d(EPS, "imageUri = " + imageUri.toString());
-            externalImageLoad = true;
-            externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+        try {
+            Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            if (imageUri != null) {
+                Log.d(EPS, "imageUri = " + imageUri.toString());
+                externalImageLoad = true;
+                externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            }
+        }
+        catch (Exception e) {
+            showFileErrorAlert();
         }
     }
 
@@ -410,7 +411,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Uri pdfUri = intent.getData();
         if (pdfUri != null) {
             Uri tempUri = getTempUri(pdfUri);
-            Log.d(EPS, "tempUri is " + tempUri);
+            // if tmp file creation throws exception, tempUri is null
+            if (tempUri == null) {
+                showFileErrorAlert();
+                return;
+            }
             UriPage uriPage = new UriPage();
             uriPage.uri = tempUri;
             uriPage.pageNumber = 0;
@@ -442,7 +447,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             return Uri.fromFile(file);
         }
         catch (Exception e) {
-            // do something
             return null;
         }
     }
@@ -487,9 +491,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 currentPdfUri = pdfUri;
                 isNewPdf = true;
             }
-            // Uri is not a file path, need to get InputStream and convert to temporary file
-            Log.d(EPS, "pdfUri = " + pdfUri.getPath().toString());
-
+            // note that library handles exceptions
             decodeService.open(pdfUri);
             numberOfPdfPages = decodeService.getPageCount();
             currentPdfPageNumber = uriPage.pageNumber;
@@ -504,8 +506,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             matrix.postScale(3, 3);
 
             Bitmap bitmap = page.render(new Rect(0, 0, width * 3, height * 3), matrix);
-            Log.d(EPS, "bitmap width = " + bitmap.getWidth() + " bitmap height = " + bitmap.getHeight());
-
             return bitmap;
         }
 
@@ -557,15 +557,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         uriPage.pageNumber = currentPdfPageNumber;
         new AsyncLoadPDF().execute(uriPage);
     }
-
-//    private File convertStreamToFile(InputStream is) throws IOException {
-//        File targetFile = createTmpPdfFile();
-//        OutputStream os = new FileOutputStream(targetFile);
-//
-//        byte[] buffer = new byte[is.available()];
-//        os.write(buffer);
-//        return targetFile;
-//    }
 
     public boolean getFirstRun(SharedPreferences prefs) {
       return prefs.getBoolean("firstRun" + About.VERSION, true);
@@ -1145,7 +1136,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                // TODO toast it?
+                showFileErrorAlert();
+                return;
             }
             if (photoFile != null) {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
@@ -1652,6 +1644,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         builder.setPositiveButton("OK", null);
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void showFileErrorAlert() {
+        showSimpleAlert(R.string.file_load_error, R.string.file_load_message);
     }
 
     private void clearCalibration() {

@@ -88,4 +88,6 @@
         mean rates and QTc will be enabled.\n\nUse the *Switch* button on the top right to
         load and adjust ECG images.\n\nSee the *Help* menu item for full help.</string>
     <string name="opening_pdf_message">Opening PDF</string>
+    <string name="file_load_error">File load error</string>
+    <string name="file_load_message">File could not be loaded</string>
 </resources>
