@@ -87,4 +87,5 @@
         After calibration the menu items that allow toggling interval and rate and calculating
         mean rates and QTc will be enabled.\n\nUse the *Switch* button on the top right to
         load and adjust ECG images.\n\nSee the *Help* menu item for full help.</string>
+    <string name="opening_pdf_message">Opening PDF</string>
 </resources>

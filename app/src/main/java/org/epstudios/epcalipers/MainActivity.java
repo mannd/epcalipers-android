@@ -49,6 +49,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.pdfdroid.codec.PdfContext;
@@ -193,24 +194,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
 
-        // Check savedInstanceState to avoid redoing this every time onCreate called,
-        // see http://stackoverflow.com/questions/3148418/how-to-clear-intent-that-started-activity
-        if (savedInstanceState == null && Intent.ACTION_SEND.equals(action) && type != null) {
-            if (type.startsWith("image/")) {
-                try {
-                    handleImage(intent);
-                } catch (IOException e) {
-                    Log.d(EPS, "exception thrown");
-                }
-            }
-        }
-        else if (savedInstanceState == null && Intent.ACTION_VIEW.equals(action) && type != null) {
-            if (type.equals("application/pdf")) {
-                handlePDF(intent);
-            }
-        }
-
-        Log.d(EPS, "Action = " + action);
 
         noSavedInstance = (savedInstanceState == null);
 
@@ -224,7 +207,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         imageView = (ImageView) findViewById(R.id.imageView);
         // imageView always enabled in v2.0+
         imageView.setEnabled(true);
-        if (!showStartImage && savedInstanceState == null) {
+        if (!showStartImage && noSavedInstance) {
             imageView.setVisibility(View.INVISIBLE);
         }
         attacher = new PhotoViewAttacher(imageView);
@@ -235,6 +218,21 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // since the former only fires when scale has completely changed and
         // the latter fires while the scale is changing, so is inaccurate.
         attacher.setOnMatrixChangeListener(new MatrixChangeListener());
+
+        if (noSavedInstance && Intent.ACTION_SEND.equals(action) && type != null) {
+            if (type.startsWith("image/")) {
+                try {
+                    handleImage(intent);
+                } catch (IOException e) {
+                    Log.d(EPS, "exception thrown");
+                }
+            }
+        }
+        else if (noSavedInstance && Intent.ACTION_VIEW.equals(action) && type != null) {
+            if (type.equals("application/pdf")) {
+                handlePDF(intent);
+            }
+        }
 
         calipersView = (CalipersView) findViewById(R.id.caliperView);
         shortAnimationDuration = getResources().getInteger(
@@ -456,11 +454,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private class AsyncLoadPDF extends AsyncTask<UriPage,
             Void, Bitmap> {
+        private boolean isNewPdf;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+            Toast toast = Toast.makeText(getApplicationContext(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
+            toast.show();
+
         }
 
         @Override
@@ -477,17 +479,16 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 else {
                     // use currently opened PDF
                     pdfUri = currentPdfUri;
+                    isNewPdf = false;
                 }
             }
             else {
                 // retain PDF Uri for future page changes
                 currentPdfUri = pdfUri;
+                isNewPdf = true;
             }
             // Uri is not a file path, need to get InputStream and convert to temporary file
             Log.d(EPS, "pdfUri = " + pdfUri.getPath().toString());
-
-
-
 
             decodeService.open(pdfUri);
             numberOfPdfPages = decodeService.getPageCount();
@@ -514,6 +515,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 imageView.setImageBitmap(bitmap);
                 attacher.update();
                 attacher.setScale(attacher.getMinimumScale());
+                if (isNewPdf) {
+                    clearCalibration();
+                }
             }
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
