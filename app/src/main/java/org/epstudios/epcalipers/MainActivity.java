@@ -153,6 +153,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Uri currentPdfUri;
     private int numberOfPdfPages;
     private int currentPdfPageNumber;
+    private Menu menu;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -193,7 +194,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         currentPdfPageNumber = 0;
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-
 
         noSavedInstance = (savedInstanceState == null);
 
@@ -1059,6 +1059,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -1100,17 +1101,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // imageView is always enabled now that touch events pass through
         // imageView.setEnabled(!calipersMode);
         calipersView.setEnabled(calipersMode);
+        MenuItem switchModeMenuItem = menu.findItem(R.id.action_switch);
 
         if (calipersMode) {
             getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
             getSupportActionBar().setBackgroundDrawable(
                     new ColorDrawable(getResources().getColor(R.color.primary)));
             unfadeCalipersView();
+            switchModeMenuItem.setTitle(R.string.image_button_title);
             selectMainMenu();
         } else {
             getSupportActionBar().setTitle(getString(R.string.image_mode_title));
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
             fadeCalipersView();
+            switchModeMenuItem.setTitle(R.string.measure_button_title);
             selectImageMenu();
         }
     }

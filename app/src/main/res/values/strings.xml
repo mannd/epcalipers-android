@@ -29,7 +29,6 @@
     <string name="about_label">EP Calipers</string>
     <string name="help_title">Help</string>
     <string name="switch_mode_title">Switch</string>
-    <string name="image_button_label">Image</string>
     <string name="no_time_caliper_selected_title">No Time Caliper Selected</string>
     <string name="no_time_caliper_selected_message">Use a selected (highlighted) caliper to
         measure one or more RR intervals.</string>
@@ -90,4 +89,6 @@
     <string name="opening_pdf_message">Opening PDF</string>
     <string name="file_load_error">File load error</string>
     <string name="file_load_message">File could not be loaded</string>
+    <string name="image_button_title">Image</string>
+    <string name="measure_button_title">Measure</string>
 </resources>
