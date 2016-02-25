@@ -410,14 +410,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void handlePDF(Intent intent) {
         Uri pdfUri = intent.getData();
         if (pdfUri != null) {
-            Uri tempUri = getTempUri(pdfUri);
-            // if tmp file creation throws exception, tempUri is null
-            if (tempUri == null) {
-                showFileErrorAlert();
-                return;
-            }
             UriPage uriPage = new UriPage();
-            uriPage.uri = tempUri;
+            uriPage.uri = pdfUri;
             uriPage.pageNumber = 0;
             new AsyncLoadPDF().execute(uriPage);
         }
@@ -480,13 +474,17 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     // can't do anything if all is null
                     return null;
                 }
-                else {
-                    // use currently opened PDF
-                    pdfUri = currentPdfUri;
-                    isNewPdf = false;
-                }
+                // use currently opened PDF
+                pdfUri = currentPdfUri;
+                isNewPdf = false;
             }
             else {
+                // change Uri to a real file path
+                pdfUri = getTempUri(pdfUri);
+                // if getTempUri returns null then exception was thrown
+                if (pdfUri == null) {
+                    return null;
+                }
                 // retain PDF Uri for future page changes
                 currentPdfUri = pdfUri;
                 isNewPdf = true;
