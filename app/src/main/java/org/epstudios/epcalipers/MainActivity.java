@@ -666,7 +666,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         outState.putFloat("totalRotation", totalRotation);
         outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
         // Calibration
-        outState.putString("hcalUnits", horizontalCalibration.getUnits());
+        // must use rawUnits here, otherwise original calibration units are lost
+        outState.putString("hcalUnits", horizontalCalibration.rawUnits());
         outState.putString("hcalCalibrationString", horizontalCalibration.getCalibrationString());
         outState.putBoolean("hcalDisplayRate", horizontalCalibration.getDisplayRate());
         outState.putFloat("hcalOriginalZoom", horizontalCalibration.getOriginalZoom());
@@ -674,7 +675,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         outState.putBoolean("hcalCalibrated", horizontalCalibration.isCalibrated());
         outState.putFloat(("hcalOriginalCalFactor"), horizontalCalibration.getOriginalCalFactor());
 
-        outState.putString("vcalUnits", verticalCalibration.getUnits());
+        outState.putString("vcalUnits", verticalCalibration.rawUnits());
         outState.putString("vcalCalibrationString", verticalCalibration.getCalibrationString());
         outState.putBoolean("vcalDisplayRate", verticalCalibration.getDisplayRate());
         outState.putFloat("vcalOriginalZoom", verticalCalibration.getOriginalZoom());

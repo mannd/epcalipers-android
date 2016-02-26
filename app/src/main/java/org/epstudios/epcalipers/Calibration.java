@@ -149,6 +149,7 @@ public class Calibration {
                 || upcaseUnits.equals("SECONDS");
     }
 
+
     public boolean unitsAreMsec() {
         if (units.length() < 1) {
             return false;
