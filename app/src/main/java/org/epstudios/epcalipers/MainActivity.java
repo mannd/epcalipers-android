@@ -745,8 +745,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         verticalCalibration.setCalibrated(savedInstanceState.getBoolean("vcalCalibrated"));
         verticalCalibration.setOriginalCalFactor(savedInstanceState.getFloat("vcalOriginalCalFactor"));
 
-        setMode();
-
         // restore calipers
         int calipersCount = savedInstanceState.getInt("CalipersCount");
         for (int i = 0; i < calipersCount; i++) {
@@ -1058,9 +1056,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(EPS, "onCreateOptionsMenu");
         // Inflate the menu; this adds items to the action bar if it is present.
         this.menu = menu;
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        setMode();
         return true;
     }
 
