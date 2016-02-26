@@ -1717,6 +1717,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         addCaliperWithDirectionAtRect(direction, new Rect(0, 0, calipersView.getWidth(),
                 calipersView.getHeight()));
         calipersView.invalidate();
+        selectMainMenu();
     }
 
     private void addCaliperWithDirectionAtRect(Caliper.Direction direction,
