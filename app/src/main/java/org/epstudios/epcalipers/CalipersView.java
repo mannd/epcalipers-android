@@ -239,8 +239,10 @@ public class CalipersView extends View {
         if (isLocked()) {
             return;
         }
+        boolean caliperToggled = false;
         for (int i = calipersCount() - 1; i >= 0; i--) {
-            if (calipers.get(i).pointNearCaliper(pointF)) {
+            if (calipers.get(i).pointNearCaliper(pointF) && !caliperToggled) {
+                caliperToggled = true;
                 if (calipers.get(i).isSelected()) {
                     unselectCaliper(calipers.get(i));
                 } else {
