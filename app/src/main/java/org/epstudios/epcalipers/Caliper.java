@@ -289,17 +289,29 @@ public class Caliper {
         return barCoord(p) > barPosition - DELTA && barCoord(p) < barPosition + DELTA;
     }
 
+
+//    +    // avoid overlapping deltas inside calipers that prevent crossbar touch when short interval
+//            if (self.direction == Horizontal) {
+//        -        nearBar = (p.x > fminf(self.bar1Position, self.bar2Position) + delta && p.x < fmaxf(self.bar2Position, self.bar1Position) - delta && p.y > self.crossBarPosition - delta && p.y < self.crossBarPosition + delta);
+//        +        nearBar = (p.x > fminf(self.bar1Position, self.bar2Position) && p.x < fmaxf(self.bar2Position, self.bar1Position) && p.y > self.crossBarPosition - delta && p.y < self.crossBarPosition + delta);
+//    } else {
+//        -        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) + delta && p.y < fmaxf(self.bar2Position, self.bar1Position) - delta && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
+//        +        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) && p.y < fmaxf(self.bar2Position, self.bar1Position) && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
+
+
+
+
     public boolean pointNearCrossBar(PointF p) {
         boolean nearBar = false;
         float delta = DELTA + 5.0f;  // cross bar delta a little bigger
         if (direction == Direction.HORIZONTAL) {
-            nearBar = (p.x > Math.min(bar1Position, bar2Position) + delta
-                    && p.x < Math.max(bar2Position, bar1Position) - delta
+            nearBar = (p.x > Math.min(bar1Position, bar2Position)
+                    && p.x < Math.max(bar2Position, bar1Position)
                     && p.y > crossBarPosition - delta
                     && p.y < crossBarPosition + delta);
         } else {
-            nearBar = (p.y > Math.min(bar1Position, bar2Position) + delta
-                    && p.y < Math.max(bar2Position, bar1Position) - delta
+            nearBar = (p.y > Math.min(bar1Position, bar2Position)
+                    && p.y < Math.max(bar2Position, bar1Position)
                     && p.x > crossBarPosition - delta
                     && p.x < crossBarPosition + delta);
         }
