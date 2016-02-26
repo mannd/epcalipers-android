@@ -267,12 +267,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 if (key.equals(getString(R.string.default_time_calibration_key))) {
                     defaultTimeCalibration = sharedPreferences.getString(key,
                             getString(R.string.default_time_calibration_value));
-                    return; // no need to invalidate calpersView.
+                    horizontalCalibration.setCalibrationString(defaultTimeCalibration);
+                    return; // no need to invalidate calipersView.
                 }
                 if (key.equals(getString(R.string.default_amplitude_calibration_key))) {
                     defaultAmplitudeCalibration = sharedPreferences.getString(key,
                             getString(R.string.default_amplitude_calibration_value));
-                    return; // no need to invalidate calpersView.
+                    verticalCalibration.setCalibrationString(defaultAmplitudeCalibration);
+                    return; // no need to invalidate calipersView.
                 }
                 if (key.equals(getString(R.string.default_caliper_color_key))) {
                     try {
