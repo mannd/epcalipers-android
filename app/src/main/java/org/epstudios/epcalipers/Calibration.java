@@ -1,7 +1,5 @@
 package org.epstudios.epcalipers;
 
-import android.content.Context;
-
 /**
  * Copyright (C) 2015 EP Studios, Inc.
  * www.epstudiossoftware.com

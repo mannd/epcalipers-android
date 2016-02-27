@@ -11,7 +11,7 @@
         app:showAsAction="never" />
 
     <item android:id="@+id/help"
-        android:title="Help"
+        android:title="@string/help"
         app:showAsAction="never" />
 
 

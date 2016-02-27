@@ -1,19 +1,13 @@
 package org.epstudios.epcalipers;
 
-import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.util.Log;
 
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.Format;
-import java.util.Locale;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -119,8 +113,8 @@ public class Caliper {
 
     private int selectedColor;
     private boolean selected;
-    private DecimalFormat decimalFormat;
-    private Paint paint;
+    private final DecimalFormat decimalFormat;
+    private final Paint paint;
 
     public Calibration getCalibration() {
         return calibration;
@@ -229,7 +223,7 @@ public class Caliper {
         return (direction == Direction.HORIZONTAL ? p.x : p.y);
     }
 
-    public String measurement() {
+    private String measurement() {
         String result = decimalFormat.format(calibratedResult());
         result += " " + calibration.getUnits();
         return result;
@@ -302,7 +296,7 @@ public class Caliper {
 
 
     public boolean pointNearCrossBar(PointF p) {
-        boolean nearBar = false;
+        boolean nearBar;
         float delta = DELTA + 5.0f;  // cross bar delta a little bigger
         if (direction == Direction.HORIZONTAL) {
             nearBar = (p.x > Math.min(bar1Position, bar2Position)

@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +26,9 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
@@ -46,7 +47,6 @@ import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,17 +57,12 @@ import org.vudroid.pdfdroid.codec.PdfPage;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -78,8 +73,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MainActivity extends ActionBarActivity implements View.OnClickListener {
-    static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
     private static final String EPS = "EPS";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
@@ -144,7 +139,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private String defaultTimeCalibration;
     private String defaultAmplitudeCalibration;
     private String dialogResult;
-    private SharedPreferences.OnSharedPreferenceChangeListener listener;
     private int shortAnimationDuration;
     private boolean noSavedInstance;
     private float totalRotation;
@@ -257,7 +251,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             externalImageLoad = false;
         }
 
-        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 // show start image only has effect with restart
@@ -396,7 +390,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void handleImage(Intent intent) {
         Log.d(EPS, "handleImage");
         try {
-            Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
             if (imageUri != null) {
                 Log.d(EPS, "imageUri = " + imageUri.toString());
                 externalImageLoad = true;
@@ -429,7 +423,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             byte[] buffer = new byte[bufferSize];
 
             // we need to know how may bytes were read to write them to the byteBuffer
-            int len = 0;
+            int len;
             while ((len = is.read(buffer)) != -1) {
                 byteBuffer.write(buffer, 0, len);
             }
@@ -497,16 +491,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             currentPdfPageNumber = uriPage.pageNumber;
             PdfPage page = (PdfPage) decodeService.getPage(currentPdfPageNumber);
 
-            int width = (int) (page.getWidth());
-            int height = (int) (page.getHeight());
+            int width = page.getWidth();
+            int height = page.getHeight();
 
             Matrix matrix = new Matrix();
             matrix.preTranslate(0, height);
             matrix.preScale(1, -1);
             matrix.postScale(3, 3);
 
-            Bitmap bitmap = page.render(new Rect(0, 0, width * 3, height * 3), matrix);
-            return bitmap;
+            return page.render(new Rect(0, 0, width * 3, height * 3), matrix);
         }
 
         protected void onPostExecute(Bitmap bitmap) {
@@ -565,7 +558,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void setRunned(SharedPreferences prefs) {
         SharedPreferences.Editor edit = prefs.edit();
         edit.putBoolean("firstRun" + About.VERSION, false);
-        edit.commit();
+        edit.apply();
     }
 
 
@@ -580,11 +573,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 getString(R.string.default_amplitude_calibration_key), defaultAmplitudeCalibration);
         try {
             currentCaliperColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_caliper_color_key),
-                    new Integer(DEFAULT_CALIPER_COLOR).toString()));
+                    Integer.valueOf(DEFAULT_CALIPER_COLOR).toString()));
             currentHighlightColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_highlight_color_key),
-                    new Integer(DEFAULT_HIGHLIGHT_COLOR).toString()));
+                    Integer.valueOf(DEFAULT_HIGHLIGHT_COLOR).toString()));
             currentLineWidth = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_line_width_key),
-                    new Integer(DEFAULT_LINE_WIDTH).toString()));
+                    Integer.valueOf(DEFAULT_LINE_WIDTH).toString()));
         } catch (Exception ex) {
             currentCaliperColor = DEFAULT_CALIPER_COLOR;
             currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
@@ -612,8 +605,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         float verticalSpace = statusBarHeight + actionBarHeight + toolbarHeight;
 
         float portraitWidth = Math.min(screenHeight, screenWidth);
-        float landscapeWidth = Math.max(screenHeight, screenWidth);
-        float portraitHeight = Math.max(screenHeight, screenWidth) - verticalSpace;
+//        float landscapeWidth = Math.max(screenHeight, screenWidth);
+//        float portraitHeight = Math.max(screenHeight, screenWidth) - verticalSpace;
         float landscapeHeight = Math.min(screenHeight, screenWidth) - verticalSpace;
 
 //        Log.d(EPS, "ActionBar height = " + actionBarHeight + " Toolbar height = " +
@@ -649,7 +642,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         display.getSize(size);
         int height = size.y;
         int width = size.x;
-        return new Pair<Integer, Integer>(width, height);
+        return new Pair<>(width, height);
     }
 
     private float getStatusBarHeight() {
@@ -715,7 +708,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Log.d(EPS, "onRestoreInstanceState");
         calipersMode = savedInstanceState.getBoolean("calipersMode");
 
-        Bitmap image = (Bitmap) savedInstanceState.getParcelable("Image");
+        Bitmap image = savedInstanceState.getParcelable("Image");
         imageView.setImageBitmap(image);
 
         totalRotation = savedInstanceState.getFloat("totalRotation");
@@ -1108,8 +1101,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         if (calipersMode) {
             getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
-            getSupportActionBar().setBackgroundDrawable(
-                    new ColorDrawable(getResources().getColor(R.color.primary)));
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.primary)));
             unfadeCalipersView();
             switchModeMenuItem.setTitle(R.string.image_button_title);
             selectMainMenu();
@@ -1121,6 +1113,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             selectImageMenu();
         }
     }
+
+//    ContextCompat.getColor(context, R.color.your_color);
+
 
     private void changeSettings() {
         Intent i = new Intent(this, Prefs.class);
@@ -1137,7 +1132,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void takePhoto() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (deviceHasCamera(takePictureIntent)) {
-            File photoFile = null;
+            File photoFile;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
@@ -1159,7 +1154,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = getTimeStamp();
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
@@ -1175,7 +1170,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private File createTmpPdfFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String timeStamp = getTimeStamp();
         String pdfFileName = "PDF_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
@@ -1186,6 +1181,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         );
         //currentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private String getTimeStamp() {
+        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
     // possibly implement save photo to gallery
@@ -1206,6 +1206,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Cursor cursor = getContentResolver().query(selectedImage,
                     filePathColumn, null, null, null);
+            if (cursor == null) {
+                return;
+            }
             cursor.moveToFirst();
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
@@ -1242,8 +1245,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         int targetHeight = imageView.getHeight();
         options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight);
         options.inJustDecodeBounds = false;
-        Bitmap bitmap = BitmapFactory.decodeFile(picturePath, options);
-        return bitmap;
+        return BitmapFactory.decodeFile(picturePath, options);
     }
 
     private void rotateImage(float degrees) {
@@ -1533,14 +1535,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             verticalCalibration.setCalibrationString(defaultAmplitudeCalibration);
         }
         input.setText(calibrationString);
-        if (c != null) {
-            Caliper.Direction direction = c.getDirection();
-            if (direction == Caliper.Direction.HORIZONTAL) {
-                calibrationString = horizontalCalibration.getCalibrationString();
-            } else {
-                calibrationString = verticalCalibration.getCalibrationString();
-            }
+
+        Caliper.Direction direction = c.getDirection();
+        if (direction == Caliper.Direction.HORIZONTAL) {
+            calibrationString = horizontalCalibration.getCalibrationString();
+        } else {
+            calibrationString = verticalCalibration.getCalibrationString();
         }
+
         input.setText(calibrationString);
 
         builder.setView(input);

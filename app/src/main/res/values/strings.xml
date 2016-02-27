@@ -20,7 +20,6 @@
     <string name="rotate_image_left_button_title">90°L</string>
     <string name="tweak_image_right_button_title">1°R</string>
     <string name="tweak_image_left_button_title">1°L</string>
-    <string name="flip_image_button_title">Flip</string>
     <string name="reset_image_button_title">Reset</string>
     <string name="done_button_title">Cancel</string>
     <string name="set_calibration_button_title">Set</string>
@@ -91,4 +90,8 @@
     <string name="file_load_message">File could not be loaded</string>
     <string name="image_button_title">Image</string>
     <string name="measure_button_title">Measure</string>
+    <string name="normal_ecg">normal_ecg</string>
+    <string name="about">About</string>
+    <string name="help">Help</string>
+    <string name="app_version">Version %1s</string>
 </resources>

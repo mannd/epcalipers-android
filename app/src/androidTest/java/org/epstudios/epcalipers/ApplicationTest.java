@@ -3,7 +3,6 @@ package org.epstudios.epcalipers;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.test.ApplicationTestCase;
@@ -23,7 +22,6 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testCanDisplayRate() {
-        Context context = new Activity();
         Calibration cal = new Calibration();
         cal.setCalibrated(true);
         cal.setUnits("msec");
@@ -48,7 +46,6 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testCurrentHorizontalCalFactor() {
-        Context context = new Activity();
         Calibration cal = new Calibration();
         cal.setOriginalZoom(1.0f);
         cal.setOriginalCalFactor(0.5f);
