@@ -95,7 +95,7 @@ When more than one caliper is present, it is necessary that one is selected to b
 #+CAPTION: Two uncalibrated calipers, a time and amplitude.  The time caliper is selected.
 [image selected caliper]
 * Calibration
-Select *Cal* or *Calibrate*.[fn:1]  Stretch the selected caliper over a known interval (such as 1000 msec for time, or 10 mm for amplitude calipers).  Select *Set*.  In the dialog box, make sure the interval matches what you are measuring.  Enter both the calibration interval and units (e.g. 500 msec or 1 sec or 1 mV).  Select *Set* in the dialog box to set the calibration.  Time and amplitude calipers need to be calibrated separately.  Once calibrated, calipers will show intervals in the units used to calibrate.  Newly created calipers will use the same calibration.
+Select *Cal* or *Calibrate*.  Stretch the selected caliper over a known interval (such as 1000 msec for time, or 10 mm for amplitude calipers).  Select *Set*.  In the dialog box, make sure the interval matches what you are measuring.  Enter both the calibration interval and units (e.g. 500 msec or 1 sec or 1 mV).  Select *Set* in the dialog box to set the calibration.  Time and amplitude calipers need to be calibrated separately.  Once calibrated, calipers will show intervals in the units used to calibrate.  Newly created calipers will use the same calibration.
 #+CAPTION: Time caliper about to be calibrated
 [precalibration]
 #+CAPTION: Calibrated time caliper
@@ -103,17 +103,17 @@ Select *Cal* or *Calibrate*.[fn:1]  Stretch the selected caliper over a known in
 * Changing calibration
 You can recalibrate at any time.  You can clear all calibration by selecting *Clear* in the calibration toolbar.  Note that calibration is maintained if the device is rotated, or the image is zoomed.  Selecting a new image will reset calibration.
 * Interval/Rate
-Once a time (horizontal) caliper is calibrated, provided you use time units (such as msec or sec) for the calibration, it is possible to toggle between interval measurements (e.g. 600 msec) and heart rate measurements (e.g. 100 bpm) by selecting *Interval/Rate* or *I/R*.[fn:1]
+Once a time (horizontal) caliper is calibrated, provided you use time units (such as msec or sec) for the calibration, it is possible to toggle between interval measurements (e.g. 600 msec) and heart rate measurements (e.g. 100 bpm) by selecting *Interval/Rate* or *I/R*.
 * Mean rate and interval calculation
-Select a calibrated caliper and stretch it over a number of intervals. Select *Mean Rate* or *mRate*[fn:1] and enter the number of intervals measured.  A dialog box will show the calculated mean heart rate and interval.  This is useful for calculating rates and intervals in irregular rhythms, such as atrial fibrillation.
+Select a calibrated caliper and stretch it over a number of intervals. Select *Mean Rate* or *mRate* and enter the number of intervals measured.  A dialog box will show the calculated mean heart rate and interval.  This is useful for calculating rates and intervals in irregular rhythms, such as atrial fibrillation.
 * QTc calculation
 Select *QTc*.  Stretch a time caliper over one or more RR intervals and select *Measure*.  Enter the number of intervals the caliper is stretched over and select *Continue*.  Then use the same caliper to measure the QT interval.  Select *Measure*.  A dialog box will give the calculated QTc using Bazett's formula.
 #+CAPTION: QTc measurement first step: measure 1 or more RR intervals
-[[./img/qtc_first_step.png]]
+[qtc first step]
 #+CAPTION: QTc measurement second step: measure the QT interval
-[[./img/qtc_second_step.png]]
+[qtc second step]
 #+CAPTION: QTc result
-[[./img/qtc_result.png]]
+[qtc results]
 * Settings
 Preferences such as caliper colors and default calibration intervals can be selected using the *Settings* menu item on the toolbar at the top of the app.
 * Device rotation
@@ -129,7 +129,6 @@ Caliper calibration as well as scaling and rotation of the ECG image are maintai
 - For questions, error reporting or suggestions contact
   [[mailto:mannd@epstudiossoftware.com][EP Studios]].
 - Website: [[http://www.epstudiossoftware.com][epstudiossoftware.com]]
-
 * Footnotes
 
 [fn:1] Note that button titles may be slightly different depending on the size and orientation of the device (e.g. phone vs tablet, portrait vs landscape).

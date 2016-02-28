@@ -1343,6 +1343,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void calculateQTc() {
         horizontalCalibration.setDisplayRate(false);
+        calipersView.invalidate();
         Caliper singleHorizontalCaliper = getLoneTimeCaliper();
         if (singleHorizontalCaliper != null && !singleHorizontalCaliper.isSelected()) {
             calipersView.selectCaliper(singleHorizontalCaliper);
