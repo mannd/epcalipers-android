@@ -27,8 +27,8 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
@@ -73,7 +73,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends ActionBarActivity implements View.OnClickListener {
     private static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
     private static final String EPS = "EPS";
     private static final int RESULT_LOAD_IMAGE = 1;
@@ -1101,7 +1101,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (calipersMode) {
             getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.primary)));
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
             unfadeCalipersView();
             switchModeMenuItem.setTitle(R.string.image_button_title);
             selectMainMenu();
@@ -1113,9 +1113,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectImageMenu();
         }
     }
-
-//    ContextCompat.getColor(context, R.color.your_color);
-
 
     private void changeSettings() {
         Intent i = new Intent(this, Prefs.class);
@@ -1377,11 +1374,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             input.setSingleLine(true);
             input.setInputType(InputType.TYPE_CLASS_NUMBER);
             input.setHint(getString(R.string.mean_rr_dialog_hint));
-            input.setText(getString(R.string.default_number_rr_intervals));
+            input.setText(getString(R.string.default_number_qtc_rr_intervals));
             input.setSelection(0);
 
             builder.setView(input);
-            builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(getString(R.string.continue_title), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Caliper c = calipersView.activeCaliper();
