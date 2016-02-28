@@ -568,9 +568,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         showStartImage = sharedPreferences.getBoolean(
                 getString(R.string.show_start_image_key), true);
         defaultTimeCalibration = sharedPreferences.getString(getString(
-                R.string.default_time_calibration_key), defaultTimeCalibration);
+                R.string.default_time_calibration_key), getString(R.string.default_time_calibration_value));
         defaultAmplitudeCalibration = sharedPreferences.getString(
-                getString(R.string.default_amplitude_calibration_key), defaultAmplitudeCalibration);
+                getString(R.string.default_amplitude_calibration_key), getString(R.string.default_amplitude_calibration_value));
         try {
             currentCaliperColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_caliper_color_key),
                     Integer.valueOf(DEFAULT_CALIPER_COLOR).toString()));
