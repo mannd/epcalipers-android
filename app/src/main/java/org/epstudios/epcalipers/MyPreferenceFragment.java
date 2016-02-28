@@ -51,6 +51,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultHighlightColor;
     private String defaultLineWidth;
     private String defaultTimeCalibration;
+    private String defaultAmplitudeCalibration;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -66,7 +67,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         defaultLineWidth = activity.getString(R.string.default_line_width);
         boolean showStartImage = true;
         defaultTimeCalibration = activity.getString(R.string.default_time_calibration_value);
-        String defaultAmplitudeCalibration = activity.getString(R.string.default_amplitude_calibration_value);
+        defaultAmplitudeCalibration = activity.getString(R.string.default_amplitude_calibration_value);
         addPreferencesFromResource(R.xml.settings);
 
         Preference defaultTimeCalibrationPreference = findPreference(defaultTimeCalibrationKey);
