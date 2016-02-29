@@ -148,6 +148,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private int numberOfPdfPages;
     private int currentPdfPageNumber;
     private Menu menu;
+    private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -251,10 +252,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             externalImageLoad = false;
         }
 
-        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        // OnSharedPreferenceListener must be a class field, i.e. strong reference
+        // as otherwise it is a weak reference and will be garbage collected, thus
+        // making it stop working.
+        // See http://stackoverflow.com/questions/2542938/sharedpreferences-onsharedpreferencechangelistener-not-being-called-consistently
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 // show start image only has effect with restart
+                Log.d(EPS, "onSharedPreferenceChangeListener");
                 if (key.equals(getString(R.string.show_start_image_key))) {
                     return;
                 }
