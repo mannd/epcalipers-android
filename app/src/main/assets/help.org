@@ -101,7 +101,7 @@ Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bar
 * Making measurements
 The interval measured by each caliper is displayed next to the crossbar of the caliper.  Until the calipers are calibrated, measurements are displayed in arbitrary units (points, roughly equivalent to screen pixels)).
 * Adding and deleting calipers
-Select the *+* or *Add Caliper* icon to add new calipers.[fn:1]
+Select the *+* or *Add Caliper* button to add new calipers.[fn:1]
 #+CAPTION: Main menu, prior to calibration
 [[./main_menu_uncalibrated.png]]
 
