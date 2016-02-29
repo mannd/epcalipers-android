@@ -860,7 +860,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // Add Caliper menu
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
-        cancelAddCaliperButton = createButton(getString(R.string.done_button_title));
+        cancelAddCaliperButton = createButton(getString(R.string.cancel_button_title));
         // Adjust Image menu
         rotateImageRightButton = createButton(getString(R.string.rotate_image_right_button_title));
         rotateImageLeftButton = createButton(getString(R.string.rotate_image_left_button_title));
