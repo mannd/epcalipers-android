@@ -67,7 +67,6 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         defaultCaliperColor = activity.getString(R.string.default_caliper_color);
         defaultHighlightColor = activity.getString(R.string.default_highlight_color);
         defaultLineWidth = activity.getString(R.string.default_line_width);
-        boolean showStartImage = true;
         defaultTimeCalibration = activity.getString(R.string.default_time_calibration_value);
         defaultAmplitudeCalibration = activity.getString(R.string.default_amplitude_calibration_value);
         addPreferencesFromResource(R.xml.settings);

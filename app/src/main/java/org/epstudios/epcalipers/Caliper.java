@@ -34,6 +34,9 @@ public class Caliper {
     private static int differential = 0;
     private static final float DELTA = 30.0f;
 
+    private final float SMALL_FONT = 32.0f;
+    private final float LARGE_FONT = 48.0f;
+
     public enum TouchedBar {NONE, BAR1, BAR2, CROSSBAR}
 
     public TouchedBar getTouchedBar() {
@@ -147,7 +150,7 @@ public class Caliper {
         paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
                 Paint.Align.LEFT);
 
-        paint.setTextSize(32.0f);
+        paint.setTextSize(SMALL_FONT);
        // paint.setTextScaleX(0.8f);
     }
 
@@ -169,6 +172,15 @@ public class Caliper {
 
     public float getLineWidth() {
         return paint.getStrokeWidth();
+    }
+
+    public void setUseLargeFont(boolean useLargeFont) {
+        if (useLargeFont) {
+            paint.setTextSize(LARGE_FONT);
+        }
+        else {
+            paint.setTextSize(SMALL_FONT);
+        }
     }
 
     public void setInitialPosition(Rect rect) {

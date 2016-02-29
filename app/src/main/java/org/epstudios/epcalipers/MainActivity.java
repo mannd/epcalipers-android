@@ -148,6 +148,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private int numberOfPdfPages;
     private int currentPdfPageNumber;
     private Menu menu;
+    private boolean useLargeFont;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     public static int calculateInSampleSize(
@@ -187,6 +188,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         currentPdfUri = null;
         numberOfPdfPages = 0;
         currentPdfPageNumber = 0;
+        useLargeFont = false;
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
 
@@ -316,6 +318,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                         }
                     } catch (Exception ex) {
                         return;
+                    }
+                }
+                if (key.equals(getString(R.string.use_large_font_key))) {
+                    useLargeFont = sharedPreferences.getBoolean(key, false);
+                    for (Caliper c : calipersView.getCalipers()) {
+                        c.setUseLargeFont(useLargeFont);
                     }
                 }
                 calipersView.invalidate();
@@ -577,6 +585,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 R.string.default_time_calibration_key), getString(R.string.default_time_calibration_value));
         defaultAmplitudeCalibration = sharedPreferences.getString(
                 getString(R.string.default_amplitude_calibration_key), getString(R.string.default_amplitude_calibration_value));
+        useLargeFont = sharedPreferences.getBoolean(getString(R.string.use_large_font_key), false);
         try {
             currentCaliperColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_caliper_color_key),
                     Integer.valueOf(DEFAULT_CALIPER_COLOR).toString()));
@@ -770,6 +779,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             c.setSelectedColor(currentHighlightColor);
             c.setColor(c.isSelected() ? currentHighlightColor : currentCaliperColor);
             c.setLineWidth(currentLineWidth);
+            c.setUseLargeFont(useLargeFont);
             if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
                 c.setCalibration(horizontalCalibration);
             }
@@ -1742,6 +1752,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         } else {
             c.setCalibration(verticalCalibration);
         }
+        c.setUseLargeFont(useLargeFont);
         c.setInitialPosition(rect);
         getCalipers().add(c);
     }

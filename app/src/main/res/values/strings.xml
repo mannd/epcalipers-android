@@ -62,6 +62,10 @@
     <string name="default_line_width_label">Line width</string>
     <string name="show_start_image_off_summary">Don\'t show ECG</string>
     <string name="show_start_image_on_summary">Show ECG</string>
+    <string name="use_large_font_key">use_large_font</string>
+    <string name="use_large_font_label">Use large font caliper labels?"</string>
+    <string name="use_large_font_off_summary">Use normal size font</string>
+    <string name="use_large_font_on_summary">Use large font</string>
     <string name="default_caliper_color">Blue</string>
     <string name="default_highlight_color">Red</string>
     <string name="default_line_width">2 points</string>

@@ -47,6 +47,14 @@
         android:key="@string/default_line_width_key"
         android:title="@string/default_line_width_label" />
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/use_large_font_key"
+        android:title="@string/use_large_font_label"
+        android:summaryOff="@string/use_large_font_off_summary"
+        android:summaryOn="@string/use_large_font_on_summary" />
+
+
 
 
 </PreferenceScreen>
