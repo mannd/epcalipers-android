@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-02-28 Sun 21:13 -->
+<!-- 2016-02-29 Mon 16:23 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title></title>
@@ -193,14 +193,23 @@ advanced measurements like the corrected QT interval.It's intuitive
 <div id="outline-container-orgheadline5" class="outline-2">
 <h2 id="orgheadline5">Loading an image</h2>
 <div class="outline-text-2" id="text-orgheadline5">
-<p>
-Use the <b>Image</b> button at the top right of the
-screen to show the <b>Image</b> menu at the botton of your screen.
+
+<div class="figure">
+<p><img src="./image_button.png" alt="image_button.png" />
 </p>
+<p><span class="figure-number">Figure 1:</span> <b>Image</b> button at right upper corner of screen</p>
+</div>
 
 <p>
-[image picture]
+Use the <b>Image</b> button at the top right of the
+screen to switch to <b>Image mode</b>.  The <b>Image</b> menu will appear at the botton of your screen.
 </p>
+
+<div class="figure">
+<p><img src="./image_menu.png" alt="image_menu.png" />
+</p>
+<p><span class="figure-number">Figure 2:</span> <b>Image</b> menu</p>
+</div>
 
 <p>
 With this menu you can load and adjust an ECG image.  There are several ways to load and ECG image.
@@ -213,7 +222,7 @@ With this menu you can load and adjust an ECG image.  There are several ways to 
 Touch the <b>Camera</b> button to take a photo of an ECG tracing and load
 it into the app.  Note that images captured this way are not saved in
 the photos collection of the device.  It's best to use this option to
-make a quick measurement when you don't need to save the image.
+make a quick measurement when you don't need to save the image.  If you want to save the image, take use your camera outside of the app, and then use the next method to load the photo into the app.
 </p>
 </div>
 </div>
@@ -229,23 +238,55 @@ Touch <b>Select</b> to chose an image that is already saved on your device in yo
 <h3 id="orgheadline8">Select a photo or PDF using the <b>Share</b> menu from other apps</h3>
 <div class="outline-text-3" id="text-orgheadline8">
 <p>
-<b>EP Calipers</b> can open image and PDF files regardless of where they are located on your device.  You can directly open email attachments, downloaded files, Google Drive, and Dropbox files.  It is also easy to open ECG images directly from the <i>AliveCor AliveECG™</i> app.  The key to opening images in external apps is to use the <b>Share</b> button.  It looks like this: [share button image]
+<b>EP Calipers</b> can open image and PDF files regardless of where they are located on your device.  You can directly open email attachments, downloaded files, Google Drive, and Dropbox files.  It is also easy to open ECG images directly from the <i>AliveCor AliveECG™</i> app.  The key to opening images in external apps is to use the <b>Share</b> button.  It usually looks like this: 
 </p>
 
-<p>
-Here you can see the <b>Share</b> button at the top right of the <i>AliveECG</i> screen:
+<div class="figure">
+<p><img src="./android_share_button.png" alt="android_share_button.png" />
 </p>
-<p>
-[Alive cor share button]
-</p>
+<p><span class="figure-number">Figure 3:</span> Android <b>Share</b> button</p>
+</div>
+
 
 <p>
-Once the <b>Share</b> menu is open, one of the options should be <b>EP Calipers</b>.  Selecting this option will open the image in the app.
+Some apps use a different button style or distinguish between "sharing" and "opening" a file.  For example the Dropbox app uses this style button:
 </p>
 
-<p>
-[image of open in EP Calipers]
+<div class="figure">
+<p><img src="./dropbox_share_button.png" alt="dropbox_share_button.png" />
 </p>
+<p><span class="figure-number">Figure 4:</span> Dropbox <b>Open with</b> button (left button)</p>
+</div>
+
+<p>
+The <i>AliveECG</i> app from <i>AliveCor</i> uses yet another style.
+</p>
+
+<div class="figure">
+<p><img src="./alivecor_share_button.png" alt="alivecor_share_button.png" />
+</p>
+<p><span class="figure-number">Figure 5:</span> <i>AliveECG</i> <b>Share</b> button using an envelope icon</p>
+</div>
+
+<p>
+Once you select the <i>AliveECG</i> <b>Share</b> button, a dialog opens.  Select <b>PDF</b>.
+</p>
+
+<div class="figure">
+<p><img src="./alivecor_dialog.png" alt="alivecor_dialog.png" />
+</p>
+<p><span class="figure-number">Figure 6:</span> Select PDF to create a PDF file that can be opened by <b>EP Calipers</b></p>
+</div>
+
+<p>
+You will then be given options for opening the PDF report.  One of the options should be <b>EP Calipers</b>.  Selecting this option will open the PDF image in the app.
+</p>
+
+<div class="figure">
+<p><img src="./share_menu.png" alt="share_menu.png" />
+</p>
+<p><span class="figure-number">Figure 7:</span> Selecting <b>EP Calipers</b> will open the image in <b>EP Calipers</b></p>
+</div>
 </div>
 </div>
 
@@ -253,7 +294,9 @@ Once the <b>Share</b> menu is open, one of the options should be <b>EP Calipers<
 <h3 id="orgheadline9">Multiple page PDFs</h3>
 <div class="outline-text-3" id="text-orgheadline9">
 <p>
-When PDF files have more than one page, the app will display the first page initially.  You can go to other pages by selecting <b>Previous</b> or <b>Next</b> in the Image menu.
+When PDF files have more than one page, the app will display the first
+page initially.  You can go to other pages by selecting <b>Previous</b> or
+<b>Next</b> in the <b>Image</b> menu.
 </p>
 </div>
 </div>
@@ -264,15 +307,22 @@ When PDF files have more than one page, the app will display the first page init
 <p>
 You can adjust the positioning of the image using pinch-to-zoom,
 dragging, and double-tapping. Use the <b>Adjust</b> menu to fine-tune your
-image further.  You can rotate the image by 90° in either direction,
-or by increments of 1°.  This is particularly useful if the image is
+image further.  
+</p>
+
+<div class="figure">
+<p><img src="./adjust_menu.png" alt="adjust_menu.png" />
+</p>
+<p><span class="figure-number">Figure 8:</span> The <b>Adjust</b> menu</p>
+</div>
+
+<p>
+You can rotate the image by 90° in either direction,
+or by increments of 1°.  This is particularly useful if the original image is
 rotated or not quite square to the screen.  You should recalibrate
 your calipers after rotating the image.  If you need to go back to the
 original image position use <b>Reset</b>.  After adjusting the image select
 <b>Done</b> to return to the main image menu.
-</p>
-<p>
-[image menu image]
 </p>
 </div>
 </div>
@@ -282,22 +332,30 @@ original image position use <b>Reset</b>.  After adjusting the image select
 <p>
 After loading and adjusting the image, you need to exit Image mode so that you can use the calipers.  Select the <b>Measure</b> button at the top left of the screen to return to the <b>EP Calipers</b> main screen.
 </p>
-<p>
-[measure button]
+
+<div class="figure">
+<p><img src="./measure_button.png" alt="measure_button.png" />
 </p>
+<p><span class="figure-number">Figure 9:</span> Use the <b>Measure</b> button to exit <b>Image</b> mode</p>
 </div>
 </div>
+</div>
+
 <div id="outline-container-orgheadline12" class="outline-2">
 <h2 id="orgheadline12">Moving calipers</h2>
 <div class="outline-text-2" id="text-orgheadline12">
 <p>
 Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bars (or top or bottom in the case of vertical calipers) to stretch or shrink the calipers.  Note that you cannot pinch both bars at the same time.
 </p>
-<p>
-[image thereof]
+
+<div class="figure">
+<p><img src="./unselected_time_caliper.png" alt="unselected_time_caliper.png" />
 </p>
+<p><span class="figure-number">Figure 10:</span> Single unselected uncalibrated time caliper</p>
 </div>
 </div>
+</div>
+
 <div id="outline-container-orgheadline13" class="outline-2">
 <h2 id="orgheadline13">Making measurements</h2>
 <div class="outline-text-2" id="text-orgheadline13">
@@ -312,43 +370,62 @@ The interval measured by each caliper is displayed next to the crossbar of the c
 <p>
 Select the <b>+</b> or <b>Add Caliper</b> icon to add new calipers.<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>
 </p>
-<p>
-[main menu image]
+
+<div class="figure">
+<p><img src="./main_menu_uncalibrated.png" alt="main_menu_uncalibrated.png" />
 </p>
+<p><span class="figure-number">Figure 11:</span> Main menu, prior to calibration</p>
+</div>
 
 <p>
 Calipers can be horizontal (time measurements) or vertical (amplitude measurements).  Select <b>Time</b> or <b>Amplitude</b> to add the type of caliper you want.  Double-tap a caliper to delete it.
 </p>
-<p>
-[add caliper menu]
+
+<div class="figure">
+<p><img src="./add_caliper_menu.png" alt="add_caliper_menu.png" />
 </p>
+<p><span class="figure-number">Figure 12:</span> Add caliper menu</p>
 </div>
 </div>
+</div>
+
 <div id="outline-container-orgheadline15" class="outline-2">
 <h2 id="orgheadline15">Selecting a caliper</h2>
 <div class="outline-text-2" id="text-orgheadline15">
 <p>
 When more than one caliper is present, it is necessary that one is selected to be the active caliper when calibrating or making calculated measurements.  By default an unselected caliper is blue and a selected caliper is red (You can change these colors if you want).  Single tapping an unselected caliper will select it.  Tap it again (but not too soon after the first tap, as a double tap deletes the caliper) will unselect it.  As there can be only one selected caliper at a time, selecting a caliper will unselect any other caliper that happens to be selected.  In some cases a caliper will be selected automatically (for example to do calibration) if you have not already selected one.  If you want to select a different caliper, just tap another caliper.
 </p>
-<p>
-[image selected caliper]
+
+<div class="figure">
+<p><img src="./selected_caliper.png" alt="selected_caliper.png" />
 </p>
+<p><span class="figure-number">Figure 13:</span> Two uncalibrated calipers, a time and amplitude.  The time caliper is selected.</p>
 </div>
 </div>
+</div>
+
 <div id="outline-container-orgheadline16" class="outline-2">
 <h2 id="orgheadline16">Calibration</h2>
 <div class="outline-text-2" id="text-orgheadline16">
 <p>
 Select <b>Cal</b> or <b>Calibrate</b>.  Stretch the selected caliper over a known interval (such as 1000 msec for time, or 10 mm for amplitude calipers).  Select <b>Set</b>.  In the dialog box, make sure the interval matches what you are measuring.  Enter both the calibration interval and units (e.g. 500 msec or 1 sec or 1 mV).  Select <b>Set</b> in the dialog box to set the calibration.  Time and amplitude calipers need to be calibrated separately.  Once calibrated, calipers will show intervals in the units used to calibrate.  Newly created calipers will use the same calibration.
 </p>
-<p>
-[precalibration]
+
+<div class="figure">
+<p><img src="./calibration_dialog.png" alt="calibration_dialog.png" />
 </p>
-<p>
-[post-calibration]
+<p><span class="figure-number">Figure 14:</span> Time caliper about to be calibrated</p>
+</div>
+
+
+<div class="figure">
+<p><img src="./calibrated_caliper.png" alt="calibrated_caliper.png" />
 </p>
+<p><span class="figure-number">Figure 15:</span> Calibrated time caliper</p>
 </div>
 </div>
+</div>
+
 <div id="outline-container-orgheadline17" class="outline-2">
 <h2 id="orgheadline17">Changing calibration</h2>
 <div class="outline-text-2" id="text-orgheadline17">
@@ -379,17 +456,29 @@ Select a calibrated caliper and stretch it over a number of intervals. Select <b
 <p>
 Select <b>QTc</b>.  Stretch a time caliper over one or more RR intervals and select <b>Measure</b>.  Enter the number of intervals the caliper is stretched over and select <b>Continue</b>.  Then use the same caliper to measure the QT interval.  Select <b>Measure</b>.  A dialog box will give the calculated QTc using Bazett's formula.
 </p>
-<p>
-[qtc first step]
+
+<div class="figure">
+<p><img src="./qtc_step_1.png" alt="qtc_step_1.png" />
 </p>
-<p>
-[qtc second step]
+<p><span class="figure-number">Figure 16:</span> QTc measurement first step: measure 1 or more RR intervals</p>
+</div>
+
+
+<div class="figure">
+<p><img src="./qtc_step_2.png" alt="qtc_step_2.png" />
 </p>
-<p>
-[qtc results]
+<p><span class="figure-number">Figure 17:</span> QTc measurement second step: measure the QT interval</p>
+</div>
+
+
+<div class="figure">
+<p><img src="./qtc_result.png" alt="qtc_result.png" />
 </p>
+<p><span class="figure-number">Figure 18:</span> QTc result</p>
 </div>
 </div>
+</div>
+
 <div id="outline-container-orgheadline21" class="outline-2">
 <h2 id="orgheadline21">Settings</h2>
 <div class="outline-text-2" id="text-orgheadline21">

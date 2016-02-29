@@ -33,73 +33,95 @@ The remainder of these instructions will go over how to load ECG
 images, add and delete calipers, calibrate the calipers and make
 advanced measurements like the corrected QT interval.It's intuitive
 * Loading an image
-Use the *Image* button at the top right of the
-screen to show the *Image* menu at the botton of your screen.
+#+CAPTION: *Image* button at right upper corner of screen
+[[./image_button.png]]
 
-#+CAPTION: *Image* button
-[image picture]
+Use the *Image* button at the top right of the
+screen to switch to *Image mode*.  The *Image* menu will appear at the botton of your screen.
+#+CAPTION: *Image* menu
+[[./image_menu.png]]
 
 With this menu you can load and adjust an ECG image.  There are several ways to load and ECG image.
 ** Take a photo of an ECG
 Touch the *Camera* button to take a photo of an ECG tracing and load
 it into the app.  Note that images captured this way are not saved in
 the photos collection of the device.  It's best to use this option to
-make a quick measurement when you don't need to save the image.
+make a quick measurement when you don't need to save the image.  If you want to save the image, take use your camera outside of the app, and then use the next method to load the photo into the app.
 ** Select a photo from your photo gallery
 Touch *Select* to chose an image that is already saved on your device in your photos collection (for example, an image file attached to an email that you saved or a photo that your previously took).
 ** Select a photo or PDF using the *Share* menu from other apps
-*EP Calipers* can open image and PDF files regardless of where they are located on your device.  You can directly open email attachments, downloaded files, Google Drive, and Dropbox files.  It is also easy to open ECG images directly from the /AliveCor AliveECG™/ app.  The key to opening images in external apps is to use the *Share* button.  It looks like this: [share button image]
+*EP Calipers* can open image and PDF files regardless of where they are located on your device.  You can directly open email attachments, downloaded files, Google Drive, and Dropbox files.  It is also easy to open ECG images directly from the /AliveCor AliveECG™/ app.  The key to opening images in external apps is to use the *Share* button.  It usually looks like this: 
+#+CAPTION: Android *Share* button
+[[./android_share_button.png]]
 
-Here you can see the *Share* button at the top right of the /AliveECG/ screen:
-#+CAPTION: *Share* button at top right
-[Alive cor share button]
 
-Once the *Share* menu is open, one of the options should be *EP Calipers*.  Selecting this option will open the image in the app.
+Some apps use a different button style or distinguish between "sharing" and "opening" a file.  For example the Dropbox app uses this style button:
+#+CAPTION: Dropbox *Open with* button (left button)
+[[./dropbox_share_button.png]]
 
-#+CAPTION: *EP Calipers* will open the image in *EP Calipers*
-[image of open in EP Calipers]
+The /AliveECG/ app from /AliveCor/ uses yet another style.
+#+CAPTION: /AliveECG/ *Share* button using an envelope icon
+[[./alivecor_share_button.png]]
+
+Once you select the /AliveECG/ *Share* button, a dialog opens.  Select *PDF*.
+#+CAPTION: Select PDF to create a PDF file that can be opened by *EP Calipers*
+[[./alivecor_dialog.png]]
+
+You will then be given options for opening the PDF report.  One of the options should be *EP Calipers*.  Selecting this option will open the PDF image in the app.
+#+CAPTION: Selecting *EP Calipers* will open the image in *EP Calipers*
+[[./share_menu.png]]
 
 ** Multiple page PDFs
-When PDF files have more than one page, the app will display the first page initially.  You can go to other pages by selecting *Previous* or *Next* in the Image menu.
+When PDF files have more than one page, the app will display the first
+page initially.  You can go to other pages by selecting *Previous* or
+*Next* in the *Image* menu.
 * Adjusting the image
 You can adjust the positioning of the image using pinch-to-zoom,
 dragging, and double-tapping. Use the *Adjust* menu to fine-tune your
-image further.  You can rotate the image by 90° in either direction,
-or by increments of 1°.  This is particularly useful if the image is
+image further.  
+#+CAPTION: The *Adjust* menu
+[[./adjust_menu.png]]
+
+You can rotate the image by 90° in either direction,
+or by increments of 1°.  This is particularly useful if the original image is
 rotated or not quite square to the screen.  You should recalibrate
 your calipers after rotating the image.  If you need to go back to the
 original image position use *Reset*.  After adjusting the image select
 *Done* to return to the main image menu.
-#+CAPTION: The *Adjust* menu
-[image menu image]
 * Exiting *Image* mode
 After loading and adjusting the image, you need to exit Image mode so that you can use the calipers.  Select the *Measure* button at the top left of the screen to return to the *EP Calipers* main screen.
 #+CAPTION: Use the *Measure* button to exit *Image* mode
-[measure button]
+[[./measure_button.png]]
+
 * Moving calipers
 Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bars (or top or bottom in the case of vertical calipers) to stretch or shrink the calipers.  Note that you cannot pinch both bars at the same time.
 #+CAPTION: Single unselected uncalibrated time caliper
-[image thereof]
+[[./unselected_time_caliper.png]]
+
 * Making measurements
 The interval measured by each caliper is displayed next to the crossbar of the caliper.  Until the calipers are calibrated, measurements are displayed in arbitrary units (points, roughly equivalent to screen pixels)).
 * Adding and deleting calipers
 Select the *+* or *Add Caliper* icon to add new calipers.[fn:1]
 #+CAPTION: Main menu, prior to calibration
-[main menu image]
+[[./main_menu_uncalibrated.png]]
 
 Calipers can be horizontal (time measurements) or vertical (amplitude measurements).  Select *Time* or *Amplitude* to add the type of caliper you want.  Double-tap a caliper to delete it.
 #+CAPTION: Add caliper menu
-[add caliper menu]
+[[./add_caliper_menu.png]]
+
 * Selecting a caliper
 When more than one caliper is present, it is necessary that one is selected to be the active caliper when calibrating or making calculated measurements.  By default an unselected caliper is blue and a selected caliper is red (You can change these colors if you want).  Single tapping an unselected caliper will select it.  Tap it again (but not too soon after the first tap, as a double tap deletes the caliper) will unselect it.  As there can be only one selected caliper at a time, selecting a caliper will unselect any other caliper that happens to be selected.  In some cases a caliper will be selected automatically (for example to do calibration) if you have not already selected one.  If you want to select a different caliper, just tap another caliper.
 #+CAPTION: Two uncalibrated calipers, a time and amplitude.  The time caliper is selected.
-[image selected caliper]
+[[./selected_caliper.png]]
+
 * Calibration
 Select *Cal* or *Calibrate*.  Stretch the selected caliper over a known interval (such as 1000 msec for time, or 10 mm for amplitude calipers).  Select *Set*.  In the dialog box, make sure the interval matches what you are measuring.  Enter both the calibration interval and units (e.g. 500 msec or 1 sec or 1 mV).  Select *Set* in the dialog box to set the calibration.  Time and amplitude calipers need to be calibrated separately.  Once calibrated, calipers will show intervals in the units used to calibrate.  Newly created calipers will use the same calibration.
 #+CAPTION: Time caliper about to be calibrated
-[precalibration]
+[[./calibration_dialog.png]]
+
 #+CAPTION: Calibrated time caliper
-[post-calibration]
+[[./calibrated_caliper.png]]
+
 * Changing calibration
 You can recalibrate at any time.  You can clear all calibration by selecting *Clear* in the calibration toolbar.  Note that calibration is maintained if the device is rotated, or the image is zoomed.  Selecting a new image will reset calibration.
 * Interval/Rate
@@ -109,11 +131,14 @@ Select a calibrated caliper and stretch it over a number of intervals. Select *M
 * QTc calculation
 Select *QTc*.  Stretch a time caliper over one or more RR intervals and select *Measure*.  Enter the number of intervals the caliper is stretched over and select *Continue*.  Then use the same caliper to measure the QT interval.  Select *Measure*.  A dialog box will give the calculated QTc using Bazett's formula.
 #+CAPTION: QTc measurement first step: measure 1 or more RR intervals
-[qtc first step]
+[[./qtc_step_1.png]]
+
 #+CAPTION: QTc measurement second step: measure the QT interval
-[qtc second step]
+[[./qtc_step_2.png]]
+
 #+CAPTION: QTc result
-[qtc results]
+[[./qtc_result.png]]
+
 * Settings
 Preferences such as caliper colors and default calibration intervals can be selected using the *Settings* menu item on the toolbar at the top of the app.
 * Device rotation
