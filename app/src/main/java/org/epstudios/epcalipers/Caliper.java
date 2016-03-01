@@ -1,19 +1,13 @@
 package org.epstudios.epcalipers;
 
-import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.util.Log;
 
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.Format;
-import java.util.Locale;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -39,6 +33,9 @@ import java.util.Locale;
 public class Caliper {
     private static int differential = 0;
     private static final float DELTA = 30.0f;
+
+    private final float SMALL_FONT = 32.0f;
+    private final float LARGE_FONT = 48.0f;
 
     public enum TouchedBar {NONE, BAR1, BAR2, CROSSBAR}
 
@@ -119,8 +116,8 @@ public class Caliper {
 
     private int selectedColor;
     private boolean selected;
-    private DecimalFormat decimalFormat;
-    private Paint paint;
+    private final DecimalFormat decimalFormat;
+    private final Paint paint;
 
     public Calibration getCalibration() {
         return calibration;
@@ -153,7 +150,7 @@ public class Caliper {
         paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
                 Paint.Align.LEFT);
 
-        paint.setTextSize(32.0f);
+        paint.setTextSize(SMALL_FONT);
        // paint.setTextScaleX(0.8f);
     }
 
@@ -175,6 +172,15 @@ public class Caliper {
 
     public float getLineWidth() {
         return paint.getStrokeWidth();
+    }
+
+    public void setUseLargeFont(boolean useLargeFont) {
+        if (useLargeFont) {
+            paint.setTextSize(LARGE_FONT);
+        }
+        else {
+            paint.setTextSize(SMALL_FONT);
+        }
     }
 
     public void setInitialPosition(Rect rect) {
@@ -229,7 +235,7 @@ public class Caliper {
         return (direction == Direction.HORIZONTAL ? p.x : p.y);
     }
 
-    public String measurement() {
+    private String measurement() {
         String result = decimalFormat.format(calibratedResult());
         result += " " + calibration.getUnits();
         return result;
@@ -289,17 +295,29 @@ public class Caliper {
         return barCoord(p) > barPosition - DELTA && barCoord(p) < barPosition + DELTA;
     }
 
+
+//    +    // avoid overlapping deltas inside calipers that prevent crossbar touch when short interval
+//            if (self.direction == Horizontal) {
+//        -        nearBar = (p.x > fminf(self.bar1Position, self.bar2Position) + delta && p.x < fmaxf(self.bar2Position, self.bar1Position) - delta && p.y > self.crossBarPosition - delta && p.y < self.crossBarPosition + delta);
+//        +        nearBar = (p.x > fminf(self.bar1Position, self.bar2Position) && p.x < fmaxf(self.bar2Position, self.bar1Position) && p.y > self.crossBarPosition - delta && p.y < self.crossBarPosition + delta);
+//    } else {
+//        -        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) + delta && p.y < fmaxf(self.bar2Position, self.bar1Position) - delta && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
+//        +        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) && p.y < fmaxf(self.bar2Position, self.bar1Position) && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
+
+
+
+
     public boolean pointNearCrossBar(PointF p) {
-        boolean nearBar = false;
+        boolean nearBar;
         float delta = DELTA + 5.0f;  // cross bar delta a little bigger
         if (direction == Direction.HORIZONTAL) {
-            nearBar = (p.x > Math.min(bar1Position, bar2Position) + delta
-                    && p.x < Math.max(bar2Position, bar1Position) - delta
+            nearBar = (p.x > Math.min(bar1Position, bar2Position)
+                    && p.x < Math.max(bar2Position, bar1Position)
                     && p.y > crossBarPosition - delta
                     && p.y < crossBarPosition + delta);
         } else {
-            nearBar = (p.y > Math.min(bar1Position, bar2Position) + delta
-                    && p.y < Math.max(bar2Position, bar1Position) - delta
+            nearBar = (p.y > Math.min(bar1Position, bar2Position)
+                    && p.y < Math.max(bar2Position, bar1Position)
                     && p.x > crossBarPosition - delta
                     && p.x < crossBarPosition + delta);
         }

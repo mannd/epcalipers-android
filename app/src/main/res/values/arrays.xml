@@ -30,10 +30,14 @@
         <item>1 point</item>
         <item>2 points</item>
         <item>3 points</item>
+        <item>4 points</item>
+        <item>5 points</item>
     </string-array>
     <string-array name="line_width_values">
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
+        <item>5</item>
     </string-array>
 </resources>

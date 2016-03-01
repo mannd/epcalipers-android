@@ -34,17 +34,19 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         map.put(1, "1 point");
         map.put(2, "2 points");
         map.put(3, "3 points");
+        map.put(4, "4 points");
+        map.put(5, "5 points");
 
 
         return map;
     }
 
     //keys
-    String defaultTimeCalibrationKey;
-    String defaultAmplitudeCalibrationKey;
-    String defaultCaliperColorKey;
-    String defaultHighlightColorKey;
-    String defaultLineWidthKey;
+    private String defaultTimeCalibrationKey;
+    private String defaultAmplitudeCalibrationKey;
+    private String defaultCaliperColorKey;
+    private String defaultHighlightColorKey;
+    private String defaultLineWidthKey;
 
 
     private String defaultCaliperColor;
@@ -52,7 +54,6 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultLineWidth;
     private String defaultTimeCalibration;
     private String defaultAmplitudeCalibration;
-    private boolean showStartImage;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -66,7 +67,6 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         defaultCaliperColor = activity.getString(R.string.default_caliper_color);
         defaultHighlightColor = activity.getString(R.string.default_highlight_color);
         defaultLineWidth = activity.getString(R.string.default_line_width);
-        showStartImage = true;
         defaultTimeCalibration = activity.getString(R.string.default_time_calibration_value);
         defaultAmplitudeCalibration = activity.getString(R.string.default_amplitude_calibration_value);
         addPreferencesFromResource(R.xml.settings);
@@ -131,6 +131,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
             Integer value = Integer.parseInt(sharedPreferences.getString(key, defaultName));
             return names.get(value);
         } catch (Exception ex) {
+            //noinspection SuspiciousMethodCalls
             return names.get(defaultName);
         }
     }

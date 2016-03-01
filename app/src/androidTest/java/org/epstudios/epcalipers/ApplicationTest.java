@@ -3,7 +3,6 @@ package org.epstudios.epcalipers;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.test.ApplicationTestCase;
@@ -23,7 +22,6 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testCanDisplayRate() {
-        Context context = new Activity();
         Calibration cal = new Calibration();
         cal.setCalibrated(true);
         cal.setUnits("msec");
@@ -48,7 +46,6 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testCurrentHorizontalCalFactor() {
-        Context context = new Activity();
         Calibration cal = new Calibration();
         cal.setOriginalZoom(1.0f);
         cal.setOriginalCalFactor(0.5f);
@@ -61,24 +58,24 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public void testInitialCaliperPosition() {
         Caliper c = new Caliper();
         c.setInitialPosition(new Rect(0, 0, 600, 600));
-        assertEquals(c.getBar1Position(), 200);
-        assertEquals(c.getBar2Position(), 400);
-        assertEquals(c.getCrossbarPosition(), 300);
+        assertEquals(c.getBar1Position(), 200.0, 0.001);
+        assertEquals(c.getBar2Position(), 400.0, 0.001);
+        assertEquals(c.getCrossbarPosition(), 300.0, 0.001);
         c.setInitialPosition(new Rect(0, 0, 600, 600));
         c.setDirection(Caliper.Direction.VERTICAL);
-        assertEquals(c.getBar1Position(), 215.0f);
-        assertEquals(c.getBar2Position(), 415.0f);
-        assertEquals(c.getCrossbarPosition(), 315.0f);
+        assertEquals(c.getBar1Position(), 215.0f, 0.001);
+        assertEquals(c.getBar2Position(), 415.0f, 0.001);
+        assertEquals(c.getCrossbarPosition(), 315.0f, 0.001);
     }
 
     public void testBarCoord() {
         Caliper c = new Caliper();
-        assertEquals(c.getBar1Position(), 0);
-        assertEquals(c.getBar2Position(), 0);
-        assertEquals(c.getCrossbarPosition(), 100);
+        assertEquals(c.getBar1Position(), 0, 0.001);
+        assertEquals(c.getBar2Position(), 0, 0.001);
+        assertEquals(c.getCrossbarPosition(), 100.0, 0.001);
         PointF p = new PointF(100, 50);
-        assertEquals(c.barCoord(p), 100.0f);
+        assertEquals(c.barCoord(p), 100.0f, 0.001);
         c.setDirection(Caliper.Direction.VERTICAL);
-        assertEquals(c.barCoord(p),50.0f);
+        assertEquals(c.barCoord(p),50.0f, 0.001);
     }
 }

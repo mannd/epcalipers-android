@@ -4,7 +4,6 @@
     <string name="calibrate_button_title">Calibrate</string>
     <string name="interval_rate_button_title">Interval/Rate</string>
     <string name="mean_rate_button_title">Mean Rate</string>
-    <string name="switch_mode_title">Switch Mode</string>
     <string name="quick_start_message">Tap *Switch Mode
         * at the upper right to switch modes
         between manipulating or loading images and manipulating calipers.

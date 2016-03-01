@@ -20,16 +20,14 @@
     <string name="rotate_image_left_button_title">90°L</string>
     <string name="tweak_image_right_button_title">1°R</string>
     <string name="tweak_image_left_button_title">1°L</string>
-    <string name="flip_image_button_title">Flip</string>
     <string name="reset_image_button_title">Reset</string>
     <string name="done_button_title">Done</string>
     <string name="set_calibration_button_title">Set</string>
     <string name="clear_calibration_button_title">Clear</string>
-    <string name="about_text">Copyright \u00a9 2015 EP Studios, Inc.\nAll rights reserved.\n</string>
+    <string name="about_text">Copyright \u00a9 2015, 2016 EP Studios, Inc.\nAll rights reserved.\n</string>
     <string name="about_label">EP Calipers</string>
     <string name="help_title">Help</string>
     <string name="switch_mode_title">Switch</string>
-    <string name="image_button_label">Image</string>
     <string name="no_time_caliper_selected_title">No Time Caliper Selected</string>
     <string name="no_time_caliper_selected_message">Use a selected (highlighted) caliper to
         measure one or more RR intervals.</string>
@@ -64,6 +62,10 @@
     <string name="default_line_width_label">Line width</string>
     <string name="show_start_image_off_summary">Don\'t show ECG</string>
     <string name="show_start_image_on_summary">Show ECG</string>
+    <string name="use_large_font_key">use_large_font</string>
+    <string name="use_large_font_label">Use large font caliper labels?"</string>
+    <string name="use_large_font_off_summary">Use normal size font</string>
+    <string name="use_large_font_on_summary">Use large font</string>
     <string name="default_caliper_color">Blue</string>
     <string name="default_highlight_color">Red</string>
     <string name="default_line_width">2 points</string>
@@ -79,12 +81,26 @@
     <string name="invalid_result_message">Invalid Result</string>
     <string name="calculated_qtc_dialog_title">Calculated QTc</string>
     <string name="quick_start_title">EP Calipers Quick Start</string>
-    <string name="quick_start_message">What\'s new: It\'s easier to move the calipers and zoom and
-        move the ECG image.  No need anymore to switch modes.  You can adjust everything on the
-        same screen at the same time.\n\nQuick Start: Use your fingers to move and position
-        calipers or move and zoom the image.\n\nAdd calipers with the *+* menu item, single tap
-        a caliper to select it, tap again to unselect, and double tap to delete a caliper.
-        After calibration the menu items that allow toggling interval and rate and calculating
-        mean rates and QTc will be enabled.\n\nUse the *Switch* button on the top right to
-        load and adjust ECG images.\n\nSee the *Help* menu item for full help.</string>
+    <string name="quick_start_message">What\'s new: Open PDF files
+    (even those with multiple pages) from the Share menu of email
+    attachments and from the AliveECG™ app.\n\nQuick Start: Use your
+    fingers to move and position calipers or move and zoom the
+    image.\n\nAdd calipers with the *+* menu item, single tap a
+    caliper to select it, tap again to unselect, and double tap to
+    delete a caliper.  After calibration the menu items that allow
+    toggling interval and rate and calculating mean rates and QTc will
+    be enabled.\n\nUse the *Switch* button on the top right to load
+    and adjust ECG images.\n\nSee the *Help* menu item for full
+    help.</string>
+    <string name="opening_pdf_message">Opening PDF</string>
+    <string name="file_load_error">File load error</string>
+    <string name="file_load_message">File could not be loaded</string>
+    <string name="image_button_title">Image</string>
+    <string name="measure_button_title">Measure</string>
+    <string name="normal_ecg">normal_ecg</string>
+    <string name="about">About</string>
+    <string name="help">Help</string>
+    <string name="app_version">Version %1s</string>
+    <string name="default_number_qtc_rr_intervals">1</string>
+    <string name="continue_title">Continue</string>
 </resources>

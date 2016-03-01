@@ -1,7 +1,5 @@
 package org.epstudios.epcalipers;
 
-import android.content.Context;
-
 /**
  * Copyright (C) 2015 EP Studios, Inc.
  * www.epstudiossoftware.com
@@ -148,6 +146,7 @@ public class Calibration {
                 || upcaseUnits.equals("SECS")
                 || upcaseUnits.equals("SECONDS");
     }
+
 
     public boolean unitsAreMsec() {
         if (units.length() < 1) {
