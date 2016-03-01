@@ -609,6 +609,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private void scaleImageForImageView() {
         Drawable image = imageView.getDrawable();
+        if (image == null) {
+            return;
+        }
         float imageWidth = image.getIntrinsicWidth();
         float imageHeight = image.getIntrinsicHeight();
         float actionBarHeight = actionBar.getHeight();
@@ -636,6 +639,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             ratio = landscapeHeight / imageHeight;
         }
         Bitmap bitmap = ((BitmapDrawable)image).getBitmap();
+        if (bitmap == null) {
+            return;
+        }
         int bitmapWidth = bitmap.getWidth();
         int bitmapHeight = bitmap.getHeight();
 //        Log.d(EPS, "imageWidth = " + imageWidth + " imageHeight = " + imageHeight);
@@ -647,6 +653,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Bitmap scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth,
                 bitmapHeight, matrix, true);
         BitmapDrawable result = new BitmapDrawable(getResources(), scaledBitmap);
+
         imageView.setImageDrawable(result);
         attacher.update();
     }
@@ -760,10 +767,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         int calipersCount = savedInstanceState.getInt("CalipersCount");
         for (int i = 0; i < calipersCount; i++) {
             String directionString = savedInstanceState.getString(i + "CaliperDirection");
+            if (directionString == null) {
+                // something very wrong, give up on restoring calipers
+                return;
+            }
             Caliper.Direction direction = directionString.equals("Horizontal") ?
                     Caliper.Direction.HORIZONTAL : Caliper.Direction.VERTICAL;
-
-
             float bar1Position = savedInstanceState.getFloat(i + "CaliperBar1Position");
             float bar2Position = savedInstanceState.getFloat(i + "CaliperBar2Position");
             float crossbarPosition = savedInstanceState.getFloat(i + "CaliperCrossbarPosition");
@@ -1187,13 +1196,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         String pdfFileName = "PDF_" + timeStamp + "_";
         File storageDir = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
+        //currentPhotoPath = image.getAbsolutePath();
+        return File.createTempFile(
                 pdfFileName,  /* prefix */
                 ".pdf",         /* suffix */
                 storageDir      /* directory */
         );
-        //currentPhotoPath = image.getAbsolutePath();
-        return image;
     }
 
     @SuppressLint("SimpleDateFormat")
