@@ -70,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -499,21 +500,25 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 currentPdfUri = pdfUri;
                 isNewPdf = true;
             }
-            // note that library handles exceptions
-            decodeService.open(pdfUri);
-            numberOfPdfPages = decodeService.getPageCount();
-            currentPdfPageNumber = uriPage.pageNumber;
-            PdfPage page = (PdfPage) decodeService.getPage(currentPdfPageNumber);
+            try {
+                decodeService.open(pdfUri);
+                numberOfPdfPages = decodeService.getPageCount();
+                currentPdfPageNumber = uriPage.pageNumber;
+                PdfPage page = (PdfPage) decodeService.getPage(currentPdfPageNumber);
 
-            int width = page.getWidth();
-            int height = page.getHeight();
+                int width = page.getWidth();
+                int height = page.getHeight();
 
-            Matrix matrix = new Matrix();
-            matrix.preTranslate(0, height);
-            matrix.preScale(1, -1);
-            matrix.postScale(3, 3);
+                Matrix matrix = new Matrix();
+                matrix.preTranslate(0, height);
+                matrix.preScale(1, -1);
+                matrix.postScale(3, 3);
 
-            return page.render(new Rect(0, 0, width * 3, height * 3), matrix);
+                return page.render(new Rect(0, 0, width * 3, height * 3), matrix);
+            } catch (Exception e) {
+                // catch out of memory errors and just don't load rather than crash
+                return null;
+            }
         }
 
         protected void onPostExecute(Bitmap bitmap) {
@@ -525,6 +530,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 if (isNewPdf) {
                     clearCalibration();
                 }
+            }
+            else {
+                Toast toast = Toast.makeText(getApplicationContext(), R.string.pdf_error_message, Toast.LENGTH_SHORT);
+                toast.show();
             }
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
