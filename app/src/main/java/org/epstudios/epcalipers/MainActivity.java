@@ -531,6 +531,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     clearCalibration();
                 }
             }
+            else {
+                Toast toast = Toast.makeText(getApplicationContext(), R.string.pdf_error_message, Toast.LENGTH_SHORT);
+                toast.show();
+            }
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
     }

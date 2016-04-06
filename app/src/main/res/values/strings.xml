@@ -103,4 +103,5 @@
     <string name="app_version">Version %1s</string>
     <string name="default_number_qtc_rr_intervals">1</string>
     <string name="continue_title">Continue</string>
+    <string name="pdf_error_message">Could not open PDF</string>
 </resources>
