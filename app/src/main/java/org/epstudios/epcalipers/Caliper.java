@@ -119,6 +119,12 @@ public class Caliper {
     private final DecimalFormat decimalFormat;
     private final Paint paint;
 
+    public void setRoundMsecRate(boolean roundMsecRate) {
+        this.roundMsecRate = roundMsecRate;
+    }
+
+    private boolean roundMsecRate;
+
     public Calibration getCalibration() {
         return calibration;
     }
@@ -151,7 +157,6 @@ public class Caliper {
                 Paint.Align.LEFT);
 
         paint.setTextSize(SMALL_FONT);
-       // paint.setTextScaleX(0.8f);
     }
 
     public Caliper() {
@@ -236,7 +241,13 @@ public class Caliper {
     }
 
     private String measurement() {
-        String result = decimalFormat.format(calibratedResult());
+        String result;
+        if (roundMsecRate && (calibration.getDisplayRate() == true || calibration.unitsAreMsec())) {
+            result = String.valueOf((int) Math.round(calibratedResult()));
+        }
+        else {
+            result = decimalFormat.format(calibratedResult());
+        }
         result += " " + calibration.getUnits();
         return result;
     }

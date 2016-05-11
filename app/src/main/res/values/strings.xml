@@ -104,4 +104,8 @@
     <string name="default_number_qtc_rr_intervals">1</string>
     <string name="continue_title">Continue</string>
     <string name="pdf_error_message">Could not open PDF</string>
+    <string name="round_msec_rate_key">round_msec_rate</string>
+    <string name="round_msec_rate_label">Round msec and heart rate</string>
+    <string name="round_msec_rate_off_summary">No rounding of intervals and rates</string>
+    <string name="round_msec_rate_on_summary">Msec and heart rate rounded to nearest interger</string>
 </resources>
