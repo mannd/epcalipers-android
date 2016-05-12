@@ -806,6 +806,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             c.setColor(c.isSelected() ? currentHighlightColor : currentCaliperColor);
             c.setLineWidth(currentLineWidth);
             c.setUseLargeFont(useLargeFont);
+            c.setRoundMsecRate(roundMsecRate);
             if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
                 c.setCalibration(horizontalCalibration);
             }
