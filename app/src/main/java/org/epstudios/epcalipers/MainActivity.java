@@ -134,6 +134,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private float landscapeWidth;
     private float landscapeHeight;
     private boolean showStartImage;
+    private boolean roundMsecRate;
     private int currentCaliperColor;
     private int currentHighlightColor;
     private int currentLineWidth;
@@ -325,6 +326,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     useLargeFont = sharedPreferences.getBoolean(key, false);
                     for (Caliper c : calipersView.getCalipers()) {
                         c.setUseLargeFont(useLargeFont);
+                    }
+                }
+                if (key.equals(getString(R.string.round_msec_rate_key))) {
+                    roundMsecRate = sharedPreferences.getBoolean(key, true);
+                    for (Caliper c : calipersView.getCalipers()) {
+                        c.setRoundMsecRate(roundMsecRate);
                     }
                 }
                 calipersView.invalidate();
@@ -590,6 +597,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 .getDefaultSharedPreferences(this);
         showStartImage = sharedPreferences.getBoolean(
                 getString(R.string.show_start_image_key), true);
+        roundMsecRate = sharedPreferences.getBoolean(getString(R.string.round_msec_rate_key), true);
         defaultTimeCalibration = sharedPreferences.getString(getString(
                 R.string.default_time_calibration_key), getString(R.string.default_time_calibration_value));
         defaultAmplitudeCalibration = sharedPreferences.getString(
@@ -1313,7 +1321,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         Caliper c = calipersView.activeCaliper();
         if (c.getDirection() == Caliper.Direction.VERTICAL) {
-            showNoTimeCaliperSelectedAlert(); // TODO reword this dialog
+            showNoTimeCaliperSelectedAlert();
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -1770,6 +1778,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             c.setCalibration(verticalCalibration);
         }
         c.setUseLargeFont(useLargeFont);
+        c.setRoundMsecRate(roundMsecRate);
         c.setInitialPosition(rect);
         getCalipers().add(c);
     }

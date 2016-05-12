@@ -54,7 +54,12 @@
         android:summaryOff="@string/use_large_font_off_summary"
         android:summaryOn="@string/use_large_font_on_summary" />
 
-
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/round_msec_rate_key"
+        android:title="@string/round_msec_rate_label"
+        android:summaryOff="@string/round_msec_rate_off_summary"
+        android:summaryOn="@string/round_msec_rate_on_summary" />
 
 
 </PreferenceScreen>
