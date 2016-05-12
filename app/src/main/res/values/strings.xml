@@ -81,9 +81,10 @@
     <string name="invalid_result_message">Invalid Result</string>
     <string name="calculated_qtc_dialog_title">Calculated QTc</string>
     <string name="quick_start_title">EP Calipers Quick Start</string>
-    <string name="quick_start_message">What\'s new: Open PDF files
-    (even those with multiple pages) from the Share menu of email
-    attachments and from the AliveECG™ app.\n\nQuick Start: Use your
+    <string name="quick_start_message">What\'s new: Intervals with units
+        of msec and heart rates are rounded by default to nearest
+        integer.  If you want more precision, uncheck *Round msec and
+        heart rate* in Settings.\n\nQuick Start: Use your
     fingers to move and position calipers or move and zoom the
     image.\n\nAdd calipers with the *+* menu item, single tap a
     caliper to select it, tap again to unselect, and double tap to
@@ -107,5 +108,5 @@
     <string name="round_msec_rate_key">round_msec_rate</string>
     <string name="round_msec_rate_label">Round msec and heart rate</string>
     <string name="round_msec_rate_off_summary">No rounding of intervals and rates</string>
-    <string name="round_msec_rate_on_summary">Msec and heart rate rounded to nearest interger</string>
+    <string name="round_msec_rate_on_summary">Msec and heart rate rounded to nearest integer</string>
 </resources>
