@@ -1321,7 +1321,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         Caliper c = calipersView.activeCaliper();
         if (c.getDirection() == Caliper.Direction.VERTICAL) {
-            showNoTimeCaliperSelectedAlert(); // TODO reword this dialog
+            showNoTimeCaliperSelectedAlert();
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
