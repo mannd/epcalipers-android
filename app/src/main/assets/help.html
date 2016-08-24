@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2016-03-01 Tue 17:13 -->
+<!-- 2016-08-24 Wed 13:28 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title></title>
@@ -55,13 +55,96 @@
     border: 1px solid black;
   }
   pre.src:hover:before { display: inline;}
-  pre.src-sh:before    { content: 'sh'; }
-  pre.src-bash:before  { content: 'sh'; }
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
   pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
-  pre.src-R:before     { content: 'R'; }
-  pre.src-perl:before  { content: 'Perl'; }
-  pre.src-java:before  { content: 'Java'; }
-  pre.src-sql:before   { content: 'SQL'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
 
   table { border-collapse:collapse; }
   caption.t-above { caption-side: top; }
@@ -146,9 +229,41 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<div id="outline-container-orgheadline1" class="outline-2">
-<h2 id="orgheadline1">You're on call, again&#x2026;</h2>
-<div class="outline-text-2" id="text-orgheadline1">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgc159dbb">You're on call, again&#x2026;</a></li>
+<li><a href="#orga89e461">Electronic Calipers</a></li>
+<li><a href="#org7dffb5d">What's new?</a></li>
+<li><a href="#orgbe874c9">Quick start</a></li>
+<li><a href="#orge5da457">Loading an image</a>
+<ul>
+<li><a href="#org1ef6e14">Take a photo of an ECG</a></li>
+<li><a href="#orgd2c5075">Select a photo from your photo gallery</a></li>
+<li><a href="#org031a94f">Select a photo or PDF using the <b>Share</b> menu from other apps</a></li>
+<li><a href="#org7986e0a">Multiple page PDFs</a></li>
+</ul>
+</li>
+<li><a href="#org7ecc930">Adjusting the image</a></li>
+<li><a href="#org999cadf">Exiting <b>Image</b> mode</a></li>
+<li><a href="#orga60ce49">Moving calipers</a></li>
+<li><a href="#orgbc338c2">Making measurements</a></li>
+<li><a href="#org34221ad">Adding and deleting calipers</a></li>
+<li><a href="#org0831bf5">Selecting a caliper</a></li>
+<li><a href="#org1d8d34b">Calibration</a></li>
+<li><a href="#org7397e0b">Changing calibration</a></li>
+<li><a href="#org5873bea">Interval/Rate</a></li>
+<li><a href="#org6380d36">Mean rate and interval calculation</a></li>
+<li><a href="#org9382fef">QTc calculation</a></li>
+<li><a href="#org99f8efe">Settings</a></li>
+<li><a href="#orgd8b2a74">Acknowledgments</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgc159dbb" class="outline-2">
+<h2 id="orgc159dbb">You're on call, again&#x2026;</h2>
+<div class="outline-text-2" id="text-orgc159dbb">
 <p>
 It's 2 AM and the phone rings.  It's a nurse on the cardiac unit.  Mr. Smith is due to get his antiarrhythmic drug (who comes up with these crazy drug schedules?) and his ECG has a borderline prolonged QTc interval, at least according to the computer.  She's not sure if it is safe to give the drug.  The nurse wants to send you the ECG.
 </p>
@@ -158,25 +273,25 @@ You open the ECG on your phone.  You look at the QT interval.  You're not sure a
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline2" class="outline-2">
-<h2 id="orgheadline2">Electronic Calipers</h2>
-<div class="outline-text-2" id="text-orgheadline2">
+<div id="outline-container-orga89e461" class="outline-2">
+<h2 id="orga89e461">Electronic Calipers</h2>
+<div class="outline-text-2" id="text-orga89e461">
 <p>
 <b>EP Calipers</b> provides <b>electronic calipers</b> for measuring intervals on images of electrocardiograms (ECGs) or electrophysiologic recordings.  In the electrophysiology lab electronic calipers are included as part of the recording system.  <b>EP Calipers</b> is intended to provide similar electronic calipers for use on your Android phone or tablet.  The electronic calipers of <b>EP Calipers</b> are more accurate, easier to use, and less dangerous than mechanical calipers (they don't have sharp points!).
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline3" class="outline-2">
-<h2 id="orgheadline3">What's new?</h2>
-<div class="outline-text-2" id="text-orgheadline3">
+<div id="outline-container-org7dffb5d" class="outline-2">
+<h2 id="org7dffb5d">What's new?</h2>
+<div class="outline-text-2" id="text-org7dffb5d">
 <p>
 This new version of <b>EP Calipers</b> can be used to analyze PDF files, as well as standard image files.  Multi-page PDF files are supported.  Thus the app can be used to analyze <i>AliveCor™</i> files as well as academic papers in PDF format.
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline4" class="outline-2">
-<h2 id="orgheadline4">Quick start</h2>
-<div class="outline-text-2" id="text-orgheadline4">
+<div id="outline-container-orgbe874c9" class="outline-2">
+<h2 id="orgbe874c9">Quick start</h2>
+<div class="outline-text-2" id="text-orgbe874c9">
 <p>
 When <b>EP Calipers</b> starts, a sample ECG and a time caliper are loaded.
 Move the caliper around by touching the caliper's crossbar and
@@ -190,9 +305,9 @@ advanced measurements like the corrected QT interval.
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline5" class="outline-2">
-<h2 id="orgheadline5">Loading an image</h2>
-<div class="outline-text-2" id="text-orgheadline5">
+<div id="outline-container-orge5da457" class="outline-2">
+<h2 id="orge5da457">Loading an image</h2>
+<div class="outline-text-2" id="text-orge5da457">
 
 <div class="figure">
 <p><img src="./image_button.png" alt="image_button.png" />
@@ -215,9 +330,9 @@ screen to switch to <b>Image mode</b>.  The <b>Image</b> menu will appear at the
 With this menu you can load and adjust an ECG image.  There are several ways to load an ECG image, as described next.
 </p>
 </div>
-<div id="outline-container-orgheadline6" class="outline-3">
-<h3 id="orgheadline6">Take a photo of an ECG</h3>
-<div class="outline-text-3" id="text-orgheadline6">
+<div id="outline-container-org1ef6e14" class="outline-3">
+<h3 id="org1ef6e14">Take a photo of an ECG</h3>
+<div class="outline-text-3" id="text-org1ef6e14">
 <p>
 Touch the <b>Camera</b> button to take a photo of an ECG tracing and load
 it into the app.  Note that images captured this way are not saved in
@@ -226,17 +341,17 @@ make a quick measurement when you don't need to save the image.  If you want to 
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline7" class="outline-3">
-<h3 id="orgheadline7">Select a photo from your photo gallery</h3>
-<div class="outline-text-3" id="text-orgheadline7">
+<div id="outline-container-orgd2c5075" class="outline-3">
+<h3 id="orgd2c5075">Select a photo from your photo gallery</h3>
+<div class="outline-text-3" id="text-orgd2c5075">
 <p>
 Touch <b>Select</b> to chose an image that is already saved on your device in your photos collection, for example an image file attached to an email that you saved or a photo that your previously took.
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline8" class="outline-3">
-<h3 id="orgheadline8">Select a photo or PDF using the <b>Share</b> menu from other apps</h3>
-<div class="outline-text-3" id="text-orgheadline8">
+<div id="outline-container-org031a94f" class="outline-3">
+<h3 id="org031a94f">Select a photo or PDF using the <b>Share</b> menu from other apps</h3>
+<div class="outline-text-3" id="text-org031a94f">
 <p>
 <b>EP Calipers</b> can open image and PDF files regardless of where they are located on your device.  You can directly open email attachments, downloaded files, Google Drive, and Dropbox files.  It is also easy to open ECG images directly from the <i>AliveCor AliveECG™</i> app.  The key to opening images in external apps is to use the <b>Share</b> button.  It usually looks like this: 
 </p>
@@ -290,9 +405,9 @@ You will then be given options for opening the PDF report.  One of the options s
 </div>
 </div>
 
-<div id="outline-container-orgheadline9" class="outline-3">
-<h3 id="orgheadline9">Multiple page PDFs</h3>
-<div class="outline-text-3" id="text-orgheadline9">
+<div id="outline-container-org7986e0a" class="outline-3">
+<h3 id="org7986e0a">Multiple page PDFs</h3>
+<div class="outline-text-3" id="text-org7986e0a">
 <p>
 When PDF files have more than one page, the app will display the first
 page initially.  You can go to other pages by selecting <b>Previous</b> or
@@ -301,9 +416,9 @@ page initially.  You can go to other pages by selecting <b>Previous</b> or
 </div>
 </div>
 </div>
-<div id="outline-container-orgheadline10" class="outline-2">
-<h2 id="orgheadline10">Adjusting the image</h2>
-<div class="outline-text-2" id="text-orgheadline10">
+<div id="outline-container-org7ecc930" class="outline-2">
+<h2 id="org7ecc930">Adjusting the image</h2>
+<div class="outline-text-2" id="text-org7ecc930">
 <p>
 You can adjust the positioning of the image using pinch-to-zoom,
 dragging, and double-tapping. Use the <b>Adjust</b> menu to fine-tune your
@@ -318,7 +433,7 @@ image further.
 
 <p>
 You can rotate the image by 90° in either direction,
-or by increments of 1°.  This is particularly useful if the original image is
+or by increments of 0.1° or 1°.  This is particularly useful if the original image is
 rotated or not quite square to the screen.  You should recalibrate
 your calipers after rotating the image.  If you need to go back to the
 original image position use <b>Reset</b>.  After adjusting the image select
@@ -326,9 +441,9 @@ original image position use <b>Reset</b>.  After adjusting the image select
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline11" class="outline-2">
-<h2 id="orgheadline11">Exiting <b>Image</b> mode</h2>
-<div class="outline-text-2" id="text-orgheadline11">
+<div id="outline-container-org999cadf" class="outline-2">
+<h2 id="org999cadf">Exiting <b>Image</b> mode</h2>
+<div class="outline-text-2" id="text-org999cadf">
 <p>
 After loading and adjusting the image, you need to exit Image mode so that you can use the calipers.  Select the <b>Measure</b> button at the top left of the screen to return to the <b>EP Calipers</b> main screen.
 </p>
@@ -341,9 +456,9 @@ After loading and adjusting the image, you need to exit Image mode so that you c
 </div>
 </div>
 
-<div id="outline-container-orgheadline12" class="outline-2">
-<h2 id="orgheadline12">Moving calipers</h2>
-<div class="outline-text-2" id="text-orgheadline12">
+<div id="outline-container-orga60ce49" class="outline-2">
+<h2 id="orga60ce49">Moving calipers</h2>
+<div class="outline-text-2" id="text-orga60ce49">
 <p>
 Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bars (or top or bottom in the case of vertical calipers) to stretch or shrink the calipers.  Note that you cannot pinch both bars at the same time.
 </p>
@@ -356,17 +471,17 @@ Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bar
 </div>
 </div>
 
-<div id="outline-container-orgheadline13" class="outline-2">
-<h2 id="orgheadline13">Making measurements</h2>
-<div class="outline-text-2" id="text-orgheadline13">
+<div id="outline-container-orgbc338c2" class="outline-2">
+<h2 id="orgbc338c2">Making measurements</h2>
+<div class="outline-text-2" id="text-orgbc338c2">
 <p>
 The interval measured by each caliper is displayed next to the crossbar of the caliper.  Until the calipers are calibrated, measurements are displayed in arbitrary units (points, roughly equivalent to screen pixels)).
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline14" class="outline-2">
-<h2 id="orgheadline14">Adding and deleting calipers</h2>
-<div class="outline-text-2" id="text-orgheadline14">
+<div id="outline-container-org34221ad" class="outline-2">
+<h2 id="org34221ad">Adding and deleting calipers</h2>
+<div class="outline-text-2" id="text-org34221ad">
 <p>
 Select the <b>+</b> or <b>Add Caliper</b> button to add new calipers.<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>
 </p>
@@ -389,9 +504,9 @@ Calipers can be horizontal (time measurements) or vertical (amplitude measuremen
 </div>
 </div>
 
-<div id="outline-container-orgheadline15" class="outline-2">
-<h2 id="orgheadline15">Selecting a caliper</h2>
-<div class="outline-text-2" id="text-orgheadline15">
+<div id="outline-container-org0831bf5" class="outline-2">
+<h2 id="org0831bf5">Selecting a caliper</h2>
+<div class="outline-text-2" id="text-org0831bf5">
 <p>
 When more than one caliper is present, it is necessary to indicate which caliper you are using for calibration or to make measurements.  You select or unselect calipers by tapping them.  By default an unselected caliper is blue and a selected caliper is red (you can change these colors if you want).  Single tapping an unselected caliper will select it.  Tap it again (but not too soon after the first tap, as a double tap deletes the caliper) to unselect it.  As there can be only one selected caliper at a time, selecting a caliper will unselect any other caliper that happens to be selected.  In some cases a caliper will be selected automatically (for example to do calibration) if you have not already selected one.  If you want to select a different caliper, just tap another caliper.
 </p>
@@ -404,9 +519,9 @@ When more than one caliper is present, it is necessary to indicate which caliper
 </div>
 </div>
 
-<div id="outline-container-orgheadline16" class="outline-2">
-<h2 id="orgheadline16">Calibration</h2>
-<div class="outline-text-2" id="text-orgheadline16">
+<div id="outline-container-org1d8d34b" class="outline-2">
+<h2 id="org1d8d34b">Calibration</h2>
+<div class="outline-text-2" id="text-org1d8d34b">
 <p>
 Select <b>Cal</b> or <b>Calibrate</b>.  Stretch the selected caliper over a known interval (such as 1000 msec for time, or 10 mm for amplitude calipers).  Select <b>Set</b>.  In the dialog box, make sure the interval matches what you are measuring.  Enter both the calibration interval and units (e.g. 500 msec or 1 sec or 1 mV).  Select <b>Set</b> in the dialog box to set the calibration.  Time and amplitude calipers need to be calibrated separately.  Once calibrated, calipers will show intervals in the units used to calibrate.  Newly created calipers will use the same calibration.
 </p>
@@ -426,33 +541,33 @@ Select <b>Cal</b> or <b>Calibrate</b>.  Stretch the selected caliper over a know
 </div>
 </div>
 
-<div id="outline-container-orgheadline17" class="outline-2">
-<h2 id="orgheadline17">Changing calibration</h2>
-<div class="outline-text-2" id="text-orgheadline17">
+<div id="outline-container-org7397e0b" class="outline-2">
+<h2 id="org7397e0b">Changing calibration</h2>
+<div class="outline-text-2" id="text-org7397e0b">
 <p>
 You can recalibrate at any time.  You can clear all calibration by selecting <b>Clear</b> in the calibration toolbar.  Note that calibration is maintained if the device is rotated or the image is zoomed.  Selecting a new image will reset calibration.
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline18" class="outline-2">
-<h2 id="orgheadline18">Interval/Rate</h2>
-<div class="outline-text-2" id="text-orgheadline18">
+<div id="outline-container-org5873bea" class="outline-2">
+<h2 id="org5873bea">Interval/Rate</h2>
+<div class="outline-text-2" id="text-org5873bea">
 <p>
 Once a time (horizontal) caliper is calibrated, provided you use time units (such as msec or sec) for the calibration, it is possible to toggle between interval measurements (e.g. 600 msec) and heart rate measurements (e.g. 100 bpm) by selecting <b>Interval/Rate</b> or <b>I/R</b>.
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline19" class="outline-2">
-<h2 id="orgheadline19">Mean rate and interval calculation</h2>
-<div class="outline-text-2" id="text-orgheadline19">
+<div id="outline-container-org6380d36" class="outline-2">
+<h2 id="org6380d36">Mean rate and interval calculation</h2>
+<div class="outline-text-2" id="text-org6380d36">
 <p>
 Select a calibrated caliper and stretch it over a number of intervals. Select <b>Mean Rate</b> or <b>mRate</b> and enter the number of intervals measured.  A dialog box will show the calculated mean heart rate and interval.  This is useful for calculating rates and intervals in irregular rhythms, such as atrial fibrillation.
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline20" class="outline-2">
-<h2 id="orgheadline20">QTc calculation</h2>
-<div class="outline-text-2" id="text-orgheadline20">
+<div id="outline-container-org9382fef" class="outline-2">
+<h2 id="org9382fef">QTc calculation</h2>
+<div class="outline-text-2" id="text-org9382fef">
 <p>
 Select <b>QTc</b>.  Stretch a time caliper over one or more RR intervals and select <b>Measure</b>.  Enter the number of intervals the caliper is stretched over and select <b>Continue</b>.  Then use the same caliper to measure the QT interval.  Select <b>Measure</b>.  A dialog box will give the calculated QTc using Bazett's formula.  Note that device rotation in the middle of this process will cancel the measurement.
 </p>
@@ -479,17 +594,17 @@ Select <b>QTc</b>.  Stretch a time caliper over one or more RR intervals and sel
 </div>
 </div>
 
-<div id="outline-container-orgheadline21" class="outline-2">
-<h2 id="orgheadline21">Settings</h2>
-<div class="outline-text-2" id="text-orgheadline21">
+<div id="outline-container-org99f8efe" class="outline-2">
+<h2 id="org99f8efe">Settings</h2>
+<div class="outline-text-2" id="text-org99f8efe">
 <p>
 Preferences such as caliper colors and default calibration intervals can be selected using the <b>Settings</b> menu item on the toolbar at the top of the app.
 </p>
 </div>
 </div>
-<div id="outline-container-orgheadline22" class="outline-2">
-<h2 id="orgheadline22">Acknowledgments</h2>
-<div class="outline-text-2" id="text-orgheadline22">
+<div id="outline-container-orgd8b2a74" class="outline-2">
+<h2 id="orgd8b2a74">Acknowledgments</h2>
+<div class="outline-text-2" id="text-orgd8b2a74">
 <ul class="org-ul">
 <li>Thanks to Dr. Michael Katz for the concept.</li>
 <li>The source code for <b>EP Calipers</b> is available on <a href="https://github.com/mannd/epcalipers-android">GitHub</a>.</li>
