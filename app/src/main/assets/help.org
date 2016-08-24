@@ -5,7 +5,7 @@
 #+DESCRIPTION: EP Calipers Help for Android
 #+KEYWORDS:
 #+LANGUAGE:  en
-#+OPTIONS:   H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   H:3 num:nil toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
 #+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
 #+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
 #+EXPORT_SELECT_TAGS: export
@@ -83,7 +83,7 @@ image further.
 [[./adjust_menu.png]]
 
 You can rotate the image by 90° in either direction,
-or by increments of 1°.  This is particularly useful if the original image is
+or by increments of 0.1° or 1°.  This is particularly useful if the original image is
 rotated or not quite square to the screen.  You should recalibrate
 your calipers after rotating the image.  If you need to go back to the
 original image position use *Reset*.  After adjusting the image select

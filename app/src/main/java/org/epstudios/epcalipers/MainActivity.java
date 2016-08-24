@@ -96,6 +96,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Button rotateImageLeftButton;
     private Button tweakImageRightButton;
     private Button tweakImageLeftButton;
+    private Button microTweakImageRightButton;
+    private Button microTweakImageLeftButton;
     private Button resetImageButton;
     private Button backToImageMenuButton;
     private Button horizontalCaliperButton;
@@ -850,6 +852,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             rotateImage(-1.0f);
         } else if (v == tweakImageRightButton) {
             rotateImage(1.0f);
+        } else if (v == microTweakImageLeftButton) {
+            rotateImage(-0.1f);
+        } else if (v == microTweakImageRightButton) {
+            rotateImage(0.1f);
         } else if (v == resetImageButton) {
             resetImage();
         } else if (v == horizontalCaliperButton) {
@@ -909,6 +915,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         rotateImageLeftButton = createButton(getString(R.string.rotate_image_left_button_title));
         tweakImageRightButton = createButton(getString(R.string.tweak_image_right_button_title));
         tweakImageLeftButton = createButton(getString(R.string.tweak_image_left_button_title));
+        microTweakImageRightButton = createButton(getString(R.string.micro_tweak_image_right_button_title));
+        microTweakImageLeftButton = createButton(getString(R.string.micro_tweak_image_left_button_title));
         resetImageButton = createButton(getString(R.string.reset_image_button_title));
         backToImageMenuButton = createButton(getString(R.string.done_button_title));
         // Calibration menu
@@ -965,6 +973,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         buttons.add(rotateImageRightButton);
         buttons.add(tweakImageLeftButton);
         buttons.add(tweakImageRightButton);
+        buttons.add(microTweakImageLeftButton);
+        buttons.add(microTweakImageRightButton);
         buttons.add(resetImageButton);
         buttons.add(backToImageMenuButton);
         adjustImageMenu = createMenu(buttons);
