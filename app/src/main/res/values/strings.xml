@@ -83,18 +83,17 @@
     <string name="invalid_result_message">Invalid Result</string>
     <string name="calculated_qtc_dialog_title">Calculated QTc</string>
     <string name="quick_start_title">EP Calipers Quick Start</string>
-    <string name="quick_start_message">What\'s new: Intervals with units
-        of msec and heart rates are rounded by default to nearest
-        integer.  If you want more precision, uncheck *Round msec and
-        heart rate* in Settings.\n\nQuick Start: Use your
-    fingers to move and position calipers or move and zoom the
-    image.\n\nAdd calipers with the *+* menu item, single tap a
-    caliper to select it, tap again to unselect, and double tap to
-    delete a caliper.  After calibration the menu items that allow
-    toggling interval and rate and calculating mean rates and QTc will
-    be enabled.\n\nUse the *Switch* button on the top right to load
-    and adjust ECG images.\n\nSee the *Help* menu item for full
-    help.</string>
+    <string name="quick_start_message">What\'s new: Straighten your ECG image
+        better using 0.1 degree rotation controls.  Help now has
+        a table of contents.\n\nQuick Start: Use your
+        fingers to move and position calipers or move and zoom the
+        image.\n\nAdd calipers with the *+* menu item, single tap a
+        caliper to select it, tap again to unselect, and double tap to
+        delete a caliper.  After calibration the menu items that allow
+        toggling interval and rate and calculating mean rates and QTc will
+        be enabled.\n\nUse the *Switch* button on the top right to load
+        and adjust ECG images.\n\nSee the *Help* menu item for full
+        help.</string>
     <string name="opening_pdf_message">Opening PDF</string>
     <string name="file_load_error">File load error</string>
     <string name="file_load_message">File could not be loaded</string>
