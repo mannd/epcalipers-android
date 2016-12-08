@@ -123,6 +123,10 @@ public class Caliper {
         this.roundMsecRate = roundMsecRate;
     }
 
+    public boolean isRoundMsecRate() {
+        return roundMsecRate;
+    }
+
     private boolean roundMsecRate;
 
     public Calibration getCalibration() {
@@ -224,6 +228,10 @@ public class Caliper {
             canvas.drawLine(0, bar2Position, canvas.getWidth(), bar2Position, paint);
             canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
         }
+        caliperText(canvas);
+    }
+
+    public void caliperText(Canvas canvas) {
         String text = measurement();
         if (direction == Direction.HORIZONTAL) {
             canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
@@ -233,7 +241,6 @@ public class Caliper {
             canvas.drawText(text, crossBarPosition + 5,
                     bar1Position + ((bar2Position - bar1Position) / 2), paint);
         }
-
     }
 
     public float barCoord(PointF p) {
@@ -302,6 +309,7 @@ public class Caliper {
         }
     }
 
+    // TODO: change to private method
     public boolean pointNearBar(PointF p, float barPosition) {
         return barCoord(p) > barPosition - DELTA && barCoord(p) < barPosition + DELTA;
     }
@@ -315,7 +323,13 @@ public class Caliper {
 //        -        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) + delta && p.y < fmaxf(self.bar2Position, self.bar1Position) - delta && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
 //        +        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) && p.y < fmaxf(self.bar2Position, self.bar1Position) && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
 
+    public boolean pointNearBar1(PointF p) {
+        return pointNearBar(p, bar1Position);
+    }
 
+    public boolean pointNearBar2(PointF p) {
+        return pointNearBar(p, bar2Position);
+    }
 
 
     public boolean pointNearCrossBar(PointF p) {
@@ -339,5 +353,27 @@ public class Caliper {
         return pointNearCrossBar(p)
                 || pointNearBar(p, bar1Position)
                 || pointNearBar(p, bar2Position);
+    }
+
+    public boolean requiresCalibration() {
+        return true;
+    }
+
+    public boolean isAngleCaliper() {
+        return false;
+    }
+
+    public void moveCrossBar(PointF delta) {
+        bar1Position += delta.x;
+        bar2Position += delta.x;
+        crossBarPosition += delta.y;
+    }
+
+    public void moveBar1(PointF delta, PointF location) {
+        bar1Position += delta.x;
+    }
+
+    public void moveBar2(PointF delta, PointF location) {
+        bar2Position += delta.x;
     }
 }
