@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
 
@@ -363,17 +364,17 @@ public class Caliper {
         return false;
     }
 
-    public void moveCrossBar(PointF delta) {
-        bar1Position += delta.x;
-        bar2Position += delta.x;
-        crossBarPosition += delta.y;
+    public void moveCrossBar(float deltaX, float deltaY, MotionEvent event) {
+        bar1Position += deltaX;
+        bar2Position += deltaX;
+        crossBarPosition += deltaY;
     }
 
-    public void moveBar1(PointF delta, PointF location) {
-        bar1Position += delta.x;
+    public void moveBar1(float delta, MotionEvent event) {
+        bar1Position += delta;
     }
 
-    public void moveBar2(PointF delta, PointF location) {
-        bar2Position += delta.x;
+    public void moveBar2(float delta, MotionEvent event) {
+        bar2Position += delta;
     }
 }
