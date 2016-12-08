@@ -78,4 +78,27 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         c.setDirection(Caliper.Direction.VERTICAL);
         assertEquals(c.barCoord(p),50.0f, 0.001);
     }
+
+    public void testUnitsAreMM() {
+        Calibration cal = new Calibration();
+        cal.setCalibrated(true);
+        cal.setDirection(Caliper.Direction.VERTICAL);
+        cal.setUnits("mm");
+        assertTrue(cal.unitsAreMM());
+        cal.setUnits("millimeters");
+        assertTrue(cal.unitsAreMM());
+        cal.setUnits("Millimeter");
+        assertTrue(cal.unitsAreMM());
+        cal.setUnits("MM");
+        assertTrue(cal.unitsAreMM());
+        cal.setUnits("milliM");
+        assertTrue(cal.unitsAreMM());
+        cal.setUnits("milliVolts");
+        assertFalse(cal.unitsAreMM());
+        cal.setUnits("mV");
+        assertFalse(cal.unitsAreMM());
+        cal.setUnits("msec");
+        assertFalse(cal.unitsAreMM());
+
+    }
 }
