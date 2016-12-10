@@ -102,6 +102,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Button backToImageMenuButton;
     private Button horizontalCaliperButton;
     private Button verticalCaliperButton;
+    private Button angleCaliperButton;
     private Button cancelAddCaliperButton;
     private Button setCalibrationButton;
     private Button clearCalibrationButton;
@@ -213,7 +214,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         attacher = new PhotoViewAttacher(imageView);
         attacher.setScaleType(ImageView.ScaleType.CENTER);
-        attacher.setMaximumScale(5.5f);
+        attacher.setMaximumScale(7.5f);
         attacher.setMinimumScale(0.3f);
         // We need to use MatrixChangeListener and not ScaleChangeListener
         // since the former only fires when scale has completely changed and
@@ -862,6 +863,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
         } else if (v == verticalCaliperButton) {
             addCaliperWithDirection(Caliper.Direction.VERTICAL);
+        } else if (v == angleCaliperButton) {
+            addAngleCaliper();
         } else if (v == selectImageButton) {
             selectImageFromGallery();
         } else if (v == cameraButton) {
@@ -909,6 +912,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // Add Caliper menu
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
+        angleCaliperButton = createButton(getString(R.string.angle_caliper_button_title));
         cancelAddCaliperButton = createButton(getString(R.string.cancel_button_title));
         // Adjust Image menu
         rotateImageRightButton = createButton(getString(R.string.rotate_image_right_button_title));
@@ -963,6 +967,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         ArrayList<TextView> buttons = new ArrayList<>();
         buttons.add(horizontalCaliperButton);
         buttons.add(verticalCaliperButton);
+        buttons.add(angleCaliperButton);
         buttons.add(cancelAddCaliperButton);
         addCaliperMenu = createMenu(buttons);
     }
@@ -1792,6 +1797,25 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         c.setRoundMsecRate(roundMsecRate);
         c.setInitialPosition(rect);
         getCalipers().add(c);
+    }
+
+    private void addAngleCaliper() {
+        AngleCaliper c = new AngleCaliper();
+        Rect rect = new Rect(0, 0, calipersView.getWidth(),
+                calipersView.getHeight());
+        c.setUnselectedColor(currentCaliperColor);
+        c.setSelectedColor(currentHighlightColor);
+        c.setColor(currentCaliperColor);
+        c.setLineWidth(currentLineWidth);
+        c.setUseLargeFont(useLargeFont);
+        c.setRoundMsecRate(roundMsecRate);
+        c.setDirection(Caliper.Direction.HORIZONTAL);
+        c.setCalibration(horizontalCalibration);
+        c.setVerticalCalibration(verticalCalibration);
+        c.setInitialPosition(rect);
+        getCalipers().add(c);
+        calipersView.invalidate();
+        selectMainMenu();
     }
 
     private void matrixChangedAction() {
