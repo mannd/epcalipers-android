@@ -740,6 +740,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             outState.putFloat(i + "CaliperCrossbarPosition",
                     transformCoordinate(c.getCrossbarPosition(), maxY));
             outState.putBoolean(i + "CaliperSelected", c.isSelected());
+            outState.putBoolean(i + "IsAngleCaliper", c.isAngleCaliper());
         }
         outState.putInt("CalipersCount", calipersCount());
     }
@@ -787,6 +788,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         int calipersCount = savedInstanceState.getInt("CalipersCount");
         for (int i = 0; i < calipersCount; i++) {
             String directionString = savedInstanceState.getString(i + "CaliperDirection");
+            boolean isAngleCaliper = savedInstanceState.getBoolean(i + "IsAngleCaliper");
             if (directionString == null) {
                 // something very wrong, give up on restoring calipers
                 return;
@@ -797,7 +799,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             float bar2Position = savedInstanceState.getFloat(i + "CaliperBar2Position");
             float crossbarPosition = savedInstanceState.getFloat(i + "CaliperCrossbarPosition");
             boolean selected = savedInstanceState.getBoolean(i + "CaliperSelected");
-            Caliper c = new Caliper();
+            Caliper c;
+            if (isAngleCaliper) {
+                c = new AngleCaliper();
+            }
+            else {
+                c = new Caliper();
+            }
             c.setDirection(direction);
 
             c.setBar1Position(bar1Position);
