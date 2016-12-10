@@ -375,11 +375,11 @@ public class Caliper {
         crossBarPosition += deltaY;
     }
 
-    public void moveBar1(float delta, MotionEvent event) {
+    public void moveBar1(float delta, float deltaY, MotionEvent event) {
         bar1Position += delta;
     }
 
-    public void moveBar2(float delta, MotionEvent event) {
+    public void moveBar2(float delta, float deltaY, MotionEvent event) {
         bar2Position += delta;
     }
 }

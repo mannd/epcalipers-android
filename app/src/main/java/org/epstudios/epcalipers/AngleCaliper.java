@@ -25,6 +25,8 @@ package org.epstudios.epcalipers;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.util.Log;
+import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
 
@@ -110,28 +112,7 @@ public class AngleCaliper extends Caliper {
                 getPaint());
     }
 
-//    public void draw(Canvas canvas) {
-//        if (direction == Direction.HORIZONTAL) {
-//            crossBarPosition = Math.min(crossBarPosition, canvas.getHeight() - DELTA);
-//            crossBarPosition = Math.max(crossBarPosition, DELTA);
-//            bar1Position = Math.min(bar1Position, canvas.getWidth() - DELTA);
-//            bar2Position = Math.max(bar2Position, DELTA);
-//            canvas.drawLine(bar1Position, 0, bar1Position, canvas.getHeight(), paint);
-//            canvas.drawLine(bar2Position, 0, bar2Position, canvas.getHeight(), paint);
-//            canvas.drawLine(bar2Position, crossBarPosition, bar1Position, crossBarPosition, paint);
-//        }
-//        else {  // draw vertical caliper
-//            crossBarPosition = Math.min(crossBarPosition, canvas.getWidth() - DELTA);
-//            crossBarPosition = Math.max(crossBarPosition, DELTA);
-//            bar1Position = Math.min(bar1Position, canvas.getHeight() - DELTA);
-//            bar2Position = Math.max(bar2Position, DELTA);
-//            canvas.drawLine(0, bar1Position, canvas.getWidth(), bar1Position, paint);
-//            canvas.drawLine(0, bar2Position, canvas.getWidth(), bar2Position, paint);
-//            canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
-//        }
-//        caliperText(canvas);
-//    }
-//
+
 //    public void caliperText(Canvas canvas) {
 //        String text = measurement();
 //        if (direction == Direction.HORIZONTAL) {
@@ -277,16 +258,18 @@ public class AngleCaliper extends Caliper {
         return radians * 180.0 / Math.PI;
     }
 
-    public void moveBar1(float deltaX, float deltaY, PointF location) {
-        bar1Angle = moveBarAngle(deltaX, deltaY, location);
+    @Override
+    public void moveBar1(float deltaX, float deltaY, MotionEvent event) {
+        bar1Angle = moveBarAngle(deltaX, deltaY, event);
     }
 
-    public void moveBar2(float deltaX, float deltaY, PointF location) {
-        bar2Angle = moveBarAngle(deltaX, deltaY, location);
+    @Override
+    public void moveBar2(float deltaX, float deltaY, MotionEvent event) {
+        bar2Angle = moveBarAngle(deltaX, deltaY, event);
     }
 
-    private double moveBarAngle(float deltaX, float deltaY, PointF location) {
-        PointF newPosition = new PointF(location.x + deltaX, location.y + deltaY);
+    private double moveBarAngle(float deltaX, float deltaY, MotionEvent event) {
+        PointF newPosition = new PointF(event.getX() + deltaX, event.getY() + deltaY);
         return relativeTheta(newPosition);
     }
 

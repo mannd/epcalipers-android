@@ -128,7 +128,7 @@ public class CalipersView extends View {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                                 float distanceY) {
-            move(e1, -distanceX, -distanceY);
+            move(e2, -distanceX, -distanceY);
             return true;
         }
 
@@ -283,10 +283,10 @@ public class CalipersView extends View {
             touchedCaliper.moveCrossBar(distanceX, distanceY, event);
         }
         else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR1) {
-            touchedCaliper.moveBar1(distanceX, event);
+            touchedCaliper.moveBar1(distanceX, distanceY, event);
         }
         else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR2) {
-            touchedCaliper.moveBar2(distanceX, event);
+            touchedCaliper.moveBar2(distanceX, distanceY, event);
         }
         invalidate();
     }
