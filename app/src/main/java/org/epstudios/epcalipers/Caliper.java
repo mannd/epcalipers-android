@@ -253,7 +253,7 @@ public class Caliper {
         return (direction == Direction.HORIZONTAL ? p.x : p.y);
     }
 
-    private String measurement() {
+    protected String measurement() {
         String result;
         if (roundMsecRate && (calibration.getDisplayRate() || calibration.unitsAreMsec())) {
             result = String.valueOf((int) Math.round(calibratedResult()));

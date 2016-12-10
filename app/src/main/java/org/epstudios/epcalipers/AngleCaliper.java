@@ -75,7 +75,7 @@ public class AngleCaliper extends Caliper {
         setBar2Position(100.0f);
         setCrossbarPosition(100.0f);
         setVerticalCalibration(null);
-        degreeDecimalFormat = new DecimalFormat("@@@##");
+        degreeDecimalFormat = new DecimalFormat("#.#");
 
     }
 
@@ -110,6 +110,7 @@ public class AngleCaliper extends Caliper {
                 bar2Angle, length);
         canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
                 getPaint());
+        caliperText(canvas);
     }
 
 
@@ -239,7 +240,8 @@ public class AngleCaliper extends Caliper {
         return endPoint;
     }
 
-    public String measurement() {
+    @Override
+    protected String measurement() {
         double angle = bar1Angle - bar2Angle;
         double degrees = radiansToDegrees(angle);
         return degreeDecimalFormat.format(degrees) + "°";
