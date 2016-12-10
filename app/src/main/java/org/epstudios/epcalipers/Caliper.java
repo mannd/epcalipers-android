@@ -118,6 +118,11 @@ public class Caliper {
     private int selectedColor;
     private boolean selected;
     private final DecimalFormat decimalFormat;
+
+    public Paint getPaint() {
+        return paint;
+    }
+
     private final Paint paint;
 
     public void setRoundMsecRate(boolean roundMsecRate) {

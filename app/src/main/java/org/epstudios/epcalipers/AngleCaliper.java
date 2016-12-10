@@ -22,13 +22,17 @@
 
 package org.epstudios.epcalipers;
 
+import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.Rect;
+
+import java.text.DecimalFormat;
 
 public class AngleCaliper extends Caliper {
 
     static float differential = 0.0f;
-
+    private final double angle_delta = 0.15;
+    private final float delta = 20.0f;
 
     public double getBar1Angle() {
         return bar1Angle;
@@ -57,6 +61,7 @@ public class AngleCaliper extends Caliper {
     private double bar1Angle;
     private double bar2Angle;
     private Calibration verticalCalibration;
+    private DecimalFormat degreeDecimalFormat;
 
     public AngleCaliper() {
         super();
@@ -68,6 +73,7 @@ public class AngleCaliper extends Caliper {
         setBar2Position(100.0f);
         setCrossbarPosition(100.0f);
         setVerticalCalibration(null);
+        degreeDecimalFormat = new DecimalFormat("@@@##");
 
     }
 
@@ -82,13 +88,63 @@ public class AngleCaliper extends Caliper {
         }
     }
 
-
     @Override
-    public boolean pointNearBar(PointF p, float barPosition) {
-        return false;
+    public void draw(Canvas canvas) {
+        //        CGFloat length = MAX(rect.size.height, rect.size.height) * 2;
+        float length = Math.max(canvas.getHeight(), canvas.getHeight() * 2);
+
+        setCrossbarPosition(Math.min(getCrossbarPosition(), canvas.getHeight() - delta));
+        setCrossbarPosition(Math.max(getCrossbarPosition(), delta));
+        setBar1Position(Math.min(getBar1Position(), canvas.getHeight() - delta));
+        setBar1Position(Math.max(getBar1Position(), delta));
+        setBar2Position(getBar1Position());
+
+        PointF endPointBar1 = endPointForPosition(new PointF(getBar1Position(), getCrossbarPosition()),
+                bar1Angle, length);
+        canvas.drawLine(getBar1Position(), getCrossbarPosition(), endPointBar1.x, endPointBar1.y,
+                getPaint());
+
+        PointF endPointBar2 = endPointForPosition(new PointF(getBar2Position(), getCrossbarPosition()),
+                bar2Angle, length);
+        canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
+                getPaint());
     }
 
-//- (void)drawWithContext:(CGContextRef)context inRect:(CGRect)rect {
+//    public void draw(Canvas canvas) {
+//        if (direction == Direction.HORIZONTAL) {
+//            crossBarPosition = Math.min(crossBarPosition, canvas.getHeight() - DELTA);
+//            crossBarPosition = Math.max(crossBarPosition, DELTA);
+//            bar1Position = Math.min(bar1Position, canvas.getWidth() - DELTA);
+//            bar2Position = Math.max(bar2Position, DELTA);
+//            canvas.drawLine(bar1Position, 0, bar1Position, canvas.getHeight(), paint);
+//            canvas.drawLine(bar2Position, 0, bar2Position, canvas.getHeight(), paint);
+//            canvas.drawLine(bar2Position, crossBarPosition, bar1Position, crossBarPosition, paint);
+//        }
+//        else {  // draw vertical caliper
+//            crossBarPosition = Math.min(crossBarPosition, canvas.getWidth() - DELTA);
+//            crossBarPosition = Math.max(crossBarPosition, DELTA);
+//            bar1Position = Math.min(bar1Position, canvas.getHeight() - DELTA);
+//            bar2Position = Math.max(bar2Position, DELTA);
+//            canvas.drawLine(0, bar1Position, canvas.getWidth(), bar1Position, paint);
+//            canvas.drawLine(0, bar2Position, canvas.getWidth(), bar2Position, paint);
+//            canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
+//        }
+//        caliperText(canvas);
+//    }
+//
+//    public void caliperText(Canvas canvas) {
+//        String text = measurement();
+//        if (direction == Direction.HORIZONTAL) {
+//            canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
+//                    crossBarPosition - 10, paint);
+//        }
+//        else {
+//            canvas.drawText(text, crossBarPosition + 5,
+//                    bar1Position + ((bar2Position - bar1Position) / 2), paint);
+//        }
+//    }
+
+    //- (void)drawWithContext:(CGContextRef)context inRect:(CGRect)rect {
 //
 //        CGContextSetStrokeColorWithColor(context, [self.color CGColor]);
 //        CGContextSetLineWidth(context, self.lineWidth);
@@ -143,14 +199,14 @@ public class AngleCaliper extends Caliper {
 //
 //        }
 //
-// test if angle is in inferior half of unit circle
-// these are the only angles relevant for Brugada triangle base measurement
 
+    // test if angle is in inferior half of unit circle
+    // these are the only angles relevant for Brugada triangle base measurement
     private boolean angleInSouthernHemisphere(double angle) {
         return 0.0 <= angle && angle <= Math.PI;
     }
 
-    private  double calibratedBaseResult(double lengthInPoints) {
+    private double calibratedBaseResult(double lengthInPoints) {
         lengthInPoints *= getCalibration().multiplier();
         if (isRoundMsecRate() && getCalibration().unitsAreMsec()) {
             lengthInPoints = Math.round(lengthInPoints);
@@ -164,54 +220,51 @@ public class AngleCaliper extends Caliper {
 //
 //        }
 //
-//        - (BOOL)pointNearBar:(CGPoint)p forBarAngle:(double)barAngle {
-//        double theta = [self relativeTheta:p];
-//        return theta < barAngle + ANGLE_DELTA && theta > barAngle - ANGLE_DELTA;
-//        }
+    private boolean pointNearBar(PointF p, double barAngle) {
+        double theta = relativeTheta(p);
+        return theta < barAngle + angle_delta && theta > barAngle - angle_delta;
+    }
+
+    private double relativeTheta(PointF p) {
+        float x = p.x - getBar1Position();
+        float y = p.y - getCrossbarPosition();
+        return Math.atan2(y,x);
+    }
+
+    @Override
+    public boolean pointNearBar1(PointF p) {
+        return pointNearBar(p, bar1Angle);
+    }
+
+    @Override
+    public boolean pointNearBar2(PointF p) {
+        return pointNearBar(p, bar2Angle);
+    }
+
+    public boolean pointNearCrossBar(PointF p) {
+        float delta = 40.0f;
+        return (p.x > getBar1Position() - delta && p.x < getBar1Position() + delta &&
+                p.y > getCrossbarPosition() - delta && p.y < getCrossbarPosition() + delta);
+    }
+
+    public boolean pointNearCaliper(PointF p) {
+        return pointNearCrossBar(p) || pointNearBar1(p) || pointNearBar2(p);
+    }
+
+    public PointF endPointForPosition(PointF p, double angle, float length) {
+        float endX = (float)Math.cos(angle) * length + p.x;
+        float endY = (float)Math.sin(angle) * length + p.y;
+        PointF endPoint = new PointF(endX, endY);
+        return endPoint;
+    }
+
+    public String measurement() {
+        double angle = bar1Angle - bar2Angle;
+        double degrees = radiansToDegrees(angle);
+        return degreeDecimalFormat.format(degrees) + "°";
+    }
 //
-//        - (double)relativeTheta:(CGPoint)p {
-//        float x = p.x - self.bar1Position;
-//        float y = p.y - self.crossBarPosition;
-//        return atan2(y, x);
-//        }
-//
-//        - (BOOL)pointNearBar1:(CGPoint)p {
-//        return [self pointNearBar:p forBarAngle:self.angleBar1];
-//        }
-//
-//        - (BOOL)pointNearBar2:(CGPoint)p {
-//        return [self pointNearBar:p forBarAngle:self.angleBar2];
-//        }
-//
-//        - (BOOL)pointNearCrossBar:(CGPoint)p {
-//        float delta = 40.0f;
-//        return (p.x > self.bar1Position - delta && p.x < self.bar1Position + delta && p.y > self.crossBarPosition - delta && p.y < self.crossBarPosition + delta);
-//        }
-//
-//        - (BOOL)pointNearCaliper:(CGPoint)p {
-//        return [self pointNearCrossBar:p] || [self pointNearBar1:p]
-//        || [self pointNearBar2:p];
-//        }
-//
-//        - (CGPoint)endPointForPosition:(CGPoint)p forAngle:(double)angle andLength:(CGFloat)length {
-//        double endX = cos(angle) * length + p.x;
-//        double endY = sin(angle) * length + p.y;
-//        CGPoint endPoint = CGPointMake(endX, endY);
-//        return endPoint;
-//        }
-//
-//        - (NSString *)measurement {
-//        double angle = self.angleBar1 - self.angleBar2;
-//        double degrees = [AngleCaliper radiansToDegrees:angle];
-//        NSString *text = [NSString stringWithFormat:@"%.1f°", degrees];
-//        return text;
-//        }
-//
-//// override intervalResult to give angle in radians to calling functions
-//        - (double)intervalResult {
-//        return self.angleBar1 - self.angleBar2;
-//        }
-//
+
 //        - (NSString *)alphaAngle {
 //        // the angle between bar2 and a vertical
 //        double angle = 0.5 * M_PI - self.angleBar2;
@@ -220,31 +273,33 @@ public class AngleCaliper extends Caliper {
 //        return text;
 //        }
 //
-//// provide this a utility to calling classes
-//        + (double)radiansToDegrees:(double)radians {
-//        return radians * 180.0 / M_PI;
-//        }
-//
-//        - (void)moveBar1:(CGPoint)delta forLocation:(CGPoint)location {
-//        self.angleBar1 = [self moveBarAngle:delta forLocation:location];
-//        }
-//
-//        - (void)moveBar2:(CGPoint)delta forLocation:(CGPoint)location {
-//        self.angleBar2 = [self moveBarAngle:delta forLocation:location];
-//        }
-//
-//        - (double)moveBarAngle:(CGPoint)delta forLocation:(CGPoint)location {
-//        CGPoint newPosition = CGPointMake(location.x + delta.x, location.y + delta.y);
-//        return [self relativeTheta:newPosition];
-//        }
-//
-//        - (BOOL)requiresCalibration {
-//        return NO;
-//        }
-//
-//        - (BOOL)isAngleCaliper {
-//        return YES;
-//        }
+    static public double radiansToDegrees(double radians) {
+        return radians * 180.0 / Math.PI;
+    }
+
+    public void moveBar1(float deltaX, float deltaY, PointF location) {
+        bar1Angle = moveBarAngle(deltaX, deltaY, location);
+    }
+
+    public void moveBar2(float deltaX, float deltaY, PointF location) {
+        bar2Angle = moveBarAngle(deltaX, deltaY, location);
+    }
+
+    private double moveBarAngle(float deltaX, float deltaY, PointF location) {
+        PointF newPosition = new PointF(location.x + deltaX, location.y + deltaY);
+        return relativeTheta(newPosition);
+    }
+
+    @Override
+    public boolean requiresCalibration() {
+        return false;
+    }
+
+    @Override
+    public boolean isAngleCaliper() {
+        return true;
+    }
+
 //
 //// height of triangle in points, angle1 is angle of bar1, angle2 of bar2, in radians
 //// returns length of base of triangle in points
