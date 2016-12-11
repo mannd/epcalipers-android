@@ -129,6 +129,8 @@ public class AngleCaliper extends Caliper {
         PointF point2 = getBasePoint2ForHeight(height);
         double lengthInPoints = point2.x - point1.x;
         canvas.drawLine(point1.x, point1.y, point2.x, point2.y, getPaint());
+        canvas.drawText(baseMeasurement(lengthInPoints), point1.x + (point2.x - point1.x) / 2,
+                point1.y - 10, getPaint());
 
     }
 
@@ -223,12 +225,20 @@ public class AngleCaliper extends Caliper {
         return 0.0 <= angle && angle <= Math.PI;
     }
 
-    private double calibratedBaseResult(double lengthInPoints) {
+    private String calibratedBaseResult(double lengthInPoints) {
+        String result;
         lengthInPoints *= getCalibration().multiplier();
         if (isRoundMsecRate() && getCalibration().unitsAreMsec()) {
-            lengthInPoints = Math.round(lengthInPoints);
+            result = String.valueOf((int)Math.round(lengthInPoints));
         }
-        return lengthInPoints;
+        else {
+            result = getDecimalFormat().format(lengthInPoints);
+        }
+        return result;
+    }
+
+    private String baseMeasurement(double lengthInPoints) {
+        return calibratedBaseResult(lengthInPoints) + " " + getCalibration().getUnits();
     }
 
 //        - (NSString *)baseMeasurement:(double)lengthInPoints {

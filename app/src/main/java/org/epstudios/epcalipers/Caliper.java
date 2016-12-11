@@ -117,6 +117,11 @@ public class Caliper {
 
     private int selectedColor;
     private boolean selected;
+
+    public DecimalFormat getDecimalFormat() {
+        return decimalFormat;
+    }
+
     private final DecimalFormat decimalFormat;
 
     public Paint getPaint() {
