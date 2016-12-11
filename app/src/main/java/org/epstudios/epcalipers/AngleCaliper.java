@@ -99,7 +99,7 @@ public class AngleCaliper extends Caliper {
 
         setCrossbarPosition(Math.min(getCrossbarPosition(), canvas.getHeight() - delta));
         setCrossbarPosition(Math.max(getCrossbarPosition(), delta));
-        setBar1Position(Math.min(getBar1Position(), canvas.getHeight() - delta));
+        setBar1Position(Math.min(getBar1Position(), canvas.getWidth() - delta));
         setBar1Position(Math.max(getBar1Position(), delta));
         setBar2Position(getBar1Position());
 
