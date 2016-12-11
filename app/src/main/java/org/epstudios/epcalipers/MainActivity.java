@@ -155,6 +155,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Menu menu;
     private boolean useLargeFont;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
+    private final float max_zoom = 10.0f;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -214,7 +215,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         attacher = new PhotoViewAttacher(imageView);
         attacher.setScaleType(ImageView.ScaleType.CENTER);
-        attacher.setMaximumScale(7.5f);
+        attacher.setMaximumScale(max_zoom);
         attacher.setMinimumScale(0.3f);
         // We need to use MatrixChangeListener and not ScaleChangeListener
         // since the former only fires when scale has completely changed and
