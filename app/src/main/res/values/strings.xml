@@ -32,7 +32,7 @@
     <string name="help_title">Help</string>
     <string name="switch_mode_title">Switch</string>
     <string name="no_time_caliper_selected_title">No Time Caliper Selected</string>
-    <string name="no_time_caliper_selected_message">Use a selected (highlighted) caliper to
+    <string name="no_time_caliper_selected_message">Select a time caliper to
         measure one or more RR intervals.</string>
     <string name="no_calipers_alert_title">No Calipers To Use</string>
     <string name="no_calipers_alert_message">Add one or more calipers first
@@ -111,4 +111,6 @@
     <string name="round_msec_rate_label">Round msec and heart rate</string>
     <string name="round_msec_rate_off_summary">No rounding of intervals and rates</string>
     <string name="round_msec_rate_on_summary">Msec and heart rate rounded to nearest integer</string>
+    <string name="angle_caliper_title">Angle Caliper</string>
+    <string name="angle_caliper_calibration_message">Angle calipers don\'t require calibration.  Only time or amplitude calipers need to be calibrated.  If you want to use an angle caliper as a Brugadometer, you must first calibrate time and amplitude calipers.</string>
 </resources>

@@ -35,6 +35,8 @@ public class AngleCaliper extends Caliper {
     static float differential = 0.0f;
     private final double angle_delta = 0.15;
     private final float delta = 20.0f;
+    // this constant is number of mm for height of Brugada triangle
+    private final double brugada_triangle_height = 5.0;
 
     public double getBar1Angle() {
         return bar1Angle;
@@ -111,6 +113,39 @@ public class AngleCaliper extends Caliper {
         canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
                 getPaint());
         caliperText(canvas);
+
+        // triangle base for Brugadometer
+        if (getVerticalCalibration() != null && getVerticalCalibration().isCalibrated() && getVerticalCalibration().unitsAreMM()) {
+            if (angleInSouthernHemisphere(bar1Angle) && angleInSouthernHemisphere(bar2Angle)) {
+                double pointsPerMM = 1.0 / getVerticalCalibration().multiplier();
+                drawTriangleBase(canvas, brugada_triangle_height * pointsPerMM);
+            }
+        }
+    }
+
+    // note: height is in points
+    private void drawTriangleBase(Canvas canvas, double height) {
+        PointF point1 = getBasePoint1ForHeight(height);
+        PointF point2 = getBasePoint2ForHeight(height);
+        double lengthInPoints = point2.x - point1.x;
+        canvas.drawLine(point1.x, point1.y, point2.x, point2.y, getPaint());
+
+    }
+
+    private PointF getBasePoint1ForHeight(double height) {
+        double pointY = getCrossbarPosition() + height;
+        double pointX = 0;
+        pointX = height * (Math.sin(bar1Angle - Math.PI / 2) / Math.sin(Math.PI - bar1Angle));
+        pointX = getBar1Position() - pointX;
+        return new PointF((float)pointX, (float)pointY);
+    }
+
+    private PointF getBasePoint2ForHeight(double height) {
+        double pointY = getCrossbarPosition() + height;
+        double pointX = 0;
+        pointX = height * (Math.sin(Math.PI / 2 - bar2Angle) / Math.sin(bar2Angle));
+        pointX += getBar1Position();
+        return new PointF((float)pointX, (float)pointY);
     }
 
 

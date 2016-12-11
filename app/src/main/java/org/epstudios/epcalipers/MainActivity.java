@@ -802,6 +802,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             Caliper c;
             if (isAngleCaliper) {
                 c = new AngleCaliper();
+                ((AngleCaliper)c).setVerticalCalibration(verticalCalibration);
             }
             else {
                 c = new Caliper();
@@ -1535,7 +1536,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private boolean noTimeCaliperSelected() {
         return calipersCount() < 1 ||
                 calipersView.noCaliperIsSelected() ||
-                calipersView.activeCaliper().getDirection() == Caliper.Direction.VERTICAL;
+                calipersView.activeCaliper().getDirection() == Caliper.Direction.VERTICAL ||
+                calipersView.activeCaliper().isAngleCaliper();
+    }
+
+    private boolean noAngleCaliperSelected() {
+        return calipersCount() < 1 ||
+                calipersView.noCaliperIsSelected() ||
+                !calipersView.activeCaliper().isAngleCaliper();
     }
 
     private void noCaliperSelectedAlert() {
@@ -1568,6 +1576,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Caliper c = calipersView.activeCaliper();
         if (c == null) {
             return; // shouldn't happen, but if it does...
+        }
+        if (!c.requiresCalibration()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.angle_caliper_title);
+            builder.setMessage(R.string.angle_caliper_calibration_message);
+            builder.setNegativeButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.show();
+            return;
         }
         String example;
         if (c.getDirection() == Caliper.Direction.VERTICAL) {
@@ -1762,6 +1783,21 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (calipersCount() > 0) {
             for (Caliper caliper : getCalipers()) {
                 if (caliper.getDirection() == Caliper.Direction.HORIZONTAL) {
+                    c = caliper;
+                    n++;
+                }
+            }
+        }
+        return (n == 1) ? c : null;
+    }
+
+    // will be used when Brugadometer button/calculator is implemented
+    private Caliper getLoneAngleCaliper() {
+        Caliper c = null;
+        int n = 0;
+        if (calipersCount() > 0) {
+            for (Caliper caliper : getCalipers()) {
+                if (caliper.isAngleCaliper()) {
                     c = caliper;
                     n++;
                 }
