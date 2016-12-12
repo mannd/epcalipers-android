@@ -84,9 +84,9 @@
     <string name="invalid_result_message">Invalid Result</string>
     <string name="calculated_qtc_dialog_title">Calculated QTc</string>
     <string name="quick_start_title">EP Calipers Quick Start</string>
-    <string name="quick_start_message">What\'s new: Straighten your ECG image
-        better using 0.1 degree rotation controls.  Help now has
-        a table of contents.\n\nQuick Start: Use your
+    <string name="quick_start_message">What\'s new: Use angle calipers to make angle measurements.
+        Evaluate ECGs for Brugada pattern using new Brugadometer.
+        \n\nQuick Start: Use your
         fingers to move and position calipers or move and zoom the
         image.\n\nAdd calipers with the *+* menu item, single tap a
         caliper to select it, tap again to unselect, and double tap to
@@ -112,5 +112,8 @@
     <string name="round_msec_rate_off_summary">No rounding of intervals and rates</string>
     <string name="round_msec_rate_on_summary">Msec and heart rate rounded to nearest integer</string>
     <string name="angle_caliper_title">Angle Caliper</string>
-    <string name="angle_caliper_calibration_message">Angle calipers don\'t require calibration.  Only time or amplitude calipers need to be calibrated.  If you want to use an angle caliper as a Brugadometer, you must first calibrate time and amplitude calipers.</string>
+    <string name="angle_caliper_calibration_message">Angle calipers don\'t require calibration.
+        Only time or amplitude calipers need to be calibrated.
+        If you want to use an angle caliper as a Brugadometer,
+        you must first calibrate time and amplitude calipers.</string>
 </resources>
