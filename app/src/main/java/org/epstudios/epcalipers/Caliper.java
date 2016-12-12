@@ -320,8 +320,7 @@ public class Caliper {
         }
     }
 
-    // TODO: change to private method
-    public boolean pointNearBar(PointF p, float barPosition) {
+    private boolean pointNearBar(PointF p, float barPosition) {
         return barCoord(p) > barPosition - DELTA && barCoord(p) < barPosition + DELTA;
     }
 

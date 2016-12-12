@@ -158,6 +158,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
     private final float max_zoom = 10.0f;
 
+    // TODO: make false for release
+    private final boolean force_first_run = true;
+
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
@@ -399,7 +402,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        if (getFirstRun(prefs)) {
+        // TODO: update BOTH quick_start_messages (there are 2 strings.xml files)
+        if (force_first_run || getFirstRun(prefs)) {
             Log.d(EPS, "firstRun");
             setRunned(prefs);
             AlertDialog.Builder builder = new AlertDialog.Builder(this);

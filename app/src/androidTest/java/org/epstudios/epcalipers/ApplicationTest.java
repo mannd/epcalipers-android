@@ -99,6 +99,24 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertFalse(cal.unitsAreMM());
         cal.setUnits("msec");
         assertFalse(cal.unitsAreMM());
-
     }
+
+    public void testRadiansToDegrees() {
+        double angle = 0;
+        assert(AngleCaliper.radiansToDegrees(angle) == 0.0);
+        angle = Math.PI / 2.0;
+        assert(AngleCaliper.radiansToDegrees(angle) == 90.0);
+        angle = Math.PI;
+        assert(AngleCaliper.radiansToDegrees(angle) == 180.0);
+    }
+
+    public void testIsAngleCaliper() {
+        Caliper caliper = new Caliper();
+        assertTrue(caliper.requiresCalibration());
+        assertFalse(caliper.isAngleCaliper());
+        Caliper angleCaliper = new AngleCaliper();
+        assertFalse(angleCaliper.requiresCalibration());
+        assertTrue(angleCaliper.isAngleCaliper());
+    }
+
 }

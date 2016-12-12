@@ -86,13 +86,12 @@
     <string name="quick_start_title">EP Calipers Quick Start</string>
     <string name="quick_start_message">What\'s new: Use angle calipers to make angle measurements.
         Evaluate ECGs for Brugada pattern using new Brugadometer.
-        \n\nQuick Start: Use your
-        fingers to move and position calipers or move and zoom the
+        \n\nQuick Start: Use your fingers to move and position calipers or move and zoom the
         image.\n\nAdd calipers with the *+* menu item, single tap a
         caliper to select it, tap again to unselect, and double tap to
         delete a caliper.  After calibration the menu items that allow
         toggling interval and rate and calculating mean rates and QTc will
-        be enabled.\n\nUse the *Switch* button on the top right to load
+        be enabled.\n\nUse the *Image* button on the top right to load
         and adjust ECG images.\n\nSee the *Help* menu item for full
         help.</string>
     <string name="opening_pdf_message">Opening PDF</string>
@@ -114,6 +113,6 @@
     <string name="angle_caliper_title">Angle Caliper</string>
     <string name="angle_caliper_calibration_message">Angle calipers don\'t require calibration.
         Only time or amplitude calipers need to be calibrated.
-        If you want to use an angle caliper as a Brugadometer,
+        \n\nIf you want to use an angle caliper as a Brugadometer,
         you must first calibrate time and amplitude calipers.</string>
 </resources>

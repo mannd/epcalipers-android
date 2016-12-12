@@ -151,73 +151,6 @@ public class AngleCaliper extends Caliper {
     }
 
 
-//    public void caliperText(Canvas canvas) {
-//        String text = measurement();
-//        if (direction == Direction.HORIZONTAL) {
-//            canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
-//                    crossBarPosition - 10, paint);
-//        }
-//        else {
-//            canvas.drawText(text, crossBarPosition + 5,
-//                    bar1Position + ((bar2Position - bar1Position) / 2), paint);
-//        }
-//    }
-
-    //- (void)drawWithContext:(CGContextRef)context inRect:(CGRect)rect {
-//
-//        CGContextSetStrokeColorWithColor(context, [self.color CGColor]);
-//        CGContextSetLineWidth(context, self.lineWidth);
-//
-//        // This ensures caliper always extends past the screen edges
-//        CGFloat length = MAX(rect.size.height, rect.size.height) * 2;
-//
-//        // Make sure focal point never too close to screen edges
-//        self.crossBarPosition = fminf(self.crossBarPosition, rect.size.height - DELTA);
-//        self.crossBarPosition = fmaxf(self.crossBarPosition, DELTA);
-//        self.bar1Position = fminf(self.bar1Position, rect.size.width - DELTA);
-//        self.bar1Position = fmaxf (self.bar1Position, DELTA);
-//        self.bar2Position = self.bar1Position;
-//
-//        CGPoint endPointBar1 = [self endPointForPosition:CGPointMake(self.bar1Position, self.crossBarPosition) forAngle:self.angleBar1 andLength:length];
-//        CGContextMoveToPoint(context, self.bar1Position, self.crossBarPosition);
-//        CGContextAddLineToPoint(context, endPointBar1.x, endPointBar1.y);
-//
-//        CGPoint endPointBar2 = [self endPointForPosition:CGPointMake(self.bar2Position, self.crossBarPosition) forAngle:self.angleBar2 andLength:length];
-//        CGContextMoveToPoint(context, self.bar2Position, self.crossBarPosition);
-//        CGContextAddLineToPoint(context, endPointBar2.x, endPointBar2.y);
-//        CGContextStrokePath(context);
-//        [self caliperText];
-//
-//        if (self.verticalCalibration.calibrated && self.verticalCalibration.unitsAreMM) {
-//        if ([self angleInSouthernHemisphere:self.angleBar1] && [self angleInSouthernHemisphere:self.angleBar2]) {
-//        double pointsPerMM = 1.0 / self.verticalCalibration.multiplier;
-//        [self drawTriangleBase:context forHeight:5 * pointsPerMM];
-//        // draw label
-//        }
-//        }
-//        }
-//
-//        - (void)drawTriangleBase:(CGContextRef)context forHeight:(double)height {
-//        CGPoint point1 = [self getBasePoint1ForHeight:height];
-//        CGPoint point2 = [self getBasePoint2ForHeight:height];
-//        double lengthInPoints = point2.x - point1.x;
-//        CGContextMoveToPoint(context, point1.x, point1.y);
-//        CGContextAddLineToPoint(context, point2.x, point2.y);
-//        CGContextStrokePath(context);
-//
-//        NSString *text = [self baseMeasurement:lengthInPoints];
-//        self.paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
-//        self.paragraphStyle.alignment = NSTextAlignmentCenter;
-//
-//        [self.attributes setObject:self.textFont forKey:NSFontAttributeName];
-//        [self.attributes setObject:self.paragraphStyle forKey:NSParagraphStyleAttributeName];
-//        [self.attributes setObject:self.color forKey:NSForegroundColorAttributeName];
-//
-//        // same positioning as
-//        [text drawInRect:CGRectMake((point2.x > point1.x ? point1.x - 25: point2.x - 25), point1.y - 20,  fmax(100.0, fabs(point2.x - point1.x) + 50), 20)  withAttributes:self.attributes];
-//
-//        }
-//
 
     // test if angle is in inferior half of unit circle
     // these are the only angles relevant for Brugada triangle base measurement
@@ -241,12 +174,6 @@ public class AngleCaliper extends Caliper {
         return calibratedBaseResult(lengthInPoints) + " " + getCalibration().getUnits();
     }
 
-//        - (NSString *)baseMeasurement:(double)lengthInPoints {
-//        NSString *s = [NSString stringWithFormat:@"%.4g %@", [self calibratedBaseResult:lengthInPoints], self.calibration.units];
-//        return s;
-//
-//        }
-//
     private boolean pointNearBar(PointF p, double barAngle) {
         double theta = relativeTheta(p);
         return theta < barAngle + angle_delta && theta > barAngle - angle_delta;
@@ -329,60 +256,5 @@ public class AngleCaliper extends Caliper {
     public boolean isAngleCaliper() {
         return true;
     }
-
-//
-//// height of triangle in points, angle1 is angle of bar1, angle2 of bar2, in radians
-//// returns length of base of triangle in points
-//        + (double)calculateBaseFromHeight:(double)height andAngle1:(double)angle1 andAngle2:(double)angle2 {
-//        // alpha, beta, gamma are 3 angles of the triangle, starting at apex, going clockwise
-//        // a, b, c are vertices of triangle
-//        // m is intersection of height segment with base
-//        // alpha = angle1 - angle2;
-//        // alpha1 is angle between bar1 and height, alpha2 between height and bar2
-//        double alpha1 = angle1 - M_PI_2;
-//        double alpha2 = M_PI_2 - angle2;
-//        double beta = M_PI_2 - alpha2;
-//        double gamma = M_PI_2 - alpha1;
-//        double mb = height * sin(alpha2) / sin(beta);
-//        double cm = height * sin(alpha1) / sin(gamma);
-//        double base = cm + mb;
-//        return base;
-//        }
-//
-//// Note all angles in radians
-//        + (double)brugadaRiskV1ForBetaAngle:(double)betaAngle andBase:(double)base {
-//        betaAngle = [AngleCaliper radiansToDegrees:betaAngle];
-//        double numerator = pow(M_E, 6.297 + (-0.1714 * betaAngle) + (-0.0399 * base));
-//        double denominator = 1 + numerator;
-//        return numerator / denominator;
-//        }
-//
-//        + (double)brugadaRiskV2ForBetaAngle:(double)betaAngle andBase:(double)base {
-//        betaAngle = [AngleCaliper radiansToDegrees:betaAngle];
-//        double numerator = pow(M_E, 5.9756 + (-0.3568 * betaAngle) + (-0.9332 * base));
-//        double denominator = 1 + numerator;
-//        return numerator / denominator;
-//        }
-//
-//// figure out base coordinates
-//        - (CGPoint)getBasePoint2ForHeight:(double)height {
-//        double pointY = self.crossBarPosition + height;
-//        double pointX = 0.0;
-//        pointX = height * (sin(M_PI_2 - self.angleBar2) / sin(self.angleBar2));
-//        pointX += self.bar1Position;
-//        CGPoint point = CGPointMake(pointX, pointY);
-//        return point;
-//        }
-//
-//        - (CGPoint)getBasePoint1ForHeight:(double)height {
-//        double pointY = self.crossBarPosition + height;
-//        double pointX = 0.0;
-//        pointX = height * (sin(self.angleBar1 - M_PI_2) / sin(M_PI - self.angleBar1));
-//        pointX = self.bar1Position - pointX;
-//        CGPoint point = CGPointMake(pointX, pointY);
-//        return point;
-//        }
-//
-//@end
 
 }
