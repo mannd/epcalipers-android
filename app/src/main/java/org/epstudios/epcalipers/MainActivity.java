@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final float max_zoom = 10.0f;
 
     // TODO: make false for release
-    private final boolean force_first_run = true;
+    private final boolean force_first_run = false;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
