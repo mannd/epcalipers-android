@@ -21,7 +21,7 @@ You open the ECG on your phone.  You look at the QT interval.  You're not sure a
 * Electronic Calipers
 *EP Calipers* provides *electronic calipers* for measuring intervals on images of electrocardiograms (ECGs) or electrophysiologic recordings.  In the electrophysiology lab electronic calipers are included as part of the recording system.  *EP Calipers* is intended to provide similar electronic calipers for use on your Android phone or tablet.  The electronic calipers of *EP Calipers* are more accurate, easier to use, and less dangerous than mechanical calipers (they don't have sharp points!).
 * What's new?
-This new version of *EP Calipers* can be used to analyze PDF files, as well as standard image files.  Multi-page PDF files are supported.  Thus the app can be used to analyze /AliveCor™/ files as well as academic papers in PDF format.
+This new version of *EP Calipers* contains new angle measurement calipers and a [[Brugadometer]].
 * Quick start
 When *EP Calipers* starts, a sample ECG and a time caliper are loaded.
 Move the caliper around by touching the caliper's crossbar and
@@ -50,7 +50,7 @@ make a quick measurement when you don't need to save the image.  If you want to 
 ** Select a photo from your photo gallery
 Touch *Select* to chose an image that is already saved on your device in your photos collection, for example an image file attached to an email that you saved or a photo that your previously took.
 ** Select a photo or PDF using the *Share* menu from other apps
-*EP Calipers* can open image and PDF files regardless of where they are located on your device.  You can directly open email attachments, downloaded files, Google Drive, and Dropbox files.  It is also easy to open ECG images directly from the /AliveCor AliveECG™/ app.  The key to opening images in external apps is to use the *Share* button.  It usually looks like this: 
+*EP Calipers* can open image and PDF files regardless of where they are located on your device.  You can directly open email attachments, downloaded files, Google Drive, and Dropbox files.  It is also easy to open ECG images directly from the /AliveCor Kardia™/ app.  The key to opening images in external apps is to use the *Share* button.  It usually looks like this: 
 #+CAPTION: Android *Share* button
 [[./android_share_button.png]]
 
@@ -59,11 +59,11 @@ Some apps use a different button style or distinguish between "sharing" and "ope
 #+CAPTION: Dropbox *Open with* button (left button)
 [[./dropbox_share_button.png]]
 
-The /AliveECG/ app from /AliveCor/ uses yet another style.
-#+CAPTION: /AliveECG/ *Share* button using an envelope icon
+The /Kardia/ app from /AliveCor/ uses yet another style.
+#+CAPTION: /Kardia/ *Share* button using an envelope icon
 [[./alivecor_share_button.png]]
 
-Once you select the /AliveECG/ *Share* button, a dialog opens.  Select *PDF*.
+Once you select the /Kardia/ *Share* button, a dialog opens.  Select *PDF*.
 #+CAPTION: Select *PDF* to create a PDF file that can be opened by *EP Calipers*
 [[./alivecor_dialog.png]]
 
@@ -93,19 +93,27 @@ After loading and adjusting the image, you need to exit Image mode so that you c
 #+CAPTION: Use the *Measure* button to exit *Image* mode
 [[./measure_button.png]]
 
+* Types of calipers
+Calipers can be horizontal for time measurements, vertical for amplitude measurements or angle shaped to measure angles in degrees.  Time calipers look like the letter *H*, amplitude calipers like an *H* lying on its side, and angle calipers start out looking like an upside down *V*.  
 * Moving calipers
+** Time and amplitude calipers
 Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bars (or top or bottom in the case of vertical calipers) to stretch or shrink the calipers.  Note that you cannot pinch both bars at the same time.
 #+CAPTION: Single unselected uncalibrated time caliper
 [[./unselected_time_caliper.png]]
 
+** Angle calipers
+Angle calipers are moved as a unit by dragging at the apex or just above the apex of the angle.  The apex is where the two lines join together.  Dragging either bar of an angle caliper a little distance away from the apex will open or close the angle.
+#+CAPTION: Angle caliper
+[[./angle_caliper.png]]
+
 * Making measurements
-The interval measured by each caliper is displayed next to the crossbar of the caliper.  Until the calipers are calibrated, measurements are displayed in arbitrary units (points, roughly equivalent to screen pixels)).
+The interval measured by time or amplitude calipers is displayed on top of or next to the crossbar of the caliper.  Until these calipers are calibrated, measurements are displayed in arbitrary units (points, roughly equivalent to screen pixels).  Angle calipers show a measurement of the current angle in degrees and do not need to be calibrated to display angles.
 * Adding and deleting calipers
 Select the *+* or *Add Caliper* button to add new calipers.[fn:1]
 #+CAPTION: Main menu, prior to calibration
 [[./main_menu_uncalibrated.png]]
 
-Calipers can be horizontal (time measurements) or vertical (amplitude measurements).  Select *Time* or *Amplitude* to add the type of caliper you want.  Double-tap a caliper to delete it.
+Select *Time*, *Amplitude*, or *Angle* to add the type of caliper you want.  Double-tap a caliper to delete it.
 #+CAPTION: Add caliper menu
 [[./add_caliper_menu.png]]
 
@@ -122,6 +130,7 @@ Select *Cal* or *Calibrate*.  Stretch the selected caliper over a known interval
 #+CAPTION: Calibrated time caliper
 [[./calibrated_caliper.png]]
 
+Angle calipers do not need to be calibrated.  However, after calibration of time and amplitude calipers, angle calipers can be used as a [[Brugadometer]].
 * Changing calibration
 You can recalibrate at any time.  You can clear all calibration by selecting *Clear* in the calibration toolbar.  Note that calibration is maintained if the device is rotated or the image is zoomed.  Selecting a new image will reset calibration.
 * Interval/Rate
@@ -138,11 +147,18 @@ Select *QTc*.  Stretch a time caliper over one or more RR intervals and select *
 
 #+CAPTION: QTc result
 [[./qtc_result.png]]
+* Brugadometer
+The *Brugadometer* is a diagnostic tool for Brugada syndrome developed in collaboration with Dr. Adrian Baranchuk and his colleagues at Queen's University Kingston, Ontario, Canada.  It is a tool intended to distinguish between ECGs with a Brugada syndrome pattern in leads V1 or V2 and ECGs with incomplete right bundle branch block.  This tool is under development in *EP Calipers* and will likely evolve in future updates.  In order to use the *Brugadometer*, it is necessary to calibrate an amplitude caliper in millimeters (mm) and to calibrate a time caliper preferably in msec or mm.  After doing so, an angle caliper will appear to have a triangle at its apex as shown below.
+#+CAPTION: Brugadometer showing triangle base 5 mm below apex of caliper
+[[./brugadometer1.png]]
+
+The triangle base will be located 5 mm below the apex of the triangle.  Proper alignment of this triangle with an r' wave in a person with a suspected Brugada ECG will provide measurement of the so-called /beta angle/ and the triangle base.  A triangle base > 160 msec (4 mm at standard ECG recording speed of 25 mm/sec) has an increased probability of being a Brugada ECG.   Please see [[https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4040869/][de Luna AB, Garcia-Niebla J, Baranchuk A.  New electrocardiographic features in Brugada syndrome. Curr Cardiol Rev. 2014 Aug; 10(3): 175-180]] for further information.
 
 * Settings
 Preferences such as caliper colors and default calibration intervals can be selected using the *Settings* menu item on the toolbar at the top of the app.
 * Acknowledgments
 - Thanks to Dr. Michael Katz for the concept.
+- Thanks to Dr. Adrian Baranchuk and his colleagues at Queen's University Kingston, Ontario, Canada for the concept of the Brugadometer and for assistance in implementing this algorithm.
 - The source code for *EP Calipers* is available on [[https://github.com/mannd/epcalipers-android][GitHub]].
 - *EP Calipers* is open source software and is licensed under the [[https://www.gnu.org/copyleft/gpl.html][GNU
   General Public License version 3]].  No guarantees are made as to the

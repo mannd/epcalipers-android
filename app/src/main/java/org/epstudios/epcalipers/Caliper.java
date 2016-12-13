@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
 
@@ -116,11 +117,25 @@ public class Caliper {
 
     private int selectedColor;
     private boolean selected;
+
+    public DecimalFormat getDecimalFormat() {
+        return decimalFormat;
+    }
+
     private final DecimalFormat decimalFormat;
+
+    public Paint getPaint() {
+        return paint;
+    }
+
     private final Paint paint;
 
     public void setRoundMsecRate(boolean roundMsecRate) {
         this.roundMsecRate = roundMsecRate;
+    }
+
+    public boolean isRoundMsecRate() {
+        return roundMsecRate;
     }
 
     private boolean roundMsecRate;
@@ -224,6 +239,10 @@ public class Caliper {
             canvas.drawLine(0, bar2Position, canvas.getWidth(), bar2Position, paint);
             canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
         }
+        caliperText(canvas);
+    }
+
+    public void caliperText(Canvas canvas) {
         String text = measurement();
         if (direction == Direction.HORIZONTAL) {
             canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
@@ -233,14 +252,13 @@ public class Caliper {
             canvas.drawText(text, crossBarPosition + 5,
                     bar1Position + ((bar2Position - bar1Position) / 2), paint);
         }
-
     }
 
     public float barCoord(PointF p) {
         return (direction == Direction.HORIZONTAL ? p.x : p.y);
     }
 
-    private String measurement() {
+    protected String measurement() {
         String result;
         if (roundMsecRate && (calibration.getDisplayRate() || calibration.unitsAreMsec())) {
             result = String.valueOf((int) Math.round(calibratedResult()));
@@ -302,7 +320,7 @@ public class Caliper {
         }
     }
 
-    public boolean pointNearBar(PointF p, float barPosition) {
+    private boolean pointNearBar(PointF p, float barPosition) {
         return barCoord(p) > barPosition - DELTA && barCoord(p) < barPosition + DELTA;
     }
 
@@ -315,7 +333,13 @@ public class Caliper {
 //        -        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) + delta && p.y < fmaxf(self.bar2Position, self.bar1Position) - delta && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
 //        +        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) && p.y < fmaxf(self.bar2Position, self.bar1Position) && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
 
+    public boolean pointNearBar1(PointF p) {
+        return pointNearBar(p, bar1Position);
+    }
 
+    public boolean pointNearBar2(PointF p) {
+        return pointNearBar(p, bar2Position);
+    }
 
 
     public boolean pointNearCrossBar(PointF p) {
@@ -339,5 +363,27 @@ public class Caliper {
         return pointNearCrossBar(p)
                 || pointNearBar(p, bar1Position)
                 || pointNearBar(p, bar2Position);
+    }
+
+    public boolean requiresCalibration() {
+        return true;
+    }
+
+    public boolean isAngleCaliper() {
+        return false;
+    }
+
+    public void moveCrossBar(float deltaX, float deltaY, MotionEvent event) {
+        bar1Position += deltaX;
+        bar2Position += deltaX;
+        crossBarPosition += deltaY;
+    }
+
+    public void moveBar1(float delta, float deltaY, MotionEvent event) {
+        bar1Position += delta;
+    }
+
+    public void moveBar2(float delta, float deltaY, MotionEvent event) {
+        bar2Position += delta;
     }
 }

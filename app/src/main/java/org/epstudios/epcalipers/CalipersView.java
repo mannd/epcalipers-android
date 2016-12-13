@@ -128,7 +128,7 @@ public class CalipersView extends View {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
                                 float distanceY) {
-            move(-distanceX, -distanceY);
+            move(e2, -distanceX, -distanceY);
             return true;
         }
 
@@ -169,10 +169,10 @@ public class CalipersView extends View {
                 if (touchedCaliper.pointNearCrossBar(p)) {
                     touchedCaliper.setTouchedBar(Caliper.TouchedBar.CROSSBAR);
                 }
-                else if (touchedCaliper.pointNearBar(p, touchedCaliper.getBar1Position())) {
+                else if (touchedCaliper.pointNearBar1(p)) {
                     touchedCaliper.setTouchedBar(Caliper.TouchedBar.BAR1);
                 }
-                else if (touchedCaliper.pointNearBar(p, touchedCaliper.getBar2Position())) {
+                else if (touchedCaliper.pointNearBar2(p)) {
                     touchedCaliper.setTouchedBar(Caliper.TouchedBar.BAR2);
                 }
             }
@@ -270,7 +270,7 @@ public class CalipersView extends View {
         }
     }
 
-    public void move(float distanceX, float distanceY) {
+    public void move(MotionEvent event, float distanceX, float distanceY) {
         if (touchedCaliper == null) {
             return;
         }
@@ -280,15 +280,13 @@ public class CalipersView extends View {
             distanceY = tmp;
         }
         if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.CROSSBAR) {
-            touchedCaliper.setBar1Position(touchedCaliper.getBar1Position() + distanceX);
-            touchedCaliper.setBar2Position(touchedCaliper.getBar2Position() + distanceX);
-            touchedCaliper.setCrossbarPosition(touchedCaliper.getCrossbarPosition() + distanceY);
+            touchedCaliper.moveCrossBar(distanceX, distanceY, event);
         }
         else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR1) {
-            touchedCaliper.setBar1Position(touchedCaliper.getBar1Position() + distanceX);
+            touchedCaliper.moveBar1(distanceX, distanceY, event);
         }
         else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR2) {
-            touchedCaliper.setBar2Position(touchedCaliper.getBar2Position() + distanceX);
+            touchedCaliper.moveBar2(distanceX, distanceY, event);
         }
         invalidate();
     }

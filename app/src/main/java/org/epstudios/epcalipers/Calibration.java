@@ -173,4 +173,13 @@ public class Calibration {
     public void setOriginalCalFactor(float originalCalFactor) {
         this.originalCalFactor = originalCalFactor;
     }
+
+    // note this function is not general, it also direction
+    public boolean unitsAreMM() {
+        if (units.length() < 1 || direction != Caliper.Direction.VERTICAL) {
+            return false;
+        }
+        String upcaseUnits = units.toUpperCase();
+        return upcaseUnits.equals("MM") || upcaseUnits.contains("MILLIM");
+    }
 }

@@ -29,6 +29,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import android.os.Bundle;
@@ -74,7 +75,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MainActivity extends ActionBarActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
     private static final String EPS = "EPS";
     private static final int RESULT_LOAD_IMAGE = 1;
@@ -102,6 +103,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Button backToImageMenuButton;
     private Button horizontalCaliperButton;
     private Button verticalCaliperButton;
+    private Button angleCaliperButton;
     private Button cancelAddCaliperButton;
     private Button setCalibrationButton;
     private Button clearCalibrationButton;
@@ -154,6 +156,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Menu menu;
     private boolean useLargeFont;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
+    private final float max_zoom = 10.0f;
+
+    // TODO: make false for release
+    private final boolean force_first_run = false;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -213,7 +219,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         attacher = new PhotoViewAttacher(imageView);
         attacher.setScaleType(ImageView.ScaleType.CENTER);
-        attacher.setMaximumScale(5.5f);
+        attacher.setMaximumScale(max_zoom);
         attacher.setMinimumScale(0.3f);
         // We need to use MatrixChangeListener and not ScaleChangeListener
         // since the former only fires when scale has completely changed and
@@ -396,7 +402,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             }
         });
 
-        if (getFirstRun(prefs)) {
+        // TODO: update BOTH quick_start_messages (there are 2 strings.xml files)
+        if (force_first_run || getFirstRun(prefs)) {
             Log.d(EPS, "firstRun");
             setRunned(prefs);
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -739,6 +746,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             outState.putFloat(i + "CaliperCrossbarPosition",
                     transformCoordinate(c.getCrossbarPosition(), maxY));
             outState.putBoolean(i + "CaliperSelected", c.isSelected());
+            outState.putBoolean(i + "IsAngleCaliper", c.isAngleCaliper());
         }
         outState.putInt("CalipersCount", calipersCount());
     }
@@ -786,6 +794,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         int calipersCount = savedInstanceState.getInt("CalipersCount");
         for (int i = 0; i < calipersCount; i++) {
             String directionString = savedInstanceState.getString(i + "CaliperDirection");
+            boolean isAngleCaliper = savedInstanceState.getBoolean(i + "IsAngleCaliper");
             if (directionString == null) {
                 // something very wrong, give up on restoring calipers
                 return;
@@ -796,7 +805,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             float bar2Position = savedInstanceState.getFloat(i + "CaliperBar2Position");
             float crossbarPosition = savedInstanceState.getFloat(i + "CaliperCrossbarPosition");
             boolean selected = savedInstanceState.getBoolean(i + "CaliperSelected");
-            Caliper c = new Caliper();
+            Caliper c;
+            if (isAngleCaliper) {
+                c = new AngleCaliper();
+                ((AngleCaliper)c).setVerticalCalibration(verticalCalibration);
+            }
+            else {
+                c = new Caliper();
+            }
             c.setDirection(direction);
 
             c.setBar1Position(bar1Position);
@@ -862,6 +878,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
         } else if (v == verticalCaliperButton) {
             addCaliperWithDirection(Caliper.Direction.VERTICAL);
+        } else if (v == angleCaliperButton) {
+            addAngleCaliper();
         } else if (v == selectImageButton) {
             selectImageFromGallery();
         } else if (v == cameraButton) {
@@ -909,6 +927,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // Add Caliper menu
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
+        angleCaliperButton = createButton(getString(R.string.angle_caliper_button_title));
         cancelAddCaliperButton = createButton(getString(R.string.cancel_button_title));
         // Adjust Image menu
         rotateImageRightButton = createButton(getString(R.string.rotate_image_right_button_title));
@@ -963,6 +982,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         ArrayList<TextView> buttons = new ArrayList<>();
         buttons.add(horizontalCaliperButton);
         buttons.add(verticalCaliperButton);
+        buttons.add(angleCaliperButton);
         buttons.add(cancelAddCaliperButton);
         addCaliperMenu = createMenu(buttons);
     }
@@ -1522,7 +1542,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private boolean noTimeCaliperSelected() {
         return calipersCount() < 1 ||
                 calipersView.noCaliperIsSelected() ||
-                calipersView.activeCaliper().getDirection() == Caliper.Direction.VERTICAL;
+                calipersView.activeCaliper().getDirection() == Caliper.Direction.VERTICAL ||
+                calipersView.activeCaliper().isAngleCaliper();
+    }
+
+    private boolean noAngleCaliperSelected() {
+        return calipersCount() < 1 ||
+                calipersView.noCaliperIsSelected() ||
+                !calipersView.activeCaliper().isAngleCaliper();
     }
 
     private void noCaliperSelectedAlert() {
@@ -1555,6 +1582,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Caliper c = calipersView.activeCaliper();
         if (c == null) {
             return; // shouldn't happen, but if it does...
+        }
+        if (!c.requiresCalibration()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.angle_caliper_title);
+            builder.setMessage(R.string.angle_caliper_calibration_message);
+            builder.setNegativeButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.show();
+            return;
         }
         String example;
         if (c.getDirection() == Caliper.Direction.VERTICAL) {
@@ -1757,6 +1797,21 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return (n == 1) ? c : null;
     }
 
+    // will be used when Brugadometer button/calculator is implemented
+    private Caliper getLoneAngleCaliper() {
+        Caliper c = null;
+        int n = 0;
+        if (calipersCount() > 0) {
+            for (Caliper caliper : getCalipers()) {
+                if (caliper.isAngleCaliper()) {
+                    c = caliper;
+                    n++;
+                }
+            }
+        }
+        return (n == 1) ? c : null;
+    }
+
     private void unselectCalipersExcept(Caliper c) {
         // if only one caliper, no others can be selected
         if (calipersCount() > 1) {
@@ -1792,6 +1847,25 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         c.setRoundMsecRate(roundMsecRate);
         c.setInitialPosition(rect);
         getCalipers().add(c);
+    }
+
+    private void addAngleCaliper() {
+        AngleCaliper c = new AngleCaliper();
+        Rect rect = new Rect(0, 0, calipersView.getWidth(),
+                calipersView.getHeight());
+        c.setUnselectedColor(currentCaliperColor);
+        c.setSelectedColor(currentHighlightColor);
+        c.setColor(currentCaliperColor);
+        c.setLineWidth(currentLineWidth);
+        c.setUseLargeFont(useLargeFont);
+        c.setRoundMsecRate(roundMsecRate);
+        c.setDirection(Caliper.Direction.HORIZONTAL);
+        c.setCalibration(horizontalCalibration);
+        c.setVerticalCalibration(verticalCalibration);
+        c.setInitialPosition(rect);
+        getCalipers().add(c);
+        calipersView.invalidate();
+        selectMainMenu();
     }
 
     private void matrixChangedAction() {
