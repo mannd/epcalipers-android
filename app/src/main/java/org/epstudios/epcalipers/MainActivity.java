@@ -25,6 +25,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -700,6 +701,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return rect.top;
     }
 
+    // FIXME: Binder errors passing too much info here
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(EPS, "onSaveInstanceState");
@@ -1192,6 +1194,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(i);
     }
 
+    // Note: for target SDK over 22, must add specific code to check for permissions,
+    // as Android > 6 has dynamic granting of permissions.  Leave target SDK to avoid this.
+    // See: http://stackoverflow.com/questions/32431723/read-external-storage-permission-for-android
+    // and https://developer.android.com/training/permissions/requesting.html
     private void selectImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
