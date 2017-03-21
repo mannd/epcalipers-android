@@ -115,4 +115,5 @@
         Only time or amplitude calipers need to be calibrated.
         \n\nIf you want to use an angle caliper as a Brugadometer,
         you must first calibrate time and amplitude calipers.</string>
+    <string name="sample_normal_ecg">sample normal ECG</string>
 </resources>
