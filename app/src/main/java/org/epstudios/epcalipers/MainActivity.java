@@ -705,52 +705,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(EPS, "onSaveInstanceState");
-//        super.onSaveInstanceState(outState);
-//        outState.putBoolean("calipersMode", calipersMode);
-//        outState.putFloat("scale", attacher.getScale());
-//        outState.putFloat("totalRotation", totalRotation);
-//        outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
-//        // Calibration
-//        // must use rawUnits here, otherwise original calibration units are lost
-//        outState.putString("hcalUnits", horizontalCalibration.rawUnits());
-//        outState.putString("hcalCalibrationString", horizontalCalibration.getCalibrationString());
-//        outState.putBoolean("hcalDisplayRate", horizontalCalibration.getDisplayRate());
-//        outState.putFloat("hcalOriginalZoom", horizontalCalibration.getOriginalZoom());
-//        outState.putFloat("hcalCurrentZoom", horizontalCalibration.getCurrentZoom());
-//        outState.putBoolean("hcalCalibrated", horizontalCalibration.isCalibrated());
-//        outState.putFloat(("hcalOriginalCalFactor"), horizontalCalibration.getOriginalCalFactor());
-//
-//        outState.putString("vcalUnits", verticalCalibration.rawUnits());
-//        outState.putString("vcalCalibrationString", verticalCalibration.getCalibrationString());
-//        outState.putBoolean("vcalDisplayRate", verticalCalibration.getDisplayRate());
-//        outState.putFloat("vcalOriginalZoom", verticalCalibration.getOriginalZoom());
-//        outState.putFloat("vcalCurrentZoom", verticalCalibration.getCurrentZoom());
-//        outState.putBoolean("vcalCalibrated", verticalCalibration.isCalibrated());
-//        outState.putFloat("vcalOriginalCalFactor", verticalCalibration.getOriginalCalFactor());
-//        // save calipers
-//        for (int i = 0; i < calipersCount(); i++) {
-//            Caliper c = calipersView.getCalipers().get(i);
-//            outState.putString(i + "CaliperDirection",
-//                    c.getDirection() == Caliper.Direction.HORIZONTAL ?
-//                            "Horizontal" : "Vertical");
-//            // maxX normalizes bar and crossbar positions regardless of caliper direction,
-//            // i.e. X is direction for bars and Y is direction for crossbars.
-//            float maxX = c.getDirection() == Caliper.Direction.HORIZONTAL
-//                    ? calipersView.getWidth()
-//                    : calipersView.getHeight();
-//            float maxY = c.getDirection() == Caliper.Direction.HORIZONTAL
-//                    ? calipersView.getHeight()
-//                    : calipersView.getWidth();
-//            outState.putFloat(i + "CaliperBar1Position",
-//                    transformCoordinate(c.getBar1Position(), maxX));
-//            outState.putFloat(i + "CaliperBar2Position",
-//                    transformCoordinate(c.getBar2Position(), maxX));
-//            outState.putFloat(i + "CaliperCrossbarPosition",
-//                    transformCoordinate(c.getCrossbarPosition(), maxY));
-//            outState.putBoolean(i + "CaliperSelected", c.isSelected());
-//            outState.putBoolean(i + "IsAngleCaliper", c.isAngleCaliper());
-//        }
-//        outState.putInt("CalipersCount", calipersCount());
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("calipersMode", calipersMode);
+        outState.putFloat("scale", attacher.getScale());
+        outState.putFloat("totalRotation", totalRotation);
+        outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
+        // Calibration
+        // must use rawUnits here, otherwise original calibration units are lost
+        outState.putString("hcalUnits", horizontalCalibration.rawUnits());
+        outState.putString("hcalCalibrationString", horizontalCalibration.getCalibrationString());
+        outState.putBoolean("hcalDisplayRate", horizontalCalibration.getDisplayRate());
+        outState.putFloat("hcalOriginalZoom", horizontalCalibration.getOriginalZoom());
+        outState.putFloat("hcalCurrentZoom", horizontalCalibration.getCurrentZoom());
+        outState.putBoolean("hcalCalibrated", horizontalCalibration.isCalibrated());
+        outState.putFloat(("hcalOriginalCalFactor"), horizontalCalibration.getOriginalCalFactor());
+
+        outState.putString("vcalUnits", verticalCalibration.rawUnits());
+        outState.putString("vcalCalibrationString", verticalCalibration.getCalibrationString());
+        outState.putBoolean("vcalDisplayRate", verticalCalibration.getDisplayRate());
+        outState.putFloat("vcalOriginalZoom", verticalCalibration.getOriginalZoom());
+        outState.putFloat("vcalCurrentZoom", verticalCalibration.getCurrentZoom());
+        outState.putBoolean("vcalCalibrated", verticalCalibration.isCalibrated());
+        outState.putFloat("vcalOriginalCalFactor", verticalCalibration.getOriginalCalFactor());
+        // save calipers
+        for (int i = 0; i < calipersCount(); i++) {
+            Caliper c = calipersView.getCalipers().get(i);
+            outState.putString(i + "CaliperDirection",
+                    c.getDirection() == Caliper.Direction.HORIZONTAL ?
+                            "Horizontal" : "Vertical");
+            // maxX normalizes bar and crossbar positions regardless of caliper direction,
+            // i.e. X is direction for bars and Y is direction for crossbars.
+            float maxX = c.getDirection() == Caliper.Direction.HORIZONTAL
+                    ? calipersView.getWidth()
+                    : calipersView.getHeight();
+            float maxY = c.getDirection() == Caliper.Direction.HORIZONTAL
+                    ? calipersView.getHeight()
+                    : calipersView.getWidth();
+            outState.putFloat(i + "CaliperBar1Position",
+                    transformCoordinate(c.getBar1Position(), maxX));
+            outState.putFloat(i + "CaliperBar2Position",
+                    transformCoordinate(c.getBar2Position(), maxX));
+            outState.putFloat(i + "CaliperCrossbarPosition",
+                    transformCoordinate(c.getCrossbarPosition(), maxY));
+            outState.putBoolean(i + "CaliperSelected", c.isSelected());
+            outState.putBoolean(i + "IsAngleCaliper", c.isAngleCaliper());
+        }
+        outState.putInt("CalipersCount", calipersCount());
     }
 
     @Override
