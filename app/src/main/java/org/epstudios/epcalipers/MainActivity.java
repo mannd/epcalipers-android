@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int DEFAULT_CALIPER_COLOR = Color.BLUE;
     private static final int DEFAULT_HIGHLIGHT_COLOR = Color.RED;
     private static final int DEFAULT_LINE_WIDTH = 2;
+    public static final String TEMP_BITMAP_FILE_NAME = "/tempEPCalipersImageBitmap.png";
     private Button addCaliperButton;
     private Button calibrateButton;
     private Button intervalRateButton;
@@ -709,7 +710,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean("calipersMode", calipersMode);
         outState.putFloat("scale", attacher.getScale());
         outState.putFloat("totalRotation", totalRotation);
-        outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
+
+        // To avoid FAILED BINDER TRANSACTION issue (which is ignored up until Android 24,
+        // save to temp file instead of storing bitmap in bundle.
+        // See http://stackoverflow.com/questions/36007540/failed-binder-transaction-in-android
+        //outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
+        storeBitmapToTempFile(((BitmapDrawable) imageView.getDrawable()).getBitmap());
+
         // Calibration
         // must use rawUnits here, otherwise original calibration units are lost
         outState.putString("hcalUnits", horizontalCalibration.rawUnits());
@@ -759,21 +766,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(EPS, "onRestoreInstanceState");
         calipersMode = savedInstanceState.getBoolean("calipersMode");
 
-        Bitmap image = savedInstanceState.getParcelable("Image");
+        // Bitmap now passed via temporary file
+        //Bitmap image = savedInstanceState.getParcelable("Image");
+        Bitmap image = getBitmapFromTempFile();
         imageView.setImageBitmap(image);
 
         totalRotation = savedInstanceState.getFloat("totalRotation");
 
         attacher.update();
-        // NOTE! appears must set animate for this to work, otherwise
-        // scale goes back to 1.0.
-//        Log.d(EPS, "minScale = " + attacher.getMinimumScale() + " maxScale = " +
-//            attacher.getMaximumScale());
-        // sometimes scale gets larger than max scale, so...
         float scale = Math.max(savedInstanceState.getFloat("scale"), attacher.getMinimumScale());
         scale = Math.min(scale, attacher.getMaximumScale());
         attacher.setScale(scale, true);
-
 
         // Calibration
         horizontalCalibration.setUnits(savedInstanceState.getString("hcalUnits"));
@@ -837,6 +840,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             calipersView.getCalipers().add(c);
 
         }
+    }
+
+    private void storeBitmapToTempFile(Bitmap bitmap) {
+        try {
+            File file = new File(Environment.getExternalStorageDirectory() + TEMP_BITMAP_FILE_NAME);
+            FileOutputStream fOut = new FileOutputStream(file);
+
+            bitmap.compress(Bitmap.CompressFormat.PNG, 85, fOut);
+            fOut.flush();
+            fOut.close();
+        }
+        catch (Exception ex) {
+            Toast toast = Toast.makeText(this, "Could not store temporary image file", Toast.LENGTH_SHORT);
+            toast.show();
+            Log.d(EPS, "Could not store temp file");
+        }
+    }
+
+    private Bitmap getBitmapFromTempFile() {
+        String path = Environment.getExternalStorageDirectory() + TEMP_BITMAP_FILE_NAME;
+        Bitmap bm = BitmapFactory.decodeFile(path);
+        return bm;
     }
 
     // return coordinate position ratio will be between 0 and 1.0
