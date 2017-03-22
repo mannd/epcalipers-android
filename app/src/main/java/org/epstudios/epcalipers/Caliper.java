@@ -7,6 +7,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.view.MotionEvent;
+import android.view.View;
 
 import java.text.DecimalFormat;
 
@@ -386,4 +387,6 @@ public class Caliper {
     public void moveBar2(float delta, float deltaY, MotionEvent event) {
         bar2Position += delta;
     }
+
+
 }

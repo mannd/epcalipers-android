@@ -762,6 +762,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     transformCoordinate(c.getCrossbarPosition(), maxY));
             outState.putBoolean(i + "CaliperSelected", c.isSelected());
             outState.putBoolean(i + "IsAngleCaliper", c.isAngleCaliper());
+            outState.putInt(i + "UnselectedColor", c.getUnselectedColor());
         }
         outState.putInt("CalipersCount", calipersCount());
     }
@@ -811,6 +812,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // something very wrong, give up on restoring calipers
                 return;
             }
+            int unselectedColor = savedInstanceState.getInt(i + "UnselectedColor");
             Caliper.Direction direction = directionString.equals("Horizontal") ?
                     Caliper.Direction.HORIZONTAL : Caliper.Direction.VERTICAL;
             float bar1Position = savedInstanceState.getFloat(i + "CaliperBar1Position");
@@ -831,9 +833,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             c.setBar2Position(bar2Position);
             c.setCrossbarPosition(crossbarPosition);
             c.setSelected(selected);
-            c.setUnselectedColor(currentCaliperColor);
+            c.setUnselectedColor(unselectedColor);
             c.setSelectedColor(currentHighlightColor);
-            c.setColor(c.isSelected() ? currentHighlightColor : currentCaliperColor);
+            c.setColor(c.isSelected() ? currentHighlightColor : unselectedColor);
             c.setLineWidth(currentLineWidth);
             c.setUseLargeFont(useLargeFont);
             c.setRoundMsecRate(roundMsecRate);
@@ -843,6 +845,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             else {
                 c.setCalibration(verticalCalibration);
             }
+
 
             calipersView.getCalipers().add(c);
 
@@ -1447,7 +1450,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
                     c.getCalibration().rawUnits() + "\nMean rate = " +
                     decimalFormat.format(meanRate) + " bpm");
-             builder.show();
+            builder.show();
         }
     }
 

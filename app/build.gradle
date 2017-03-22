@@ -31,4 +31,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile project(':library')
     compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
+    compile 'com.github.QuadFlask:colorpicker:0.0.13'
 }

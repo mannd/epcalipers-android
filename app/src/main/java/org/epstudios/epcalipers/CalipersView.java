@@ -1,13 +1,22 @@
 package org.epstudios.epcalipers;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
+
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.OnColorSelectedListener;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import java.util.ArrayList;
 
@@ -81,7 +90,7 @@ public class CalipersView extends View {
         touchedCaliper = null;
         MyGestureListener listener = new MyGestureListener();
         gestureDetector = new GestureDetectorCompat(context, listener);
-        gestureDetector.setIsLongpressEnabled(false);
+        gestureDetector.setIsLongpressEnabled(true);
         View.OnTouchListener gestureListener = new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                     return gestureDetector.onTouchEvent(event);
@@ -98,6 +107,7 @@ public class CalipersView extends View {
         @Override
         public boolean onDown(MotionEvent event) {
             // must be implemented and return true for other events to work;
+            Log.d(EPS, "onDown");
             for (int i = calipersCount() - 1; i >= 0; i--) {
                 if (calipers.get(i).pointNearCaliper(new PointF(event.getX(), event.getY()))) {
                     setTouchedCaliper(event);
@@ -131,6 +141,47 @@ public class CalipersView extends View {
             move(e2, -distanceX, -distanceY);
             return true;
         }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            for (Caliper c : calipers) {
+                if (c.pointNearCaliper(new PointF(e.getX(), e.getY()))) {
+                    final Caliper selectedCaliper = c;
+                    Log.d(EPS, "Longpress detected near caliper");
+                    // https://github.com/QuadFlask/colorpicker
+                    ColorPickerDialogBuilder
+                            .with(getContext())
+                            .setTitle("Choose color")
+                            .initialColor(selectedCaliper.getUnselectedColor())
+                            .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
+                            .density(12)
+                            .setOnColorSelectedListener(new OnColorSelectedListener() {
+                                @Override
+                                public void onColorSelected(int selectedColor) {
+                                    Log.d(EPS, "onColorSelected: 0x" + Integer.toHexString(selectedColor));
+
+                                }
+                            })
+                            .setPositiveButton("ok", new ColorPickerClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                                    Log.d(EPS, "Selected color is " + selectedColor);
+                                    selectedCaliper.setColor(selectedColor);
+                                    selectedCaliper.setUnselectedColor(selectedColor);
+                                    invalidate();
+                                }
+                            })
+                            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .build()
+                            .show();
+                }
+            }
+        }
+
 
     }
 
