@@ -160,6 +160,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
     private final float max_zoom = 10.0f;
 
+    private Bitmap previousBitmap = null;
+
     // TODO: make false for release
     private final boolean force_first_run = false;
 
@@ -715,8 +717,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // save to temp file instead of storing bitmap in bundle.
         // See http://stackoverflow.com/questions/36007540/failed-binder-transaction-in-android
         //outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
-        storeBitmapToTempFile(((BitmapDrawable) imageView.getDrawable()).getBitmap());
-
+        Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        // for efficiency, don't bother writing the bitmap to a file if it hasn't changed
+        if (!imageBitmap.sameAs(previousBitmap)) {
+            Log.d(EPS, "writing new temp file.");
+            storeBitmapToTempFile(((BitmapDrawable) imageView.getDrawable()).getBitmap());
+        }
         // Calibration
         // must use rawUnits here, otherwise original calibration units are lost
         outState.putString("hcalUnits", horizontalCalibration.rawUnits());
@@ -770,6 +776,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //Bitmap image = savedInstanceState.getParcelable("Image");
         Bitmap image = getBitmapFromTempFile();
         imageView.setImageBitmap(image);
+        previousBitmap = image;
 
         totalRotation = savedInstanceState.getFloat("totalRotation");
 
