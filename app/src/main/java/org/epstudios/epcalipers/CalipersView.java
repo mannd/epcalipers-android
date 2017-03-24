@@ -145,7 +145,7 @@ public class CalipersView extends View {
         @Override
         public void onLongPress(MotionEvent e) {
             for (Caliper c : calipers) {
-                if (c.pointNearCaliper(new PointF(e.getX(), e.getY()))) {
+                if (c.pointNearCrossBar(new PointF(e.getX(), e.getY()))) {
                     final Caliper selectedCaliper = c;
                     Log.d(EPS, "Longpress detected near caliper");
                     // https://github.com/QuadFlask/colorpicker

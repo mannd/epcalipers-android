@@ -9,16 +9,18 @@ EP Calipers is open source, and licensed under the
 
 EP Calipers uses the
 [PhotoView image library](https://github.com/chrisbanes/PhotoView) of
-Chris Banes which is licensed under the Apache 2.0 license.  See the
+Chris Banes which is licensed under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).  See the
 [GitHub page](https://github.com/chrisbanes/PhotoView) for source code
 and detailed license information.  Note that per
-[the Apache Software Foundation](http://www.apache.org/licenses/GPL-compatibility.html),
+[the Apache Software Foundation](http://www.apache.org/licenses/GPL-compatibility.html), and per [gnu.org](https://www.gnu.org/licenses/license-list.en.html#GPLCompatibleLicenses)
 Apache-licensed code can be included in GPLv3 projects such as this
 one.
 EP Calipers also uses the [android-pdfview library](https://github.com/JoanZapata/android-pdfview) of Joan Zapata which is licensed under the [GNU GPL v3 license.](http://www.gnu.org/licenses/gpl.html)
+The color selector is copyright 2014-2017 [QuadFlask](https://github.com/QuadFlask/colorpicker) and is licensed under the Apache 2.0 license.
+
 
 ## Copyright
-Copyright © 2015, 2016 [EP Studios, Inc.](http://www.epstudiossoftware.com)
+Copyright © 2015, 2016, 2017 [EP Studios, Inc.](http://www.epstudiossoftware.com)
 
 ## Acknowledgments
 The *Brugadometer* is based on the work of Dr. Adrian Baranchuk and his colleagues at Queen's University Kingston, Ontario, Canada.  It is used with Dr. Baranchuk's permission and encouragement.  Please see [this article](http://europace.oxfordjournals.org/content/16/11/1639) for more information.
