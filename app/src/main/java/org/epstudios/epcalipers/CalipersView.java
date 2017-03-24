@@ -68,6 +68,12 @@ public class CalipersView extends View {
 
     boolean locked;
 
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+    }
+
+    private MainActivity mainActivity;
+
 
     public CalipersView(Context context) {
         super(context);
@@ -144,40 +150,51 @@ public class CalipersView extends View {
 
         @Override
         public void onLongPress(MotionEvent e) {
+            PointF point = new PointF(e.getX(), e.getY());
             for (Caliper c : calipers) {
-                if (c.pointNearCrossBar(new PointF(e.getX(), e.getY()))) {
-                    final Caliper selectedCaliper = c;
-                    Log.d(EPS, "Longpress detected near caliper");
+                if (c.pointNearCrossBar(point)) {
+                    final Caliper pressedCaliper = c;
                     // https://github.com/QuadFlask/colorpicker
                     ColorPickerDialogBuilder
                             .with(getContext())
                             .setTitle("Choose color")
-                            .initialColor(selectedCaliper.getUnselectedColor())
+                            .initialColor(pressedCaliper.getUnselectedColor())
                             .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
                             .density(12)
-                            .setOnColorSelectedListener(new OnColorSelectedListener() {
+                            .setPositiveButton("OK", new ColorPickerClickListener() {
                                 @Override
-                                public void onColorSelected(int selectedColor) {
-                                    Log.d(EPS, "onColorSelected: 0x" + Integer.toHexString(selectedColor));
-
-                                }
-                            })
-                            .setPositiveButton("ok", new ColorPickerClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                                    Log.d(EPS, "Selected color is " + selectedColor);
-                                    selectedCaliper.setColor(selectedColor);
-                                    selectedCaliper.setUnselectedColor(selectedColor);
+                                public void onClick(DialogInterface dialog, int chosenColor, Integer[] allColors) {
+                                    if (!pressedCaliper.isSelected()) {
+                                        pressedCaliper.setColor(chosenColor);
+                                    }
+                                    pressedCaliper.setUnselectedColor(chosenColor);
                                     invalidate();
                                 }
                             })
-                            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
                             })
                             .build()
                             .show();
+                    break;
+                }
+                else if (c.pointNearBar1(point)) {
+                    Log.d(EPS, "near bar1");
+                    selectCaliper(c);
+                    locked = true;
+                    mainActivity.unselectCalipersExcept(c);
+                    mainActivity.selectMicroMovementMenu(true);
+                    break;
+                }
+                else if (c.pointNearBar2(point)) {
+                    Log.d(EPS, "near bar2");
+                    selectCaliper(c);
+                    locked = true;
+                    mainActivity.unselectCalipersExcept(c);
+                    mainActivity.selectMicroMovementMenu(false);
+                    break;
                 }
             }
         }

@@ -116,4 +116,8 @@
         \n\nIf you want to use an angle caliper as a Brugadometer,
         you must first calibrate time and amplitude calipers.</string>
     <string name="sample_normal_ecg">sample normal ECG</string>
+    <string name="left_label">Left</string>
+    <string name="right_label">Right</string>
+    <string name="microLeft">microLeft</string>
+    <string name="microRight">microRight</string>
 </resources>

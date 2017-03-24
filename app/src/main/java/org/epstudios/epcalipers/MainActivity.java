@@ -65,6 +65,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -114,6 +115,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button cancelQTcButton;
     private Button measureQTButton;
     private Button cancelQTcMeasurementButton;
+    private Button leftButton;
+    private Button rightButton;
+    private Button microLeftButton;
+    private Button microRightButton;
+    private Button microDoneButton;
+    private TextView leftBarTextView;
+    private TextView rightBarTextView;
     private HorizontalScrollView mainMenu;
     private HorizontalScrollView imageMenu;
     private HorizontalScrollView addCaliperMenu;
@@ -121,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private HorizontalScrollView calibrationMenu;
     private HorizontalScrollView qtcStep1Menu;
     private HorizontalScrollView qtcStep2Menu;
+    private HorizontalScrollView microMovementMenu;
     private Calibration horizontalCalibration;
     private Calibration verticalCalibration;
     private ImageView imageView;
@@ -242,6 +251,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         calipersView = (CalipersView) findViewById(R.id.caliperView);
+        calipersView.setMainActivity(this);
+
         shortAnimationDuration = getResources().getInteger(
                 android.R.integer.config_shortAnimTime);
 
@@ -943,7 +954,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showPreviousPage();
         } else if (v == nextPageButton) {
             showNextPage();
+        } else if (v == leftButton) {
+            left();
+        } else if (v == rightButton) {
+            right();
+        } else if (v == microLeftButton) {
+            microLeft();
+        } else if (v == microRightButton) {
+            microRight();
+        } else if (v == microDoneButton) {
+            microDone();
         }
+
 
     }
 
@@ -984,6 +1006,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cancelQTcButton = createButton(getString(R.string.cancel_button_title));
         measureQTButton = createButton(getString(R.string.measure_button_label));
         cancelQTcMeasurementButton = createButton(getString(R.string.cancel_button_title));
+        // MicroMovement menu
+        leftButton = createButton(getString(R.string.left_label));
+        rightButton = createButton(getString(R.string.right_label));
+        microLeftButton = createButton(getString(R.string.microLeft));
+        microRightButton = createButton(getString(R.string.microRight));
+        microDoneButton = createButton(getString(R.string.done_button_title));
     }
 
     private Button createButton(String text) {
@@ -1065,6 +1093,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         qtcStep2Menu = createMenu(items);
     }
 
+    private void createMicroMovementMenu() {
+        ArrayList<TextView> items = new ArrayList<>();
+        leftBarTextView = new TextView(this);
+        leftBarTextView.setText("Left bar:");
+        rightBarTextView = new TextView(this);
+        rightBarTextView.setText("Right bar:");
+        items.add(leftBarTextView);
+        items.add(rightBarTextView);
+        items.add(leftButton);
+        items.add(rightButton);
+        items.add(microLeftButton);
+        items.add(microRightButton);
+        items.add(microDoneButton);
+        microMovementMenu = createMenu(items);
+    }
+
     private void selectMainMenu() {
         if (mainMenu == null) {
             createMainMenu();
@@ -1133,6 +1177,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createQTcStep2Menu();
         }
         selectMenu(qtcStep2Menu);
+    }
+
+    //public because used by CalipersView
+    public void selectMicroMovementMenu(boolean bar1) {
+        if (microMovementMenu == null) {
+            createMicroMovementMenu();
+        }
+        selectMenu(microMovementMenu);
+        if (bar1) {
+            rightBarTextView.setVisibility(View.GONE);
+            leftBarTextView.setVisibility(View.VISIBLE);
+        }
+        else {
+            rightBarTextView.setVisibility(View.VISIBLE);
+            leftBarTextView.setVisibility(View.GONE);
+        }
     }
 
     private void selectMenu(HorizontalScrollView menu) {
@@ -1567,6 +1627,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.invalidate();
     }
 
+    private void microMoveBar(Caliper c, boolean bar1, float distance) {
+        if (bar1) {
+            c.moveBar1(distance, 0, null);
+        }
+        else {
+            c.moveBar2(distance, 0, null);
+        }
+        calipersView.invalidate();
+    }
+
+    private void left() {
+        microMoveBar(calipersView.activeCaliper(), true, -1f);
+    }
+
+    private void right() {
+        microMoveBar(calipersView.activeCaliper(), true, 1f);
+    }
+
+    private void microLeft() {
+        microMoveBar(calipersView.activeCaliper(), true, -0.1f);
+    }
+
+    private void microRight() {
+        microMoveBar(calipersView.activeCaliper(), true, 1f);
+    }
+
+    private void microDone() {
+        calipersView.setLocked(false);
+        selectMainMenu();
+    }
+
     private int calipersCount() {
         return calipersView.calipersCount();
     }
@@ -1853,7 +1944,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return (n == 1) ? c : null;
     }
 
-    private void unselectCalipersExcept(Caliper c) {
+    public void unselectCalipersExcept(Caliper c) {
         // if only one caliper, no others can be selected
         if (calipersCount() > 1) {
             for (Caliper caliper : getCalipers()) {
