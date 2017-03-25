@@ -1562,7 +1562,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         Caliper c = calipersView.activeCaliper();
-        if (c.getDirection() == Caliper.Direction.VERTICAL) {
+        if (c.getDirection() == Caliper.Direction.VERTICAL || c.isAngleCaliper()) {
             showNoTimeCaliperSelectedAlert();
             return;
         }
