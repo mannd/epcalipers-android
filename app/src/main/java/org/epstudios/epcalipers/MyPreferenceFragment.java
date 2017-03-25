@@ -36,7 +36,9 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         map.put(3, "3 points");
         map.put(4, "4 points");
         map.put(5, "5 points");
-
+        map.put(6, "6 points");
+        map.put(7, "7 points");
+        map.put(8, "8 points");
 
         return map;
     }

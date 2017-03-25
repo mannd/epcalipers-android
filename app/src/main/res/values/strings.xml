@@ -27,7 +27,7 @@
     <string name="done_button_title">Done</string>
     <string name="set_calibration_button_title">Set</string>
     <string name="clear_calibration_button_title">Clear</string>
-    <string name="about_text">Copyright \u00a9 2015, 2016 EP Studios, Inc.\nAll rights reserved.\n</string>
+    <string name="about_text">Copyright \u00a9 2015-2017 EP Studios, Inc.\nAll rights reserved.\n</string>
     <string name="about_label">EP Calipers</string>
     <string name="help_title">Help</string>
     <string name="switch_mode_title">Switch</string>
@@ -84,8 +84,8 @@
     <string name="invalid_result_message">Invalid Result</string>
     <string name="calculated_qtc_dialog_title">Calculated QTc</string>
     <string name="quick_start_title">EP Calipers Quick Start</string>
-    <string name="quick_start_message">What\'s new: Use angle calipers to make angle measurements.
-        Evaluate ECGs for Brugada pattern using new Brugadometer.
+    <string name="quick_start_message">What\'s new: Set individual caliper colors
+    with new Color menu, and fine-tune caliper positioning with new Tweak menu.
         \n\nQuick Start: Use your fingers to move and position calipers or move and zoom the
         image.\n\nAdd calipers with the *+* menu item, single tap a
         caliper to select it, tap again to unselect, and double tap to
@@ -116,4 +116,22 @@
         \n\nIf you want to use an angle caliper as a Brugadometer,
         you must first calibrate time and amplitude calipers.</string>
     <string name="sample_normal_ecg">sample normal ECG</string>
+    <string name="left_label">Left</string>
+    <string name="right_label">Right</string>
+    <string name="micro_left_label">m-Left</string>
+    <string name="micro_right_label">m-Right</string>
+    <string name="up_label">Up</string>
+    <string name="down_label">Down</string>
+    <string name="micro_up_label">m-Up</string>
+    <string name="micro_down_label">m-Down</string>
+    <string name="left_bar_label">Move left bar</string>
+    <string name="right_bar_label">Move right bar</string>
+    <string name="up_bar_label">Move upper bar</string>
+    <string name="down_bar_label">Move lower bar</string>
+    <string name="color_label">Color</string>
+    <string name="tweak_label">Tweak</string>
+    <string name="color_menu_text">Long press calper to change color</string>
+    <string name="tweak_menu_text">Long press caliper component to tweak position</string>
+    <string name="move_angle_apex_text">Move angle apex</string>
+    <string name="move_crossbar_text">Move crossbar</string>
 </resources>

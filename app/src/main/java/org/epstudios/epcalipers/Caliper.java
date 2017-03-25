@@ -7,6 +7,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.view.MotionEvent;
+import android.view.View;
 
 import java.text.DecimalFormat;
 
@@ -32,6 +33,23 @@ import java.text.DecimalFormat;
  * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Caliper {
+
+    public enum Component {
+        Bar1,
+        Bar2,
+        Crossbar,
+        None
+    }
+
+    public enum MovementDirection {
+        Up,
+        Down,
+        Left,
+        Right,
+        None
+    }
+
+
     private static int differential = 0;
     private static final float DELTA = 30.0f;
 
@@ -246,7 +264,7 @@ public class Caliper {
         String text = measurement();
         if (direction == Direction.HORIZONTAL) {
             canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
-                    crossBarPosition - 10, paint);
+                    crossBarPosition - 12, paint);
         }
         else {
             canvas.drawText(text, crossBarPosition + 5,
@@ -344,7 +362,7 @@ public class Caliper {
 
     public boolean pointNearCrossBar(PointF p) {
         boolean nearBar;
-        float delta = DELTA + 5.0f;  // cross bar delta a little bigger
+        float delta = DELTA + 8.0f;  // cross bar delta a little bigger
         if (direction == Direction.HORIZONTAL) {
             nearBar = (p.x > Math.min(bar1Position, bar2Position)
                     && p.x < Math.max(bar2Position, bar1Position)
@@ -386,4 +404,32 @@ public class Caliper {
     public void moveBar2(float delta, float deltaY, MotionEvent event) {
         bar2Position += delta;
     }
+
+    public void moveBar(float delta, Component component, MovementDirection direction) {
+        switch (component) {
+            case Bar1:
+                bar1Position += delta;
+                break;
+            case Bar2:
+                bar2Position += delta;
+                break;
+            case Crossbar:
+                moveCrossbarDirectionally(delta, direction);
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected void moveCrossbarDirectionally(float delta, MovementDirection direction) {
+        if (direction == MovementDirection.Up || direction == MovementDirection.Down) {
+            crossBarPosition += delta;
+        }
+        else {
+            bar1Position += delta;
+            bar2Position += delta;
+        }
+    }
+
+
 }

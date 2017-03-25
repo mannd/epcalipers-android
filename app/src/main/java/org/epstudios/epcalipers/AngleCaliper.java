@@ -155,7 +155,7 @@ public class AngleCaliper extends Caliper {
     // test if angle is in inferior half of unit circle
     // these are the only angles relevant for Brugada triangle base measurement
     private boolean angleInSouthernHemisphere(double angle) {
-        return 0.0 <= angle && angle <= Math.PI;
+        return 0.0 < angle && angle < Math.PI;
     }
 
     private String calibratedBaseResult(double lengthInPoints) {
@@ -218,18 +218,13 @@ public class AngleCaliper extends Caliper {
         double degrees = radiansToDegrees(angle);
         return degreeDecimalFormat.format(degrees) + "°";
     }
-//
 
-//        - (NSString *)alphaAngle {
-//        // the angle between bar2 and a vertical
-//        double angle = 0.5 * M_PI - self.angleBar2;
-//        double degrees = [AngleCaliper radiansToDegrees:angle];
-//        NSString *text = [NSString stringWithFormat:@"%.1f°", degrees];
-//        return text;
-//        }
-//
     static public double radiansToDegrees(double radians) {
         return radians * 180.0 / Math.PI;
+    }
+
+    static public double degreesToRadians(double degrees) {
+        return (degrees * Math.PI) / 180.0;
     }
 
     @Override
@@ -256,5 +251,22 @@ public class AngleCaliper extends Caliper {
     public boolean isAngleCaliper() {
         return true;
     }
+
+    @Override
+    public void moveBar(float delta, Component component, MovementDirection direction) {
+        switch (component) {
+            case Bar1:
+                bar1Angle -= degreesToRadians(delta);
+                break;
+            case Bar2:
+                bar2Angle -= degreesToRadians(delta);
+                break;
+            case Crossbar:
+                super.moveCrossbarDirectionally(delta, direction);
+            default:
+                break;
+        }
+    }
+
 
 }

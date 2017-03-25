@@ -25,11 +25,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -69,10 +65,10 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,11 +80,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int DEFAULT_CALIPER_COLOR = Color.BLUE;
     private static final int DEFAULT_HIGHLIGHT_COLOR = Color.RED;
     private static final int DEFAULT_LINE_WIDTH = 2;
+    public static final String TEMP_BITMAP_FILE_NAME = "/tempEPCalipersImageBitmap.png";
     private Button addCaliperButton;
     private Button calibrateButton;
     private Button intervalRateButton;
     private Button meanRateButton;
     private Button qtcButton;
+    private Button colorButton;
+    private Button colorDoneButton;
+    private Button tweakButton;
+    private Button tweakDoneButton;
     private Button cameraButton;
     private Button selectImageButton;
     private Button adjustImageButton;
@@ -113,6 +114,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button cancelQTcButton;
     private Button measureQTButton;
     private Button cancelQTcMeasurementButton;
+    private Button leftButton;
+    private Button rightButton;
+    private Button microLeftButton;
+    private Button microRightButton;
+    private Button upButton;
+    private Button downButton;
+    private Button microUpButton;
+    private Button microDownButton;
+    private Button microDoneButton;
+    private TextView microTextView;
     private HorizontalScrollView mainMenu;
     private HorizontalScrollView imageMenu;
     private HorizontalScrollView addCaliperMenu;
@@ -120,6 +131,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private HorizontalScrollView calibrationMenu;
     private HorizontalScrollView qtcStep1Menu;
     private HorizontalScrollView qtcStep2Menu;
+    private HorizontalScrollView colorMenu;
+    private HorizontalScrollView tweakMenu;
+    private HorizontalScrollView microMovementMenu;
     private Calibration horizontalCalibration;
     private Calibration verticalCalibration;
     private ImageView imageView;
@@ -158,6 +172,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean useLargeFont;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
     private final float max_zoom = 10.0f;
+
+    private Bitmap previousBitmap = null;
+
+    private List<Button> upDownButtons;
+    private List<Button> rightLeftButtons;
 
     // TODO: make false for release
     private final boolean force_first_run = false;
@@ -239,6 +258,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         calipersView = (CalipersView) findViewById(R.id.caliperView);
+        calipersView.setMainActivity(this);
+
         shortAnimationDuration = getResources().getInteger(
                 android.R.integer.config_shortAnimTime);
 
@@ -701,7 +722,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return rect.top;
     }
 
-    // FIXME: Binder errors passing too much info here
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(EPS, "onSaveInstanceState");
@@ -709,7 +729,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean("calipersMode", calipersMode);
         outState.putFloat("scale", attacher.getScale());
         outState.putFloat("totalRotation", totalRotation);
-        outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
+
+        // To avoid FAILED BINDER TRANSACTION issue (which is ignored up until Android 24,
+        // save to temp file instead of storing bitmap in bundle.
+        // See http://stackoverflow.com/questions/36007540/failed-binder-transaction-in-android
+        //outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
+        Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        // for efficiency, don't bother writing the bitmap to a file if it hasn't changed
+        if (!imageBitmap.sameAs(previousBitmap)) {
+            Log.d(EPS, "writing new temp file.");
+            storeBitmapToTempFile(((BitmapDrawable) imageView.getDrawable()).getBitmap());
+        }
         // Calibration
         // must use rawUnits here, otherwise original calibration units are lost
         outState.putString("hcalUnits", horizontalCalibration.rawUnits());
@@ -749,6 +779,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     transformCoordinate(c.getCrossbarPosition(), maxY));
             outState.putBoolean(i + "CaliperSelected", c.isSelected());
             outState.putBoolean(i + "IsAngleCaliper", c.isAngleCaliper());
+            outState.putInt(i + "UnselectedColor", c.getUnselectedColor());
         }
         outState.putInt("CalipersCount", calipersCount());
     }
@@ -759,21 +790,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(EPS, "onRestoreInstanceState");
         calipersMode = savedInstanceState.getBoolean("calipersMode");
 
-        Bitmap image = savedInstanceState.getParcelable("Image");
+        // Bitmap now passed via temporary file
+        //Bitmap image = savedInstanceState.getParcelable("Image");
+        Bitmap image = getBitmapFromTempFile();
         imageView.setImageBitmap(image);
+        previousBitmap = image;
 
         totalRotation = savedInstanceState.getFloat("totalRotation");
 
         attacher.update();
-        // NOTE! appears must set animate for this to work, otherwise
-        // scale goes back to 1.0.
-//        Log.d(EPS, "minScale = " + attacher.getMinimumScale() + " maxScale = " +
-//            attacher.getMaximumScale());
-        // sometimes scale gets larger than max scale, so...
         float scale = Math.max(savedInstanceState.getFloat("scale"), attacher.getMinimumScale());
         scale = Math.min(scale, attacher.getMaximumScale());
         attacher.setScale(scale, true);
-
 
         // Calibration
         horizontalCalibration.setUnits(savedInstanceState.getString("hcalUnits"));
@@ -801,6 +829,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // something very wrong, give up on restoring calipers
                 return;
             }
+            int unselectedColor = savedInstanceState.getInt(i + "UnselectedColor");
             Caliper.Direction direction = directionString.equals("Horizontal") ?
                     Caliper.Direction.HORIZONTAL : Caliper.Direction.VERTICAL;
             float bar1Position = savedInstanceState.getFloat(i + "CaliperBar1Position");
@@ -821,9 +850,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             c.setBar2Position(bar2Position);
             c.setCrossbarPosition(crossbarPosition);
             c.setSelected(selected);
-            c.setUnselectedColor(currentCaliperColor);
+            c.setUnselectedColor(unselectedColor);
             c.setSelectedColor(currentHighlightColor);
-            c.setColor(c.isSelected() ? currentHighlightColor : currentCaliperColor);
+            c.setColor(c.isSelected() ? currentHighlightColor : unselectedColor);
             c.setLineWidth(currentLineWidth);
             c.setUseLargeFont(useLargeFont);
             c.setRoundMsecRate(roundMsecRate);
@@ -834,9 +863,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 c.setCalibration(verticalCalibration);
             }
 
+
             calipersView.getCalipers().add(c);
 
         }
+    }
+
+    private void storeBitmapToTempFile(Bitmap bitmap) {
+        try {
+            File file = new File(Environment.getExternalStorageDirectory() + TEMP_BITMAP_FILE_NAME);
+            FileOutputStream fOut = new FileOutputStream(file);
+
+            bitmap.compress(Bitmap.CompressFormat.PNG, 85, fOut);
+            fOut.flush();
+            fOut.close();
+        }
+        catch (Exception ex) {
+            Toast toast = Toast.makeText(this, "Could not store temporary image file", Toast.LENGTH_SHORT);
+            toast.show();
+            Log.d(EPS, "Could not store temp file");
+        }
+    }
+
+    private Bitmap getBitmapFromTempFile() {
+        String path = Environment.getExternalStorageDirectory() + TEMP_BITMAP_FILE_NAME;
+        Bitmap bm = BitmapFactory.decodeFile(path);
+        return bm;
     }
 
     // return coordinate position ratio will be between 0 and 1.0
@@ -908,6 +960,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showPreviousPage();
         } else if (v == nextPageButton) {
             showNextPage();
+        } else if (v == colorButton) {
+            selectColorMenu();
+        } else if (v == colorDoneButton) {
+            selectMainMenu();
+        } else if (v == tweakButton) {
+            selectTweakMenu();
+        } else if (v == tweakDoneButton) {
+            selectMainMenu();
+        } else if (v == leftButton) {
+            left();
+        } else if (v == rightButton) {
+            right();
+        } else if (v == microLeftButton) {
+            microLeft();
+        } else if (v == microRightButton) {
+            microRight();
+        } else if (v == upButton) {
+            up();
+        } else if (v == downButton) {
+            down();
+        } else if (v == microUpButton) {
+            microUp();
+        } else if (v == microDownButton) {
+            microDown();
+        } else if (v == microDoneButton) {
+            microDone();
         }
 
     }
@@ -949,6 +1027,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cancelQTcButton = createButton(getString(R.string.cancel_button_title));
         measureQTButton = createButton(getString(R.string.measure_button_label));
         cancelQTcMeasurementButton = createButton(getString(R.string.cancel_button_title));
+        // Color menu
+        colorButton = createButton(getString(R.string.color_label));
+        colorDoneButton = createButton(getString(R.string.done_button_title));
+        // Tweak menu
+        tweakButton = createButton(getString(R.string.tweak_label));
+        tweakDoneButton = createButton(getString(R.string.done_button_title));
+        // MicroMovement menu
+        leftButton = createButton(getString(R.string.left_label));
+        rightButton = createButton(getString(R.string.right_label));
+        microLeftButton = createButton(getString(R.string.micro_left_label));
+        microRightButton = createButton(getString(R.string.micro_right_label));
+        upButton = createButton(getString(R.string.up_label));
+        downButton = createButton(getString(R.string.down_label));
+        microUpButton = createButton(getString(R.string.micro_up_label));
+        microDownButton = createButton(getString(R.string.micro_down_label));
+        microDoneButton = createButton(getString(R.string.done_button_title));
+
+        upDownButtons = Arrays.asList(upButton, downButton, microUpButton, microDownButton);
+        rightLeftButtons = Arrays.asList(leftButton, rightButton, microLeftButton, microRightButton);
     }
 
     private Button createButton(String text) {
@@ -967,6 +1064,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(intervalRateButton);
         buttons.add(meanRateButton);
         buttons.add(qtcButton);
+        buttons.add(colorButton);
+        buttons.add(tweakButton);
         mainMenu = createMenu(buttons);
     }
 
@@ -1030,17 +1129,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         qtcStep2Menu = createMenu(items);
     }
 
+    private void createColorMenu() {
+        ArrayList<TextView> items = new ArrayList<>();
+        TextView textView = new TextView(this);
+        textView.setText(R.string.color_menu_text);
+        items.add(textView);
+        items.add(colorDoneButton);
+        colorMenu = createMenu(items);
+    }
+
+    private void createTweakMenu() {
+        ArrayList<TextView> items = new ArrayList<>();
+        TextView textView = new TextView(this);
+        textView.setText(R.string.tweak_menu_text);
+        items.add(textView);
+        items.add(tweakDoneButton);
+        tweakMenu = createMenu(items);
+    }
+
+    private void createMicroMovementMenu() {
+        ArrayList<TextView> items = new ArrayList<>();
+        microTextView = new TextView(this);
+        items.add(microTextView);
+        items.add(leftButton);
+        items.add(rightButton);
+        items.add(upButton);
+        items.add(downButton);
+        items.add(microLeftButton);
+        items.add(microRightButton);
+        items.add(microUpButton);
+        items.add(microDownButton);
+        items.add(microDoneButton);
+        microMovementMenu = createMenu(items);
+    }
+
     private void selectMainMenu() {
         if (mainMenu == null) {
             createMainMenu();
         }
-        Log.d(EPS, "selectMainMenu");
         selectMenu(mainMenu);
         boolean enable = horizontalCalibration.canDisplayRate();
         intervalRateButton.setEnabled(enable);
         meanRateButton.setEnabled(enable);
         qtcButton.setEnabled(enable);
         calipersView.setLocked(false);
+        calipersView.setAllowTweakPosition(false);
+        calipersView.setAllowColorChange(false);
     }
 
     private void selectImageMenu() {
@@ -1098,6 +1232,78 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createQTcStep2Menu();
         }
         selectMenu(qtcStep2Menu);
+    }
+
+    private void selectColorMenu() {
+        if (!thereAreCalipers()) {
+            noCalipersAlert();
+            return;
+        }
+        if (colorMenu == null) {
+            createColorMenu();
+        }
+        selectMenu(colorMenu);
+        calipersView.setAllowColorChange(true);
+    }
+
+    private void selectTweakMenu() {
+        if (!thereAreCalipers()) {
+            noCalipersAlert();
+            return;
+        }
+        if (tweakMenu == null) {
+            createTweakMenu();
+        }
+        selectMenu(tweakMenu);
+        calipersView.setAllowTweakPosition(true);
+
+    }
+
+    //public because used by CalipersView
+    public void selectMicroMovementMenu(Caliper c, Caliper.Component component) {
+        if (microMovementMenu == null) {
+            createMicroMovementMenu();
+        }
+        selectMenu(microMovementMenu);
+        if (component == Caliper.Component.Crossbar) {
+            setButtonsVisibility(upDownButtons, View.VISIBLE);
+            setButtonsVisibility(rightLeftButtons, View.VISIBLE);
+            microTextView.setText(c.isAngleCaliper() ? getString(R.string.move_angle_apex_text) : getString(R.string.move_crossbar_text));
+        }
+        else if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
+            setButtonsVisibility(upDownButtons, View.GONE);
+            setButtonsVisibility(rightLeftButtons, View.VISIBLE);
+            switch (component) {
+                case Bar1:
+                    microTextView.setText(getString(R.string.left_bar_label));
+                    break;
+                case Bar2:
+                    microTextView.setText(getString(R.string.right_bar_label));
+                    break;
+                default:
+                    break;
+            }
+        }
+        else {      // vertical caliper
+            setButtonsVisibility(upDownButtons, View.VISIBLE);
+            setButtonsVisibility(rightLeftButtons, View.GONE);
+            switch (component) {
+                case Bar1:
+                    microTextView.setText(getString(R.string.up_bar_label));
+                    break;
+                case Bar2:
+                    microTextView.setText(getString(R.string.down_bar_label));
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void setButtonsVisibility(List<Button> buttons, int visibility) {
+        for (Button button : buttons) {
+            button.setVisibility(visibility);
+        }
     }
 
     private void selectMenu(HorizontalScrollView menu) {
@@ -1342,22 +1548,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void meanRR() {
-        if (calipersCount() < 1) {
+        if (!thereAreCalipers()) {
             noCalipersAlert();
             selectMainMenu();
             return;
         }
         Caliper singleHorizontalCaliper = getLoneTimeCaliper();
         if (singleHorizontalCaliper != null) {
-            calipersView.selectCaliper(singleHorizontalCaliper);
-            unselectCalipersExcept(singleHorizontalCaliper);
+            calipersView.selectCaliperAndUnselectOthers(singleHorizontalCaliper);
         }
         if (calipersView.noCaliperIsSelected()) {
             noCaliperSelectedAlert();
             return;
         }
         Caliper c = calipersView.activeCaliper();
-        if (c.getDirection() == Caliper.Direction.VERTICAL) {
+        if (c.getDirection() == Caliper.Direction.VERTICAL || c.isAngleCaliper()) {
             showNoTimeCaliperSelectedAlert();
             return;
         }
@@ -1415,7 +1620,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
                     c.getCalibration().rawUnits() + "\nMean rate = " +
                     decimalFormat.format(meanRate) + " bpm");
-             builder.show();
+            builder.show();
         }
     }
 
@@ -1424,8 +1629,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.invalidate();
         Caliper singleHorizontalCaliper = getLoneTimeCaliper();
         if (singleHorizontalCaliper != null && !singleHorizontalCaliper.isSelected()) {
-            calipersView.selectCaliper(singleHorizontalCaliper);
-            unselectCalipersExcept(singleHorizontalCaliper);
+            calipersView.selectCaliperAndUnselectOthers(singleHorizontalCaliper);
         }
         if (noTimeCaliperSelected()) {
             showNoTimeCaliperSelectedAlert();
@@ -1532,6 +1736,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.invalidate();
     }
 
+    private void microMoveBar(Caliper c, Caliper.Component component, float distance, Caliper.MovementDirection direction) {
+        if (component == Caliper.Component.None) {
+            return;
+        }
+        c.moveBar(distance, component, direction);
+        calipersView.invalidate();
+    }
+
+    private void left() {
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -1f, Caliper.MovementDirection.Left);
+    }
+
+    private void right() {
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 1f, Caliper.MovementDirection.Right);
+    }
+
+    private void microLeft() {
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -0.1f, Caliper.MovementDirection.Left);
+    }
+
+    private void microRight() {
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Right);
+    }
+
+    private void up() {
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -1f, Caliper.MovementDirection.Up);
+    }
+
+    private void down() {
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 1f, Caliper.MovementDirection.Down);
+    }
+
+    private void microUp() {
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -0.1f, Caliper.MovementDirection.Up);
+    }
+
+    private void microDown() {
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Down);
+    }
+
+    private void microDone() {
+        calipersView.setLocked(false);
+        selectMainMenu();
+    }
+
     private int calipersCount() {
         return calipersView.calipersCount();
     }
@@ -1546,14 +1795,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean noTimeCaliperSelected() {
-        return calipersCount() < 1 ||
+        return !thereAreCalipers() ||
                 calipersView.noCaliperIsSelected() ||
                 calipersView.activeCaliper().getDirection() == Caliper.Direction.VERTICAL ||
                 calipersView.activeCaliper().isAngleCaliper();
     }
 
     private boolean noAngleCaliperSelected() {
-        return calipersCount() < 1 ||
+        return !thereAreCalipers() ||
                 calipersView.noCaliperIsSelected() ||
                 !calipersView.activeCaliper().isAngleCaliper();
     }
@@ -1564,7 +1813,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setupCalibration() {
-        if (calipersCount() < 1) {
+        if (!thereAreCalipers()) {
             noCalipersAlert();
         }
         else {
@@ -1576,7 +1825,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setCalibration() {
-        if (calipersCount() < 1) {
+        if (!thereAreCalipers()) {
             noCalipersAlert();
             selectMainMenu();
             return;
@@ -1789,12 +2038,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.setAlpha(1.0f);
     }
 
+    public boolean thereAreCalipers() {
+        return calipersView.getCalipers().size() > 0;
+    }
+
+
     private Caliper getLoneTimeCaliper() {
         Caliper c = null;
         int n = 0;
-        if (calipersCount() > 0) {
+        if (thereAreCalipers()) {
             for (Caliper caliper : getCalipers()) {
-                if (caliper.getDirection() == Caliper.Direction.HORIZONTAL) {
+                if (caliper.getDirection() == Caliper.Direction.HORIZONTAL && !caliper.isAngleCaliper()) {
                     c = caliper;
                     n++;
                 }
@@ -1807,7 +2061,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Caliper getLoneAngleCaliper() {
         Caliper c = null;
         int n = 0;
-        if (calipersCount() > 0) {
+        if (thereAreCalipers()) {
             for (Caliper caliper : getCalipers()) {
                 if (caliper.isAngleCaliper()) {
                     c = caliper;
@@ -1816,17 +2070,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         return (n == 1) ? c : null;
-    }
-
-    private void unselectCalipersExcept(Caliper c) {
-        // if only one caliper, no others can be selected
-        if (calipersCount() > 1) {
-            for (Caliper caliper : getCalipers()) {
-                if (caliper != c) {
-                    calipersView.unselectCaliper(caliper);
-                }
-            }
-        }
     }
 
     private void addCaliperWithDirection(Caliper.Direction direction) {

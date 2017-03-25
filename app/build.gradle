@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "org.epstudios.epcalipers"
-        minSdkVersion 19
-        targetSdkVersion 22
-        versionCode 10
-        versionName "2.4.1"
+        minSdkVersion 14
+        targetSdkVersion 23
+        versionCode 12
+        versionName "2.5"
     }
     buildTypes {
         release {
@@ -31,4 +31,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile project(':library')
     compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
+    compile 'com.github.QuadFlask:colorpicker:0.0.13'
 }
