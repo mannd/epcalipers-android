@@ -722,7 +722,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return rect.top;
     }
 
-    // FIXME: Binder errors passing too much info here
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(EPS, "onSaveInstanceState");

@@ -4,8 +4,8 @@
     <string name="calibrate_button_title">Calibrate</string>
     <string name="interval_rate_button_title">Interval/Rate</string>
     <string name="mean_rate_button_title">Mean Rate</string>
-    <string name="quick_start_message">What\'s new: Use angle calipers to make angle measurements.
-        Evaluate ECGs for Brugada pattern using new Brugadometer.
+    <string name="quick_start_message">What\'s new: Set individual caliper colors
+    with new Color menu, and fine-tune caliper positioning with new Tweak menu.
         \n\nQuick Start: Use your fingers to move and position calipers or move and zoom the
         image.\n\nAdd calipers with the *Add Caliper* menu item, single tap a
         caliper to select it, tap again to unselect, and double tap to
