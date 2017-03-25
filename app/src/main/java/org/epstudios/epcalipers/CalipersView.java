@@ -74,6 +74,14 @@ public class CalipersView extends View {
 
     private MainActivity mainActivity;
 
+    public Caliper.Component getPressedComponent() {
+        return pressedComponent;
+    }
+
+    private Caliper.Component pressedComponent = Caliper.Component.None;
+
+
+
 
     public CalipersView(Context context) {
         super(context);
@@ -151,6 +159,7 @@ public class CalipersView extends View {
         @Override
         public void onLongPress(MotionEvent e) {
             PointF point = new PointF(e.getX(), e.getY());
+            pressedComponent = Caliper.Component.None;
             for (Caliper c : calipers) {
                 if (c.pointNearCrossBar(point)) {
                     final Caliper pressedCaliper = c;
@@ -181,25 +190,23 @@ public class CalipersView extends View {
                     break;
                 }
                 else if (c.pointNearBar1(point)) {
-                    Log.d(EPS, "near bar1");
-                    selectCaliper(c);
-                    locked = true;
-                    mainActivity.unselectCalipersExcept(c);
-                    mainActivity.selectMicroMovementMenu(true);
+                    setupMicroMovements(c, Caliper.Component.Bar1);
                     break;
                 }
                 else if (c.pointNearBar2(point)) {
-                    Log.d(EPS, "near bar2");
-                    selectCaliper(c);
-                    locked = true;
-                    mainActivity.unselectCalipersExcept(c);
-                    mainActivity.selectMicroMovementMenu(false);
+                    setupMicroMovements(c, Caliper.Component.Bar2);
                     break;
                 }
             }
         }
+    }
 
-
+    private void setupMicroMovements(Caliper c, Caliper.Component component) {
+        locked = true;
+        selectCaliper(c);
+        unselectCalipersExcept(c);
+        pressedComponent = component;
+        mainActivity.selectMicroMovementMenu(component);
     }
 
     public void setPaint(int caliperColor, int highlightColor, int lineWidth) {
@@ -286,6 +293,17 @@ public class CalipersView extends View {
             }
         }
         return c;
+    }
+
+    public void unselectCalipersExcept(Caliper c) {
+        // if only one caliper, no others can be selected
+        if (calipersCount() > 1) {
+            for (Caliper caliper : calipers) {
+                if (caliper != c) {
+                    unselectCaliper(caliper);
+                }
+            }
+        }
     }
 
     public int calipersCount() {

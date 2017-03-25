@@ -33,6 +33,15 @@ import java.text.DecimalFormat;
  * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Caliper {
+
+    public enum Component {
+        Bar1,
+        Bar2,
+        Crossbar,
+        None
+    }
+
+
     private static int differential = 0;
     private static final float DELTA = 30.0f;
 
@@ -247,7 +256,7 @@ public class Caliper {
         String text = measurement();
         if (direction == Direction.HORIZONTAL) {
             canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
-                    crossBarPosition - 10, paint);
+                    crossBarPosition - 12, paint);
         }
         else {
             canvas.drawText(text, crossBarPosition + 5,
@@ -386,6 +395,19 @@ public class Caliper {
 
     public void moveBar2(float delta, float deltaY, MotionEvent event) {
         bar2Position += delta;
+    }
+
+    public void moveBar(float delta, Component component) {
+        switch (component) {
+            case Bar1:
+                bar1Position += delta;
+                break;
+            case Bar2:
+                bar2Position += delta;
+                break;
+            default:
+                break;
+        }
     }
 
 

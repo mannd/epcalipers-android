@@ -1180,12 +1180,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //public because used by CalipersView
-    public void selectMicroMovementMenu(boolean bar1) {
+    public void selectMicroMovementMenu(Caliper.Component component) {
         if (microMovementMenu == null) {
             createMicroMovementMenu();
         }
         selectMenu(microMovementMenu);
-        if (bar1) {
+        if (component == Caliper.Component.Bar1) {
             rightBarTextView.setVisibility(View.GONE);
             leftBarTextView.setVisibility(View.VISIBLE);
         }
@@ -1627,30 +1627,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.invalidate();
     }
 
-    private void microMoveBar(Caliper c, boolean bar1, float distance) {
-        if (bar1) {
-            c.moveBar1(distance, 0, null);
+    private void microMoveBar(Caliper c, Caliper.Component component, float distance) {
+        if (component == Caliper.Component.Bar1) {
+            c.moveBar(distance, component);
+        }
+        else if (component == Caliper.Component.Bar2) {
+            c.moveBar(distance, component);
         }
         else {
-            c.moveBar2(distance, 0, null);
+            return;
         }
         calipersView.invalidate();
     }
 
     private void left() {
-        microMoveBar(calipersView.activeCaliper(), true, -1f);
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -1f);
     }
 
     private void right() {
-        microMoveBar(calipersView.activeCaliper(), true, 1f);
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 1f);
     }
 
     private void microLeft() {
-        microMoveBar(calipersView.activeCaliper(), true, -0.1f);
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -0.1f);
     }
 
     private void microRight() {
-        microMoveBar(calipersView.activeCaliper(), true, 1f);
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 0.1f);
     }
 
     private void microDone() {
@@ -1946,13 +1949,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void unselectCalipersExcept(Caliper c) {
         // if only one caliper, no others can be selected
-        if (calipersCount() > 1) {
-            for (Caliper caliper : getCalipers()) {
-                if (caliper != c) {
-                    calipersView.unselectCaliper(caliper);
-                }
-            }
-        }
+        calipersView.unselectCalipersExcept(c);
     }
 
     private void addCaliperWithDirection(Caliper.Direction direction) {
