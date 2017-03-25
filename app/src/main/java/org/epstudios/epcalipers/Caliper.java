@@ -362,7 +362,7 @@ public class Caliper {
 
     public boolean pointNearCrossBar(PointF p) {
         boolean nearBar;
-        float delta = DELTA + 5.0f;  // cross bar delta a little bigger
+        float delta = DELTA + 8.0f;  // cross bar delta a little bigger
         if (direction == Direction.HORIZONTAL) {
             nearBar = (p.x > Math.min(bar1Position, bar2Position)
                     && p.x < Math.max(bar2Position, bar1Position)
