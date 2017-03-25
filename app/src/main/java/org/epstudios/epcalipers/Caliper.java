@@ -41,6 +41,14 @@ public class Caliper {
         None
     }
 
+    public enum MovementDirection {
+        Up,
+        Down,
+        Left,
+        Right,
+        None
+    }
+
 
     private static int differential = 0;
     private static final float DELTA = 30.0f;
@@ -397,7 +405,7 @@ public class Caliper {
         bar2Position += delta;
     }
 
-    public void moveBar(float delta, Component component) {
+    public void moveBar(float delta, Component component, MovementDirection direction) {
         switch (component) {
             case Bar1:
                 bar1Position += delta;
@@ -405,8 +413,21 @@ public class Caliper {
             case Bar2:
                 bar2Position += delta;
                 break;
+            case Crossbar:
+                moveCrossbarDirectionally(delta, direction);
+                break;
             default:
                 break;
+        }
+    }
+
+    protected void moveCrossbarDirectionally(float delta, MovementDirection direction) {
+        if (direction == MovementDirection.Up || direction == MovementDirection.Down) {
+            crossBarPosition += delta;
+        }
+        else {
+            bar1Position += delta;
+            bar2Position += delta;
         }
     }
 

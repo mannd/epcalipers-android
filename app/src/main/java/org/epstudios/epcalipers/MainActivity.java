@@ -1045,7 +1045,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         microDownButton = createButton(getString(R.string.micro_down_label));
         microDoneButton = createButton(getString(R.string.done_button_title));
 
-        upDownButtons = Arrays.asList(upButton, downButton, microUpButton, microLeftButton);
+        upDownButtons = Arrays.asList(upButton, downButton, microUpButton, microDownButton);
         rightLeftButtons = Arrays.asList(leftButton, rightButton, microLeftButton, microRightButton);
     }
 
@@ -1154,10 +1154,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         items.add(microTextView);
         items.add(leftButton);
         items.add(rightButton);
-        items.add(microLeftButton);
-        items.add(microRightButton);
         items.add(upButton);
         items.add(downButton);
+        items.add(microLeftButton);
+        items.add(microRightButton);
         items.add(microUpButton);
         items.add(microDownButton);
         items.add(microDoneButton);
@@ -1737,50 +1737,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.invalidate();
     }
 
-    private void microMoveBar(Caliper c, Caliper.Component component, float distance) {
-        if (component == Caliper.Component.Bar1) {
-            c.moveBar(distance, component);
-        }
-        else if (component == Caliper.Component.Bar2) {
-            c.moveBar(distance, component);
-        }
-        else {
+    private void microMoveBar(Caliper c, Caliper.Component component, float distance, Caliper.MovementDirection direction) {
+        if (component == Caliper.Component.None) {
             return;
         }
+        c.moveBar(distance, component, direction);
         calipersView.invalidate();
     }
 
     private void left() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -1f);
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -1f, Caliper.MovementDirection.Left);
     }
 
     private void right() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 1f);
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 1f, Caliper.MovementDirection.Right);
     }
 
     private void microLeft() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -0.1f);
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -0.1f, Caliper.MovementDirection.Left);
     }
 
     private void microRight() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 0.1f);
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Right);
     }
 
-    // TODO: these are only aliases if not doing Crossbar/Apex!
     private void up() {
-        left();
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -1f, Caliper.MovementDirection.Up);
     }
 
     private void down() {
-        right();
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 1f, Caliper.MovementDirection.Down);
     }
 
     private void microUp() {
-        microLeft();
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -0.1f, Caliper.MovementDirection.Up);
     }
 
     private void microDown() {
-        microRight();
+        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Down);
     }
 
     private void microDone() {

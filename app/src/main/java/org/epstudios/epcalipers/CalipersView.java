@@ -176,44 +176,6 @@ public class CalipersView extends View {
             else if (allowTweakPosition) {
                 microMove(point);
             }
-//            for (Caliper c : calipers) {
-//                if (c.pointNearCaliper(point)) {
-//                    final Caliper pressedCaliper = c;
-//                    // https://github.com/QuadFlask/colorpicker
-//                    ColorPickerDialogBuilder
-//                            .with(getContext())
-//                            .setTitle("Choose color")
-//                            .initialColor(pressedCaliper.getUnselectedColor())
-//                            .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
-//                            .density(12)
-//                            .setPositiveButton("OK", new ColorPickerClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int chosenColor, Integer[] allColors) {
-//                                    if (!pressedCaliper.isSelected()) {
-//                                        pressedCaliper.setColor(chosenColor);
-//                                    }
-//                                    pressedCaliper.setUnselectedColor(chosenColor);
-//                                    invalidate();
-//                                }
-//                            })
-//                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                }
-//                            })
-//                            .build()
-//                            .show();
-//                    break;
-//                }
-//                else if (c.pointNearBar1(point)) {
-//                    setupMicroMovements(c, Caliper.Component.Bar1);
-//                    break;
-//                }
-//                else if (c.pointNearBar2(point)) {
-//                    setupMicroMovements(c, Caliper.Component.Bar2);
-//                    break;
-//                }
-//            }
         }
     }
 

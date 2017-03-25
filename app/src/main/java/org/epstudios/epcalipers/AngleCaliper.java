@@ -253,7 +253,7 @@ public class AngleCaliper extends Caliper {
     }
 
     @Override
-    public void moveBar(float delta, Component component) {
+    public void moveBar(float delta, Component component, MovementDirection direction) {
         switch (component) {
             case Bar1:
                 bar1Angle -= degreesToRadians(delta);
@@ -261,6 +261,8 @@ public class AngleCaliper extends Caliper {
             case Bar2:
                 bar2Angle -= degreesToRadians(delta);
                 break;
+            case Crossbar:
+                super.moveCrossbarDirectionally(delta, direction);
             default:
                 break;
         }
