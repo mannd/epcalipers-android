@@ -159,7 +159,6 @@ public class CalipersView extends View {
         @Override
         public void onLongPress(MotionEvent e) {
             PointF point = new PointF(e.getX(), e.getY());
-            pressedComponent = Caliper.Component.None;
             for (Caliper c : calipers) {
                 if (c.pointNearCrossBar(point)) {
                     final Caliper pressedCaliper = c;
@@ -206,7 +205,7 @@ public class CalipersView extends View {
         selectCaliper(c);
         unselectCalipersExcept(c);
         pressedComponent = component;
-        mainActivity.selectMicroMovementMenu(component);
+        mainActivity.selectMicroMovementMenu(c, component);
     }
 
     public void setPaint(int caliperColor, int highlightColor, int lineWidth) {

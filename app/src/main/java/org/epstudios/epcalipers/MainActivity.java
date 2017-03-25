@@ -25,11 +25,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -65,7 +61,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -73,7 +68,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -120,8 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button microLeftButton;
     private Button microRightButton;
     private Button microDoneButton;
-    private TextView leftBarTextView;
-    private TextView rightBarTextView;
+    private TextView microTextView;
     private HorizontalScrollView mainMenu;
     private HorizontalScrollView imageMenu;
     private HorizontalScrollView addCaliperMenu;
@@ -1009,8 +1002,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // MicroMovement menu
         leftButton = createButton(getString(R.string.left_label));
         rightButton = createButton(getString(R.string.right_label));
-        microLeftButton = createButton(getString(R.string.microLeft));
-        microRightButton = createButton(getString(R.string.microRight));
+        microLeftButton = createButton(getString(R.string.micro_left_label));
+        microRightButton = createButton(getString(R.string.micro_right_label));
         microDoneButton = createButton(getString(R.string.done_button_title));
     }
 
@@ -1095,12 +1088,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void createMicroMovementMenu() {
         ArrayList<TextView> items = new ArrayList<>();
-        leftBarTextView = new TextView(this);
-        leftBarTextView.setText("Left bar:");
-        rightBarTextView = new TextView(this);
-        rightBarTextView.setText("Right bar:");
-        items.add(leftBarTextView);
-        items.add(rightBarTextView);
+        microTextView = new TextView(this);
+        items.add(microTextView);
         items.add(leftButton);
         items.add(rightButton);
         items.add(microLeftButton);
@@ -1113,7 +1102,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (mainMenu == null) {
             createMainMenu();
         }
-        Log.d(EPS, "selectMainMenu");
         selectMenu(mainMenu);
         boolean enable = horizontalCalibration.canDisplayRate();
         intervalRateButton.setEnabled(enable);
@@ -1180,18 +1168,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //public because used by CalipersView
-    public void selectMicroMovementMenu(Caliper.Component component) {
+    public void selectMicroMovementMenu(Caliper c, Caliper.Component component) {
         if (microMovementMenu == null) {
             createMicroMovementMenu();
         }
         selectMenu(microMovementMenu);
-        if (component == Caliper.Component.Bar1) {
-            rightBarTextView.setVisibility(View.GONE);
-            leftBarTextView.setVisibility(View.VISIBLE);
+        if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
+            leftButton.setText(getString(R.string.left_label));
+            rightButton.setText(getString(R.string.right_label));
+            microLeftButton.setText(getString(R.string.micro_left_label));
+            microRightButton.setText(getString(R.string.micro_right_label));
+            if (component == Caliper.Component.Bar1) {
+                microTextView.setText(getString(R.string.left_bar_label));
+            }
+            else {
+                microTextView.setText(getString(R.string.right_bar_label));
+            }
         }
         else {
-            rightBarTextView.setVisibility(View.VISIBLE);
-            leftBarTextView.setVisibility(View.GONE);
+            leftButton.setText(getString(R.string.up_label));
+            rightButton.setText(getString(R.string.down_label));
+            microLeftButton.setText(getString(R.string.micro_up_label));
+            microRightButton.setText(getString(R.string.micro_down_label));
+            if (component == Caliper.Component.Bar1) {
+                microTextView.setText(getString(R.string.up_bar_label));
+            }
+            else {
+                microTextView.setText(getString(R.string.down_bar_label));
+            }
         }
     }
 

@@ -118,6 +118,14 @@
     <string name="sample_normal_ecg">sample normal ECG</string>
     <string name="left_label">Left</string>
     <string name="right_label">Right</string>
-    <string name="microLeft">microLeft</string>
-    <string name="microRight">microRight</string>
+    <string name="micro_left_label">microLeft</string>
+    <string name="micro_right_label">microRight</string>
+    <string name="up_label">Up</string>
+    <string name="down_label">Down</string>
+    <string name="micro_up_label">microUp</string>
+    <string name="micro_down_label">microDown</string>
+    <string name="left_bar_label">Move left bar</string>
+    <string name="right_bar_label">Move right bar</string>
+    <string name="up_bar_label">Move upper bar</string>
+    <string name="down_bar_label">Move lower bar</string>
 </resources>
