@@ -80,6 +80,17 @@ public class CalipersView extends View {
 
     private Caliper.Component pressedComponent = Caliper.Component.None;
 
+    public void setAllowColorChange(boolean allowColorChange) {
+        this.allowColorChange = allowColorChange;
+    }
+
+    public void setAllowTweakPosition(boolean allowTweakPosition) {
+        this.allowTweakPosition = allowTweakPosition;
+    }
+
+    private boolean allowColorChange = false;
+    private boolean allowTweakPosition = false;
+
 
 
 
@@ -159,9 +170,59 @@ public class CalipersView extends View {
         @Override
         public void onLongPress(MotionEvent e) {
             PointF point = new PointF(e.getX(), e.getY());
+            if (allowColorChange) {
+                changeColor(point);
+            }
+            else if (allowTweakPosition) {
+                microMove(point);
+            }
+//            for (Caliper c : calipers) {
+//                if (c.pointNearCaliper(point)) {
+//                    final Caliper pressedCaliper = c;
+//                    // https://github.com/QuadFlask/colorpicker
+//                    ColorPickerDialogBuilder
+//                            .with(getContext())
+//                            .setTitle("Choose color")
+//                            .initialColor(pressedCaliper.getUnselectedColor())
+//                            .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
+//                            .density(12)
+//                            .setPositiveButton("OK", new ColorPickerClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int chosenColor, Integer[] allColors) {
+//                                    if (!pressedCaliper.isSelected()) {
+//                                        pressedCaliper.setColor(chosenColor);
+//                                    }
+//                                    pressedCaliper.setUnselectedColor(chosenColor);
+//                                    invalidate();
+//                                }
+//                            })
+//                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                }
+//                            })
+//                            .build()
+//                            .show();
+//                    break;
+//                }
+//                else if (c.pointNearBar1(point)) {
+//                    setupMicroMovements(c, Caliper.Component.Bar1);
+//                    break;
+//                }
+//                else if (c.pointNearBar2(point)) {
+//                    setupMicroMovements(c, Caliper.Component.Bar2);
+//                    break;
+//                }
+//            }
+        }
+    }
+
+        private void changeColor(PointF point) {
             for (Caliper c : calipers) {
-                if (c.pointNearCrossBar(point)) {
+                if (c.pointNearCaliper(point)) {
                     final Caliper pressedCaliper = c;
+                    // better if unselected color is shown after color change
+                    c.setSelected(false);
                     // https://github.com/QuadFlask/colorpicker
                     ColorPickerDialogBuilder
                             .with(getContext())
@@ -188,14 +249,22 @@ public class CalipersView extends View {
                             .show();
                     break;
                 }
-                else if (c.pointNearBar1(point)) {
-                    setupMicroMovements(c, Caliper.Component.Bar1);
-                    break;
-                }
-                else if (c.pointNearBar2(point)) {
-                    setupMicroMovements(c, Caliper.Component.Bar2);
-                    break;
-                }
+            }
+        }
+
+    private void microMove(PointF point) {
+        for (Caliper c : calipers) {
+            if (c.pointNearBar1(point)) {
+                setupMicroMovements(c, Caliper.Component.Bar1);
+                break;
+            }
+            else if (c.pointNearBar2(point)) {
+                setupMicroMovements(c, Caliper.Component.Bar2);
+                break;
+            }
+            else if (c.pointNearCrossBar(point)) {
+                setupMicroMovements(c, Caliper.Component.Crossbar);
+                break;
             }
         }
     }
@@ -294,7 +363,12 @@ public class CalipersView extends View {
         return c;
     }
 
-    public void unselectCalipersExcept(Caliper c) {
+    public void selectCaliperAndUnselectOthers(Caliper c) {
+        selectCaliper(c);
+        unselectCalipersExcept(c);
+    }
+
+    private void unselectCalipersExcept(Caliper c) {
         // if only one caliper, no others can be selected
         if (calipersCount() > 1) {
             for (Caliper caliper : calipers) {
@@ -305,9 +379,17 @@ public class CalipersView extends View {
         }
     }
 
+    public void unselectAllCalipers() {
+        for (Caliper c : calipers) {
+            c.setSelected(false);
+        }
+        invalidate();
+    }
+
     public int calipersCount() {
         return calipers.size();
     }
+
 
     public void addCaliper(Caliper c) {
         calipers.add(c);

@@ -118,14 +118,20 @@
     <string name="sample_normal_ecg">sample normal ECG</string>
     <string name="left_label">Left</string>
     <string name="right_label">Right</string>
-    <string name="micro_left_label">microLeft</string>
-    <string name="micro_right_label">microRight</string>
+    <string name="micro_left_label">m-Left</string>
+    <string name="micro_right_label">m-Right</string>
     <string name="up_label">Up</string>
     <string name="down_label">Down</string>
-    <string name="micro_up_label">microUp</string>
-    <string name="micro_down_label">microDown</string>
+    <string name="micro_up_label">m-Up</string>
+    <string name="micro_down_label">m-Down</string>
     <string name="left_bar_label">Move left bar</string>
     <string name="right_bar_label">Move right bar</string>
     <string name="up_bar_label">Move upper bar</string>
     <string name="down_bar_label">Move lower bar</string>
+    <string name="color_label">Color</string>
+    <string name="tweak_label">Tweak</string>
+    <string name="color_menu_text">Long press calper to change color</string>
+    <string name="tweak_menu_text">Long press caliper component to tweak position</string>
+    <string name="move_angle_apex_text">Move angle apex</string>
+    <string name="move_crossbar_text">Move crossbar</string>
 </resources>

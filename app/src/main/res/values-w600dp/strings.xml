@@ -14,6 +14,11 @@
         be enabled.\n\nUse the *Image* button on the top right to load
         and adjust ECG images.\n\nSee the *Help* menu item for full
         help.</string>
+    <string name="micro_left_label">microLeft</string>
+    <string name="micro_right_label">microRight</string>
+    <string name="micro_up_label">microUp</string>
+    <string name="micro_down_label">microDown</string>
+
 
 
 </resources>

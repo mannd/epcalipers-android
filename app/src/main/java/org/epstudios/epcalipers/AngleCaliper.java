@@ -155,7 +155,7 @@ public class AngleCaliper extends Caliper {
     // test if angle is in inferior half of unit circle
     // these are the only angles relevant for Brugada triangle base measurement
     private boolean angleInSouthernHemisphere(double angle) {
-        return 0.0 <= angle && angle <= Math.PI;
+        return 0.0 < angle && angle < Math.PI;
     }
 
     private String calibratedBaseResult(double lengthInPoints) {
