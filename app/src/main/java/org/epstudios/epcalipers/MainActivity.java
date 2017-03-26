@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int DEFAULT_HIGHLIGHT_COLOR = Color.RED;
     private static final int DEFAULT_LINE_WIDTH = 2;
     public static final String TEMP_BITMAP_FILE_NAME = "/tempEPCalipersImageBitmap.png";
+    private static final String ANGLE_B1 = "angleB1";
+    private static final String ANGLE_B2 = "angleB2";
     private Button addCaliperButton;
     private Button calibrateButton;
     private Button intervalRateButton;
@@ -737,7 +739,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
         // for efficiency, don't bother writing the bitmap to a file if it hasn't changed
         if (!imageBitmap.sameAs(previousBitmap)) {
-            Log.d(EPS, "writing new temp file.");
             storeBitmapToTempFile(((BitmapDrawable) imageView.getDrawable()).getBitmap());
         }
         // Calibration
@@ -780,7 +781,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             outState.putBoolean(i + "CaliperSelected", c.isSelected());
             outState.putBoolean(i + "IsAngleCaliper", c.isAngleCaliper());
             outState.putInt(i + "UnselectedColor", c.getUnselectedColor());
+
+            if (c.isAngleCaliper()) {
+                outState.putDouble(i + ANGLE_B1, ((AngleCaliper)c).getBar1Angle());
+                outState.putDouble(i + ANGLE_B2, ((AngleCaliper)c).getBar2Angle());
+            }
+            else {
+                outState.putDouble(i + ANGLE_B1, 0.0);
+                outState.putDouble(i + ANGLE_B2, 0.0);
+            }
+
+
         }
+
         outState.putInt("CalipersCount", calipersCount());
     }
 
@@ -834,8 +847,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Caliper.Direction.HORIZONTAL : Caliper.Direction.VERTICAL;
             float bar1Position = savedInstanceState.getFloat(i + "CaliperBar1Position");
             float bar2Position = savedInstanceState.getFloat(i + "CaliperBar2Position");
+            double bar1Angle = savedInstanceState.getDouble(i + ANGLE_B1);
+            double bar2Angle = savedInstanceState.getDouble(i + ANGLE_B2);
             float crossbarPosition = savedInstanceState.getFloat(i + "CaliperCrossbarPosition");
             boolean selected = savedInstanceState.getBoolean(i + "CaliperSelected");
+
             Caliper c;
             if (isAngleCaliper) {
                 c = new AngleCaliper();
@@ -861,6 +877,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else {
                 c.setCalibration(verticalCalibration);
+            }
+            if (c.isAngleCaliper()) {
+                ((AngleCaliper)c).setVerticalCalibration(verticalCalibration);
+                ((AngleCaliper)c).setBar1Angle(bar1Angle);
+                ((AngleCaliper)c).setBar2Angle(bar2Angle);
             }
 
 
