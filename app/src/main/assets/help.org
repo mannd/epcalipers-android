@@ -39,7 +39,7 @@ advanced measurements like the corrected QT interval.
 Use the *Image* button at the top right of the
 screen to switch to *Image mode*.  The *Image* menu will appear at the bottom of your screen.
 #+CAPTION: *Image* menu
-[[./image_menu.png]]
+[[./image_menu2.png]]
 
 With this menu you can load and adjust an ECG image.  There are several ways to load an ECG image, as described next.
 ** Take a photo of an ECG
@@ -88,6 +88,8 @@ rotated or not quite square to the screen.  You should recalibrate
 your calipers after rotating the image.  If you need to go back to the
 original image position use *Reset*.  After adjusting the image select
 *Done* to return to the main image menu.
+* <<Lock>>Locking the image
+When moving and adjusting calipers, you may sometimes inadvertently move the underlying image.  Select *Lock* to lock the image in place.  A message appears at the top of the screen indicating the image is locked.  Unlock the image by selecting *Unlock*.
 * Exiting *Image* mode
 After loading and adjusting the image, you need to exit Image mode so that you can use the calipers.  Select the *Measure* button at the top left of the screen to return to the *EP Calipers* main screen.
 #+CAPTION: Use the *Measure* button to exit *Image* mode
@@ -97,7 +99,7 @@ After loading and adjusting the image, you need to exit Image mode so that you c
 Calipers can be horizontal for time measurements, vertical for amplitude measurements or angle shaped to measure angles in degrees.  Time calipers look like the letter *H*, amplitude calipers like an *H* lying on its side, and angle calipers start out looking like an upside down *V*.  
 * Moving calipers
 ** Time and amplitude calipers
-Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bars (or top or bottom in the case of vertical calipers) to stretch or shrink the calipers.  Note that you cannot pinch both bars at the same time.
+Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bars (or top or bottom in the case of vertical calipers) to stretch or shrink the calipers.  Note that you cannot pinch both bars at the same time.  If you find you are inadvertently moving the underlying image rather than the calipers, use the [[Lock][*Lock*]] item from the *Image* menu to lock the image in place.
 #+CAPTION: Single unselected uncalibrated time caliper
 [[./unselected_time_caliper.png]]
 
