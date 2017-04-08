@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -68,6 +70,12 @@ public class CalipersView extends View {
 
     boolean locked;
 
+    public void setLockImage(boolean lockImage) {
+        this.lockImage = lockImage;
+    }
+
+    private boolean lockImage;
+
     public void setMainActivity(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
@@ -111,6 +119,7 @@ public class CalipersView extends View {
 
     private void init(Context context) {
         locked = false;
+        lockImage = false;
         calipers = new ArrayList<>();
         touchedCaliper = null;
         MyGestureListener listener = new MyGestureListener();
@@ -260,6 +269,28 @@ public class CalipersView extends View {
         for (Caliper c : calipers) {
             c.draw(canvas);
         }
+        if (lockImage) {
+            showLockWarning(canvas);
+        }
+    }
+
+    private void showLockWarning(Canvas canvas) {
+        String text = "IMAGE LOCKED";
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAlpha(200);
+        canvas.drawRect(10, 45, this.getWidth(), 95, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setAlpha(255);
+        paint.setStrokeWidth(3.0f);
+        paint.setAntiAlias(true);
+        paint.setTypeface(Typeface.DEFAULT);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(48.0f);
+
+        canvas.drawText(text, (float) (this.getWidth() / 2.0), 88.0f, paint);
     }
 
     private void setTouchedCaliper(MotionEvent event) {

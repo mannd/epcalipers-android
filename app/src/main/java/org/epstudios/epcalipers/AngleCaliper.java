@@ -263,6 +263,7 @@ public class AngleCaliper extends Caliper {
                 break;
             case Crossbar:
                 super.moveCrossbarDirectionally(delta, direction);
+		break;
             default:
                 break;
         }

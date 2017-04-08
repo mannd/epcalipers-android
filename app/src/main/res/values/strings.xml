@@ -134,4 +134,6 @@
     <string name="tweak_menu_text">Long press caliper component to tweak position</string>
     <string name="move_angle_apex_text">Move angle apex</string>
     <string name="move_crossbar_text">Move crossbar</string>
+    <string name="lock_label">Lock</string>
+    <string name="unlock_label">Unlock</string>
 </resources>

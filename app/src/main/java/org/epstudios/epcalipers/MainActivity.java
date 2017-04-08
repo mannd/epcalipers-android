@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button cameraButton;
     private Button selectImageButton;
     private Button adjustImageButton;
+    private Button imageLockButton;
     private Button previousPageButton;
     private Button nextPageButton;
     private Button rotateImageRightButton;
@@ -174,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean useLargeFont;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
     private final float max_zoom = 10.0f;
+    private boolean imageIsLocked = false;
 
     private Bitmap previousBitmap = null;
 
@@ -731,6 +733,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean("calipersMode", calipersMode);
         outState.putFloat("scale", attacher.getScale());
         outState.putFloat("totalRotation", totalRotation);
+        outState.putBoolean("imageIsLocked", imageIsLocked);
 
         // To avoid FAILED BINDER TRANSACTION issue (which is ignored up until Android 24,
         // save to temp file instead of storing bitmap in bundle.
@@ -802,6 +805,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onRestoreInstanceState(savedInstanceState);
         Log.d(EPS, "onRestoreInstanceState");
         calipersMode = savedInstanceState.getBoolean("calipersMode");
+        imageIsLocked = savedInstanceState.getBoolean("imageIsLocked");
+        lockImage(imageIsLocked);
 
         // Bitmap now passed via temporary file
         //Bitmap image = savedInstanceState.getParcelable("Image");
@@ -977,6 +982,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             doQTcCalculation();
         } else if (v == cancelQTcMeasurementButton) {
             selectMainMenu();
+        } else if (v == imageLockButton) {
+            lockImage();
         } else if (v == previousPageButton) {
             showPreviousPage();
         } else if (v == nextPageButton) {
@@ -1023,6 +1030,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cameraButton.setEnabled(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA));
         selectImageButton = createButton(getString(R.string.select_image_button_title));
         adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
+        imageLockButton = createButton(getString(R.string.lock_label));
         previousPageButton = createButton("Previous");
         nextPageButton = createButton("Next");
         // Add Caliper menu
@@ -1095,6 +1103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(cameraButton);
         buttons.add(selectImageButton);
         buttons.add(adjustImageButton);
+        buttons.add(imageLockButton);
         buttons.add(previousPageButton);
         buttons.add(nextPageButton);
         imageMenu = createMenu(buttons);
@@ -1395,10 +1404,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setMode();
     }
 
+
+    private void lockImage() {
+        imageIsLocked = !imageIsLocked;
+        lockImage(imageIsLocked);
+    }
+
+    private void lockImage(boolean lock) {
+        imageView.setEnabled(!lock);
+        calipersView.setLockImage(lock);
+        if (lock) {
+            imageLockButton.setText(getString(R.string.unlock_label));
+        }
+        else {
+            imageLockButton.setText(getString(R.string.lock_label));
+        }
+        calipersView.invalidate();
+    }
+
     private void setMode() {
         // imageView is always enabled now that touch events pass through
         // imageView.setEnabled(!calipersMode);
         calipersView.setEnabled(calipersMode);
+
         MenuItem switchModeMenuItem = menu.findItem(R.id.action_switch);
 
         if (calipersMode) {
