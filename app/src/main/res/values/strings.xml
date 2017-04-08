@@ -84,8 +84,8 @@
     <string name="invalid_result_message">Invalid Result</string>
     <string name="calculated_qtc_dialog_title">Calculated QTc</string>
     <string name="quick_start_title">EP Calipers Quick Start</string>
-    <string name="quick_start_message">What\'s new: Set individual caliper colors
-    with new Color menu, and fine-tune caliper positioning with new Tweak menu.
+    <string name="quick_start_message">What\'s new: Lock image in place using the *Lock* menu item
+        in the *Image* menu.
         \n\nQuick Start: Use your fingers to move and position calipers or move and zoom the
         image.\n\nAdd calipers with the *+* menu item, single tap a
         caliper to select it, tap again to unselect, and double tap to
