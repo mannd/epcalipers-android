@@ -280,7 +280,7 @@ public class CalipersView extends View {
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.FILL);
         paint.setAlpha(200);
-        canvas.drawRect(10, 45, this.getWidth(), 95, paint);
+        canvas.drawRect(0, 45, this.getWidth(), 95, paint);
         paint.setStyle(Paint.Style.STROKE);
         paint.setAlpha(255);
         paint.setStrokeWidth(3.0f);
