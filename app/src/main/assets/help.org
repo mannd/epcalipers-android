@@ -130,7 +130,7 @@ When more than one caliper is present, it is necessary to indicate which caliper
 [[./selected_caliper.png]]
 
 * Changing caliper colors
-Initial caliper colors are set via [[Settings][Settings]], and these colors apply to all newly added calipers.  However, once a caliper is added, its color can be changed, and each caliper can have a different color.  These color changes until the calipers are deleted or the app is stopped.  On the main menu, select the *Color* button.  Then long press a caliper to bring up a color wheel.  Select a color and the caliper will change to that color.  If you want to change the default caliper colors for each time the app runs, this can be done via [[Settings][Settings]].
+Initial caliper colors are set via [[Settings][Settings]], and these colors apply to all newly added calipers.  However, once a caliper is added, its color can be changed, and each caliper can have a different color.  These color changes persist until the calipers are deleted or the app is stopped.  On the main menu, select the *Color* button.  Then long press a caliper to bring up a color wheel.  Select a color and the caliper will change to that color.  If you want to change the default caliper colors for each time the app runs, this can be done via [[Settings][Settings]].
 #+CAPTION: Caliper color picker
 [[./color_picker.png]]
 
@@ -168,6 +168,8 @@ The triangle base will be located 5 mm below the apex of the triangle.  Proper a
 
 * <<Settings>>Settings
 Preferences such as caliper colors and default calibration intervals can be selected using the *Settings* menu item on the toolbar at the top of the app.
+* Limitations
+- After device rotation, only the currently loaded page of a multi-page PDF image is available.  It is necessary to reload the PDF in order to change pages again.
 * Acknowledgments
 - Thanks to Dr. Michael Katz for the concept.
 - Thanks to Dr. Adrian Baranchuk and his colleagues at Queen's University Kingston, Ontario, Canada for the concept of the Brugadometer and for assistance in implementing this algorithm.
