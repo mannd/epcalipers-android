@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button selectImageButton;
     private Button adjustImageButton;
     private Button imageLockButton;
+    private Button sampleEcgButton;
     private Button previousPageButton;
     private Button nextPageButton;
     private Button rotateImageRightButton;
@@ -984,6 +985,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectMainMenu();
         } else if (v == imageLockButton) {
             lockImage();
+        } else if (v == sampleEcgButton) {
+            loadSampleEcg();
         } else if (v == previousPageButton) {
             showPreviousPage();
         } else if (v == nextPageButton) {
@@ -1031,6 +1034,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         selectImageButton = createButton(getString(R.string.select_image_button_title));
         adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
         imageLockButton = createButton(getString(R.string.lock_label));
+        sampleEcgButton = createButton(getString(R.string.sample_label));
         previousPageButton = createButton("Previous");
         nextPageButton = createButton("Next");
         // Add Caliper menu
@@ -1104,6 +1108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(selectImageButton);
         buttons.add(adjustImageButton);
         buttons.add(imageLockButton);
+        buttons.add(sampleEcgButton);
         buttons.add(previousPageButton);
         buttons.add(nextPageButton);
         imageMenu = createMenu(buttons);
@@ -1447,6 +1452,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void changeSettings() {
         Intent i = new Intent(this, Prefs.class);
         startActivity(i);
+    }
+
+    private void loadSampleEcg() {
+        Bitmap image = BitmapFactory.decodeResource(this.getResources(),
+                R.drawable.sample_ecg);
+        updateImageView(image);
     }
 
     // Note: for target SDK over 22, must add specific code to check for permissions,

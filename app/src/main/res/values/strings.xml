@@ -136,4 +136,5 @@
     <string name="move_crossbar_text">Move crossbar</string>
     <string name="lock_label">Lock</string>
     <string name="unlock_label">Unlock</string>
+    <string name="sample_label">Sample</string>
 </resources>
