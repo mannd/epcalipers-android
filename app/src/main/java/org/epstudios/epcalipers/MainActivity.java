@@ -26,6 +26,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -1457,7 +1458,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (calipersMode) {
             getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.primary)));
             unfadeCalipersView();
             switchModeMenuItem.setTitle(R.string.image_button_title);
             selectMainMenu();

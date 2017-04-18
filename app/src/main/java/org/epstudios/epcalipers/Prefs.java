@@ -30,7 +30,6 @@ This file is part of EP Coding.
 package org.epstudios.epcalipers;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
