@@ -1044,7 +1044,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intervalRateButton = createButton(getString(R.string.interval_rate_button_title));
         meanRateButton = createButton(getString(R.string.mean_rate_button_title));
         qtcButton = createButton(getString(R.string.qtc_button_title));
-        // Image menu
+        // Image menuº
         cameraButton = createButton(getString(R.string.camera_button_title));
         cameraButton.setEnabled(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA));
         selectImageButton = createButton(getString(R.string.select_image_button_title));
@@ -1858,6 +1858,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void tweakDone() {
+        selectMainMenu();
+    }
+
+    private void microDone() {
         if (inQtc && allowTweakDuringQtc) {
             selectQTcStep2Menu();
         }
@@ -1865,17 +1869,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             calipersView.setLocked(false);
             selectMainMenu();
         }
-    }
-
-    private void microDone() {
-        selectTweakMenu();
-//        if (inQtc && allowTweakDuringQtc) {
-//            selectQTcStep2Menu();
-//        }
-//        else {
-//            calipersView.setLocked(false);
-//            selectMainMenu();
-//        }
     }
 
     private int calipersCount() {
