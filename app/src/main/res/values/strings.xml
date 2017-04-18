@@ -84,8 +84,9 @@
     <string name="invalid_result_message">Invalid Result</string>
     <string name="calculated_qtc_dialog_title">Calculated QTc</string>
     <string name="quick_start_title">EP Calipers Quick Start</string>
-    <string name="quick_start_message">What\'s new: Lock image in place using the *Lock* menu item
-        in the *Image* menu.
+    <string name="quick_start_message">What\'s new: This new version of *EP Calipers* adds a setting to allow
+        micromovement ("tweaking") of calipers during QTc measurements.
+        The sample ECG can now be reloaded without restarting the app.
         \n\nQuick Start: Use your fingers to move and position calipers or move and zoom the
         image.\n\nAdd calipers with the *+* menu item, single tap a
         caliper to select it, tap again to unselect, and double tap to
@@ -136,4 +137,11 @@
     <string name="move_crossbar_text">Move crossbar</string>
     <string name="lock_label">Lock</string>
     <string name="unlock_label">Unlock</string>
+    <string name="sample_label">Sample</string>
+    <string name="multipage_pdf_warning">Multipage PDF will need to be reloaded to view other pages.</string>
+    <string name="temp_image_file_warning">Could not store temporary image file</string>
+    <string name="tweak_during_qtc_label">Allow tweaking during QTc</string>
+    <string name="tweak_during_qtc_key">tweak_during_qtc</string>
+    <string name="tweak_during_qtc_summary_off">Cannot tweak caliper during QT measurement</string>
+    <string name="tweak_during_qtc_summary_on">Long press to tweak caliper during QT measurement</string>
 </resources>

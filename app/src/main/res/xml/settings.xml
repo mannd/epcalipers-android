@@ -61,6 +61,14 @@
         android:summaryOff="@string/round_msec_rate_off_summary"
         android:summaryOn="@string/round_msec_rate_on_summary" />
 
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/tweak_during_qtc_key"
+        android:title="@string/tweak_during_qtc_label"
+        android:summaryOff="@string/tweak_during_qtc_summary_off"
+        android:summaryOn="@string/tweak_during_qtc_summary_on" />
+
+
 
 </PreferenceScreen>
 

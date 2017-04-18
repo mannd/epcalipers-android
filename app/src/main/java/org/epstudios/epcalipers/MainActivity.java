@@ -26,6 +26,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button selectImageButton;
     private Button adjustImageButton;
     private Button imageLockButton;
+    private Button sampleEcgButton;
     private Button previousPageButton;
     private Button nextPageButton;
     private Button rotateImageRightButton;
@@ -157,6 +159,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private float landscapeHeight;
     private boolean showStartImage;
     private boolean roundMsecRate;
+    private boolean allowTweakDuringQtc;
+    private boolean inQtc = false;
     private int currentCaliperColor;
     private int currentHighlightColor;
     private int currentLineWidth;
@@ -300,6 +304,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // show start image only has effect with restart
                 Log.d(EPS, "onSharedPreferenceChangeListener");
                 if (key.equals(getString(R.string.show_start_image_key))) {
+                    return;
+                }
+                if (key.equals(getString(R.string.tweak_during_qtc_key))) {
+                    allowTweakDuringQtc = sharedPreferences.getBoolean(key,
+                            false);
                     return;
                 }
                 if (key.equals(getString(R.string.default_time_calibration_key))) {
@@ -638,6 +647,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         defaultAmplitudeCalibration = sharedPreferences.getString(
                 getString(R.string.default_amplitude_calibration_key), getString(R.string.default_amplitude_calibration_value));
         useLargeFont = sharedPreferences.getBoolean(getString(R.string.use_large_font_key), false);
+        allowTweakDuringQtc = sharedPreferences.getBoolean(getString(R.string.tweak_during_qtc_key), false);
         try {
             currentCaliperColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_caliper_color_key),
                     Integer.valueOf(DEFAULT_CALIPER_COLOR).toString()));
@@ -734,6 +744,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putFloat("scale", attacher.getScale());
         outState.putFloat("totalRotation", totalRotation);
         outState.putBoolean("imageIsLocked", imageIsLocked);
+        outState.putBoolean("multipagePDF", numberOfPdfPages > 0);
 
         // To avoid FAILED BINDER TRANSACTION issue (which is ignored up until Android 24,
         // save to temp file instead of storing bitmap in bundle.
@@ -807,6 +818,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersMode = savedInstanceState.getBoolean("calipersMode");
         imageIsLocked = savedInstanceState.getBoolean("imageIsLocked");
         lockImage(imageIsLocked);
+
+        boolean isMultipagePdf = savedInstanceState.getBoolean("multipagePDF");
 
         // Bitmap now passed via temporary file
         //Bitmap image = savedInstanceState.getParcelable("Image");
@@ -893,6 +906,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             calipersView.getCalipers().add(c);
 
         }
+        if (isMultipagePdf) {
+            Toast toast = Toast.makeText(this, R.string.multipage_pdf_warning,
+                    Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
 
     private void storeBitmapToTempFile(Bitmap bitmap) {
@@ -905,7 +923,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             fOut.close();
         }
         catch (Exception ex) {
-            Toast toast = Toast.makeText(this, "Could not store temporary image file", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(this, R.string.temp_image_file_warning, Toast.LENGTH_SHORT);
             toast.show();
             Log.d(EPS, "Could not store temp file");
         }
@@ -984,6 +1002,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectMainMenu();
         } else if (v == imageLockButton) {
             lockImage();
+        } else if (v == sampleEcgButton) {
+            loadSampleEcg();
         } else if (v == previousPageButton) {
             showPreviousPage();
         } else if (v == nextPageButton) {
@@ -995,7 +1015,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == tweakButton) {
             selectTweakMenu();
         } else if (v == tweakDoneButton) {
-            selectMainMenu();
+            tweakDone();
         } else if (v == leftButton) {
             left();
         } else if (v == rightButton) {
@@ -1025,12 +1045,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intervalRateButton = createButton(getString(R.string.interval_rate_button_title));
         meanRateButton = createButton(getString(R.string.mean_rate_button_title));
         qtcButton = createButton(getString(R.string.qtc_button_title));
-        // Image menu
+        // Image menuº
         cameraButton = createButton(getString(R.string.camera_button_title));
         cameraButton.setEnabled(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA));
         selectImageButton = createButton(getString(R.string.select_image_button_title));
         adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
         imageLockButton = createButton(getString(R.string.lock_label));
+        sampleEcgButton = createButton(getString(R.string.sample_label));
         previousPageButton = createButton("Previous");
         nextPageButton = createButton("Next");
         // Add Caliper menu
@@ -1104,6 +1125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(selectImageButton);
         buttons.add(adjustImageButton);
         buttons.add(imageLockButton);
+        buttons.add(sampleEcgButton);
         buttons.add(previousPageButton);
         buttons.add(nextPageButton);
         imageMenu = createMenu(buttons);
@@ -1205,6 +1227,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.setLocked(false);
         calipersView.setAllowTweakPosition(false);
         calipersView.setAllowColorChange(false);
+        inQtc = false;
     }
 
     private void selectImageMenu() {
@@ -1262,6 +1285,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createQTcStep2Menu();
         }
         selectMenu(qtcStep2Menu);
+        inQtc = true;
+        calipersView.setAllowTweakPosition(allowTweakDuringQtc);
     }
 
     private void selectColorMenu() {
@@ -1288,6 +1313,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.setAllowTweakPosition(true);
 
     }
+
+
 
     //public because used by CalipersView
     public void selectMicroMovementMenu(Caliper c, Caliper.Component component) {
@@ -1431,7 +1458,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (calipersMode) {
             getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.primary)));
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.primary)));
             unfadeCalipersView();
             switchModeMenuItem.setTitle(R.string.image_button_title);
             selectMainMenu();
@@ -1447,6 +1474,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void changeSettings() {
         Intent i = new Intent(this, Prefs.class);
         startActivity(i);
+    }
+
+    private void loadSampleEcg() {
+        Bitmap image = BitmapFactory.decodeResource(this.getResources(),
+                R.drawable.sample_ecg);
+        updateImageView(image);
     }
 
     // Note: for target SDK over 22, must add specific code to check for permissions,
@@ -1825,9 +1858,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Down);
     }
 
-    private void microDone() {
-        calipersView.setLocked(false);
+    private void tweakDone() {
         selectMainMenu();
+    }
+
+    private void microDone() {
+        if (inQtc && allowTweakDuringQtc) {
+            selectQTcStep2Menu();
+        }
+        else {
+            calipersView.setLocked(false);
+            selectMainMenu();
+        }
     }
 
     private int calipersCount() {

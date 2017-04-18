@@ -21,7 +21,7 @@ You open the ECG on your phone.  You look at the QT interval.  You're not sure a
 * Electronic Calipers
 *EP Calipers* provides *electronic calipers* for measuring intervals on images of electrocardiograms (ECGs) or electrophysiologic recordings.  In the electrophysiology lab electronic calipers are included as part of the recording system.  *EP Calipers* is intended to provide similar electronic calipers for use on your Android phone or tablet.  The electronic calipers of *EP Calipers* are more accurate, easier to use, and less dangerous than mechanical calipers (they don't have sharp points!).
 * What's new?
-This new version of *EP Calipers* allows for individual calipers to be colored differently, and has a new *Tweak* menu that allows fine adjustment of caliper positioning.
+This new version of *EP Calipers* adds a setting to allow micromovement ("tweaking") of calipers during QTc measurements.  The sample ECG can now be reloaded without restarting the app.
 * Quick start
 When *EP Calipers* starts, a sample ECG and a time caliper are loaded.
 Move the caliper around by touching the caliper's crossbar and
@@ -74,7 +74,7 @@ You will then be given options for opening the PDF report.  One of the options s
 ** Multiple page PDFs
 When PDF files have more than one page, the app will display the first
 page initially.  You can go to other pages by selecting *Previous* or
-*Next* in the *Image* menu.
+*Next* in the *Image* menu.  Note that device rotation will only preserve the current page.  If you need to change to a different page, you will need to reload the PDF.
 * Adjusting the image
 You can adjust the positioning of the image using pinch-to-zoom,
 dragging, and double-tapping. Use the *Adjust* menu to fine-tune your
@@ -90,6 +90,8 @@ original image position use *Reset*.  After adjusting the image select
 *Done* to return to the main image menu.
 * <<Lock>>Locking the image
 When moving and adjusting calipers, you may sometimes inadvertently move the underlying image.  Select *Lock* to lock the image in place.  A message appears at the top of the screen indicating the image is locked.  Unlock the image by selecting *Unlock*.
+* Sample ECG
+Tap *Sample* to show the sample ECG that comes with *EP Calipers*.  This is a good way to practice using the app, or demonstrate it to others.
 * Exiting *Image* mode
 After loading and adjusting the image, you need to exit Image mode so that you can use the calipers.  Select the *Measure* button at the top left of the screen to return to the *EP Calipers* main screen.
 #+CAPTION: Use the *Measure* button to exit *Image* mode
@@ -109,7 +111,7 @@ Angle calipers are moved as a unit by dragging at the apex or just above the ape
 [[./angle_caliper.png]]
 
 ** Tweaking calipers -- Micromovements
-There is a button marked *Tweak* on the main menu.  Tap this button if you want very fine control over caliper positioning.  You can move either sidebar (or either angle of an angle caliper) or a caliper as a whole by gradations of a single point (≈ pixel) or a tenth of a point.  Just press a caliper component (crossbar, sidebar, or, in case of an angle caliper, the apex of the angle) for a half second or so and a menu with movement buttons will appear.  Buttons like *Left* or *Right* move the selected caliper component or the whole caliper a single point or a degree (for angle calipers)  in the indicated direction.  Buttons like *m-Left* and *m-Right* stand for left and right micromovements and represent very tiny movements (a tenth of a point or a tenth of a degree).  Press the *Done* button to return to the main menu.
+Sometimes you might like to fine-tune the position of a caliper, or you find it too difficult to position a caliper exactly by dragging its components with your finger.  It's time for /tweaking/!  Tap the *Tweak* button on the main menu.  The long press a caliper component (crossbar, sidebar, or, in the case of an angle caliper, the apex of the angle) and a menu with movement buttons will appear.  Buttons like *Left* or *Right* move the selected caliper component or the whole caliper a single point (≈ pixel) or a degree (for angle calipers) in the indicated direction.  Buttons like *m-Left* and *m-Right* stand for left and right micromovements and represent very tiny movements (a tenth of a point or a tenth of a degree).  Press the *Done* button to return to the main menu.
 #+CAPTION: Buttons to tweak caliper positioning
 [[./micromovements.png]]
 
@@ -120,7 +122,9 @@ Select the *+* or *Add Caliper* button to add new calipers.[fn:1]
 #+CAPTION: Main menu, prior to calibration
 [[./main_menu_uncalibrated.png]]
 
-Select *Time*, *Amplitude*, or *Angle* to add the type of caliper you want.  Double-tap a caliper to delete it.
+Select *Time*, *Amplitude*, or *Angle* to add the type of caliper you want.  
+
+Double-tap a caliper to delete it.
 #+CAPTION: Add caliper menu
 [[./add_caliper_menu.png]]
 
@@ -130,7 +134,7 @@ When more than one caliper is present, it is necessary to indicate which caliper
 [[./selected_caliper.png]]
 
 * Changing caliper colors
-Initial caliper colors are set via [[Settings][Settings]], and these colors apply to all newly added calipers.  However, once a caliper is added, its color can be changed, and each caliper can have a different color.  These color changes until the calipers are deleted or the app is stopped.  On the main menu, select the *Color* button.  Then long press a caliper to bring up a color wheel.  Select a color and the caliper will change to that color.  If you want to change the default caliper colors for each time the app runs, this can be done via [[Settings][Settings]].
+Initial caliper colors are set via [[Settings][Settings]], and these colors apply to all newly added calipers.  However, once a caliper is added, its color can be changed, and each caliper can have a different color.  These color changes persist until the calipers are deleted or the app is stopped.  On the main menu, select the *Color* button.  Then long press a caliper to bring up a color wheel.  Select a color and the caliper will change to that color.  If you want to change the default caliper colors for each time the app runs, this can be done via [[Settings][Settings]].
 #+CAPTION: Caliper color picker
 [[./color_picker.png]]
 
@@ -168,6 +172,8 @@ The triangle base will be located 5 mm below the apex of the triangle.  Proper a
 
 * <<Settings>>Settings
 Preferences such as caliper colors and default calibration intervals can be selected using the *Settings* menu item on the toolbar at the top of the app.
+* Limitations
+- After device rotation, only the currently loaded page of a multi-page PDF image is available.  It is necessary to reload the PDF in order to change pages again.
 * Acknowledgments
 - Thanks to Dr. Michael Katz for the concept.
 - Thanks to Dr. Adrian Baranchuk and his colleagues at Queen's University Kingston, Ontario, Canada for the concept of the Brugadometer and for assistance in implementing this algorithm.

@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/imageView"
-        android:src="@drawable/normal_12_lead_ecg"
+        android:src="@drawable/sample_ecg"
         android:contentDescription="@string/sample_normal_ecg"
         android:scaleType="center"/>
 
