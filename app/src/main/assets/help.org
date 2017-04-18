@@ -110,8 +110,7 @@ Angle calipers are moved as a unit by dragging at the apex or just above the ape
 #+CAPTION: Angle caliper
 [[./angle_caliper.png]]
 
-** TODO Tweaking calipers -- Micromovements
-[ Update depending on behavior of movement menu return -- to tweak menu or main menu ]
+** Tweaking calipers -- Micromovements
 Sometimes you might like to fine-tune the position of a caliper, or you find it too difficult to position a caliper exactly by dragging its components with your finger.  It's time for /tweaking/!  Tap the *Tweak* button on the main menu.  The long press a caliper component (crossbar, sidebar, or, in the case of an angle caliper, the apex of the angle) and a menu with movement buttons will appear.  Buttons like *Left* or *Right* move the selected caliper component or the whole caliper a single point (≈ pixel) or a degree (for angle calipers) in the indicated direction.  Buttons like *m-Left* and *m-Right* stand for left and right micromovements and represent very tiny movements (a tenth of a point or a tenth of a degree).  Press the *Done* button to return to the main menu.
 #+CAPTION: Buttons to tweak caliper positioning
 [[./micromovements.png]]
