@@ -735,6 +735,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putFloat("scale", attacher.getScale());
         outState.putFloat("totalRotation", totalRotation);
         outState.putBoolean("imageIsLocked", imageIsLocked);
+        outState.putBoolean("multipagePDF", numberOfPdfPages > 0);
 
         // To avoid FAILED BINDER TRANSACTION issue (which is ignored up until Android 24,
         // save to temp file instead of storing bitmap in bundle.
@@ -808,6 +809,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersMode = savedInstanceState.getBoolean("calipersMode");
         imageIsLocked = savedInstanceState.getBoolean("imageIsLocked");
         lockImage(imageIsLocked);
+
+        boolean isMultipagePdf = savedInstanceState.getBoolean("multipagePDF");
 
         // Bitmap now passed via temporary file
         //Bitmap image = savedInstanceState.getParcelable("Image");
@@ -894,6 +897,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             calipersView.getCalipers().add(c);
 
         }
+        if (isMultipagePdf) {
+            Toast toast = Toast.makeText(this, R.string.multipage_pdf_warning,
+                    Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
 
     private void storeBitmapToTempFile(Bitmap bitmap) {
@@ -906,7 +914,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             fOut.close();
         }
         catch (Exception ex) {
-            Toast toast = Toast.makeText(this, "Could not store temporary image file", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(this, R.string.temp_image_file_warning, Toast.LENGTH_SHORT);
             toast.show();
             Log.d(EPS, "Could not store temp file");
         }

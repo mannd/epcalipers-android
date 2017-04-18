@@ -137,4 +137,6 @@
     <string name="lock_label">Lock</string>
     <string name="unlock_label">Unlock</string>
     <string name="sample_label">Sample</string>
+    <string name="multipage_pdf_warning">Multipage PDF will need to be reloaded to view other pages.</string>
+    <string name="temp_image_file_warning">Could not store temporary image file</string>
 </resources>
