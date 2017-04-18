@@ -139,4 +139,8 @@
     <string name="sample_label">Sample</string>
     <string name="multipage_pdf_warning">Multipage PDF will need to be reloaded to view other pages.</string>
     <string name="temp_image_file_warning">Could not store temporary image file</string>
+    <string name="tweak_during_qtc_label">Allow tweaking during QTc</string>
+    <string name="tweak_during_qtc_key">tweak_during_qtc</string>
+    <string name="tweak_during_qtc_summary_off">Cannot tweak caliper during QT measurement</string>
+    <string name="tweak_during_qtc_summary_on">Long press to tweak caliper during QT measurement</string>
 </resources>

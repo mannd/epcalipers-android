@@ -158,6 +158,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private float landscapeHeight;
     private boolean showStartImage;
     private boolean roundMsecRate;
+    private boolean allowTweakDuringQtc;
+    private boolean inQtc = false;
     private int currentCaliperColor;
     private int currentHighlightColor;
     private int currentLineWidth;
@@ -301,6 +303,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // show start image only has effect with restart
                 Log.d(EPS, "onSharedPreferenceChangeListener");
                 if (key.equals(getString(R.string.show_start_image_key))) {
+                    return;
+                }
+                if (key.equals(getString(R.string.tweak_during_qtc_key))) {
+                    allowTweakDuringQtc = sharedPreferences.getBoolean(key,
+                            false);
                     return;
                 }
                 if (key.equals(getString(R.string.default_time_calibration_key))) {
@@ -639,6 +646,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         defaultAmplitudeCalibration = sharedPreferences.getString(
                 getString(R.string.default_amplitude_calibration_key), getString(R.string.default_amplitude_calibration_value));
         useLargeFont = sharedPreferences.getBoolean(getString(R.string.use_large_font_key), false);
+        allowTweakDuringQtc = sharedPreferences.getBoolean(getString(R.string.tweak_during_qtc_key), false);
         try {
             currentCaliperColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_caliper_color_key),
                     Integer.valueOf(DEFAULT_CALIPER_COLOR).toString()));
@@ -1006,7 +1014,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == tweakButton) {
             selectTweakMenu();
         } else if (v == tweakDoneButton) {
-            selectMainMenu();
+            tweakDone();
         } else if (v == leftButton) {
             left();
         } else if (v == rightButton) {
@@ -1218,6 +1226,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.setLocked(false);
         calipersView.setAllowTweakPosition(false);
         calipersView.setAllowColorChange(false);
+        inQtc = false;
     }
 
     private void selectImageMenu() {
@@ -1275,6 +1284,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createQTcStep2Menu();
         }
         selectMenu(qtcStep2Menu);
+        inQtc = true;
+        calipersView.setAllowTweakPosition(allowTweakDuringQtc);
     }
 
     private void selectColorMenu() {
@@ -1301,6 +1312,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.setAllowTweakPosition(true);
 
     }
+
+
 
     //public because used by CalipersView
     public void selectMicroMovementMenu(Caliper c, Caliper.Component component) {
@@ -1844,9 +1857,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Down);
     }
 
+    private void tweakDone() {
+        if (inQtc && allowTweakDuringQtc) {
+            selectQTcStep2Menu();
+        }
+        else {
+            calipersView.setLocked(false);
+            selectMainMenu();
+        }
+    }
+
     private void microDone() {
-        calipersView.setLocked(false);
-        selectMainMenu();
+        selectTweakMenu();
+//        if (inQtc && allowTweakDuringQtc) {
+//            selectQTcStep2Menu();
+//        }
+//        else {
+//            calipersView.setLocked(false);
+//            selectMainMenu();
+//        }
     }
 
     private int calipersCount() {
