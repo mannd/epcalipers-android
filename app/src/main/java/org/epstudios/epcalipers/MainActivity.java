@@ -1,5 +1,6 @@
 package org.epstudios.epcalipers;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
@@ -26,6 +27,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -84,6 +86,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final String TEMP_BITMAP_FILE_NAME = "/tempEPCalipersImageBitmap.png";
     private static final String ANGLE_B1 = "angleB1";
     private static final String ANGLE_B2 = "angleB2";
+
+    // new permissions for Android >= 6.0
+    private static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 101;
+    private static final int MY_PERMISSIONS_REQUEST_STARTUP_IMAGE = 102;
+    private static final int MY_PERMISSIONS_REQUEST_STARTUP_PDF = 103;
+    private static final int MY_PERMISSIONS_REQUEST_STORE_BITMAP = 104;
+
     private Button addCaliperButton;
     private Button calibrateButton;
     private Button intervalRateButton;
@@ -256,14 +266,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (noSavedInstance && Intent.ACTION_SEND.equals(action) && type != null) {
             if (type.startsWith("image/")) {
-                handleImage(intent);
+                handleImage();
             }
-        }
-        else if (noSavedInstance && Intent.ACTION_VIEW.equals(action) && type != null) {
+        } else if (noSavedInstance && Intent.ACTION_VIEW.equals(action) && type != null) {
             if (type.equals("application/pdf")) {
-                handlePDF(intent);
+                handlePDF();
             }
         }
+
 
         calipersView = (CalipersView) findViewById(R.id.caliperView);
         calipersView.setMainActivity(this);
@@ -453,10 +463,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void handleImage(Intent intent) {
+    private void handleImage() {
         Log.d(EPS, "handleImage");
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_STARTUP_IMAGE);
+        }
+        else {
+            proceedToHandleImage();
+        }
+    }
+
+    private void proceedToHandleImage() {
         try {
-            Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
             if (imageUri != null) {
                 Log.d(EPS, "imageUri = " + imageUri.toString());
                 externalImageLoad = true;
@@ -469,8 +492,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // from http://stackoverflow.com/questions/10698360/how-to-convert-a-pdf-page-to-an-image-in-android
-    private void handlePDF(Intent intent) {
-        Uri pdfUri = intent.getData();
+    private void handlePDF() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_STARTUP_PDF);
+        }
+        else {
+            proceedToHandlePDF();
+        }
+    }
+
+    private void proceedToHandlePDF() {
+        Uri pdfUri = getIntent().getData();
         if (pdfUri != null) {
             UriPage uriPage = new UriPage();
             uriPage.uri = pdfUri;
@@ -736,6 +772,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return rect.top;
     }
 
+    private void proceedToStoreBitmap() {
+        Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        // for efficiency, don't bother writing the bitmap to a file if it hasn't changed
+        if (imageBitmap != null && !imageBitmap.sameAs(previousBitmap)) {
+            storeBitmapToTempFile(imageBitmap);
+        }
+    }
+
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(EPS, "onSaveInstanceState");
@@ -750,11 +795,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // save to temp file instead of storing bitmap in bundle.
         // See http://stackoverflow.com/questions/36007540/failed-binder-transaction-in-android
         //outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
-        Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-        // for efficiency, don't bother writing the bitmap to a file if it hasn't changed
-        if (!imageBitmap.sameAs(previousBitmap)) {
-            storeBitmapToTempFile(((BitmapDrawable) imageView.getDrawable()).getBitmap());
+
+        // also check permissions first
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_STORE_BITMAP);
+
         }
+        else {
+            proceedToStoreBitmap();
+        }
+
         // Calibration
         // must use rawUnits here, otherwise original calibration units are lost
         outState.putString("hcalUnits", horizontalCalibration.rawUnits());
@@ -1487,6 +1542,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // See: http://stackoverflow.com/questions/32431723/read-external-storage-permission-for-android
     // and https://developer.android.com/training/permissions/requesting.html
     private void selectImageFromGallery() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
+        else {
+            proceedToSelectImageFromGallery();
+        }
+    }
+
+    private void proceedToSelectImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
@@ -1494,6 +1561,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void takePhoto() {
+        // check permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED  ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_CAMERA);
+
+        }
+        else {
+            proceedToTakePhoto();
+        }
+    }
+
+    private void proceedToTakePhoto() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (deviceHasCamera(takePictureIntent)) {
             File photoFile;
@@ -1510,6 +1594,79 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         // camera icon inactivate with if no camera present, so no warning here
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(EPS, "Camera permission granted");
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    proceedToTakePhoto();
+                } else {
+                    Log.d(EPS, "Camera permission denied");
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(EPS, "Write External storage permission granted");
+                    proceedToSelectImageFromGallery();
+                } else {
+                    Log.d(EPS, "Write external storage permission denied");
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_STARTUP_IMAGE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(EPS, "Write External storage permission granted");
+                    proceedToHandleImage();
+                } else {
+                    Log.d(EPS, "Write external storage permission denied");
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_STARTUP_PDF: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(EPS, "Write External storage permission granted");
+                    proceedToHandlePDF();
+                } else {
+                    Log.d(EPS, "Write external storage permission denied");
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_STORE_BITMAP: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(EPS, "Write External storage permission granted");
+                    proceedToStoreBitmap();
+                } else {
+                    Log.d(EPS, "Write external storage permission denied");
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+        }
     }
 
     private boolean deviceHasCamera(Intent takePictureIntent) {
