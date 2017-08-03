@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "org.epstudios.epcalipers"
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode 16
         versionName "2.8"
     }
