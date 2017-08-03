@@ -4,8 +4,7 @@
     <string name="calibrate_button_title">Calibrate</string>
     <string name="interval_rate_button_title">Interval/Rate</string>
     <string name="mean_rate_button_title">Mean Rate</string>
-    <string name="quick_start_message">What\'s new: Fix problems with ungranted permissions crashing app
-        in Android 6 and above.
+    <string name="quick_start_message">What\'s new: Fix problem with camera and PDFs in Android 7.
         \n\nQuick Start: Use your fingers to move and position calipers or move and zoom the
         image.\n\nAdd calipers with the *Add Caliper* menu item, single tap a
         caliper to select it, tap again to unselect, and double tap to
