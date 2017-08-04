@@ -84,7 +84,8 @@
     <string name="invalid_result_message">Invalid Result</string>
     <string name="calculated_qtc_dialog_title">Calculated QTc</string>
     <string name="quick_start_title">EP Calipers Quick Start</string>
-    <string name="quick_start_message">What\'s new: Fix problem with camera and PDFs in Android 7.
+    <string name="quick_start_message">What\'s new: Android 7 now uses native Android PDF renderer.
+        Heap size now set to large to avoid out of memory crashes with large PDF files.
         \n\nQuick Start: Use your fingers to move and position calipers or move and zoom the
         image.\n\nAdd calipers with the *+* menu item, single tap a
         caliper to select it, tap again to unselect, and double tap to
