@@ -4,6 +4,7 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,14 +21,17 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.ParcelFileDescriptor;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -519,6 +523,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             UriPage uriPage = new UriPage();
             uriPage.uri = pdfUri;
             uriPage.pageNumber = 0;
+            loadPDFAsynchronously(uriPage);
+        }
+    }
+
+    private void loadPDFAsynchronously(UriPage uriPage) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            new NougatAsyncLoadPDF().execute(uriPage);
+        }
+        else {
             new AsyncLoadPDF().execute(uriPage);
         }
     }
@@ -556,9 +569,94 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public int pageNumber;
     }
 
+    @TargetApi(25)
+    private class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
+        private boolean isNewPdf;
+        private String exceptionMessage = "";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+            Toast toast = Toast.makeText(getApplicationContext(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
+            toast.show();
+
+        }
+
+        @Override
+        protected Bitmap doInBackground(UriPage... params) {
+            UriPage uriPage = params[0];
+            Uri pdfUri = uriPage.uri;
+            if (pdfUri == null) {
+                if (currentPdfUri == null) {
+                    // can't do anything if all is null
+                    return null;
+                }
+                // use currently opened PDF
+                pdfUri = currentPdfUri;
+                isNewPdf = false;
+            }
+            else {
+                // change Uri to a real file path
+                pdfUri = getTempUri(pdfUri);
+                // if getTempUri returns null then exception was thrown
+                if (pdfUri == null) {
+                    return null;
+                }
+                // retain PDF Uri for future page changes
+                currentPdfUri = pdfUri;
+                isNewPdf = true;
+            }
+            try {
+                File file = new File(pdfUri.getPath());
+                ParcelFileDescriptor fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
+                PdfRenderer renderer = new PdfRenderer(fd);
+                numberOfPdfPages = renderer.getPageCount();
+                currentPdfPageNumber = uriPage.pageNumber;
+                PdfRenderer.Page page = renderer.openPage(currentPdfPageNumber);
+
+                int width = page.getWidth();
+                int height = page.getHeight();
+
+                Bitmap bitmap = Bitmap.createBitmap(width * 3, height * 3, Bitmap.Config.ARGB_4444);
+
+
+                Matrix matrix = new Matrix();
+                matrix.preScale(3, 3);
+
+                page.render(bitmap, null, matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                return bitmap;
+            } catch (Exception e) {
+                // catch out of memory errors and just don't load rather than crash
+                exceptionMessage = e.getMessage();
+                return null;
+            }
+        }
+
+        protected void onPostExecute(Bitmap bitmap) {
+            if (bitmap != null) {
+                // Set pdf bitmap directly, scaling screws it up
+                imageView.setImageBitmap(bitmap);
+                attacher.update();
+                attacher.setScale(attacher.getMinimumScale());
+                if (isNewPdf) {
+                    clearCalibration();
+                }
+            }
+            else {
+                Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.pdf_error_message) +
+                        "\n" + exceptionMessage, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+            findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        }
+    }
+
+
     private class AsyncLoadPDF extends AsyncTask<UriPage,
             Void, Bitmap> {
         private boolean isNewPdf;
+        private String exceptionMessage = "";
 
         @Override
         protected void onPreExecute() {
@@ -612,6 +710,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return page.render(new Rect(0, 0, width * 3, height * 3), matrix);
             } catch (Exception e) {
                 // catch out of memory errors and just don't load rather than crash
+                exceptionMessage = e.getMessage();
                 return null;
             }
         }
@@ -627,7 +726,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
             else {
-                Toast toast = Toast.makeText(getApplicationContext(), R.string.pdf_error_message, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.pdf_error_message) +
+                        "\n" + exceptionMessage, Toast.LENGTH_SHORT);
                 toast.show();
             }
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -652,7 +752,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         UriPage uriPage = new UriPage();
         uriPage.uri = null;
         uriPage.pageNumber = currentPdfPageNumber;
-        new AsyncLoadPDF().execute(uriPage);
+        loadPDFAsynchronously(uriPage);
     }
 
     private void showNextPage() {
@@ -666,7 +766,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         UriPage uriPage = new UriPage();
         uriPage.uri = null;
         uriPage.pageNumber = currentPdfPageNumber;
-        new AsyncLoadPDF().execute(uriPage);
+        loadPDFAsynchronously(uriPage);
     }
 
     public boolean getFirstRun(SharedPreferences prefs) {
@@ -993,9 +1093,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private Bitmap getBitmapFromTempFile() {
-        String path = Environment.getExternalStorageDirectory() + TEMP_BITMAP_FILE_NAME;
-        Bitmap bm = BitmapFactory.decodeFile(path);
-        return bm;
+
+            String path = Environment.getExternalStorageDirectory() + TEMP_BITMAP_FILE_NAME;
+            return BitmapFactory.decodeFile(path);
     }
 
     // return coordinate position ratio will be between 0 and 1.0
@@ -1607,7 +1707,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_CAMERA: {
                 // If request is cancelled, the result arrays are empty.
@@ -1622,7 +1722,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
-                return;
+                break;
             }
             case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
                 // If request is cancelled, the result arrays are empty.
@@ -1635,7 +1735,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
-                return;
+                break;
             }
             case MY_PERMISSIONS_REQUEST_STARTUP_IMAGE: {
                 if (grantResults.length > 0
@@ -1647,7 +1747,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
-                return;
+                break;
             }
             case MY_PERMISSIONS_REQUEST_STARTUP_PDF: {
                 if (grantResults.length > 0
@@ -1659,7 +1759,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
-                return;
+                break;
             }
             case MY_PERMISSIONS_REQUEST_STORE_BITMAP: {
                 if (grantResults.length > 0
@@ -1671,7 +1771,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
-                return;
+                break;
             }
 
         }
