@@ -136,16 +136,14 @@ public class AngleCaliper extends Caliper {
 
     private PointF getBasePoint1ForHeight(double height) {
         double pointY = getCrossbarPosition() + height;
-        double pointX = 0;
-        pointX = height * (Math.sin(bar1Angle - Math.PI / 2) / Math.sin(Math.PI - bar1Angle));
+        double pointX = height * (Math.sin(bar1Angle - Math.PI / 2) / Math.sin(Math.PI - bar1Angle));
         pointX = getBar1Position() - pointX;
         return new PointF((float)pointX, (float)pointY);
     }
 
     private PointF getBasePoint2ForHeight(double height) {
         double pointY = getCrossbarPosition() + height;
-        double pointX = 0;
-        pointX = height * (Math.sin(Math.PI / 2 - bar2Angle) / Math.sin(bar2Angle));
+        double pointX = height * (Math.sin(Math.PI / 2 - bar2Angle) / Math.sin(bar2Angle));
         pointX += getBar1Position();
         return new PointF((float)pointX, (float)pointY);
     }
@@ -208,8 +206,7 @@ public class AngleCaliper extends Caliper {
     public PointF endPointForPosition(PointF p, double angle, float length) {
         float endX = (float)Math.cos(angle) * length + p.x;
         float endY = (float)Math.sin(angle) * length + p.y;
-        PointF endPoint = new PointF(endX, endY);
-        return endPoint;
+        return new PointF(endX, endY);
     }
 
     @Override
