@@ -284,6 +284,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (type.equals("application/pdf")) {
                 handlePDF();
             }
+            if (type.startsWith("image/")) {
+                handleImage();
+            }
         }
 
 
@@ -491,7 +494,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void proceedToHandleImage() {
         try {
-            Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
+            //Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
+            Uri imageUri = getIntent().getData();
             if (imageUri != null) {
                 Log.d(EPS, "imageUri = " + imageUri.toString());
                 externalImageLoad = true;
@@ -1785,8 +1789,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Create an image file name
         String timeStamp = getTimeStamp();
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
+        File storageDir = Environment.getExternalStorageDirectory();
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -1801,8 +1804,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private File createTmpPdfFile() throws IOException {
         String timeStamp = getTimeStamp();
         String pdfFileName = "PDF_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
+        File storageDir = Environment.getExternalStorageDirectory();
         //currentPhotoPath = image.getAbsolutePath();
         return File.createTempFile(
                 pdfFileName,  /* prefix */
