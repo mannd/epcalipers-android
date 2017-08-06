@@ -4,8 +4,7 @@
     <string name="calibrate_button_title">Calibrate</string>
     <string name="interval_rate_button_title">Interval/Rate</string>
     <string name="mean_rate_button_title">Mean Rate</string>
-    <string name="quick_start_message">What\'s new: Android 7 now uses native Android PDF renderer.
-        Heap size now set to large to avoid out of memory crashes with large PDF files.
+    <string name="quick_start_message">What\'s new: Handle shared images better.
         \n\nQuick Start: Use your fingers to move and position calipers or move and zoom the
         image.\n\nAdd calipers with the *Add Caliper* menu item, single tap a
         caliper to select it, tap again to unselect, and double tap to
