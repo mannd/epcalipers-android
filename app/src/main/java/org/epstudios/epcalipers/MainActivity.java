@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_IMAGE = 102;
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_PDF = 103;
     private static final int MY_PERMISSIONS_REQUEST_STORE_BITMAP = 104;
+    private static final int MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE = 105;
 
     private Button addCaliperButton;
     private Button calibrateButton;
@@ -278,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (noSavedInstance && Intent.ACTION_SEND.equals(action) && type != null) {
             if (type.startsWith("image/")) {
-                handleImage();
+                handleSentImage();
             }
         } else if (noSavedInstance && Intent.ACTION_VIEW.equals(action) && type != null) {
             if (type.equals("application/pdf")) {
@@ -492,10 +493,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void handleSentImage() {
+        Log.d(EPS, "handleSentImage");
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE);
+        }
+        else {
+            proceedToHandleSentImage();
+        }
+    }
+
     private void proceedToHandleImage() {
         try {
             //Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
             Uri imageUri = getIntent().getData();
+            if (imageUri != null) {
+                Log.d(EPS, "imageUri = " + imageUri.toString());
+                externalImageLoad = true;
+                externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            }
+        }
+        catch (Exception e) {
+            showFileErrorAlert();
+        }
+    }
+
+    private void proceedToHandleSentImage() {
+        try {
+            Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
+            //Uri imageUri = getIntent().getData();
             if (imageUri != null) {
                 Log.d(EPS, "imageUri = " + imageUri.toString());
                 externalImageLoad = true;
@@ -1746,6 +1776,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(EPS, "Write External storage permission granted");
                     proceedToHandleImage();
+                } else {
+                    Log.d(EPS, "Write external storage permission denied");
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                break;
+            }
+            case MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(EPS, "Write External storage permission granted");
+                    proceedToHandleSentImage();
                 } else {
                     Log.d(EPS, "Write external storage permission denied");
                     // permission denied, boo! Disable the
