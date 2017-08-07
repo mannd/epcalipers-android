@@ -239,8 +239,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
-            builder.detectFileUriExposure();
         }
+
 
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -509,7 +509,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void proceedToHandleImage() {
         try {
-            //Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
             Uri imageUri = getIntent().getData();
             if (imageUri != null) {
                 Log.d(EPS, "imageUri = " + imageUri.toString());
@@ -525,7 +524,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void proceedToHandleSentImage() {
         try {
             Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
-            //Uri imageUri = getIntent().getData();
             if (imageUri != null) {
                 Log.d(EPS, "imageUri = " + imageUri.toString());
                 externalImageLoad = true;
@@ -572,6 +570,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Uri getTempUri(Uri uri) {
         try {
+            Log.d(EPS, "File uri is " + uri.getPath());
             InputStream is = getContentResolver().openInputStream(uri);
             ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
@@ -637,6 +636,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (pdfUri == null) {
                     return null;
                 }
+                // close old currentPdfUri if possible
+                if (currentPdfUri != null) {
+                    File file = new File(currentPdfUri.getPath());
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                }
                 // retain PDF Uri for future page changes
                 currentPdfUri = pdfUri;
                 isNewPdf = true;
@@ -656,9 +662,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
                 Matrix matrix = new Matrix();
-                matrix.preScale(3, 3);
+                matrix.postScale(3, 3);
 
                 page.render(bitmap, null, matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                page.close();
+                renderer.close();
+                fd.close();
                 return bitmap;
             } catch (Exception e) {
                 // catch out of memory errors and just don't load rather than crash
@@ -723,6 +732,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (pdfUri == null) {
                     return null;
                 }
+                // close old currentPdfUri if possible
+                if (currentPdfUri != null) {
+                    File file = new File(currentPdfUri.getPath());
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                }
                 // retain PDF Uri for future page changes
                 currentPdfUri = pdfUri;
                 isNewPdf = true;
@@ -741,7 +757,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 matrix.preScale(1, -1);
                 matrix.postScale(3, 3);
 
-                return page.render(new Rect(0, 0, width * 3, height * 3), matrix);
+                Bitmap bitmap = page.render(new Rect(0, 0, width * 3, height * 3), matrix);
+                page.recycle();
+                decodeService.recycle();
+                return bitmap;
             } catch (Exception e) {
                 // catch out of memory errors and just don't load rather than crash
                 exceptionMessage = e.getMessage();
@@ -1112,7 +1131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void storeBitmapToTempFile(Bitmap bitmap) {
         try {
-            File file = new File(Environment.getExternalStorageDirectory() + TEMP_BITMAP_FILE_NAME);
+            File file = new File(getCacheDir() + TEMP_BITMAP_FILE_NAME);
             FileOutputStream fOut = new FileOutputStream(file);
 
             bitmap.compress(Bitmap.CompressFormat.PNG, 85, fOut);
@@ -1128,7 +1147,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Bitmap getBitmapFromTempFile() {
 
-            String path = Environment.getExternalStorageDirectory() + TEMP_BITMAP_FILE_NAME;
+            String path = getCacheDir() + TEMP_BITMAP_FILE_NAME;
             return BitmapFactory.decodeFile(path);
     }
 
@@ -1846,7 +1865,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private File createTmpPdfFile() throws IOException {
         String timeStamp = getTimeStamp();
         String pdfFileName = "PDF_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStorageDirectory();
+        File storageDir = this.getCacheDir();
         //currentPhotoPath = image.getAbsolutePath();
         return File.createTempFile(
                 pdfFileName,  /* prefix */
