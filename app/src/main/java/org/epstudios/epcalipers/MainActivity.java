@@ -34,6 +34,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -235,11 +236,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Log.d(EPS, "onCreate");
 
-        // see: https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-            StrictMode.setVmPolicy(builder.build());
-        }
+//        // see: https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+//            StrictMode.setVmPolicy(builder.build());
+//        }
 
 
         Intent intent = getIntent();
@@ -1749,8 +1750,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             }
             if (photoFile != null) {
+                Uri photoUri;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    photoUri = FileProvider.getUriForFile(MainActivity.this,
+                            BuildConfig.APPLICATION_ID + ".provider",
+                            photoFile);
+                }
+                else {
+                    photoUri = Uri.fromFile(photoFile);
+                }
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(photoFile));
+                        photoUri);
                 startActivityForResult(takePictureIntent, RESULT_CAPTURE_IMAGE);
             }
         }
