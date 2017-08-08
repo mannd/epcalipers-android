@@ -681,6 +681,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (bitmap != null) {
                 // Set pdf bitmap directly, scaling screws it up
                 imageView.setImageBitmap(bitmap);
+                // must set visibility as imageview will be hidden if started with sample ecg hidden
+                imageView.setVisibility(View.VISIBLE);
                 attacher.update();
                 attacher.setScale(attacher.getMinimumScale());
                 if (isNewPdf) {
@@ -773,6 +775,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (bitmap != null) {
                 // Set pdf bitmap directly, scaling screws it up
                 imageView.setImageBitmap(bitmap);
+                // must set visibility as imageview will be hidden if started with sample ecg hidden
+                imageView.setVisibility(View.VISIBLE);
                 attacher.update();
                 attacher.setScale(attacher.getMinimumScale());
                 if (isNewPdf) {
