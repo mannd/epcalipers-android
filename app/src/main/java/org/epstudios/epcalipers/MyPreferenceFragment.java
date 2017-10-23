@@ -49,6 +49,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultCaliperColorKey;
     private String defaultHighlightColorKey;
     private String defaultLineWidthKey;
+    private String defaultQtcFormulaKey;
 
 
     private String defaultCaliperColor;
@@ -56,6 +57,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultLineWidth;
     private String defaultTimeCalibration;
     private String defaultAmplitudeCalibration;
+    private String defaultQtcFormula;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -66,11 +68,13 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         defaultCaliperColorKey = activity.getString(R.string.default_caliper_color_key);
         defaultHighlightColorKey = activity.getString(R.string.default_highlight_color_key);
         defaultLineWidthKey = activity.getString(R.string.default_line_width_key);
+        defaultQtcFormulaKey = activity.getString(R.string.default_qtc_formula_key);
         defaultCaliperColor = activity.getString(R.string.default_caliper_color);
         defaultHighlightColor = activity.getString(R.string.default_highlight_color);
         defaultLineWidth = activity.getString(R.string.default_line_width);
         defaultTimeCalibration = activity.getString(R.string.default_time_calibration_value);
         defaultAmplitudeCalibration = activity.getString(R.string.default_amplitude_calibration_value);
+        defaultQtcFormula = activity.getString(R.string.default_qtc_formula_value);
         addPreferencesFromResource(R.xml.settings);
 
         Preference defaultTimeCalibrationPreference = findPreference(defaultTimeCalibrationKey);
@@ -104,7 +108,19 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         String defaultLineWidthName = names.get(Integer.parseInt(defaultLineWidthValue));
         defaultLineWidthPreference.setSummary(defaultLineWidthName);
 
+        Preference defaultQtcFormulaPreference = findPreference(defaultQtcFormulaKey);
+        String defaultQtcFormulaValue = getPreferenceScreen()
+                .getSharedPreferences()
+                .getString(defaultQtcFormulaKey, defaultQtcFormula);
+        // Below is sneaky code, taking advantage of QTc key is just lower case version
+        // of QTc value, where first letter is capitalized.  If the QTc formula arrays are
+        // changed, this will break.
+        String defaultQtcFormulaName = capitalize(defaultQtcFormulaValue);
+        defaultQtcFormulaPreference.setSummary(defaultQtcFormulaName);
+    }
 
+    private String capitalize(String s) {
+        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
     }
 
     @Override
@@ -125,6 +141,11 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         }
         else if (key.equals(defaultLineWidthKey)) {
             pref.setSummary(getNameFromKey(sharedPreferences, key, defaultLineWidth));
+        }
+        else if (key.equals(defaultQtcFormulaKey)) {
+            String formulaName = sharedPreferences.getString(key, defaultQtcFormula);
+            formulaName = capitalize(formulaName);
+            pref.setSummary(formulaName);
         }
     }
 

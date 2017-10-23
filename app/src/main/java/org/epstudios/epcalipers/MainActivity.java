@@ -76,10 +76,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.epstudios.epcalipers.QtcCalculator.QtcFormula;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
@@ -203,6 +207,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Button> upDownButtons;
     private List<Button> rightLeftButtons;
 
+//    private enum QtcFormulaPreference {
+//        Bazett,
+//        Framingham,
+//        Hodges,
+//        Fridericia,
+//        All
+//    }
+    private Map<String, QtcFormula> qtcFormulaMap;
+    // Bazett has the been the only option in previous versions of EP Calipers,
+    // so it is now the default.  Users who want to change this must opt in using Preferences.
+    private QtcFormula qtcFormulaPreference = QtcFormula.qtcBzt;
+
     // TODO: make false for release
     private final boolean force_first_run = false;
 
@@ -260,6 +276,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         currentCaliperColor = DEFAULT_CALIPER_COLOR;
         currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
         currentLineWidth = DEFAULT_LINE_WIDTH;
+
+        qtcFormulaMap = new HashMap<>();
+        qtcFormulaMap.put("bazett", QtcFormula.qtcBzt);
+        qtcFormulaMap.put("framingham", QtcFormula.qtcFrm);
+        qtcFormulaMap.put("hodges", QtcFormula.qtcHdg);
+        qtcFormulaMap.put("fridericia", QtcFormula.qtcFrd);
+        qtcFormulaMap.put("all", QtcFormula.qtcAll);
 
         loadSettings();
 
@@ -321,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             externalImageLoad = false;
         }
 
+
         // OnSharedPreferenceListener must be a class field, i.e. strong reference
         // as otherwise it is a weak reference and will be garbage collected, thus
         // making it stop working.
@@ -349,6 +373,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             getString(R.string.default_amplitude_calibration_value));
                     verticalCalibration.setCalibrationString(defaultAmplitudeCalibration);
                     return; // no need to invalidate calipersView.
+                }
+                if (key.equals(getString(R.string.default_qtc_formula_key))) {
+                    String qtcFormulaName = sharedPreferences.getString(key,
+                            getString(R.string.default_qtc_formula_value));
+                    qtcFormulaPreference = qtcFormulaMap.get(qtcFormulaName);
+                    return;  // no need to invalidate calipersView
                 }
                 if (key.equals(getString(R.string.default_caliper_color_key))) {
                     try {
@@ -850,6 +880,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 getString(R.string.default_amplitude_calibration_key), getString(R.string.default_amplitude_calibration_value));
         useLargeFont = sharedPreferences.getBoolean(getString(R.string.use_large_font_key), false);
         allowTweakDuringQtc = sharedPreferences.getBoolean(getString(R.string.tweak_during_qtc_key), false);
+        String qtcFormulaName = sharedPreferences.getString(getString(R.string.default_qtc_formula_key),
+                getString(R.string.default_qtc_formula_value));
+        qtcFormulaPreference = qtcFormulaMap.get(qtcFormulaName);
         try {
             currentCaliperColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_caliper_color_key),
                     Integer.valueOf(DEFAULT_CALIPER_COLOR).toString()));
@@ -2131,21 +2164,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             double meanRR = Math.abs(rrIntervalForQTc);
             String result;
             if (meanRR > 0) {
-                double sqrtRR = Math.sqrt(meanRR);
-                double qtc = qt / sqrtRR;
-                if (c.getCalibration().unitsAreMsec()) {
-                    meanRR *= 1000;
-                    qt *= 1000;
-                    qtc *= 1000;
-                }
-                DecimalFormat decimalFormat = new DecimalFormat("@@@##");
-                result = "Mean interval = " + decimalFormat.format(meanRR) + " " +
-                        c.getCalibration().getUnits() + "\nQT = " +
-                        decimalFormat.format(qt) + " " +
-                        c.getCalibration().getUnits() +
-                        "\nQTc = " + decimalFormat.format(qtc) + " " +
-                        c.getCalibration().getUnits() +
-                        "\n(Bazett's formula)";
+                QtcCalculator calculator = new QtcCalculator(qtcFormulaPreference);
+                result = calculator.calculate(qt, meanRR, c.getCalibration().unitsAreMsec(),
+                        c.getCalibration().getUnits());
+//                double sqrtRR = Math.sqrt(meanRR);
+//                double qtc = qt / sqrtRR;
+//                if (c.getCalibration().unitsAreMsec()) {
+//                    meanRR *= 1000;
+//                    qt *= 1000;
+//                    qtc *= 1000;
+//                }
+//                DecimalFormat decimalFormat = new DecimalFormat("@@@##");
+//                result = "Mean interval = " + decimalFormat.format(meanRR) + " " +
+//                        c.getCalibration().getUnits() + "\nQT = " +
+//                        decimalFormat.format(qt) + " " +
+//                        c.getCalibration().getUnits() +
+//                        "\nQTc = " + decimalFormat.format(qtc) + " " +
+//                        c.getCalibration().getUnits() +
+//                        "\n(Bazett's formula)";
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.calculated_qtc_dialog_title));
                 builder.setMessage(result);

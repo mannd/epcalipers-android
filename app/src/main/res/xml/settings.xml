@@ -68,7 +68,12 @@
         android:summaryOff="@string/tweak_during_qtc_summary_off"
         android:summaryOn="@string/tweak_during_qtc_summary_on" />
 
-
+    <ListPreference
+        android:defaultValue="bazett"
+        android:entries="@array/qtc_formula_names"
+        android:entryValues="@array/qtc_formula_values"
+        android:key="@string/default_qtc_formula_key"
+        android:title="@string/default_qtc_formula_title" />
 
 </PreferenceScreen>
 

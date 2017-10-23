@@ -46,4 +46,19 @@
         <item>7</item>
         <item>8</item>
     </string-array>
+    <string-array name="qtc_formula_values">
+        <item>bazett</item>
+        <item>framingham</item>
+        <item>hodges</item>
+        <item>fridericia</item>
+        <item>all</item>
+    </string-array>
+    <string-array name="qtc_formula_names">
+        <item>Bazett</item>
+        <item>Framingham</item>
+        <item>Hodges</item>
+        <item>Fridericia</item>
+        <item>All</item>
+    </string-array>
+
 </resources>
