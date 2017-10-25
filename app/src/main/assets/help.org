@@ -154,7 +154,7 @@ Once a time (horizontal) caliper is calibrated, provided you use time units (suc
 * Mean rate and interval calculation
 Select a calibrated caliper and stretch it over a number of intervals. Select *Mean Rate* or *mRate* and enter the number of intervals measured.  A dialog box will show the calculated mean heart rate and interval.  This is useful for calculating rates and intervals in irregular rhythms, such as atrial fibrillation.
 * QTc calculation
-Select *QTc*.  Stretch a time caliper over one or more RR intervals and select *Measure*.  Enter the number of intervals the caliper is stretched over and select *Continue*.  Then use the same caliper to measure the QT interval.  Select *Measure*.  A dialog box will give the calculated QTc using Bazett's formula.  Note that device rotation in the middle of this process will cancel the measurement.
+Select *QTc*.  Stretch a time caliper over one or more RR intervals and select *Measure*.  Enter the number of intervals the caliper is stretched over and select *Continue*.  Then use the same caliper to measure the QT interval.  Select *Measure*.  A dialog box will give the calculated QTc using Bazett's formula by default.  The QTc formula can be changed using any or all of 4 common QTc equations (Bazett, Framingham, Hodges, and Fridericia) via [[Settings][Settings]].  Note that device rotation in the middle of this process will cancel the QTc measurement.
 #+CAPTION: QTc measurement first step: measure 1 or more RR intervals
 [[./qtc_step_1.png]]
 

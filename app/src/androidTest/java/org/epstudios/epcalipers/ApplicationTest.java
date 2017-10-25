@@ -146,6 +146,12 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         result = calc2.calculate(0.278, 0.6818, false, "sec");
         assertEquals(result, "Mean RR = 0.6818 sec\nQT = 0.278 sec\nQTc = 0.31586 sec (Fridericia formula)");
         // TODO: add the other formulas here
+        calc2.setFormula(QtcCalculator.QtcFormula.qtcHdg);
+        result = calc2.calculate(0.278, 0.6818, false, "sec");
+        assertEquals(result, "Mean RR = 0.6818 sec\nQT = 0.278 sec\nQTc = 0.327 sec (Hodges formula)");
+        calc2.setFormula(QtcCalculator.QtcFormula.qtcFrm);
+        result = calc2.calculate(0.278, 0.6818, true, "msec");
+        assertEquals(result, "Mean RR = 681.8 msec\nQT = 278 msec\nQTc = 327 msec (Framingham formula)");
     }
 
 }

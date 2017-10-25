@@ -42,6 +42,10 @@ public class QtcCalculator {
     }
 
     private QtcFormula formula;
+    public void setFormula(QtcFormula value) {
+	formula = value;
+    }
+    
     private DecimalFormat decimalFormat;
     // use to iterate through all formulas
     private QtcFormula[] allFormulas = {
