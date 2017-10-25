@@ -498,11 +498,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (force_first_run || getFirstRun(prefs)) {
             Log.d(EPS, "firstRun");
             setRunned(prefs);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.quick_start_title));
-            builder.setMessage(getString(R.string.quick_start_message));
-            builder.setPositiveButton(getString(R.string.ok_title), null);
-            builder.show();
+            // We no longer show update dialog after app updated.
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setTitle(getString(R.string.quick_start_title));
+//            builder.setMessage(getString(R.string.quick_start_message));
+//            builder.setPositiveButton(getString(R.string.ok_title), null);
+//            builder.show();
         }
 
         if (externalImageLoad) {
@@ -611,6 +612,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             // we need to know how may bytes were read to write them to the byteBuffer
             int len;
+            if (is == null) {
+                return null;
+            }
             while ((len = is.read(buffer)) != -1) {
                 byteBuffer.write(buffer, 0, len);
             }
@@ -1711,14 +1715,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MenuItem switchModeMenuItem = menu.findItem(R.id.action_switch);
 
         if (calipersMode) {
-            getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.primary)));
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
+                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.primary)));
+            }
             unfadeCalipersView();
             switchModeMenuItem.setTitle(R.string.image_button_title);
             selectMainMenu();
         } else {
-            getSupportActionBar().setTitle(getString(R.string.image_mode_title));
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(getString(R.string.image_mode_title));
+                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+            }
             fadeCalipersView();
             switchModeMenuItem.setTitle(R.string.measure_button_title);
             selectImageMenu();
