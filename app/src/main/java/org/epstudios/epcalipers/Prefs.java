@@ -42,8 +42,9 @@ public class Prefs extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.action_bar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+		if (getSupportActionBar() != null) {
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		}
 
 
         // Display the fragment as the main content.

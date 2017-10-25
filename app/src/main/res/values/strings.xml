@@ -142,4 +142,7 @@
     <string name="tweak_during_qtc_key">tweak_during_qtc</string>
     <string name="tweak_during_qtc_summary_off">Cannot tweak caliper during QT measurement</string>
     <string name="tweak_during_qtc_summary_on">Long press to tweak caliper during QT measurement</string>
+    <string name="default_qtc_formula_title">QTc Formula</string>
+    <string name="default_qtc_formula_key">qtc_formula</string>
+    <string name="default_qtc_formula_value">bazett</string>
 </resources>
