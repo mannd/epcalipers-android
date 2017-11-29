@@ -57,6 +57,9 @@ public class Caliper {
     private final float SMALL_FONT = 32.0f;
     private final float LARGE_FONT = 48.0f;
 
+    private final float MIN_DISTANCE_FOR_MARCH = 20.0f;
+    private final int MAX_MARCHING_CALIPERS = 20;
+
     public enum TouchedBar {NONE, BAR1, BAR2, CROSSBAR}
 
     public TouchedBar getTouchedBar() {
@@ -148,6 +151,7 @@ public class Caliper {
     }
 
     private final Paint paint;
+    private final Paint marchingPaint;
 
     public void setRoundMsecRate(boolean roundMsecRate) {
         this.roundMsecRate = roundMsecRate;
@@ -169,6 +173,16 @@ public class Caliper {
 
     private Calibration calibration;
 
+    public boolean isMarching() {
+        return marching;
+    }
+
+    public void setMarching(boolean marching) {
+        this.marching = marching;
+    }
+
+    private boolean marching;
+
 
     public Caliper(Direction direction, float bar1Position, float bar2Position,
                    float crossBarPosition) {
@@ -180,6 +194,7 @@ public class Caliper {
         this.selectedColor = Color.RED;
         this.selected = false;
         this.touchedBar = TouchedBar.NONE;
+        this.marching = false;
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
@@ -191,14 +206,22 @@ public class Caliper {
                 Paint.Align.LEFT);
 
         paint.setTextSize(SMALL_FONT);
+        marchingPaint = new Paint(paint);
+        setMarchingPaintStrokeWidth(paint);
     }
 
     public Caliper() {
         this(Direction.HORIZONTAL, 0, 0, 100);
     }
 
+    private void setMarchingPaintStrokeWidth(Paint paint) {
+        // seems like difference of 2 in strokewidth works well for marching calipers
+        marchingPaint.setStrokeWidth(Math.max(paint.getStrokeWidth() - 2, 1));
+    }
+
     public void setColor(int color) {
         paint.setColor(color);
+        marchingPaint.setColor(color);
     }
 
     public int getColor() {
@@ -207,6 +230,7 @@ public class Caliper {
 
     public void setLineWidth(float lineWidth) {
         paint.setStrokeWidth(lineWidth);
+        setMarchingPaintStrokeWidth(paint);
     }
 
     public float getLineWidth() {
@@ -258,7 +282,44 @@ public class Caliper {
             canvas.drawLine(0, bar2Position, canvas.getWidth(), bar2Position, paint);
             canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
         }
+        if (marching && direction == Direction.HORIZONTAL) {
+            drawMarchingCalipers(canvas);
+        }
         caliperText(canvas);
+    }
+
+    private void drawMarchingCalipers(Canvas canvas) {
+        float difference = Math.abs(bar1Position - bar2Position);
+        if (difference < MIN_DISTANCE_FOR_MARCH) {
+            return;
+        }
+        float greaterBar = Math.max(bar1Position, bar2Position);
+        float lesserBar = Math.min(bar1Position, bar2Position);
+        float[] biggerBars = new float[MAX_MARCHING_CALIPERS];
+        float[] smallerBars = new float[MAX_MARCHING_CALIPERS];
+        float point = greaterBar + difference;
+        int index = 0;
+        while (point < canvas.getWidth() && index < MAX_MARCHING_CALIPERS) {
+            biggerBars[index] = point;
+            point += difference;
+            index++;
+        }
+        int maxBiggerBars = index;
+        index = 0;
+        point = lesserBar - difference;
+        while (point > 0 && index < MAX_MARCHING_CALIPERS) {
+            smallerBars[index] = point;
+            point -= difference;
+            index++;
+        }
+        int maxSmallerBars = index;
+        // draw them, using marchingPaint, which is similar to Paint but with narrower lines
+        for (int i = 0; i < maxBiggerBars; i++) {
+            canvas.drawLine(biggerBars[i], 0, biggerBars[i], canvas.getHeight(), marchingPaint);
+        }
+        for (int i = 0; i < maxSmallerBars; i++) {
+            canvas.drawLine(smallerBars[i], 0, smallerBars[i], canvas.getHeight(), marchingPaint);
+        }
     }
 
     public void caliperText(Canvas canvas) {

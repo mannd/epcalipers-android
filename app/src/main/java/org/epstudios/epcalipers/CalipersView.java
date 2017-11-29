@@ -99,6 +99,16 @@ public class CalipersView extends View {
     private boolean allowColorChange = false;
     private boolean allowTweakPosition = false;
 
+    public boolean isACaliperIsMarching() {
+        return aCaliperIsMarching;
+    }
+
+    public void setACaliperIsMarching(boolean aCaliperIsMarching) {
+        this.aCaliperIsMarching = aCaliperIsMarching;
+    }
+
+    private boolean aCaliperIsMarching = false;
+
 
 
 
@@ -424,6 +434,9 @@ public class CalipersView extends View {
         for (int i = calipersCount() - 1; i >= 0; i--) {
             if (calipers.get(i).pointNearCaliper(pointF)) {
                 calipers.remove(i);
+                if (calipersCount() < 1) {
+                    aCaliperIsMarching = false;
+                }
                 invalidate();
                 return;
             }
@@ -449,6 +462,38 @@ public class CalipersView extends View {
             touchedCaliper.moveBar2(distanceX, distanceY, event);
         }
         invalidate();
+    }
+
+    public void toggleShowMarchingCaliper() {
+        if (calipersCount() <= 0) {
+            aCaliperIsMarching = false;
+            return;
+        }
+        if (aCaliperIsMarching) {
+            for (Caliper c : calipers) {
+                c.setMarching(false);
+            }
+            aCaliperIsMarching = false;
+            return;
+        }
+        // first try to find a selected Horizontal caliper
+        for (Caliper c : calipers) {
+            if (c.isSelected() && c.getDirection() == Caliper.Direction.HORIZONTAL) {
+                c.setMarching(true);
+                aCaliperIsMarching = true;
+                return;
+            }
+        }
+        // if not, settle for the first Horizontal caliper
+        for (Caliper c : calipers) {
+            if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
+                c.setMarching(true);
+                aCaliperIsMarching = true;
+                return;
+            }
+        }
+        // otherwise give up
+        aCaliperIsMarching = false;
     }
 
 }
