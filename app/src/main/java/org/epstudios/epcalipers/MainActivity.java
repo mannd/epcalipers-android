@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button colorDoneButton;
     private Button tweakButton;
     private Button tweakDoneButton;
+    private Button marchingButton;
     private Button cameraButton;
     private Button selectImageButton;
     private Button adjustImageButton;
@@ -993,6 +994,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putFloat("totalRotation", totalRotation);
         outState.putBoolean("imageIsLocked", imageIsLocked);
         outState.putBoolean("multipagePDF", numberOfPdfPages > 0);
+        outState.putBoolean("aCaliperIsMarching", calipersView.isACaliperIsMarching());
 
         // To avoid FAILED BINDER TRANSACTION issue (which is ignored up until Android 24,
         // save to temp file instead of storing bitmap in bundle.
@@ -1053,6 +1055,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             outState.putBoolean(i + "CaliperSelected", c.isSelected());
             outState.putBoolean(i + "IsAngleCaliper", c.isAngleCaliper());
             outState.putInt(i + "UnselectedColor", c.getUnselectedColor());
+            outState.putBoolean(i + "MarchingCaliper", c.isMarching());
 
             if (c.isAngleCaliper()) {
                 outState.putDouble(i + ANGLE_B1, ((AngleCaliper)c).getBar1Angle());
@@ -1076,6 +1079,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersMode = savedInstanceState.getBoolean("calipersMode");
         imageIsLocked = savedInstanceState.getBoolean("imageIsLocked");
         lockImage(imageIsLocked);
+        calipersView.setACaliperIsMarching(savedInstanceState.getBoolean("aCaliperIsMarching"));
 
         boolean isMultipagePdf = savedInstanceState.getBoolean("multipagePDF");
 
@@ -1114,6 +1118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < calipersCount; i++) {
             String directionString = savedInstanceState.getString(i + "CaliperDirection");
             boolean isAngleCaliper = savedInstanceState.getBoolean(i + "IsAngleCaliper");
+            boolean isMarching = savedInstanceState.getBoolean(i + "MarchingCaliper");
             if (directionString == null) {
                 // something very wrong, give up on restoring calipers
                 return;
@@ -1148,6 +1153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             c.setLineWidth(currentLineWidth);
             c.setUseLargeFont(useLargeFont);
             c.setRoundMsecRate(roundMsecRate);
+            c.setMarching(isMarching);
             if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
                 c.setCalibration(horizontalCalibration);
             }
@@ -1292,6 +1298,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             microDown();
         } else if (v == microDoneButton) {
             microDone();
+        } else if (v == marchingButton) {
+            toggleMarchingCalipers();
         }
 
     }
@@ -1341,6 +1349,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Tweak menu
         tweakButton = createButton(getString(R.string.tweak_label));
         tweakDoneButton = createButton(getString(R.string.done_button_title));
+        // Marching calipers
+        marchingButton = createButton(getString(R.string.marching_label));
         // MicroMovement menu
         leftButton = createButton(getString(R.string.left_label));
         rightButton = createButton(getString(R.string.right_label));
@@ -1374,6 +1384,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(qtcButton);
         buttons.add(colorButton);
         buttons.add(tweakButton);
+        buttons.add(marchingButton);
         mainMenu = createMenu(buttons);
     }
 
@@ -2547,6 +2558,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         return (n == 1) ? c : null;
+    }
+
+    private void toggleMarchingCalipers() {
+        calipersView.toggleShowMarchingCaliper();
+        calipersView.invalidate();
     }
 
     private void addCaliperWithDirection(Caliper.Direction direction) {

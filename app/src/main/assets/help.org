@@ -20,8 +20,6 @@ It's 2 AM and the phone rings.  It's a nurse on the cardiac unit.  Mr. Smith is 
 You open the ECG on your phone.  You look at the QT interval.  You're not sure about the computer's measurement.  You really should double check it.  You start counting little boxes.  You pull out the (t)rusty old pair of mechanical calipers some drug rep gave you many years ago, back when such largesse was still legal.  You think to yourself: I live in a digital age.  Am I really making measurements on my smart phone with a dumb pair of calipers?
 * Electronic Calipers
 *EP Calipers* provides *electronic calipers* for measuring intervals on images of electrocardiograms (ECGs) or electrophysiologic recordings.  In the electrophysiology lab electronic calipers are included as part of the recording system.  *EP Calipers* is intended to provide similar electronic calipers for use on your Android phone or tablet.  The electronic calipers of *EP Calipers* are more accurate, easier to use, and less dangerous than mechanical calipers (they don't have sharp points!).
-* What's new?
-This new version of *EP Calipers* adds a setting to allow micromovement ("tweaking") of calipers during QTc measurements.  The sample ECG can now be reloaded without restarting the app.
 * Quick start
 When *EP Calipers* starts, a sample ECG and a time caliper are loaded.
 Move the caliper around by touching the caliper's crossbar and
@@ -115,6 +113,11 @@ Sometimes you might like to fine-tune the position of a caliper, or you find it 
 #+CAPTION: Buttons to tweak caliper positioning
 [[./micromovements.png]]
 
+** Marching calipers
+Select *March* to convert a time caliper to a marching caliper.  Vertical caliper lines will appear equal to the caliper width on either side of the caliper.  This is very useful to assess the regularity or irregularity of a rhythm, or to detect P waves marching through a tachycardia or during heart block.  Select *March* again to change the marching caliper back to normal again.
+#+CAPTION: Marching calipers
+[[./marching_calipers.png]]
+
 * Making measurements
 The interval measured by time or amplitude calipers is displayed on top of or next to the crossbar of the caliper.  Until these calipers are calibrated, measurements are displayed in arbitrary units (points, roughly equivalent to screen pixels).  Angle calipers show a measurement of the current angle in degrees and do not need to be calibrated to display angles.
 * Adding and deleting calipers
@@ -177,6 +180,7 @@ Preferences such as caliper colors and default calibration intervals can be sele
 * Acknowledgments
 - Thanks to Dr. Michael Katz for the concept.
 - Thanks to Dr. Adrian Baranchuk and his colleagues at Queen's University Kingston, Ontario, Canada for the concept of the Brugadometer and for assistance in implementing this algorithm.
+- Thanks to Scott Krankkala for the idea behind marching calipers.
 - The source code for *EP Calipers* is available on [[https://github.com/mannd/epcalipers-android][GitHub]].
 - *EP Calipers* is open source software and is licensed under the [[https://www.gnu.org/copyleft/gpl.html][GNU
   General Public License version 3]].  No guarantees are made as to the
