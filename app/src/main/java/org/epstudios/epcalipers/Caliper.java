@@ -453,6 +453,10 @@ public class Caliper {
         return false;
     }
 
+    public boolean isTimeCaliper() {
+        return direction == Direction.HORIZONTAL && !isAngleCaliper();
+    }
+
     public void moveCrossBar(float deltaX, float deltaY, MotionEvent event) {
         bar1Position += deltaX;
         bar2Position += deltaX;

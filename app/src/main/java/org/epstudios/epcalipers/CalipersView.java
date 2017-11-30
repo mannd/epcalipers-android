@@ -434,7 +434,7 @@ public class CalipersView extends View {
         for (int i = calipersCount() - 1; i >= 0; i--) {
             if (calipers.get(i).pointNearCaliper(pointF)) {
                 calipers.remove(i);
-                if (calipersCount() < 1) {
+                if (thereAreNoTimeCalipers()) {
                     aCaliperIsMarching = false;
                 }
                 invalidate();
@@ -476,17 +476,17 @@ public class CalipersView extends View {
             aCaliperIsMarching = false;
             return;
         }
-        // first try to find a selected Horizontal caliper
+        // first try to find a selected Time caliper
         for (Caliper c : calipers) {
-            if (c.isSelected() && c.getDirection() == Caliper.Direction.HORIZONTAL) {
+            if (c.isSelected() && c.isTimeCaliper()) {
                 c.setMarching(true);
                 aCaliperIsMarching = true;
                 return;
             }
         }
-        // if not, settle for the first Horizontal caliper
+        // if not, settle for the first Time caliper
         for (Caliper c : calipers) {
-            if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
+            if (c.isTimeCaliper()) {
                 c.setMarching(true);
                 aCaliperIsMarching = true;
                 return;
@@ -494,6 +494,20 @@ public class CalipersView extends View {
         }
         // otherwise give up
         aCaliperIsMarching = false;
+    }
+
+    private boolean thereAreNoTimeCalipers() {
+        if (calipersCount() <= 0) {
+            return true;
+        }
+        boolean noTimeCalipers = true;
+        for (Caliper c : calipers) {
+            if (c.isTimeCaliper()) {
+                noTimeCalipers = false;
+                break;
+            }
+        }
+        return noTimeCalipers;
     }
 
 }
