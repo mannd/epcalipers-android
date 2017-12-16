@@ -146,4 +146,5 @@
     <string name="default_qtc_formula_key">qtc_formula</string>
     <string name="default_qtc_formula_value">bazett</string>
     <string name="marching_label">March</string>
+    <string name="repeat_qt_button_title">Repeat QT</string>
 </resources>

@@ -2186,26 +2186,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 QtcCalculator calculator = new QtcCalculator(qtcFormulaPreference);
                 result = calculator.calculate(qt, meanRR, c.getCalibration().unitsAreMsec(),
                         c.getCalibration().getUnits());
-//                double sqrtRR = Math.sqrt(meanRR);
-//                double qtc = qt / sqrtRR;
-//                if (c.getCalibration().unitsAreMsec()) {
-//                    meanRR *= 1000;
-//                    qt *= 1000;
-//                    qtc *= 1000;
-//                }
-//                DecimalFormat decimalFormat = new DecimalFormat("@@@##");
-//                result = "Mean interval = " + decimalFormat.format(meanRR) + " " +
-//                        c.getCalibration().getUnits() + "\nQT = " +
-//                        decimalFormat.format(qt) + " " +
-//                        c.getCalibration().getUnits() +
-//                        "\nQTc = " + decimalFormat.format(qtc) + " " +
-//                        c.getCalibration().getUnits() +
-//                        "\n(Bazett's formula)";
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.calculated_qtc_dialog_title));
                 builder.setMessage(result);
+                builder.setNegativeButton(getString(R.string.repeat_qt_button_title), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selectQTcStep2Menu();
+                    }
+                });
+                builder.setPositiveButton(getString(R.string.done_button_title), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selectMainMenu();
+                    }
+                });
                 builder.show();
-                selectMainMenu();
             }
         }
     }
