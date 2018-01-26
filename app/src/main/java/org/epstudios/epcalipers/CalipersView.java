@@ -13,10 +13,8 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
@@ -137,7 +135,8 @@ public class CalipersView extends View {
         gestureDetector.setIsLongpressEnabled(true);
         View.OnTouchListener gestureListener = new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
-                    return gestureDetector.onTouchEvent(event);
+                v.performClick();
+                return gestureDetector.onTouchEvent(event);
             }
         };
 
@@ -207,11 +206,11 @@ public class CalipersView extends View {
                     // https://github.com/QuadFlask/colorpicker
                     ColorPickerDialogBuilder
                             .with(getContext())
-                            .setTitle("Choose color")
+                            .setTitle(getContext().getString(R.string.choose_color_label))
                             .initialColor(pressedCaliper.getUnselectedColor())
                             .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
                             .density(12)
-                            .setPositiveButton("OK", new ColorPickerClickListener() {
+                            .setPositiveButton(getContext().getString(R.string.ok_title), new ColorPickerClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int chosenColor, Integer[] allColors) {
                                     if (!pressedCaliper.isSelected()) {
@@ -221,7 +220,7 @@ public class CalipersView extends View {
                                     invalidate();
                                 }
                             })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            .setNegativeButton(getContext().getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                 }

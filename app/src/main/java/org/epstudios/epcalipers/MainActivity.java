@@ -25,10 +25,10 @@ import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -37,8 +37,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
-import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.util.Pair;
@@ -58,11 +56,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.epstudios.epcalipers.QtcCalculator.QtcFormula;
 import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.pdfdroid.codec.PdfContext;
 import org.vudroid.pdfdroid.codec.PdfPage;
-
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -83,7 +80,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.epstudios.epcalipers.QtcCalculator.QtcFormula;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
@@ -676,6 +673,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (currentPdfUri != null) {
                     File file = new File(currentPdfUri.getPath());
                     if (file.exists()) {
+                        //noinspection ResultOfMethodCallIgnored
                         file.delete();
                     }
                 }
@@ -774,6 +772,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (currentPdfUri != null) {
                     File file = new File(currentPdfUri.getPath());
                     if (file.exists()) {
+                        //noinspection ResultOfMethodCallIgnored
                         file.delete();
                     }
                 }
@@ -1318,8 +1317,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
         imageLockButton = createButton(getString(R.string.lock_label));
         sampleEcgButton = createButton(getString(R.string.sample_label));
-        previousPageButton = createButton("Previous");
-        nextPageButton = createButton("Next");
+        previousPageButton = createButton(getString(R.string.previous_button_label));
+        nextPageButton = createButton(getString(R.string.next_button_label));
         // Add Caliper menu
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
@@ -1960,6 +1959,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
+            if (selectedImage == null) {
+                return;
+            }
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Cursor cursor = getContentResolver().query(selectedImage,
                     filePathColumn, null, null, null);
@@ -2183,7 +2185,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             double meanRR = Math.abs(rrIntervalForQTc);
             String result;
             if (meanRR > 0) {
-                QtcCalculator calculator = new QtcCalculator(qtcFormulaPreference);
+                QtcCalculator calculator = new QtcCalculator(qtcFormulaPreference, this);
                 result = calculator.calculate(qt, meanRR, c.getCalibration().unitsAreMsec(),
                         c.getCalibration().getUnits());
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);

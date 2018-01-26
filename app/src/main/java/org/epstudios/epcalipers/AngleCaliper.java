@@ -25,14 +25,13 @@ package org.epstudios.epcalipers;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
 
 public class AngleCaliper extends Caliper {
 
-    static float differential = 0.0f;
+    private static float differential = 0.0f;
     private final double angle_delta = 0.15;
     private final float delta = 20.0f;
     // this constant is number of mm for height of Brugada triangle
@@ -65,7 +64,7 @@ public class AngleCaliper extends Caliper {
     private double bar1Angle;
     private double bar2Angle;
     private Calibration verticalCalibration;
-    private DecimalFormat degreeDecimalFormat;
+    private final DecimalFormat degreeDecimalFormat;
 
     public AngleCaliper() {
         super();
@@ -203,7 +202,7 @@ public class AngleCaliper extends Caliper {
         return pointNearCrossBar(p) || pointNearBar1(p) || pointNearBar2(p);
     }
 
-    public PointF endPointForPosition(PointF p, double angle, float length) {
+    private PointF endPointForPosition(PointF p, double angle, float length) {
         float endX = (float)Math.cos(angle) * length + p.x;
         float endY = (float)Math.sin(angle) * length + p.y;
         return new PointF(endX, endY);

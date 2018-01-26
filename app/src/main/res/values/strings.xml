@@ -5,11 +5,11 @@
     <string name="points">points</string>
     <string name="ep_calipers_title">EP Calipers</string>
     <string name="image_mode_title">Image Mode</string>
-    <string name="calibrate_button_title">Cal</string>
+    <string name="calibrate_button_title">Calibrate</string>
     <string name="add_caliper_button_title">+</string>
     <string name="interval_rate_button_title">I/R</string>
     <string name="mean_rate_button_title">mRate</string>
-    <string name="qtc_button_title">QTc</string>
+    <string name="qtc_button_title" translatable="false">QTc</string>
     <string name="camera_button_title">Camera</string>
     <string name="select_image_button_title">Select</string>
     <string name="adjust_image_button_title">Adjust</string>
@@ -30,7 +30,6 @@
     <string name="about_text">Copyright \u00a9 2015–2017 EP Studios, Inc.\nAll rights reserved.\n</string>
     <string name="about_label">EP Calipers</string>
     <string name="help_title">Help</string>
-    <string name="switch_mode_title">Switch</string>
     <string name="no_time_caliper_selected_title">No Time Caliper Selected</string>
     <string name="no_time_caliper_selected_message">Select a time caliper to
         measure one or more RR intervals.</string>
@@ -38,34 +37,31 @@
     <string name="no_calipers_alert_message">Add one or more calipers first
         before proceeding.</string>
     <string name="no_caliper_selected_alert_title">No Caliper Selected</string>
-    <string name="no_caliper_selected_alert_message">Selected a
-        caliper by single-tapping it.  Move the caliper to a known
-        interval.  Touch Set to enter the calibration measurement.</string>
+    <string name="no_caliper_selected_alert_message">Select a caliper by single-tapping it. Move the caliper to a known interval. Touch Set to enter the calibration measurement.</string>
     <string name="calibration_dialog_message">Enter measurement (e.g. %s):</string>
     <string name="example_amplitude_measurement">1 mV</string>
     <string name="example_time_measurement">500 msec</string>
     <string name="calibrate_dialog_title">Calibrate</string>
     <string name="ok_title">OK</string>
     <string name="cancel_title">Cancel</string>
-    <string name="calibration_dialog_hint">Type current measurement here.</string>
-    <string name="show_start_image_key">show_start_image</string>
+    <string name="show_start_image_key" translatable="false">show_start_image</string>
     <string name="show_start_image_label">Show sample ECG at start?</string>
     <string name="settings_title">Settings</string>
-    <string name="default_time_calibration_key">default_time_calibration</string>
+    <string name="default_time_calibration_key" translatable="false">default_time_calibration</string>
     <string name="default_time_calibration_label">Default time calibration</string>
     <string name="default_time_calibration_value">1000 msec</string>
     <string name="default_amplitude_calibration_value">10 mm</string>
-    <string name="default_amplitude_calibration_key">default_amplitude_calibration</string>
+    <string name="default_amplitude_calibration_key" translatable="false">default_amplitude_calibration</string>
     <string name="default_amplitude_calibration_label">Default amplitude calibration</string>
-    <string name="default_caliper_color_key">default_caliper_color</string>
+    <string name="default_caliper_color_key" translatable="false">default_caliper_color</string>
     <string name="default_caliper_color_label">Caliper color</string>
     <string name="default_highlight_color_label">Highlight color</string>
-    <string name="default_highlight_color_key">default_highlight_color</string>
-    <string name="default_line_width_key">default_line_width</string>
+    <string name="default_highlight_color_key" translatable="false">default_highlight_color</string>
+    <string name="default_line_width_key" translatable="false">default_line_width</string>
     <string name="default_line_width_label">Line width</string>
     <string name="show_start_image_off_summary">Don\'t show ECG</string>
     <string name="show_start_image_on_summary">Show ECG</string>
-    <string name="use_large_font_key">use_large_font</string>
+    <string name="use_large_font_key" translatable="false">use_large_font</string>
     <string name="use_large_font_label">Use large font caliper labels?"</string>
     <string name="use_large_font_off_summary">Use normal size font</string>
     <string name="use_large_font_on_summary">Use large font</string>
@@ -83,29 +79,17 @@
     <string name="qt_interval_query">QT interval?</string>
     <string name="invalid_result_message">Invalid Result</string>
     <string name="calculated_qtc_dialog_title">Calculated QTc</string>
-    <string name="quick_start_title">EP Calipers Quick Start</string>
-    <string name="quick_start_message">What\'s new: Bug fixes.
-        \n\nQuick Start: Use your fingers to move and position calipers or move and zoom the
-        image.\n\nAdd calipers with the *+* menu item, single tap a
-        caliper to select it, tap again to unselect, and double tap to
-        delete a caliper.  After calibration the menu items that allow
-        toggling interval and rate and calculating mean rates and QTc will
-        be enabled.\n\nUse the *Image* button on the top right to load
-        and adjust ECG images.\n\nSee the *Help* menu item for full
-        help.</string>
     <string name="opening_pdf_message">Opening PDF</string>
     <string name="file_load_error">File load error</string>
     <string name="file_load_message">File could not be loaded</string>
     <string name="image_button_title">Image</string>
     <string name="measure_button_title">Measure</string>
-    <string name="normal_ecg">normal_ecg</string>
     <string name="about">About</string>
     <string name="help">Help</string>
     <string name="app_version">Version %1s</string>
     <string name="default_number_qtc_rr_intervals">1</string>
     <string name="continue_title">Continue</string>
-    <string name="pdf_error_message">Could not open PDF</string>
-    <string name="round_msec_rate_key">round_msec_rate</string>
+    <string name="round_msec_rate_key" translatable="false">round_msec_rate</string>
     <string name="round_msec_rate_label">Round msec and heart rate</string>
     <string name="round_msec_rate_off_summary">No rounding of intervals and rates</string>
     <string name="round_msec_rate_on_summary">Msec and heart rate rounded to nearest integer</string>
@@ -139,12 +123,40 @@
     <string name="multipage_pdf_warning">Multipage PDF will need to be reloaded to view other pages.</string>
     <string name="temp_image_file_warning">Could not store temporary image file</string>
     <string name="tweak_during_qtc_label">Allow tweaking during QTc</string>
-    <string name="tweak_during_qtc_key">tweak_during_qtc</string>
+    <string name="tweak_during_qtc_key" translatable="false">tweak_during_qtc</string>
     <string name="tweak_during_qtc_summary_off">Cannot tweak caliper during QT measurement</string>
     <string name="tweak_during_qtc_summary_on">Long press to tweak caliper during QT measurement</string>
     <string name="default_qtc_formula_title">QTc Formula</string>
-    <string name="default_qtc_formula_key">qtc_formula</string>
-    <string name="default_qtc_formula_value">bazett</string>
+    <string name="default_qtc_formula_key" translatable="false">qtc_formula</string>
+    <string name="default_qtc_formula_value" translatable="false">bazett</string>
     <string name="marching_label">March</string>
     <string name="repeat_qt_button_title">Repeat QT</string>
+    <string name="previous_button_label" translatable="false">&lt;</string>
+    <string name="next_button_label" translatable="false">&gt;</string>
+    <string name="choose_color_label">Choose color</string>
+    <string name="calibration_dialog_hint">Enter calibration measurement.</string>
+    <string name="pdf_error_message">Could not open PDF</string>
+    <string name="black_color">Black</string>
+    <string name="magenta_color">Magenta</string>
+    <string name="light_gray_color">Light Gray</string>
+    <string name="blue_color">Blue</string>
+    <string name="green_color">Green</string>
+    <string name="white_color">White</string>
+    <string name="red_color">Red</string>
+    <string name="yellow_color">Yellow</string>
+    <string name="dark_gray_color">Dark Gray</string>
+    <string name="one_point">1 point</string>
+    <string name="two_points">2 points</string>
+    <string name="three_points">3 points</string>
+    <string name="four_points">4 points</string>
+    <string name="five_points">5 points</string>
+    <string name="six_points">6 points</string>
+    <string name="seven_points">7 points</string>
+    <string name="eight_points">8 points</string>
+    <string name="bazett_formula">Bazett</string>
+    <string name="framingham_formula">Framingham</string>
+    <string name="fridericia_formula">Fridericia</string>
+    <string name="hodges_formula">Hodges</string>
+    <string name="all_formulas">All</string>
+    <string name="error">Error</string>
 </resources>
