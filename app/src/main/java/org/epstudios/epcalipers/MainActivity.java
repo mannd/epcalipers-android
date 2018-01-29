@@ -82,15 +82,24 @@ import java.util.regex.Pattern;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
+import static org.epstudios.epcalipers.MyPreferenceFragment.ALL;
+import static org.epstudios.epcalipers.MyPreferenceFragment.BAZETT;
+import static org.epstudios.epcalipers.MyPreferenceFragment.FRAMINGHAM;
+import static org.epstudios.epcalipers.MyPreferenceFragment.FRIDERICIA;
+import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
+    // TODO: regex below includes Cyrillic and must be updated with new alphabets
+    private static final String calibrationRegex = "[.,0-9]+|[a-zA-ZА-яЁё]+";
+    private static final Pattern VALID_PATTERN = Pattern.compile(calibrationRegex);
     private static final String EPS = "EPS";
+    private static final String LF = "\n";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
     private static final int DEFAULT_CALIPER_COLOR = Color.BLUE;
     private static final int DEFAULT_HIGHLIGHT_COLOR = Color.RED;
     private static final int DEFAULT_LINE_WIDTH = 2;
-    public static final String TEMP_BITMAP_FILE_NAME = "/tempEPCalipersImageBitmap.png";
+    private static final String TEMP_BITMAP_FILE_NAME = "/tempEPCalipersImageBitmap.png";
     private static final String ANGLE_B1 = "angleB1";
     private static final String ANGLE_B2 = "angleB2";
 
@@ -101,6 +110,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_PDF = 103;
     private static final int MY_PERMISSIONS_REQUEST_STORE_BITMAP = 104;
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE = 105;
+    private static final String HORIZONTAL = "Horizontal";
+    private static final String VERTICAL = "Vertical";
+    private static final String IMAGE_TYPE = "image/";
+    private static final String APPLICATION_PDF_TYPE = "application/pdf";
 
     private Button addCaliperButton;
     private Button calibrateButton;
@@ -276,11 +289,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         currentLineWidth = DEFAULT_LINE_WIDTH;
 
         qtcFormulaMap = new HashMap<>();
-        qtcFormulaMap.put("bazett", QtcFormula.qtcBzt);
-        qtcFormulaMap.put("framingham", QtcFormula.qtcFrm);
-        qtcFormulaMap.put("hodges", QtcFormula.qtcHdg);
-        qtcFormulaMap.put("fridericia", QtcFormula.qtcFrd);
-        qtcFormulaMap.put("all", QtcFormula.qtcAll);
+        qtcFormulaMap.put(BAZETT, QtcFormula.qtcBzt);
+        qtcFormulaMap.put(FRAMINGHAM, QtcFormula.qtcFrm);
+        qtcFormulaMap.put(HODGES, QtcFormula.qtcHdg);
+        qtcFormulaMap.put(FRIDERICIA, QtcFormula.qtcFrd);
+        qtcFormulaMap.put(ALL, QtcFormula.qtcAll);
 
         loadSettings();
 
@@ -300,14 +313,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         attacher.setOnMatrixChangeListener(new MatrixChangeListener());
 
         if (noSavedInstance && Intent.ACTION_SEND.equals(action) && type != null) {
-            if (type.startsWith("image/")) {
+            if (type.startsWith(IMAGE_TYPE)) {
                 handleSentImage();
             }
         } else if (noSavedInstance && Intent.ACTION_VIEW.equals(action) && type != null) {
-            if (type.equals("application/pdf")) {
+            if (type.equals(APPLICATION_PDF_TYPE)) {
                 handlePDF();
             }
-            if (type.startsWith("image/")) {
+            if (type.startsWith(IMAGE_TYPE)) {
                 handleImage();
             }
         }
@@ -326,8 +339,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         createButtons();
 
-        horizontalCalibration = new Calibration(Caliper.Direction.HORIZONTAL);
-        verticalCalibration = new Calibration(Caliper.Direction.VERTICAL);
+        horizontalCalibration = new Calibration(Caliper.Direction.HORIZONTAL, this);
+        verticalCalibration = new Calibration(Caliper.Direction.VERTICAL, this);
 
         rrIntervalForQTc = 0.0;
 
@@ -493,6 +506,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         // TODO: update BOTH quick_start_messages (there are 2 strings.xml files)
+        //noinspection ConstantConditions
         if (force_first_run || getFirstRun(prefs)) {
             Log.d(EPS, "firstRun");
             setRunned(prefs);
@@ -535,6 +549,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else {
             proceedToHandleSentImage();
         }
+    }
+
+    private void epsLog(String s) {
+        Log.d(EPS, s);
     }
 
     private void proceedToHandleImage() {
@@ -724,7 +742,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else {
                 Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.pdf_error_message) +
-                        "\n" + exceptionMessage, Toast.LENGTH_SHORT);
+                        LF + exceptionMessage, Toast.LENGTH_SHORT);
                 toast.show();
             }
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -819,7 +837,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else {
                 Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.pdf_error_message) +
-                        "\n" + exceptionMessage, Toast.LENGTH_SHORT);
+                        LF + exceptionMessage, Toast.LENGTH_SHORT);
                 toast.show();
             }
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -1036,7 +1054,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Caliper c = calipersView.getCalipers().get(i);
             outState.putString(i + "CaliperDirection",
                     c.getDirection() == Caliper.Direction.HORIZONTAL ?
-                            "Horizontal" : "Vertical");
+                            HORIZONTAL : VERTICAL);
             // maxX normalizes bar and crossbar positions regardless of caliper direction,
             // i.e. X is direction for bars and Y is direction for crossbars.
             float maxX = c.getDirection() == Caliper.Direction.HORIZONTAL
@@ -1123,7 +1141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             }
             int unselectedColor = savedInstanceState.getInt(i + "UnselectedColor");
-            Caliper.Direction direction = directionString.equals("Horizontal") ?
+            Caliper.Direction direction = directionString.equals(HORIZONTAL) ?
                     Caliper.Direction.HORIZONTAL : Caliper.Direction.VERTICAL;
             float bar1Position = savedInstanceState.getFloat(i + "CaliperBar1Position");
             float bar2Position = savedInstanceState.getFloat(i + "CaliperBar2Position");
@@ -1914,7 +1932,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = getTimeStamp();
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "JPEG_" + timeStamp + "_"; //NON-NLS
         File storageDir = Environment.getExternalStorageDirectory();
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
@@ -1929,7 +1947,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private File createTmpPdfFile() throws IOException {
         String timeStamp = getTimeStamp();
-        String pdfFileName = "PDF_" + timeStamp + "_";
+        String pdfFileName = "PDF_" + timeStamp + "_"; //NON-NLS
         File storageDir = this.getCacheDir();
         //currentPhotoPath = image.getAbsolutePath();
         return File.createTempFile(
@@ -2095,9 +2113,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setTitle(getString(R.string.mean_rr_result_dialog_title));
             DecimalFormat decimalFormat = new DecimalFormat("@@@##");
 
-            builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
-                    c.getCalibration().rawUnits() + "\nMean rate = " +
-                    decimalFormat.format(meanRate) + " bpm");
+            builder.setMessage(String.format(getString(R.string.mean_rr_result_dialog_message),
+                    decimalFormat.format(meanRR), c.getCalibration().rawUnits(),
+                    decimalFormat.format(meanRate) ));
+//            builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
+//                    c.getCalibration().rawUnits() + "\nMean rate = " +
+//                    decimalFormat.format(meanRate) + " " + getString(R.string.bpm));
             builder.show();
         }
     }
@@ -2479,7 +2500,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title);
         builder.setMessage(message);
-        builder.setPositiveButton("OK", null);
+        builder.setPositiveButton(getString(R.string.ok_title), null);
         AlertDialog dialog = builder.create();
         dialog.show();
     }

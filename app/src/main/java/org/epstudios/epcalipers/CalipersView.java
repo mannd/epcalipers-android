@@ -9,7 +9,6 @@ import android.graphics.PointF;
 import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -44,7 +43,6 @@ import java.util.ArrayList;
 public class CalipersView extends View {
 
     private GestureDetectorCompat gestureDetector;
-    private final static String EPS = "EPS";
 
     private Caliper touchedCaliper;
 
@@ -150,7 +148,6 @@ public class CalipersView extends View {
         @Override
         public boolean onDown(MotionEvent event) {
             // must be implemented and return true for other events to work;
-            Log.d(EPS, "onDown");
             for (int i = calipersCount() - 1; i >= 0; i--) {
                 if (calipers.get(i).pointNearCaliper(new PointF(event.getX(), event.getY()))) {
                     setTouchedCaliper(event);
@@ -284,7 +281,7 @@ public class CalipersView extends View {
     }
 
     private void showLockWarning(Canvas canvas) {
-        String text = "IMAGE LOCKED";
+        String text = getContext().getString(R.string.image_locked);
         Paint paint = new Paint();
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.FILL);
@@ -452,7 +449,7 @@ public class CalipersView extends View {
             distanceY = tmp;
         }
         if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.CROSSBAR) {
-            touchedCaliper.moveCrossBar(distanceX, distanceY, event);
+            touchedCaliper.moveCrossBar(distanceX, distanceY);
         }
         else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR1) {
             touchedCaliper.moveBar1(distanceX, distanceY, event);

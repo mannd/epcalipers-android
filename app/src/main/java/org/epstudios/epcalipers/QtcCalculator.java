@@ -26,7 +26,7 @@
 package org.epstudios.epcalipers;
 
 
-import android.app.Activity;
+import android.content.Context;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -41,7 +41,10 @@ public class QtcCalculator {
         qtcAll  // calculate all the above QTcs
     }
 
+    private static final String SPACE = " ";
+    private static final String LF = "\n";
     private QtcFormula formula;
+    private final Context context;
     public void setFormula(QtcFormula value) {
 	formula = value;
     }
@@ -57,15 +60,16 @@ public class QtcCalculator {
 
     private final Map<QtcFormula, String> formulaNames;
 
-    QtcCalculator(QtcFormula formula, Activity activity) {
+    QtcCalculator(QtcFormula formula, Context context) {
         this.formula = formula;
+        this.context = context;
         decimalFormat = new DecimalFormat("@@@##");
         formulaNames = new HashMap<>();
-        formulaNames.put(QtcFormula.qtcBzt, activity.getString(R.string.bazett_formula));
-        formulaNames.put(QtcFormula.qtcFrm, activity.getString(R.string.framingham_formula));
-        formulaNames.put(QtcFormula.qtcHdg, activity.getString(R.string.hodges_formula));
-        formulaNames.put(QtcFormula.qtcFrd, activity.getString(R.string.fridericia_formula));
-        formulaNames.put(QtcFormula.qtcAll, activity.getString(R.string.all_formulas));
+        formulaNames.put(QtcFormula.qtcBzt, context.getString(R.string.bazett_formula));
+        formulaNames.put(QtcFormula.qtcFrm, context.getString(R.string.framingham_formula));
+        formulaNames.put(QtcFormula.qtcHdg, context.getString(R.string.hodges_formula));
+        formulaNames.put(QtcFormula.qtcFrd, context.getString(R.string.fridericia_formula));
+        formulaNames.put(QtcFormula.qtcAll, context.getString(R.string.all_formulas));
     }
 
     public String calculate(double qtInSec, double rrInSec,
@@ -81,17 +85,20 @@ public class QtcCalculator {
             meanRR *= 1000.0;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("Mean RR = ").append(decimalFormat.format(meanRR)).append(" ")
-                .append(units).append("\nQT = ").append(decimalFormat.format(qt)).append(" ").append(units);
+        sb.append(context.getString(R.string.mean_rr_equals)).append(SPACE)
+                .append(decimalFormat.format(meanRR)).append(SPACE)
+                .append(units).append(LF).append(context.getString(R.string.qt_equals)).append(SPACE)
+                .append(decimalFormat.format(qt)).append(SPACE).append(units);
         for (QtcFormula formula1 : formulas) {
             double qtc = calculate(qtInSec, rrInSec, formula1);
             if (convertToMsec) {
                 qtc *= 1000.0;
             }
-            sb.append("\nQTc = ").append(decimalFormat.format(qtc)).append(" ")
-                    .append(units).append(" (").append(formulaNames.get(formula1)).append(" formula)");
-//            result += "\nQTc = " + decimalFormat.format(qtc) + " " +
-//                    units + " (" + formulaNames.get(formulas[i]) + " formula)";
+            sb.append(LF).append(context.getString(R.string.qtc_equals)).append(SPACE)
+                    .append(decimalFormat.format(qtc)).append(SPACE)
+                    .append(units).append(SPACE)
+                    .append(String.format(context.getString(R.string.formula_detail),
+                    formulaNames.get(formula1)))    ;
         }
         return sb.toString();
     }

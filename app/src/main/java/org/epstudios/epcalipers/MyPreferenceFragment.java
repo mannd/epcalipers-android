@@ -16,6 +16,12 @@ import java.util.Map;
 public class MyPreferenceFragment extends PreferenceFragment implements
         OnSharedPreferenceChangeListener {
 
+    public static final String BAZETT = "bazett";
+    public static final String FRAMINGHAM = "framingham";
+    public static final String HODGES = "hodges";
+    public static final String FRIDERICIA = "fridericia";
+    public static final String ALL = "all";
+
     private SparseArray<String> names = null;
 
     private SparseArray<String> createMap(Activity activity) {
@@ -47,11 +53,11 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private Map<String, String> formulaNames = null;
     private Map<String, String> createFormulaNamesMap(Activity activity) {
         Map<String, String> map = new HashMap<>();
-        map.put("bazett", activity.getString(R.string.bazett_formula));
-        map.put("framingham", activity.getString(R.string.framingham_formula));
-        map.put("hodges", activity.getString(R.string.hodges_formula));
-        map.put("fridericia", activity.getString(R.string.fridericia_formula));
-        map.put("all", activity.getString(R.string.all_formulas));
+        map.put(BAZETT, activity.getString(R.string.bazett_formula));
+        map.put(FRAMINGHAM, activity.getString(R.string.framingham_formula));
+        map.put(HODGES, activity.getString(R.string.hodges_formula));
+        map.put(FRIDERICIA, activity.getString(R.string.fridericia_formula));
+        map.put(ALL, activity.getString(R.string.all_formulas));
         return map;
     }
 

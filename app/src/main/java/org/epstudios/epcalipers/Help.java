@@ -37,6 +37,7 @@ public class Help extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.help);
+        @SuppressWarnings("HardCodedStringLiteral")
         String url = "file:///android_asset/help.html";
         //webView = new WebView(this);
         //setContentView(webView);

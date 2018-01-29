@@ -44,8 +44,7 @@ public class Caliper {
         Up,
         Down,
         Left,
-        Right,
-        None
+        Right
     }
 
 
@@ -455,7 +454,7 @@ public class Caliper {
         return direction == Direction.HORIZONTAL && !isAngleCaliper();
     }
 
-    public void moveCrossBar(float deltaX, float deltaY, MotionEvent event) {
+    public void moveCrossBar(float deltaX, float deltaY) {
         bar1Position += deltaX;
         bar2Position += deltaX;
         crossBarPosition += deltaY;

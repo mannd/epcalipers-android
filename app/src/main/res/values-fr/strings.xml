@@ -106,7 +106,7 @@
     <string name="number_of_intervals_dialog_message">Combien d\'intervalles ce compas mesure-t-il ?</string>
     <string name="mean_rr_dialog_hint">Nombre d\'intervalles mesurés</string>
     <string name="mean_rr_result_dialog_title">Intervalle moyen et fréquence cardiaque moyenne</string>
-    <string name="mean_rr_result_dialog_message">Intervalle moyen = %%s %%s\\nFréquence cardiaque moyenne = %%s bpm</string>
+    <string name="mean_rr_result_dialog_message">Intervalle moyen = %s %s%nFréquence cardiaque moyenne = %s bpm</string>
     <string name="select_rr_intervals_message">Intervalle(s) RR?</string>
     <string name="measure_button_label">Mesurer</string>
     <string name="qt_interval_query">Intervalle QT?</string>
@@ -166,4 +166,9 @@
     <string name="hodges_formula">Hodges</string>
     <string name="all_formulas">Toutes</string>
     <string name="error">Erreur</string>
+    <string name="mean_rr_equals">Moyen RR =</string>
+    <string name="qt_equals">QT =</string>
+    <string name="qtc_equals">QTc =</string>
+    <string name="formula_detail">(formule %s)</string>
+    <string name="image_locked">IMAGE BLOQUÉE</string>
 </resources>

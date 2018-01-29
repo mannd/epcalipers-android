@@ -72,7 +72,7 @@
     <string name="number_of_intervals_dialog_message">How many intervals is this caliper measuring?</string>
     <string name="mean_rr_dialog_hint">Number of intervals measured</string>
     <string name="mean_rr_result_dialog_title">Mean Interval and Rate</string>
-    <string name="mean_rr_result_dialog_message">Mean interval = %%s %%s\\nMean rate = %%s bpm</string>
+    <string name="mean_rr_result_dialog_message">Mean interval = %s %s%nMean rate = %s bpm</string>
     <string name="select_rr_intervals_message">RR interval(s)?</string>
     <string name="measure_button_label">Measure</string>
     <string name="default_number_rr_intervals">3</string>
@@ -86,7 +86,7 @@
     <string name="measure_button_title">Measure</string>
     <string name="about">About</string>
     <string name="help">Help</string>
-    <string name="app_version">Version %1s</string>
+    <string name="app_version">Version %s</string>
     <string name="default_number_qtc_rr_intervals">1</string>
     <string name="continue_title">Continue</string>
     <string name="round_msec_rate_key" translatable="false">round_msec_rate</string>
@@ -113,7 +113,7 @@
     <string name="down_bar_label">Move lower bar</string>
     <string name="color_label">Color</string>
     <string name="tweak_label">Tweak</string>
-    <string name="color_menu_text">Long press calper to change color</string>
+    <string name="color_menu_text">Long press caliper to change color</string>
     <string name="tweak_menu_text">Long press caliper component to tweak position</string>
     <string name="move_angle_apex_text">Move angle apex</string>
     <string name="move_crossbar_text">Move crossbar</string>
@@ -159,4 +159,9 @@
     <string name="hodges_formula">Hodges</string>
     <string name="all_formulas">All</string>
     <string name="error">Error</string>
+    <string name="image_locked">IMAGE LOCKED</string>
+    <string name="mean_rr_equals">Mean RR =</string>
+    <string name="qt_equals">QT =</string>
+    <string name="qtc_equals">QTc =</string>
+    <string name="formula_detail">(%s formula)</string>
 </resources>
