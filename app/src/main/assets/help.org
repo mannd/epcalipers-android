@@ -91,7 +91,7 @@ When moving and adjusting calipers, you may sometimes inadvertently move the und
 * Sample ECG
 Tap *Sample* to show the sample ECG that comes with *EP Calipers*.  This is a good way to practice using the app, or demonstrate it to others.
 * Exiting *Image* mode
-After loading and adjusting the image, you need to exit Image mode so that you can use the calipers.  Select the *Measure* button at the top left of the screen to return to the *EP Calipers* main screen.
+After loading and adjusting the image, you need to exit Image mode so that you can use the calipers.  Select the *Measure* button at the top right of the screen to return to the *EP Calipers* main screen.
 #+CAPTION: Use the *Measure* button to exit *Image* mode
 [[./measure_button.png]]
 
@@ -99,7 +99,7 @@ After loading and adjusting the image, you need to exit Image mode so that you c
 Calipers can be horizontal for time measurements, vertical for amplitude measurements or angle shaped to measure angles in degrees.  Time calipers look like the letter *H*, amplitude calipers like an *H* lying on its side, and angle calipers start out looking like an upside down *V*.  
 * Moving calipers
 ** Time and amplitude calipers
-Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bars (or top or bottom in the case of vertical calipers) to stretch or shrink the calipers.  Note that you cannot pinch both bars at the same time.  If you find you are inadvertently moving the underlying image rather than the calipers, use the [[Lock][*Lock*]] item from the *Image* menu to lock the image in place.
+Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bars (or top or bottom in the case of amplitude calipers) to stretch or shrink the calipers.  Note that you cannot pinch both bars at the same time.  If you find you are inadvertently moving the underlying image rather than the calipers, use the [[Lock][*Lock*]] item from the *Image* menu to lock the image in place.
 #+CAPTION: Single unselected uncalibrated time caliper
 [[./unselected_time_caliper.png]]
 
@@ -121,7 +121,7 @@ Select *March* to convert a time caliper to a marching caliper.  Vertical calipe
 * Making measurements
 The interval measured by time or amplitude calipers is displayed on top of or next to the crossbar of the caliper.  Until these calipers are calibrated, measurements are displayed in arbitrary units (points, roughly equivalent to screen pixels).  Angle calipers show a measurement of the current angle in degrees and do not need to be calibrated to display angles.
 * Adding and deleting calipers
-Select the *+* or *Add Caliper* button to add new calipers.[fn:1]
+Select the *+* button to add new calipers.
 #+CAPTION: Main menu, prior to calibration
 [[./main_menu_uncalibrated.png]]
 
@@ -188,6 +188,3 @@ Preferences such as caliper colors and default calibration intervals can be sele
 - For questions, error reporting or suggestions contact
   [[mailto:mannd@epstudiossoftware.com][EP Studios]].
 - Website: [[http://www.epstudiossoftware.com][epstudiossoftware.com]]
-* Footnotes
-
-[fn:1] Note that button titles may be slightly different depending on the size and orientation of the device (e.g. phone vs tablet, portrait vs landscape).

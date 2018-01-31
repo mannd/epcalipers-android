@@ -123,8 +123,8 @@
     <string name="micro_down_label">m-Inf</string>
     <string name="left_bar_label">Déplacer la barre gauche</string>
     <string name="right_bar_label">Déplacer la barre droite</string>
-    <string name="up_bar_label">Déplacer la barre sup</string>
-    <string name="down_bar_label">Déplacer la barre inf</string>
+    <string name="up_bar_label">Déplacer la barre supérieure</string>
+    <string name="down_bar_label">Déplacer la barre inférieure</string>
     <string name="color_menu_text">Appuyer sur un compas</string>
     <string name="tweak_menu_text">Appuyer sur un composant d\'un compas</string>
     <string name="tweak_during_qtc_label">Permettre de régler pendant QTc</string>
