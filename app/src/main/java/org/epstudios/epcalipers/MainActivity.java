@@ -1033,8 +1033,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         // Calibration
-        // must use rawUnits here, otherwise original calibration units are lost
-        outState.putString("hcalUnits", horizontalCalibration.rawUnits());
+        // must use getRawUnits here, otherwise original calibration units are lost
+        outState.putString("hcalUnits", horizontalCalibration.getRawUnits());
         outState.putString("hcalCalibrationString", horizontalCalibration.getCalibrationString());
         outState.putBoolean("hcalDisplayRate", horizontalCalibration.getDisplayRate());
         outState.putFloat("hcalOriginalZoom", horizontalCalibration.getOriginalZoom());
@@ -1042,7 +1042,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean("hcalCalibrated", horizontalCalibration.isCalibrated());
         outState.putFloat(("hcalOriginalCalFactor"), horizontalCalibration.getOriginalCalFactor());
 
-        outState.putString("vcalUnits", verticalCalibration.rawUnits());
+        outState.putString("vcalUnits", verticalCalibration.getRawUnits());
         outState.putString("vcalCalibrationString", verticalCalibration.getCalibrationString());
         outState.putBoolean("vcalDisplayRate", verticalCalibration.getDisplayRate());
         outState.putFloat("vcalOriginalZoom", verticalCalibration.getOriginalZoom());
@@ -2114,10 +2114,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             DecimalFormat decimalFormat = new DecimalFormat("@@@##");
 
             builder.setMessage(String.format(getString(R.string.mean_rr_result_dialog_message),
-                    decimalFormat.format(meanRR), c.getCalibration().rawUnits(),
+                    decimalFormat.format(meanRR), c.getCalibration().getRawUnits(),
                     decimalFormat.format(meanRate) ));
 //            builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
-//                    c.getCalibration().rawUnits() + "\nMean rate = " +
+//                    c.getCalibration().getRawUnits() + "\nMean rate = " +
 //                    decimalFormat.format(meanRate) + " " + getString(R.string.bpm));
             builder.show();
         }

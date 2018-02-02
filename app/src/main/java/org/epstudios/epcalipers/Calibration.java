@@ -132,7 +132,7 @@ public class Calibration {
         this.units = value;
     }
 
-    public String rawUnits() {
+    public String getRawUnits() {
         return units;
     }
 

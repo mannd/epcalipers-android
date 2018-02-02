@@ -168,7 +168,7 @@ public class AngleCaliper extends Caliper {
     }
 
     private String baseMeasurement(double lengthInPoints) {
-        return calibratedBaseResult(lengthInPoints) + " " + getCalibration().getUnits();
+        return calibratedBaseResult(lengthInPoints) + " " + getCalibration().getRawUnits();
     }
 
     private boolean pointNearBar(PointF p, double barAngle) {
