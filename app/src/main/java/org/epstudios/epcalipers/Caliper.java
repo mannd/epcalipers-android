@@ -10,6 +10,11 @@ import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
 
+import static org.epstudios.epcalipers.Caliper.MovementDirection.Down;
+import static org.epstudios.epcalipers.Caliper.MovementDirection.Left;
+import static org.epstudios.epcalipers.Caliper.MovementDirection.Right;
+import static org.epstudios.epcalipers.Caliper.MovementDirection.Up;
+
 /**
  * Copyright (C) 2015 EP Studios, Inc.
  * www.epstudiossoftware.com
@@ -44,7 +49,8 @@ public class Caliper {
         Up,
         Down,
         Left,
-        Right
+        Right,
+        Stationary
     }
 
 
@@ -484,8 +490,26 @@ public class Caliper {
         }
     }
 
+    private MovementDirection swapDirection(MovementDirection direction) {
+        switch (direction) {
+            case Left:
+                return MovementDirection.Up;
+            case Right:
+                return MovementDirection.Down;
+            case Up:
+                return MovementDirection.Left;
+            case Down:
+                return MovementDirection.Right;
+            default:
+                return MovementDirection.Stationary;
+        }
+    }
+
     protected void moveCrossbarDirectionally(float delta, MovementDirection direction) {
-        if (direction == MovementDirection.Up || direction == MovementDirection.Down) {
+        if (getDirection() == Direction.VERTICAL) {
+            direction = swapDirection(direction);
+        }
+        if (direction == Up || direction == Down) {
             crossBarPosition += delta;
         }
         else {

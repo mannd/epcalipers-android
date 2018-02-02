@@ -37,7 +37,7 @@
     <string name="mean_rate_button_title">FCM</string>
     <string name="camera_button_title">Camera</string>
     <string name="select_image_button_title">Choisir</string>
-    <string name="adjust_image_button_title">Régler</string>
+    <string name="adjust_image_button_title">Ajuster</string>
     <string name="horizontal_caliper_button_title">Temps</string>
     <string name="vertical_caliper_button_title">Amplitude</string>
     <string name="angle_caliper_button_title">Angle</string>
