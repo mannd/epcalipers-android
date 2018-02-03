@@ -99,14 +99,14 @@
         \n\nIf you want to use an angle caliper as a Brugadometer,
         you must first calibrate time and amplitude calipers.</string>
     <string name="sample_normal_ecg">sample normal ECG</string>
-    <string name="left_label">Left</string>
-    <string name="right_label">Right</string>
-    <string name="micro_left_label">m-Left</string>
-    <string name="micro_right_label">m-Right</string>
-    <string name="up_label">Up</string>
-    <string name="down_label">Down</string>
-    <string name="micro_up_label">m-Up</string>
-    <string name="micro_down_label">m-Down</string>
+    <string name="left_label" translatable="false">◀</string>
+    <string name="right_label" translatable="false">▶</string>
+    <string name="micro_left_label" translatable="false">←</string>
+    <string name="micro_right_label" translatable="false">→</string>
+    <string name="up_label" translatable="false">▲</string>
+    <string name="down_label" translatable="false">▼</string>
+    <string name="micro_up_label" translatable="false">↑</string>
+    <string name="micro_down_label" translatable="false">↓</string>
     <string name="left_bar_label">Move left bar</string>
     <string name="right_bar_label">Move right bar</string>
     <string name="up_bar_label">Move upper bar</string>
@@ -131,8 +131,6 @@
     <string name="default_qtc_formula_value" translatable="false">bazett</string>
     <string name="marching_label">March</string>
     <string name="repeat_qt_button_title">Repeat QT</string>
-    <string name="previous_button_label" translatable="false">&lt;</string>
-    <string name="next_button_label" translatable="false">&gt;</string>
     <string name="choose_color_label">Choose color</string>
     <string name="calibration_dialog_hint">Enter calibration measurement.</string>
     <string name="pdf_error_message">Could not open PDF</string>
@@ -164,4 +162,6 @@
     <string name="qt_equals">QT =</string>
     <string name="qtc_equals">QTc =</string>
     <string name="formula_detail">(%s formula)</string>
+    <string name="next_button_label" translatable="false">▶</string>
+    <string name="previous_button_label" translatable="false">◀</string>
 </resources>
