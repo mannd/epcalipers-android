@@ -396,12 +396,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         int color = Integer.parseInt(sharedPreferences.getString(key,
                                 getString(R.string.default_caliper_color)));
                         currentCaliperColor = color;
-                        for (Caliper c : calipersView.getCalipers()) {
-                            c.setUnselectedColor(color);
-                            if (!c.isSelected()) {
-                                c.setColor(color);
-                            }
-                        }
+                        // We don't change already drawn calipers anymore,
+                        // since we want to keep the custom colors that
+                        // have already been applied.  Only new calipers
+                        // will have the currentCaliperColor
                     } catch (Exception ex) {
                         return;
                     }
