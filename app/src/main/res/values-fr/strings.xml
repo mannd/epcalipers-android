@@ -59,7 +59,7 @@
     <string name="no_calipers_alert_title">Pas de compas à utiliser</string>
     <string name="no_calipers_alert_message">Ajouter un ou plus de compas avant de continuer</string>
     <string name="no_caliper_selected_alert_title">Compas pas choisi</string>
-    <string name="no_caliper_selected_alert_message">Choisir un compas en le tapant une seule fois.  Le déplacer à un intervalle connu.  Toucher « définir » pour entrer l\'intervalle de l\'étalonnage</string>
+    <string name="no_caliper_selected_alert_message">Choisir un compas en le tapant une seule fois.  Le déplacer à un intervalle connu.  Toucher « définir » pour saisir l\'intervalle de l\'étalonnage</string>
     <string name="calibration_dialog_message">Saisir la mesure (p.e. %s):</string>
     <string name="example_amplitude_measurement">1 mV</string>
     <string name="calibrate_dialog_title">Étalonner</string>
