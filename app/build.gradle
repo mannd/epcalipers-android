@@ -10,8 +10,8 @@ android {
         applicationId "org.epstudios.epcalipers"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 27
-        versionName "2.11"
+        versionCode 28
+        versionName "2.12"
     }
     buildTypes {
         release {
