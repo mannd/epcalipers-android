@@ -25,10 +25,10 @@ import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -37,8 +37,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
-import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.util.Pair;
@@ -58,11 +56,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.epstudios.epcalipers.QtcCalculator.QtcFormula;
 import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.pdfdroid.codec.PdfContext;
 import org.vudroid.pdfdroid.codec.PdfPage;
-
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -83,17 +80,26 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.epstudios.epcalipers.QtcCalculator.QtcFormula;
+import uk.co.senab.photoview.PhotoViewAttacher;
+
+import static org.epstudios.epcalipers.MyPreferenceFragment.ALL;
+import static org.epstudios.epcalipers.MyPreferenceFragment.BAZETT;
+import static org.epstudios.epcalipers.MyPreferenceFragment.FRAMINGHAM;
+import static org.epstudios.epcalipers.MyPreferenceFragment.FRIDERICIA;
+import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final Pattern VALID_PATTERN = Pattern.compile("[.,0-9]+|[a-zA-Z]+");
+    // TODO: regex below includes Cyrillic and must be updated with new alphabets
+    private static final String calibrationRegex = "[.,0-9]+|[a-zA-ZА-яЁё]+";
+    private static final Pattern VALID_PATTERN = Pattern.compile(calibrationRegex);
     private static final String EPS = "EPS";
+    private static final String LF = "\n";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
     private static final int DEFAULT_CALIPER_COLOR = Color.BLUE;
     private static final int DEFAULT_HIGHLIGHT_COLOR = Color.RED;
     private static final int DEFAULT_LINE_WIDTH = 2;
-    public static final String TEMP_BITMAP_FILE_NAME = "/tempEPCalipersImageBitmap.png";
+    private static final String TEMP_BITMAP_FILE_NAME = "/tempEPCalipersImageBitmap.png";
     private static final String ANGLE_B1 = "angleB1";
     private static final String ANGLE_B2 = "angleB2";
 
@@ -104,6 +110,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_PDF = 103;
     private static final int MY_PERMISSIONS_REQUEST_STORE_BITMAP = 104;
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE = 105;
+    private static final String HORIZONTAL = "Horizontal";
+    private static final String VERTICAL = "Vertical";
+    private static final String IMAGE_TYPE = "image/";
+    private static final String APPLICATION_PDF_TYPE = "application/pdf";
 
     private Button addCaliperButton;
     private Button calibrateButton;
@@ -279,11 +289,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         currentLineWidth = DEFAULT_LINE_WIDTH;
 
         qtcFormulaMap = new HashMap<>();
-        qtcFormulaMap.put("bazett", QtcFormula.qtcBzt);
-        qtcFormulaMap.put("framingham", QtcFormula.qtcFrm);
-        qtcFormulaMap.put("hodges", QtcFormula.qtcHdg);
-        qtcFormulaMap.put("fridericia", QtcFormula.qtcFrd);
-        qtcFormulaMap.put("all", QtcFormula.qtcAll);
+        qtcFormulaMap.put(BAZETT, QtcFormula.qtcBzt);
+        qtcFormulaMap.put(FRAMINGHAM, QtcFormula.qtcFrm);
+        qtcFormulaMap.put(HODGES, QtcFormula.qtcHdg);
+        qtcFormulaMap.put(FRIDERICIA, QtcFormula.qtcFrd);
+        qtcFormulaMap.put(ALL, QtcFormula.qtcAll);
 
         loadSettings();
 
@@ -303,14 +313,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         attacher.setOnMatrixChangeListener(new MatrixChangeListener());
 
         if (noSavedInstance && Intent.ACTION_SEND.equals(action) && type != null) {
-            if (type.startsWith("image/")) {
+            if (type.startsWith(IMAGE_TYPE)) {
                 handleSentImage();
             }
         } else if (noSavedInstance && Intent.ACTION_VIEW.equals(action) && type != null) {
-            if (type.equals("application/pdf")) {
+            if (type.equals(APPLICATION_PDF_TYPE)) {
                 handlePDF();
             }
-            if (type.startsWith("image/")) {
+            if (type.startsWith(IMAGE_TYPE)) {
                 handleImage();
             }
         }
@@ -329,8 +339,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         createButtons();
 
-        horizontalCalibration = new Calibration(Caliper.Direction.HORIZONTAL);
-        verticalCalibration = new Calibration(Caliper.Direction.VERTICAL);
+        horizontalCalibration = new Calibration(Caliper.Direction.HORIZONTAL, this);
+        verticalCalibration = new Calibration(Caliper.Direction.VERTICAL, this);
 
         rrIntervalForQTc = 0.0;
 
@@ -386,12 +396,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         int color = Integer.parseInt(sharedPreferences.getString(key,
                                 getString(R.string.default_caliper_color)));
                         currentCaliperColor = color;
-                        for (Caliper c : calipersView.getCalipers()) {
-                            c.setUnselectedColor(color);
-                            if (!c.isSelected()) {
-                                c.setColor(color);
-                            }
-                        }
+                        // We don't change already drawn calipers anymore,
+                        // since we want to keep the custom colors that
+                        // have already been applied.  Only new calipers
+                        // will have the currentCaliperColor
                     } catch (Exception ex) {
                         return;
                     }
@@ -496,6 +504,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         // TODO: update BOTH quick_start_messages (there are 2 strings.xml files)
+        //noinspection ConstantConditions
         if (force_first_run || getFirstRun(prefs)) {
             Log.d(EPS, "firstRun");
             setRunned(prefs);
@@ -538,6 +547,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else {
             proceedToHandleSentImage();
         }
+    }
+
+    private void epsLog(String s) {
+        Log.d(EPS, s);
     }
 
     private void proceedToHandleImage() {
@@ -676,6 +689,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (currentPdfUri != null) {
                     File file = new File(currentPdfUri.getPath());
                     if (file.exists()) {
+                        //noinspection ResultOfMethodCallIgnored
                         file.delete();
                     }
                 }
@@ -726,7 +740,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else {
                 Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.pdf_error_message) +
-                        "\n" + exceptionMessage, Toast.LENGTH_SHORT);
+                        LF + exceptionMessage, Toast.LENGTH_SHORT);
                 toast.show();
             }
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -774,6 +788,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (currentPdfUri != null) {
                     File file = new File(currentPdfUri.getPath());
                     if (file.exists()) {
+                        //noinspection ResultOfMethodCallIgnored
                         file.delete();
                     }
                 }
@@ -820,7 +835,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else {
                 Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.pdf_error_message) +
-                        "\n" + exceptionMessage, Toast.LENGTH_SHORT);
+                        LF + exceptionMessage, Toast.LENGTH_SHORT);
                 toast.show();
             }
             findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -1016,8 +1031,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         // Calibration
-        // must use rawUnits here, otherwise original calibration units are lost
-        outState.putString("hcalUnits", horizontalCalibration.rawUnits());
+        // must use getRawUnits here, otherwise original calibration units are lost
+        outState.putString("hcalUnits", horizontalCalibration.getRawUnits());
         outState.putString("hcalCalibrationString", horizontalCalibration.getCalibrationString());
         outState.putBoolean("hcalDisplayRate", horizontalCalibration.getDisplayRate());
         outState.putFloat("hcalOriginalZoom", horizontalCalibration.getOriginalZoom());
@@ -1025,7 +1040,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean("hcalCalibrated", horizontalCalibration.isCalibrated());
         outState.putFloat(("hcalOriginalCalFactor"), horizontalCalibration.getOriginalCalFactor());
 
-        outState.putString("vcalUnits", verticalCalibration.rawUnits());
+        outState.putString("vcalUnits", verticalCalibration.getRawUnits());
         outState.putString("vcalCalibrationString", verticalCalibration.getCalibrationString());
         outState.putBoolean("vcalDisplayRate", verticalCalibration.getDisplayRate());
         outState.putFloat("vcalOriginalZoom", verticalCalibration.getOriginalZoom());
@@ -1037,7 +1052,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Caliper c = calipersView.getCalipers().get(i);
             outState.putString(i + "CaliperDirection",
                     c.getDirection() == Caliper.Direction.HORIZONTAL ?
-                            "Horizontal" : "Vertical");
+                            HORIZONTAL : VERTICAL);
             // maxX normalizes bar and crossbar positions regardless of caliper direction,
             // i.e. X is direction for bars and Y is direction for crossbars.
             float maxX = c.getDirection() == Caliper.Direction.HORIZONTAL
@@ -1124,7 +1139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             }
             int unselectedColor = savedInstanceState.getInt(i + "UnselectedColor");
-            Caliper.Direction direction = directionString.equals("Horizontal") ?
+            Caliper.Direction direction = directionString.equals(HORIZONTAL) ?
                     Caliper.Direction.HORIZONTAL : Caliper.Direction.VERTICAL;
             float bar1Position = savedInstanceState.getFloat(i + "CaliperBar1Position");
             float bar2Position = savedInstanceState.getFloat(i + "CaliperBar2Position");
@@ -1318,8 +1333,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
         imageLockButton = createButton(getString(R.string.lock_label));
         sampleEcgButton = createButton(getString(R.string.sample_label));
-        previousPageButton = createButton("Previous");
-        nextPageButton = createButton("Next");
+        previousPageButton = createButton(getString(R.string.previous_button_label));
+        nextPageButton = createButton(getString(R.string.next_button_label));
         // Add Caliper menu
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
@@ -1915,7 +1930,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = getTimeStamp();
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "JPEG_" + timeStamp + "_"; //NON-NLS
         File storageDir = Environment.getExternalStorageDirectory();
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
@@ -1930,7 +1945,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private File createTmpPdfFile() throws IOException {
         String timeStamp = getTimeStamp();
-        String pdfFileName = "PDF_" + timeStamp + "_";
+        String pdfFileName = "PDF_" + timeStamp + "_"; //NON-NLS
         File storageDir = this.getCacheDir();
         //currentPhotoPath = image.getAbsolutePath();
         return File.createTempFile(
@@ -1960,6 +1975,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
+            if (selectedImage == null) {
+                return;
+            }
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Cursor cursor = getContentResolver().query(selectedImage,
                     filePathColumn, null, null, null);
@@ -2093,9 +2111,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setTitle(getString(R.string.mean_rr_result_dialog_title));
             DecimalFormat decimalFormat = new DecimalFormat("@@@##");
 
-            builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
-                    c.getCalibration().rawUnits() + "\nMean rate = " +
-                    decimalFormat.format(meanRate) + " bpm");
+            builder.setMessage(String.format(getString(R.string.mean_rr_result_dialog_message),
+                    decimalFormat.format(meanRR), c.getCalibration().getRawUnits(),
+                    decimalFormat.format(meanRate) ));
+//            builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
+//                    c.getCalibration().getRawUnits() + "\nMean rate = " +
+//                    decimalFormat.format(meanRate) + " " + getString(R.string.bpm));
             builder.show();
         }
     }
@@ -2183,7 +2204,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             double meanRR = Math.abs(rrIntervalForQTc);
             String result;
             if (meanRR > 0) {
-                QtcCalculator calculator = new QtcCalculator(qtcFormulaPreference);
+                QtcCalculator calculator = new QtcCalculator(qtcFormulaPreference, this);
                 result = calculator.calculate(qt, meanRR, c.getCalibration().unitsAreMsec(),
                         c.getCalibration().getUnits());
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -2477,7 +2498,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title);
         builder.setMessage(message);
-        builder.setPositiveButton("OK", null);
+        builder.setPositiveButton(getString(R.string.ok_title), null);
         AlertDialog dialog = builder.create();
         dialog.show();
     }

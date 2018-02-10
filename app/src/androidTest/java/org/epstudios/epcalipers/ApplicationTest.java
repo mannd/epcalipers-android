@@ -1,8 +1,6 @@
 package org.epstudios.epcalipers;
 
-import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.test.ApplicationTestCase;
@@ -22,7 +20,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testCanDisplayRate() {
-        Calibration cal = new Calibration();
+        Calibration cal = new Calibration(getContext());
         cal.setCalibrated(true);
         cal.setUnits("msec");
         assertTrue(cal.canDisplayRate());
@@ -40,13 +38,17 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertFalse(cal.canDisplayRate());
         cal.setUnits("mSecs");
         assertTrue(cal.canDisplayRate());
+        cal.setUnits("сек");
+        assertTrue(cal.canDisplayRate());
+        cal.setUnits("СЕк");
+        assertTrue(cal.canDisplayRate());
         cal.setDirection(Caliper.Direction.VERTICAL);
         assertFalse(cal.canDisplayRate());
 
     }
 
     public void testCurrentHorizontalCalFactor() {
-        Calibration cal = new Calibration();
+        Calibration cal = new Calibration(getContext());
         cal.setOriginalZoom(1.0f);
         cal.setOriginalCalFactor(0.5f);
         cal.setCurrentZoom(1.0f);
@@ -80,7 +82,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     }
 
     public void testUnitsAreMM() {
-        Calibration cal = new Calibration();
+        Calibration cal = new Calibration(getContext());
         cal.setCalibrated(true);
         cal.setDirection(Caliper.Direction.VERTICAL);
         cal.setUnits("mm");
@@ -139,10 +141,10 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 //    }
 
     public void testQTc() {
-        QtcCalculator calc = new QtcCalculator(QtcCalculator.QtcFormula.qtcBzt);
+        QtcCalculator calc = new QtcCalculator(QtcCalculator.QtcFormula.qtcBzt, getContext());
         String result = calc.calculate(0.278, 0.6818, false, "sec");
         assertEquals(result, "Mean RR = 0.6818 sec\nQT = 0.278 sec\nQTc = 0.33668 sec (Bazett formula)");
-        QtcCalculator calc2 = new QtcCalculator(QtcCalculator.QtcFormula.qtcFrd);
+        QtcCalculator calc2 = new QtcCalculator(QtcCalculator.QtcFormula.qtcFrd, getContext());
         result = calc2.calculate(0.278, 0.6818, false, "sec");
         assertEquals(result, "Mean RR = 0.6818 sec\nQT = 0.278 sec\nQTc = 0.31586 sec (Fridericia formula)");
         // TODO: add the other formulas here

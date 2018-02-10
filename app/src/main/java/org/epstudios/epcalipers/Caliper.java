@@ -5,12 +5,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.view.MotionEvent;
-import android.view.View;
 
 import java.text.DecimalFormat;
+
+import static org.epstudios.epcalipers.Caliper.MovementDirection.Down;
+import static org.epstudios.epcalipers.Caliper.MovementDirection.Left;
+import static org.epstudios.epcalipers.Caliper.MovementDirection.Right;
+import static org.epstudios.epcalipers.Caliper.MovementDirection.Up;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -47,7 +50,7 @@ public class Caliper {
         Down,
         Left,
         Right,
-        None
+        Stationary
     }
 
 
@@ -457,7 +460,7 @@ public class Caliper {
         return direction == Direction.HORIZONTAL && !isAngleCaliper();
     }
 
-    public void moveCrossBar(float deltaX, float deltaY, MotionEvent event) {
+    public void moveCrossBar(float deltaX, float deltaY) {
         bar1Position += deltaX;
         bar2Position += deltaX;
         crossBarPosition += deltaY;
@@ -487,8 +490,26 @@ public class Caliper {
         }
     }
 
+    private MovementDirection swapDirection(MovementDirection direction) {
+        switch (direction) {
+            case Left:
+                return MovementDirection.Up;
+            case Right:
+                return MovementDirection.Down;
+            case Up:
+                return MovementDirection.Left;
+            case Down:
+                return MovementDirection.Right;
+            default:
+                return MovementDirection.Stationary;
+        }
+    }
+
     protected void moveCrossbarDirectionally(float delta, MovementDirection direction) {
-        if (direction == MovementDirection.Up || direction == MovementDirection.Down) {
+        if (getDirection() == Direction.VERTICAL) {
+            direction = swapDirection(direction);
+        }
+        if (direction == Up || direction == Down) {
             crossBarPosition += delta;
         }
         else {

@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.webkit.WebView;
+
+import java.util.Locale;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -33,13 +36,20 @@ import android.webkit.WebView;
 
 public class Help extends AppCompatActivity {
 
+    private static final String englishHelpPath = "file:///android_asset/help.html";
+    private static final String frenchHelpPath = "file:///android_asset/fr/help.html";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.help);
-        String url = "file:///android_asset/help.html";
-        //webView = new WebView(this);
-        //setContentView(webView);
+        String url;
+        if (usingFrenchLanguage()) {
+            url = frenchHelpPath;
+        }
+        else {
+            url = englishHelpPath;
+        }
         WebView webView = (WebView) findViewById(R.id.webView);
         webView.loadUrl(url);
 
@@ -73,4 +83,11 @@ public class Help extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private boolean usingFrenchLanguage() {
+        return getLocaleLanguageString().equals("fr");
+    }
+
+    private String getLocaleLanguageString() {
+        return Locale.getDefault().getLanguage();
+    }
 }

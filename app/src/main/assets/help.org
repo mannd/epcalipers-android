@@ -41,19 +41,19 @@ screen to switch to *Image mode*.  The *Image* menu will appear at the bottom of
 
 With this menu you can load and adjust an ECG image.  There are several ways to load an ECG image, as described next.
 ** Take a photo of an ECG
-Touch the *Camera* button to take a photo of an ECG tracing and load
-it into the app.  Note that images captured this way are not saved in
-the photos collection of the device.  It's best to use this option to
-make a quick measurement when you don't need to save the image.  If you want to save the image use your camera app to take the picture and load the image into *EP Calipers* from your photo gallery as described next.
+Touch the *Camera* button to take a photo of an ECG tracing and load it into the app.  Note that images captured this way are not saved in the photos collection of the device.  It's best to use this option to make a quick measurement when you don't need to save the image.  If you want to save the image use your camera app to take the picture and load the image into *EP Calipers* from your photo gallery as described next.
 ** Select a photo from your photo gallery
 Touch *Select* to chose an image that is already saved on your device in your photos collection, for example an image file attached to an email that you saved or a photo that your previously took.
-** Select a photo or PDF using the *Share* menu from other apps
-*EP Calipers* can open image and PDF files regardless of where they are located on your device.  You can directly open email attachments, downloaded files, Google Drive, and Dropbox files.  It is also easy to open ECG images directly from the [[https://www.alivecor.com][AliveCor]] /Kardia™/ app.  The key to opening images in external apps is to use the *Share* button.  It usually looks like this: 
+** Select a photo or PDF from other apps
+*EP Calipers* can open image and PDF files regardless of where they are located on your device.  You can directly open email attachments, downloaded files, Google Drive, and Dropbox files.  Often you can open a file with EP Calipers by tapping on it.
+#+CAPTION: Open with EP Calipers
+[[./open_epcalipers_en.png]]
+
+Opening images in external apps sometimes requires using using the *Share* button.  It usually looks like this: 
 #+CAPTION: Android *Share* button
 [[./android_share_button.png]]
 
-
-Some apps use a different button style or distinguish between "sharing" and "opening" a file.  For example the Dropbox app uses this style button:
+Some apps use a different button style.  For example the Dropbox app uses this style button:
 #+CAPTION: Dropbox *Open with* button (left button)
 [[./dropbox_share_button.png]]
 
@@ -70,28 +70,19 @@ You will then be given options for opening the PDF report.  One of the options s
 [[./share_menu.png]]
 
 ** Multiple page PDFs
-When PDF files have more than one page, the app will display the first
-page initially.  You can go to other pages by selecting *Previous* or
-*Next* in the *Image* menu.  Note that device rotation will only preserve the current page.  If you need to change to a different page, you will need to reload the PDF.
+When PDF files have more than one page, the app will display the first page initially.  You can go to other pages by selecting *◀* or *▶* in the *Image* menu.  Note that device rotation will only preserve the current page.  If you need to change to a different page, you will need to reload the PDF.
 * Adjusting the image
-You can adjust the positioning of the image using pinch-to-zoom,
-dragging, and double-tapping. Use the *Adjust* menu to fine-tune your
-image further.  
+You can adjust the positioning of the image using pinch-to-zoom, dragging, and double-tapping. Use the *Adjust* menu to fine-tune your image further.  
 #+CAPTION: The *Adjust* menu
 [[./adjust_menu.png]]
 
-You can rotate the image by 90° in either direction,
-or by increments of 0.1° or 1°.  This is particularly useful if the original image is
-rotated or not quite square to the screen.  You should recalibrate
-your calipers after rotating the image.  If you need to go back to the
-original image position use *Reset*.  After adjusting the image select
-*Done* to return to the main image menu.
+You can rotate the image by 90° in either direction, or by increments of 0.1° or 1°.  This is particularly useful if the original image is rotated or not quite square to the screen.  You should recalibrate your calipers after rotating the image.  If you need to go back to the original image position use *Reset*.  After adjusting the image select *Done* to return to the main image menu.
 * <<Lock>>Locking the image
 When moving and adjusting calipers, you may sometimes inadvertently move the underlying image.  Select *Lock* to lock the image in place.  A message appears at the top of the screen indicating the image is locked.  Unlock the image by selecting *Unlock*.
 * Sample ECG
 Tap *Sample* to show the sample ECG that comes with *EP Calipers*.  This is a good way to practice using the app, or demonstrate it to others.
 * Exiting *Image* mode
-After loading and adjusting the image, you need to exit Image mode so that you can use the calipers.  Select the *Measure* button at the top left of the screen to return to the *EP Calipers* main screen.
+After loading and adjusting the image, you need to exit Image mode so that you can use the calipers.  Select the *Measure* button at the top right of the screen to return to the *EP Calipers* main screen.
 #+CAPTION: Use the *Measure* button to exit *Image* mode
 [[./measure_button.png]]
 
@@ -99,7 +90,7 @@ After loading and adjusting the image, you need to exit Image mode so that you c
 Calipers can be horizontal for time measurements, vertical for amplitude measurements or angle shaped to measure angles in degrees.  Time calipers look like the letter *H*, amplitude calipers like an *H* lying on its side, and angle calipers start out looking like an upside down *V*.  
 * Moving calipers
 ** Time and amplitude calipers
-Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bars (or top or bottom in the case of vertical calipers) to stretch or shrink the calipers.  Note that you cannot pinch both bars at the same time.  If you find you are inadvertently moving the underlying image rather than the calipers, use the [[Lock][*Lock*]] item from the *Image* menu to lock the image in place.
+Drag the crossbar of a caliper to move it as a unit.  Drag the left or right bars (or top or bottom in the case of amplitude calipers) to stretch or shrink the calipers.  Note that you cannot pinch both bars at the same time.  If you find you are inadvertently moving the underlying image rather than the calipers, use the [[Lock][*Lock*]] item from the *Image* menu to lock the image in place.
 #+CAPTION: Single unselected uncalibrated time caliper
 [[./unselected_time_caliper.png]]
 
@@ -108,20 +99,20 @@ Angle calipers are moved as a unit by dragging at the apex or just above the ape
 #+CAPTION: Angle caliper
 [[./angle_caliper.png]]
 
-** Tweaking calipers -- Micromovements
-Sometimes you might like to fine-tune the position of a caliper, or you find it too difficult to position a caliper exactly by dragging its components with your finger.  It's time for /tweaking/!  Tap the *Tweak* button on the main menu.  The long press a caliper component (crossbar, sidebar, or, in the case of an angle caliper, the apex of the angle) and a menu with movement buttons will appear.  Buttons like *Left* or *Right* move the selected caliper component or the whole caliper a single point (≈ pixel) or a degree (for angle calipers) in the indicated direction.  Buttons like *m-Left* and *m-Right* stand for left and right micromovements and represent very tiny movements (a tenth of a point or a tenth of a degree).  Press the *Done* button to return to the main menu.
+** <<tweak>>Tweaking calipers -- Micromovements
+Sometimes you might like to fine-tune the position of a caliper, or you find it too difficult to position a caliper exactly by dragging its components with your finger.  It's time for /tweaking/!  Tap the *Tweak* button on the main menu.  Then long press a caliper component (crossbar, sidebar, or, in the case of an angle caliper, the apex of the angle) and a menu with movement buttons will appear.  Buttons like *◀* or *▶* move the selected caliper component or the whole caliper a single point (≈ pixel) or a degree (for angle calipers) in the indicated direction.  Buttons like *←* and *→* stand for left and right micromovements and represent very tiny movements (a tenth of a point or a tenth of a degree).  Press the *Done* button to return to the main menu.
 #+CAPTION: Buttons to tweak caliper positioning
 [[./micromovements.png]]
 
 ** Marching calipers
-Select *March* to convert a time caliper to a marching caliper.  Vertical caliper lines will appear equal to the caliper width on either side of the caliper.  This is very useful to assess the regularity or irregularity of a rhythm, or to detect P waves marching through a tachycardia or during heart block.  Select *March* again to change the marching caliper back to normal again.
+Select *March* to convert a time caliper to a marching caliper.  Vertical caliper lines will appear equal to the caliper width on either side of the caliper.  This is useful to assess the regularity or irregularity of a rhythm, or to detect P waves marching through a tachycardia or during heart block.  Select *March* again to change the marching caliper back to normal again.
 #+CAPTION: Marching calipers
 [[./marching_calipers.png]]
 
 * Making measurements
 The interval measured by time or amplitude calipers is displayed on top of or next to the crossbar of the caliper.  Until these calipers are calibrated, measurements are displayed in arbitrary units (points, roughly equivalent to screen pixels).  Angle calipers show a measurement of the current angle in degrees and do not need to be calibrated to display angles.
 * Adding and deleting calipers
-Select the *+* or *Add Caliper* button to add new calipers.[fn:1]
+Select the *+* button to add new calipers.
 #+CAPTION: Main menu, prior to calibration
 [[./main_menu_uncalibrated.png]]
 
@@ -142,7 +133,7 @@ Initial caliper colors are set via [[Settings][Settings]], and these colors appl
 [[./color_picker.png]]
 
 * Calibration
-Select *Cal* or *Calibrate*.  Stretch the selected caliper over a known interval (such as 1000 msec for time, or 10 mm for amplitude calipers).  Select *Set*.  In the dialog box, make sure the interval matches what you are measuring.  Enter both the calibration interval and units (e.g. 500 msec or 1 sec or 1 mV).  Select *Set* in the dialog box to set the calibration.  Time and amplitude calipers need to be calibrated separately.  Once calibrated, calipers will show intervals in the units used to calibrate.  Newly created calipers will use the same calibration.
+Select *Calibrate*.  Stretch the selected caliper over a known interval (such as 1000 msec for time, or 10 mm for amplitude calipers).  Select *Set*.  In the dialog box, make sure the interval matches what you are measuring.  Enter both the calibration interval and units (e.g. 500 msec or 1 sec or 1 mV).  Select *Set* in the dialog box to set the calibration.  Time and amplitude calipers need to be calibrated separately.  Once calibrated, calipers will show intervals in the units used to calibrate.  Newly created calipers will use the same calibration.
 #+CAPTION: Time caliper about to be calibrated
 [[./calibration_dialog.png]]
 
@@ -153,19 +144,19 @@ Angle calipers do not need to be calibrated.  However, after calibration of time
 * Changing calibration
 You can recalibrate at any time.  You can clear all calibration by selecting *Clear* in the calibration toolbar.  Note that calibration is maintained if the device is rotated or the image is zoomed.  Selecting a new image will reset calibration.
 * Interval/Rate
-Once a time (horizontal) caliper is calibrated, provided you use time units (such as msec or sec) for the calibration, it is possible to toggle between interval measurements (e.g. 600 msec) and heart rate measurements (e.g. 100 bpm) by selecting *Interval/Rate* or *I/R*.
+Once a time (horizontal) caliper is calibrated, provided you use time units (such as msec or sec) for the calibration, it is possible to toggle between interval measurements (e.g. 600 msec) and heart rate measurements (e.g. 100 bpm) by selecting *I/R*.
 * Mean rate and interval calculation
-Select a calibrated caliper and stretch it over a number of intervals. Select *Mean Rate* or *mRate* and enter the number of intervals measured.  A dialog box will show the calculated mean heart rate and interval.  This is useful for calculating rates and intervals in irregular rhythms, such as atrial fibrillation.
+Select a calibrated caliper and stretch it over a number of intervals. Select *mRate* and enter the number of intervals measured.  A dialog box will show the calculated mean heart rate and interval.  This is useful for calculating rates and intervals in irregular rhythms, such as atrial fibrillation.
 * QTc calculation
-Select *QTc*.  Stretch a time caliper over one or more RR intervals and select *Measure*.  Enter the number of intervals the caliper is stretched over and select *Continue*.  Then use the same caliper to measure the QT interval.  Select *Measure*.  A dialog box will give the calculated QTc using Bazett's formula by default.  Select *Repeat QT* to make another QT measurement using the same measured RR interval.  Select *Done* to finish measuring the QTc.  The QTc formula can be changed using any or all of 4 common QTc equations (Bazett, Framingham, Hodges, and Fridericia) via [[Settings][Settings]].  Note that device rotation in the middle of this process will cancel the QTc measurement.
+Select *QTc*.  Stretch a time caliper over one or more RR intervals and select *Measure*.  Enter the number of intervals the caliper is stretched over and select *Continue*.  Then use the same caliper to measure the QT interval.  Select *Measure*.  A dialog box will give the calculated QTc using Bazett's formula by default.  Select *Repeat QT* to make another QT measurement using the same measured RR interval.  Select *Done* to finish measuring the QTc.  You can change the QTc formula using [[Settings][Settings]].  
 #+CAPTION: QTc measurement first step: measure 1 or more RR intervals
 [[./qtc_step_1.png]]
-
 #+CAPTION: QTc measurement second step: measure the QT interval
 [[./qtc_step_2.png]]
-
 #+CAPTION: QTc result
 [[./qtc_result.png]]
+** Tweaking during QT measurement
+Note that during all other measurements, it is possible to micromove (i.e. "[[tweak][tweak]]") the caliper using the buttons of the *Tweak* menu prior to making the measurement.  However, during the second step of measuring the QTc (the QT measurement), the *Tweak* menu item is not accessible due to the presence of the QT measurement menu.  Because of this, to allow micromovements when measuring the QT, a long press on the individual caliper components can be used to bring up the micromovement buttons and allow fine-tuning of the caliper position when measuring the QT, prior to the final QTc calculation.  However, this is an optional setting.  Some people hesitate while moving a caliper, but aren't intending to bring up the *Tweak* menu; in fact, this can be an annoyance.  This is why long press gestures are not implemented throughout the app.  But in the specific situation of measuring the QT, one might desire this functionality.  This is an opt-in preference.  Set it by toggling on the *Allow Tweak during QTc* [[Settings][setting]].
 * Brugadometer
 The *Brugadometer* is a diagnostic tool for Brugada syndrome developed in collaboration with Dr. Adrian Baranchuk and his colleagues at Queen's University Kingston, Ontario, Canada.  It is a tool intended to distinguish between ECGs with a Brugada syndrome pattern in leads V1 or V2 and ECGs with incomplete right bundle branch block.  This tool is under development in *EP Calipers* and will likely evolve in future updates.  In order to use the *Brugadometer*, it is necessary to calibrate an amplitude caliper in millimeters (mm) and to calibrate a time caliper preferably in msec or mm.  After doing so, an angle caliper will appear to have a triangle at its apex as shown below.
 #+CAPTION: Brugadometer showing triangle base 5 mm below apex of caliper
@@ -176,18 +167,17 @@ The triangle base will be located 5 mm below the apex of the triangle.  Proper a
 * <<Settings>>Settings
 Preferences such as caliper colors and default calibration intervals can be selected using the *Settings* menu item on the toolbar at the top of the app.
 * Limitations
+- Images taken using the *Camera* button may not be automatically saved to your device, depending on your device and Android version.  If you need to save the image, take it with the camera outside of the app and then use the *Select* button to load it into the app.
+- Rotation of the device does not preserve the relationship between the image and the calipers, although calibration is conserved with rotation.
+- If the image itself is rotated, you should recalibrate your calipers, though the app doesn’t enforce this.  It is not necessary to recalibrate after zooming the image, however.
 - After device rotation, only the currently loaded page of a multi-page PDF image is available.  It is necessary to reload the PDF in order to change pages again.
 * Acknowledgments
 - Thanks to Dr. Michael Katz for the concept.
 - Thanks to Dr. Adrian Baranchuk and his colleagues at Queen's University Kingston, Ontario, Canada for the concept of the Brugadometer and for assistance in implementing this algorithm.
 - Thanks to Scott Krankkala for the idea behind marching calipers.
+- French translation by David Mann, Gretchen Mann, Juliet Mann and Jean-Claude Hounou.  Also thanks to Dr. Pierre Taboulet for confirming to me that a cardiologist’s caliper is a "Compas" and not an "Étrier!"
+- Thanks to Victoria Churilina for the Russian translation
 - The source code for *EP Calipers* is available on [[https://github.com/mannd/epcalipers-android][GitHub]].
-- *EP Calipers* is open source software and is licensed under the [[https://www.gnu.org/copyleft/gpl.html][GNU
-  General Public License version 3]].  No guarantees are made as to the
-  accuracy of the app, so use at your own risk.
-- For questions, error reporting or suggestions contact
-  [[mailto:mannd@epstudiossoftware.com][EP Studios]].
+- *EP Calipers* is open source software and is licensed under the [[https://www.gnu.org/copyleft/gpl.html][GNU General Public License version 3]].  No guarantees are made as to the accuracy of the app, so use at your own risk.
+- For questions, error reporting or suggestions contact [[mailto:mannd@epstudiossoftware.com][EP Studios]].
 - Website: [[http://www.epstudiossoftware.com][epstudiossoftware.com]]
-* Footnotes
-
-[fn:1] Note that button titles may be slightly different depending on the size and orientation of the device (e.g. phone vs tablet, portrait vs landscape).

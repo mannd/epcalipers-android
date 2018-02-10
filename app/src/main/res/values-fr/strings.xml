@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ /**
+  ~  Copyright (C) ${YEAR} EP Studios, Inc.
+  ~ www.epstudiossoftware.com
+  ~
+  ~ Created by ${USER} on ${DATE}.
+  ~
+  ~ This file is part of ${PROJECT_NAME}.
+  ~
+  ~     ${PROJECT_NAME} is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     ${PROJECT_NAME} is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with ${PROJECT_NAME}.  If not, see <http://www.gnu.org/licenses/>.
+  ~  */
+  ~
+  -->
+
+<resources>
+    <string name="app_name">Compas EP</string>
+    <string name="ep_calipers_title">Compas EP</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="bpm">bpm</string>
+    <string name="points">points</string>
+    <string name="image_mode_title">Mode Image</string>
+    <string name="calibrate_button_title">Étalonner</string>
+    <string name="add_caliper_button_title">+</string>
+    <string name="interval_rate_button_title">Int/FC</string>
+    <string name="mean_rate_button_title">FCM</string>
+    <string name="camera_button_title">Camera</string>
+    <string name="select_image_button_title">Choisir</string>
+    <string name="adjust_image_button_title">Ajuster</string>
+    <string name="horizontal_caliper_button_title">Temps</string>
+    <string name="vertical_caliper_button_title">Amplitude</string>
+    <string name="angle_caliper_button_title">Angle</string>
+    <string name="cancel_button_title">Annuler</string>
+    <string name="rotate_image_right_button_title">90°D</string>
+    <string name="rotate_image_left_button_title">90°G</string>
+    <string name="tweak_image_right_button_title">1°D</string>
+    <string name="tweak_image_left_button_title">1°G</string>
+    <string name="micro_tweak_image_right_button_title">0,1°D</string>
+    <string name="micro_tweak_image_left_button_title">0,1°G</string>
+    <string name="reset_image_button_title">Réinit</string>
+    <string name="done_button_title">OK</string>
+    <string name="set_calibration_button_title">Définir</string>
+    <string name="clear_calibration_button_title">Effacer</string>
+    <string name="about_label">Compas EP</string>
+    <string name="help_title">Aide</string>
+    <string name="no_time_caliper_selected_title">Compas de temps pas choisi</string>
+    <string name="no_time_caliper_selected_message">Choisir un compas pour mesurer un (ou plus) intervalle RR.</string>
+    <string name="no_calipers_alert_title">Pas de compas à utiliser</string>
+    <string name="no_calipers_alert_message">Ajouter un ou plus de compas avant de continuer</string>
+    <string name="no_caliper_selected_alert_title">Compas pas choisi</string>
+    <string name="no_caliper_selected_alert_message">Choisir un compas en le tapant une seule fois.  Le déplacer à un intervalle connu.  Toucher « définir » pour saisir l\'intervalle de l\'étalonnage</string>
+    <string name="calibration_dialog_message">Saisir la mesure (p.e. %s):</string>
+    <string name="example_amplitude_measurement">1 mV</string>
+    <string name="calibrate_dialog_title">Étalonner</string>
+    <string name="example_time_measurement">500 msec</string>
+    <string name="ok_title">OK</string>
+    <string name="cancel_title">Annuler</string>
+    <string name="settings_title">Paramètres</string>
+    <string name="default_time_calibration_value">1000 msec</string>
+    <string name="default_amplitude_calibration_value">10 mm</string>
+    <string name="default_number_qtc_rr_intervals">1</string>
+    <string name="angle_caliper_title">Compas d\'angle</string>
+    <string name="angle_caliper_calibration_message">Les compas d\'angle ne nécessitent pas d\'étalonnage.  Seuls les compas de temps ou d\'amplitude doivent être étalonnés.\\n\\nSi vous voulez utiliser un compas d\'angle comme un « Brugadometer » vous devez d\'abord étalonner les compas de temps et d\'amplitude.</string>
+    <string name="lock_label">Immobiliser</string>
+    <string name="unlock_label">Débloquer</string>
+    <string name="sample_label">Exemple</string>
+    <string name="multipage_pdf_warning">\"L\'application a été restaurée. Alors la multipage PDF montrera seulement une page.  Vous devez rouvrir le PDF avec l’application pour voir toutes les pages.</string>
+    <string name="marching_label">March</string>
+    <string name="repeat_qt_button_title">Répéter QT</string>
+    <string name="tweak_label">Régler</string>
+    <string name="color_label">Couleur</string>
+    <string name="about_text">Copyright © 2015 – 2017 EP Studios, Inc.\\nTous droits réservés.</string>
+    <string name="app_version">Version %1s</string>
+    <string name="continue_title">Continuer</string>
+    <string name="calculated_qtc_dialog_title">QTc calculé</string>
+    <string name="measure_button_title">Mesurer</string>
+    <string name="about">Sur</string>
+    <string name="help">Aide</string>
+    <string name="choose_color_label">Choisir couleur</string>
+    <string name="number_of_intervals_dialog_title">Saisir le nombre d\'intervalles</string>
+    <string name="round_msec_rate_label">Arrondir msec et bpm</string>
+    <string name="default_line_width_label">Largeur de ligne</string>
+    <string name="default_caliper_color_label">Couleur de compas</string>
+    <string name="default_highlight_color_label">Couleur de compas sélectionné</string>
+    <string name="default_time_calibration_label">Étal. d\'temps par défaut</string>
+    <string name="default_amplitude_calibration_label">Étal. d\'amplitude par défaut</string>
+    <string name="default_qtc_formula_title">Formule de QTc</string>
+    <string name="calibration_dialog_hint">Saisir la mesure d\'étalonnage</string>
+    <string name="show_start_image_label">Exemple d\'ECG à début?</string>
+    <string name="use_large_font_label">Utiliser les gros caractères?</string>
+    <string name="use_large_font_off_summary">Utiliser les caractères normals</string>
+    <string name="use_large_font_on_summary">Utiliser les gros caractères</string>
+    <string name="show_start_image_on_summary">Montrer ECG</string>
+    <string name="show_start_image_off_summary">Ne pas montrer ECG</string>
+    <string name="number_of_intervals_dialog_message">Combien d\'intervalles ce compas mesure-t-il ?</string>
+    <string name="mean_rr_dialog_hint">Nombre d\'intervalles mesurés</string>
+    <string name="mean_rr_result_dialog_title">Intervalle moyen et fréquence cardiaque moyenne</string>
+    <string name="mean_rr_result_dialog_message">Intervalle moyen = %s %s%nFréquence cardiaque moyenne = %s bpm</string>
+    <string name="select_rr_intervals_message">Intervalle(s) RR?</string>
+    <string name="measure_button_label">Mesurer</string>
+    <string name="qt_interval_query">Intervalle QT?</string>
+    <string name="invalid_result_message">Résultat invalide</string>
+    <string name="image_button_title">Image</string>
+    <string name="sample_normal_ecg">Exemple d\'ECG normal</string>
+    <string name="left_bar_label">Déplacer la barre gauche</string>
+    <string name="right_bar_label">Déplacer la barre droite</string>
+    <string name="up_bar_label">Déplacer la barre supérieure</string>
+    <string name="down_bar_label">Déplacer la barre inférieure</string>
+    <string name="color_menu_text">Appuyer sur un compas</string>
+    <string name="tweak_menu_text">Appuyer sur un composant d\'un compas</string>
+    <string name="tweak_during_qtc_label">Permettre de régler pendant QTc</string>
+    <string name="round_msec_rate_off_summary">Ne pas arrondir msec et bpm</string>
+    <string name="round_msec_rate_on_summary">Arrondir msec et bpm au nombre entier</string>
+    <string name="pdf_error_message">Impossible de charger le PDF</string>
+    <string name="move_angle_apex_text">Déplacer le sommet d\'angle</string>
+    <string name="move_crossbar_text">Déplacer la barre transversale</string>
+    <string name="temp_image_file_warning">"Ne pas pouvoir enregistrer le fichier image temporaire "</string>
+    <string name="tweak_during_qtc_summary_off">Ne pas pouvoir régler un compas pendant la mesure de QT</string>
+    <string name="tweak_during_qtc_summary_on">Appuyer sur un compas pour régler pendant la mesure de QT</string>
+    <string name="opening_pdf_message">Chargant PDF</string>
+    <string name="file_load_error">Erreur de charge</string>
+    <string name="file_load_message">Erreur de charge</string>
+    <string name="black_color">Noir</string>
+    <string name="default_caliper_color">Bleu</string>
+    <string name="default_highlight_color">Rouge</string>
+    <string name="magenta_color">Magenta</string>
+    <string name="light_gray_color">Gris Clair</string>
+    <string name="blue_color">Bleu</string>
+    <string name="green_color">Vert</string>
+    <string name="white_color">Blanc</string>
+    <string name="red_color">Rouge</string>
+    <string name="yellow_color">Jaune</string>
+    <string name="dark_gray_color">Gris Foncé</string>
+    <string name="default_number_rr_intervals">3</string>
+    <string name="default_line_width">2 points</string>
+    <string name="one_point">1 point</string>
+    <string name="two_points">2 points</string>
+    <string name="three_points">3 points</string>
+    <string name="four_points">4 points</string>
+    <string name="five_points">5 points</string>
+    <string name="six_points">6 points</string>
+    <string name="seven_points">7 points</string>
+    <string name="eight_points">8 points</string>
+    <string name="bazett_formula">Bazett</string>
+    <string name="framingham_formula">Framingham</string>
+    <string name="fridericia_formula">Fridericia</string>
+    <string name="hodges_formula">Hodges</string>
+    <string name="all_formulas">Toutes</string>
+    <string name="error">Erreur</string>
+    <string name="mean_rr_equals">Moyen RR =</string>
+    <string name="qt_equals">QT =</string>
+    <string name="qtc_equals">QTc =</string>
+    <string name="formula_detail">(formule %s)</string>
+    <string name="image_locked">IMAGE BLOQUÉE</string>
+</resources>

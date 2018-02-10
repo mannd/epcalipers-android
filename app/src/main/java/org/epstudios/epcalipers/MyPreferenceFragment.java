@@ -7,6 +7,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.util.SparseArray;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,33 +16,51 @@ import java.util.Map;
 public class MyPreferenceFragment extends PreferenceFragment implements
         OnSharedPreferenceChangeListener {
 
-    private final static Map<Integer, String> names = createMap();
+    public static final String BAZETT = "bazett";
+    public static final String FRAMINGHAM = "framingham";
+    public static final String HODGES = "hodges";
+    public static final String FRIDERICIA = "fridericia";
+    public static final String ALL = "all";
 
-    private static Map<Integer, String> createMap() {
-        Map<Integer, String> map = new HashMap<>();
+    private SparseArray<String> names = null;
+
+    private SparseArray<String> createMap(Activity activity) {
+        SparseArray<String> map = new SparseArray<>();
         // caliper names
-        map.put(-16777216, "Black");
-        map.put(-65281, "Magenta");
-        map.put(-3355444, "Light Gray");
-        map.put(-16776961, "Blue");
-        map.put(-16711936, "Green");
-        map.put(-1, "White");
+        map.put(-16777216, activity.getString(R.string.black_color));
+        map.put(-65281, getString(R.string.magenta_color));
+        map.put(-3355444, getString(R.string.light_gray_color));
+        map.put(-16776961, getString(R.string.blue_color));
+        map.put(-16711936, getString(R.string.green_color));
+        map.put(-1, getString(R.string.white_color));
         // highlight names
-        map.put(-65536, "Red");
-        map.put(-256, "Yellow");
-        map.put(-12303292, "Dark Gray");
+        map.put(-65536, getString(R.string.red_color));
+        map.put(-256, getString(R.string.yellow_color));
+        map.put(-12303292, getString(R.string.dark_gray_color));
         // line widths
-        map.put(1, "1 point");
-        map.put(2, "2 points");
-        map.put(3, "3 points");
-        map.put(4, "4 points");
-        map.put(5, "5 points");
-        map.put(6, "6 points");
-        map.put(7, "7 points");
-        map.put(8, "8 points");
+        map.put(1, getString(R.string.one_point));
+        map.put(2, getString(R.string.two_points));
+        map.put(3, getString(R.string.three_points));
+        map.put(4, getString(R.string.four_points));
+        map.put(5, getString(R.string.five_points));
+        map.put(6, getString(R.string.six_points));
+        map.put(7, getString(R.string.seven_points));
+        map.put(8, getString(R.string.eight_points));
 
         return map;
     }
+
+    private Map<String, String> formulaNames = null;
+    private Map<String, String> createFormulaNamesMap(Activity activity) {
+        Map<String, String> map = new HashMap<>();
+        map.put(BAZETT, activity.getString(R.string.bazett_formula));
+        map.put(FRAMINGHAM, activity.getString(R.string.framingham_formula));
+        map.put(HODGES, activity.getString(R.string.hodges_formula));
+        map.put(FRIDERICIA, activity.getString(R.string.fridericia_formula));
+        map.put(ALL, activity.getString(R.string.all_formulas));
+        return map;
+    }
+
 
     //keys
     private String defaultTimeCalibrationKey;
@@ -63,6 +82,8 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Activity activity = getActivity();
+        names = createMap(activity);
+        formulaNames = createFormulaNamesMap(activity);
         defaultTimeCalibrationKey = activity.getString(R.string.default_time_calibration_key);
         defaultAmplitudeCalibrationKey = activity.getString(R.string.default_amplitude_calibration_key);
         defaultCaliperColorKey = activity.getString(R.string.default_caliper_color_key);
@@ -112,15 +133,8 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         String defaultQtcFormulaValue = getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultQtcFormulaKey, defaultQtcFormula);
-        // Below is sneaky code, taking advantage of QTc key is just lower case version
-        // of QTc value, where first letter is capitalized.  If the QTc formula arrays are
-        // changed, this will break.
-        String defaultQtcFormulaName = capitalize(defaultQtcFormulaValue);
+        String defaultQtcFormulaName = formulaNames.get(defaultQtcFormulaValue);
         defaultQtcFormulaPreference.setSummary(defaultQtcFormulaName);
-    }
-
-    private String capitalize(String s) {
-        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
     }
 
     @Override
@@ -144,7 +158,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         }
         else if (key.equals(defaultQtcFormulaKey)) {
             String formulaName = sharedPreferences.getString(key, defaultQtcFormula);
-            formulaName = capitalize(formulaName);
+            formulaName = formulaNames.get(formulaName);
             pref.setSummary(formulaName);
         }
     }
@@ -155,7 +169,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
             return names.get(value);
         } catch (Exception ex) {
             //noinspection SuspiciousMethodCalls
-            return names.get(defaultName);
+            return getString(R.string.error);
         }
     }
 

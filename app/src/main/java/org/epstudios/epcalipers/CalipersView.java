@@ -9,14 +9,11 @@ import android.graphics.PointF;
 import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
@@ -46,7 +43,6 @@ import java.util.ArrayList;
 public class CalipersView extends View {
 
     private GestureDetectorCompat gestureDetector;
-    private final static String EPS = "EPS";
 
     private Caliper touchedCaliper;
 
@@ -137,7 +133,8 @@ public class CalipersView extends View {
         gestureDetector.setIsLongpressEnabled(true);
         View.OnTouchListener gestureListener = new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
-                    return gestureDetector.onTouchEvent(event);
+                v.performClick();
+                return gestureDetector.onTouchEvent(event);
             }
         };
 
@@ -151,7 +148,6 @@ public class CalipersView extends View {
         @Override
         public boolean onDown(MotionEvent event) {
             // must be implemented and return true for other events to work;
-            Log.d(EPS, "onDown");
             for (int i = calipersCount() - 1; i >= 0; i--) {
                 if (calipers.get(i).pointNearCaliper(new PointF(event.getX(), event.getY()))) {
                     setTouchedCaliper(event);
@@ -207,11 +203,11 @@ public class CalipersView extends View {
                     // https://github.com/QuadFlask/colorpicker
                     ColorPickerDialogBuilder
                             .with(getContext())
-                            .setTitle("Choose color")
+                            .setTitle(getContext().getString(R.string.choose_color_label))
                             .initialColor(pressedCaliper.getUnselectedColor())
                             .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
                             .density(12)
-                            .setPositiveButton("OK", new ColorPickerClickListener() {
+                            .setPositiveButton(getContext().getString(R.string.ok_title), new ColorPickerClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int chosenColor, Integer[] allColors) {
                                     if (!pressedCaliper.isSelected()) {
@@ -221,7 +217,7 @@ public class CalipersView extends View {
                                     invalidate();
                                 }
                             })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            .setNegativeButton(getContext().getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
@@ -285,7 +281,7 @@ public class CalipersView extends View {
     }
 
     private void showLockWarning(Canvas canvas) {
-        String text = "IMAGE LOCKED";
+        String text = getContext().getString(R.string.image_locked);
         Paint paint = new Paint();
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.FILL);
@@ -453,7 +449,7 @@ public class CalipersView extends View {
             distanceY = tmp;
         }
         if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.CROSSBAR) {
-            touchedCaliper.moveCrossBar(distanceX, distanceY, event);
+            touchedCaliper.moveCrossBar(distanceX, distanceY);
         }
         else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR1) {
             touchedCaliper.moveBar1(distanceX, distanceY, event);
