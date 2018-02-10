@@ -167,6 +167,9 @@ The triangle base will be located 5 mm below the apex of the triangle.  Proper a
 * <<Settings>>Settings
 Preferences such as caliper colors and default calibration intervals can be selected using the *Settings* menu item on the toolbar at the top of the app.
 * Limitations
+- Images taken using the *Camera* button may not be automatically saved to your device, depending on your device and Android version.  If you need to save the image, take it with the camera outside of the app and then use the *Select* button to load it into the app.
+- Rotation of the device does not preserve the relationship between the image and the calipers, although calibration is conserved with rotation.
+- If the image itself is rotated, you should recalibrate your calipers, though the app doesn’t enforce this.  It is not necessary to recalibrate after zooming the image, however.
 - After device rotation, only the currently loaded page of a multi-page PDF image is available.  It is necessary to reload the PDF in order to change pages again.
 * Acknowledgments
 - Thanks to Dr. Michael Katz for the concept.

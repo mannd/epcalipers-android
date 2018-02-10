@@ -36,7 +36,7 @@ Toucher le bouton de la *Camera* pour prendre une photo d'un ECG et pour la char
 ** Choisir une photo de votre collection de photos
 Taper *Choisir* pour choisir une image qui a été déja enregistrée dans la collection de photos de votre appareil, par exemple, un fichier joint ou une photo déja prise.
 ** Choisir une photo ou un PDF d'autres applications
-*Compas EP* peut ouvrir des fichiers d'images et des PDF, quel que soit l'endroit où ils se trouvent dans votre appareil.  Il est facile d'ouvrir directement les fichiers joints and les fichiers iCloud, Google Drive, et Dropbox.  Souvent vous pouvez ouvrir un fichier en le tapotant.
+*Compas EP* peut ouvrir des fichiers d'images et des PDF, quel que soit l'endroit où ils se trouvent dans votre appareil.  Il est facile d'ouvrir directement les fichiers joints and les fichiers Google Drive et Dropbox.  Souvent vous pouvez ouvrir un fichier en le tapotant.
 #+CAPTION: Ouvrir avec Compas EP
 [[./open_epcalipers_fr.png]]
 
@@ -61,7 +61,7 @@ Vous pouvez réajuster la position d'une image en utilisant les gestes de multit
 
 * Exemple ECG
 Taper *Exemple* pour montrer l'exemple ECG qui apparaît quand *Compas EP* commence.  Il est utile de pratiquer l'utilisation de l'application, ou pour la démontrer aux autres.
-* Fixer l'image / needs to go in image menu section
+* Fixer l'image 
 Pendant le mouvement et l'ajustement des compas, vous pouvez parfois déplacer l'image ECG involontairement.  Choisir *Immobiliser* pour immobiliser l'image sur l'écran.  Un message apparaîtra en haut de l'écran pour indiquer que l'image est immobilisée.  Démobiliser l'image en choisissant *Débloquer*.
 * Quitter le mode d'image
 Après avoir chargé et réajusté l'image, vous devez quitter le mode *Image* pour utiliser les compas.  Choisir le bouton *Mesurer* en haut à droite pour retourner à l'écran principal de  *Compas EP*.
@@ -113,7 +113,7 @@ Choisir *March* pour changer un compas de temps à un compas qui marche.  Des li
 [[./marching_calipers.png]]
 
 * Étalonnage
-Choisir *Étalonner*.  Étirer le compas sélectionné sur un intervalle connu (par exemple 1 000 msec de temps, ou 10 mm d'amplitude).  Choisir *Définir*.  Dans la boîte de dialogue, saisir l'intervalle et les unités (par exemple 500 msec, ou 1 sec, ou 1 mV).  Choisir *Définir* dans la boîte du dialogue pour définir l'étalonnage.  Noter qu'il faut que les compas de temps et d'amplitude soient étalonnés individuellement.  Après l'étalonnage, les compas montreront les intervalles avec les unités utilisées pour les étalonner.  Des nouveaux compas créés utiliseront le même étalonnage.
+Choisir *Étalonner*.  Étirer le compas sélectionné sur un intervalle connu (par exemple 1 000 msec de temps, ou 10 mm d'amplitude).  Choisir *Définir*.  Dans la boîte de dialogue, saisir l'intervalle et les unités (par exemple 500 msec, ou 1 sec, ou 1 mV).  Choisir *OK* dans la boîte du dialogue pour définir l'étalonnage.  Noter qu'il faut que les compas de temps et d'amplitude soient étalonnés individuellement.  Après l'étalonnage, les compas montreront les intervalles avec les unités utilisées pour les étalonner.  Des nouveaux compas créés utiliseront le même étalonnage.
 #+CAPTION: Compas de temps qui sera étalonné
 [[./calibration_dialog.png]]
 #+CAPTION: Compas de temps après l'étalonnage
