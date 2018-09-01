@@ -20,7 +20,7 @@ The color selector is copyright 2014-2017 [QuadFlask](https://github.com/QuadFla
 
 
 ## Copyright
-Copyright © 2015, 2016, 2017 [EP Studios, Inc.](http://www.epstudiossoftware.com)
+Copyright © 2015--2018 [EP Studios, Inc.](http://www.epstudiossoftware.com)
 
 ## Acknowledgments
 The *Brugadometer* is based on the work of Dr. Adrian Baranchuk and his colleagues at Queen's University Kingston, Ontario, Canada.  It is used with Dr. Baranchuk's permission and encouragement.  Please see [this article](http://europace.oxfordjournals.org/content/16/11/1639) for more information.
