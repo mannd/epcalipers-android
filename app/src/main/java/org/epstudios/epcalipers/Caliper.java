@@ -135,6 +135,10 @@ public class Caliper {
         this.textPosition = textPosition;
     }
 
+    public TextPosition getTextPosition() {
+        return textPosition;
+    }
+
     private TextPosition textPosition;
 
     private Boolean useAltLabelPosition = true;
@@ -215,7 +219,7 @@ public class Caliper {
         this.selected = false;
         this.touchedBar = TouchedBar.NONE;
         this.marching = false;
-        this.textPosition = TextPosition.Right;
+        this.textPosition = TextPosition.Left;
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
@@ -223,6 +227,7 @@ public class Caliper {
         paint.setStrokeWidth(3.0f);
         paint.setAntiAlias(true);
         paint.setTypeface(Typeface.DEFAULT);
+        /// TODO: can it all be Paint.Align.Center?
         paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
                 Paint.Align.LEFT);
         paint.setTextSize(SMALL_FONT);
@@ -345,80 +350,89 @@ public class Caliper {
     public void caliperText(Canvas canvas) {
         String text = measurement();
         Rect bounds = getTextBounds(text);
-        PointF textPosition = caliperTextPosition(bounds, canvas.getWidth());
+        PointF textPositionPoint = caliperTextPosition(bounds, canvas.getWidth(), textPosition);
         // Note x and y for draw text depend of the alignment property of paint
-        canvas.drawText(text, textPosition.x, textPosition.y, paint);
+        canvas.drawText(text, textPositionPoint.x, textPositionPoint.y, paint);
     }
 
-    PointF caliperTextPosition(Rect bounds, float width) {
+    protected PointF caliperTextPosition(Rect bounds, float width, TextPosition textPosition) {
         float x = 0;
         float y = 0;
         float textHeight = bounds.height();
         float textWidth = bounds.width();
-        // Guard against the margin obscuring left and right labels.
-        TextPosition optimizedPosition = textPosition;
-        switch (textPosition) {
-            case CenterAbove:
-            case CenterBelow:
-                break;
-            case Left:
-                if (textWidth > leftOrTopMostBarPosition()) {
-                    if (textWidth + rightOrBottomMostBarPosition() > width) {
-                       optimizedPosition = TextPosition.CenterAbove;
-                    }
-                    else {
-                        optimizedPosition = TextPosition.Right;
-                    }
-                }
-                break;
-            case Right:
-                if (textWidth + rightOrBottomMostBarPosition() > width) {
-                    if (textWidth > leftOrTopMostBarPosition()) {
-                        optimizedPosition = TextPosition.CenterAbove;
-                    }
-                    else {
-                        optimizedPosition = TextPosition.Left;
-                    }
-                }
-
-        }
-
-        Log.i("EPS", "textHeight = " + textHeight + " textWidth = " + textWidth);
-        Log.i("EPS", "crossbar position = " + crossBarPosition);
         float yOffset = 12;
         float xOffset = 5;
+        float yTweakOffset = 4;
+        float xTweakOffset = 10;
         if (direction == Direction.HORIZONTAL) {
+            // Guard against the margin obscuring left and right labels.
+            TextPosition optimizedPosition = textPosition;
             switch (optimizedPosition) {
                 case CenterAbove:
+                case CenterBelow:
+                    break;
+                case Left:
+                    if (textWidth > leftOrTopMostBarPosition()) {
+                        if (textWidth + rightOrBottomMostBarPosition() > width) {
+                            optimizedPosition = TextPosition.CenterAbove;
+                        }
+                        else {
+                            optimizedPosition = TextPosition.Right;
+                        }
+                    }
+                case Right:
+                    if (textWidth + rightOrBottomMostBarPosition() > width) {
+                        if (textWidth > leftOrTopMostBarPosition()) {
+                            optimizedPosition = TextPosition.CenterAbove;
+                        }
+                        else {
+                            optimizedPosition = TextPosition.Left;
+                        }
+                    }
+            }
+            switch (optimizedPosition) {
+                case CenterAbove:
+                    /// TODO: make this in terms of textHeight.
                     yOffset = 12;
                     x = bar1Position + (bar2Position - bar1Position) / 2;
                     y = crossBarPosition - yOffset;
                     break;
                 case CenterBelow:
-                    yOffset = -(textHeight + 4);
+                    yOffset = -(textHeight + yTweakOffset);
                     x = bar1Position + (bar2Position - bar1Position) / 2;
                     y = crossBarPosition - yOffset;
                     break;
                 case Left:
-                    x = leftOrTopMostBarPosition() - 10 - textWidth / 2;
-                    y = crossBarPosition - 4;
+                    x = leftOrTopMostBarPosition() - xTweakOffset - textWidth / 2;
+                    y = crossBarPosition - yTweakOffset;
                     break;
                 case Right:
-                    x = rightOrBottomMostBarPosition() + 10 + textWidth / 2;
-                    y = crossBarPosition - 4;
+                    x = rightOrBottomMostBarPosition() + xTweakOffset + textWidth / 2;
+                    y = crossBarPosition - yTweakOffset;
                     break;
                 default:
                     break;
             }
         }
-        else {
-            x = crossBarPosition + xOffset;
+        else {  // Vertical (amplitude) caliper
+            switch (textPosition) {
+                case CenterAbove:
+                case CenterBelow:
+                    x = crossBarPosition + xOffset;
+                    break;
+                case Left:
+                    x = crossBarPosition - xTweakOffset - textWidth / 2;
+                    break;
+                case Right:
+                    x = crossBarPosition + xTweakOffset + textWidth / 2;
+                    break;
+            }
             y = bar1Position + (bar2Position - bar1Position) / 2;
         }
         return new PointF(x, y);
     }
 
-    private Rect getTextBounds(String text) {
+    protected Rect getTextBounds(String text) {
         Rect bounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), bounds);
         return bounds;
