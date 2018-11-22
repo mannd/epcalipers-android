@@ -63,5 +63,26 @@
         <item>@string/fridericia_formula</item>
         <item>@string/all_formulas</item>
     </string-array>
-
+    <string-array name="time_caliper_text_positions">
+        <item>@string/center_above</item>
+        <item>@string/center_below</item>
+        <item>@string/left</item>
+        <item>@string/right</item>
+    </string-array>
+    <string-array name="amplitude_caliper_text_positions">
+        <item>@string/center</item>
+        <item>@string/left</item>
+        <item>@string/right</item>
+    </string-array>
+    <string-array name="time_caliper_text_position_values">
+        <item>centerAbove</item>
+        <item>centerBelow</item>
+        <item>left</item>
+        <item>right</item>
+    </string-array>
+    <string-array name="amplitude_caliper_text_position_values">
+        <item>centerAbove</item>
+        <item>left</item>
+        <item>right</item>
+    </string-array>
 </resources>

@@ -61,6 +61,16 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         return map;
     }
 
+    private Map<String, String> textPositionNames = null;
+    private Map<String, String> createTextPositionNamesMap(Activity activity) {
+        Map<String, String> map = new HashMap<>();
+        map.put("center", activity.getString(R.string.center));
+        map.put("centerAbove", activity.getString(R.string.center_above));
+        map.put("centerBelow", activity.getString(R.string.center_below));
+        map.put("left", activity.getString(R.string.left));
+        map.put("right", activity.getString(R.string.right));
+        return map;
+    }
 
     //keys
     private String defaultTimeCalibrationKey;
@@ -69,7 +79,8 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultHighlightColorKey;
     private String defaultLineWidthKey;
     private String defaultQtcFormulaKey;
-
+    private String defaultTimeCaliperTextPositionKey;
+    private String defaultAmplitudeCaliperTextPositionKey;
 
     private String defaultCaliperColor;
     private String defaultHighlightColor;
@@ -77,6 +88,8 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultTimeCalibration;
     private String defaultAmplitudeCalibration;
     private String defaultQtcFormula;
+    private String defaultTimeCaliperTextPosition;
+    private String defaultAmplitudeCaliperTextPosition;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -84,18 +97,23 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         Activity activity = getActivity();
         names = createMap(activity);
         formulaNames = createFormulaNamesMap(activity);
+        textPositionNames = createTextPositionNamesMap(activity);
         defaultTimeCalibrationKey = activity.getString(R.string.default_time_calibration_key);
         defaultAmplitudeCalibrationKey = activity.getString(R.string.default_amplitude_calibration_key);
         defaultCaliperColorKey = activity.getString(R.string.default_caliper_color_key);
         defaultHighlightColorKey = activity.getString(R.string.default_highlight_color_key);
         defaultLineWidthKey = activity.getString(R.string.default_line_width_key);
         defaultQtcFormulaKey = activity.getString(R.string.default_qtc_formula_key);
+        defaultTimeCaliperTextPositionKey = activity.getString(R.string.default_time_caliper_text_position_key);
+        defaultAmplitudeCaliperTextPositionKey = activity.getString(R.string.default_amplitude_caliper_text_position_key);
         defaultCaliperColor = activity.getString(R.string.default_caliper_color);
         defaultHighlightColor = activity.getString(R.string.default_highlight_color);
         defaultLineWidth = activity.getString(R.string.default_line_width);
         defaultTimeCalibration = activity.getString(R.string.default_time_calibration_value);
         defaultAmplitudeCalibration = activity.getString(R.string.default_amplitude_calibration_value);
         defaultQtcFormula = activity.getString(R.string.default_qtc_formula_value);
+        defaultTimeCaliperTextPosition = activity.getString(R.string.default_time_caliper_text_position_value);
+        defaultAmplitudeCaliperTextPosition = activity.getString(R.string.default_amplitude_caliper_text_position_value);
         addPreferencesFromResource(R.xml.settings);
 
         Preference defaultTimeCalibrationPreference = findPreference(defaultTimeCalibrationKey);
@@ -135,6 +153,20 @@ public class MyPreferenceFragment extends PreferenceFragment implements
                 .getString(defaultQtcFormulaKey, defaultQtcFormula);
         String defaultQtcFormulaName = formulaNames.get(defaultQtcFormulaValue);
         defaultQtcFormulaPreference.setSummary(defaultQtcFormulaName);
+
+        Preference defaultTimeCaliperTextPositionPreference = findPreference(defaultTimeCaliperTextPositionKey);
+        String defaultTimeCaliperTextPositionValue = getPreferenceScreen()
+                .getSharedPreferences()
+                .getString(defaultTimeCaliperTextPositionKey, defaultTimeCaliperTextPosition);
+        String defaultTimeCaliperTextPositionName = textPositionNames.get(defaultTimeCaliperTextPositionValue);
+        defaultTimeCaliperTextPositionPreference.setSummary(defaultTimeCaliperTextPositionName);
+
+        Preference defaultAmplitudeCaliperTextPositionPreference = findPreference(defaultAmplitudeCaliperTextPositionKey);
+        String defaultAmplitudeCaliperTextPositionValue = getPreferenceScreen()
+                .getSharedPreferences()
+                .getString(defaultAmplitudeCaliperTextPositionKey, defaultAmplitudeCaliperTextPosition);
+        String defaultAmplitudeCaliperTextPositionName = textPositionNames.get(defaultAmplitudeCaliperTextPositionValue);
+        defaultAmplitudeCaliperTextPositionPreference.setSummary(defaultAmplitudeCaliperTextPositionName);
     }
 
     @Override
@@ -160,6 +192,16 @@ public class MyPreferenceFragment extends PreferenceFragment implements
             String formulaName = sharedPreferences.getString(key, defaultQtcFormula);
             formulaName = formulaNames.get(formulaName);
             pref.setSummary(formulaName);
+        }
+        else if (key.equals(defaultTimeCaliperTextPositionKey)) {
+            String textPositionName = sharedPreferences.getString(key, defaultTimeCaliperTextPosition);
+            textPositionName = textPositionNames.get(textPositionName);
+            pref.setSummary(textPositionName);
+        }
+        else if (key.equals(defaultAmplitudeCaliperTextPositionKey)) {
+            String textPositionName = sharedPreferences.getString(key, defaultAmplitudeCaliperTextPosition);
+            textPositionName = textPositionNames.get(textPositionName);
+            pref.setSummary(textPositionName);
         }
     }
 

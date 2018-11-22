@@ -75,6 +75,20 @@
         android:key="@string/default_qtc_formula_key"
         android:title="@string/default_qtc_formula_title" />
 
+    <ListPreference
+        android:defaultValue="@string/default_time_caliper_text_position_value"
+        android:entries="@array/time_caliper_text_positions"
+        android:entryValues="@array/time_caliper_text_position_values"
+        android:key="@string/default_time_caliper_text_position_key"
+        android:title="@string/default_time_caliper_text_position_title" />
+
+    <ListPreference
+        android:defaultValue="@string/default_amplitude_caliper_text_position_value"
+        android:entries="@array/amplitude_caliper_text_positions"
+        android:entryValues="@array/amplitude_caliper_text_position_values"
+        android:key="@string/default_amplitude_caliper_text_position_key"
+        android:title="@string/default_amplitude_caliper_text_position_title" />
+
 </PreferenceScreen>
 
 

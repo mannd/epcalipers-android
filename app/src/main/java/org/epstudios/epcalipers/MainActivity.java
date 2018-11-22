@@ -191,6 +191,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private float landscapeHeight;
     private boolean showStartImage;
     private boolean roundMsecRate;
+
+    /// TODO: use these variables
+    private Caliper.TextPosition timeCaliperTextPosition;
+    private Caliper.TextPosition amplitudeCaliperTextPosition;
+    
     private boolean allowTweakDuringQtc;
     private boolean inQtc = false;
     private int currentCaliperColor;
@@ -443,6 +448,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         c.setRoundMsecRate(roundMsecRate);
                     }
                 }
+                /// TODO: map strings to TextPosition and finish this
+//                if (key.equals(getString(R.string.default_time_caliper_text_position_key))) {
+//                    Caliper.TextPosition textPosition = sharedPreferences.getString(key, "centerBelow");
+//                }
                 calipersView.invalidate();
             }
         };
