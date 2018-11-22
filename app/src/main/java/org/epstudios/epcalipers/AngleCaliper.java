@@ -134,29 +134,12 @@ public class AngleCaliper extends Caliper {
         double lengthInPoints = point2.x - point1.x;
         canvas.drawLine(point1.x, point1.y, point2.x, point2.y, getPaint());
         // These are coordinates for drawing label for triangle base.
-        float x = 0;
-        float y = 0;
         String text = baseMeasurement(lengthInPoints);
         Rect bounds = getTextBounds(text);
-        switch (triangleBaseTextPosition) {
-            case CenterAbove:
-                x = point1.x + (point2.x - point1.x) / 2;
-                y = point1.y - 12;
-                break;
-            case CenterBelow:
-                x = point1.x + (point2.x - point1.x) / 2;
-                y = point1.y + 4 + bounds.height();
-                break;
-            case Left:
-                x = point1.x - 10 - bounds.width() / 2;
-                y = point1.y - 12;
-                break;
-            case Right:
-                x = point2.x + 10 + bounds.width() / 2;
-                y = point1.y - 12;
-                break;
-        }
-        canvas.drawText(text, x, y, getPaint());
+        PointF textOrigin = caliperTextPosition(Math.min(point1.x, point2.x),
+                Math.max(point1.x, point2.x), point1.y, bounds, canvas.getWidth(),
+                triangleBaseTextPosition);
+        canvas.drawText(text, textOrigin.x, textOrigin.y, getPaint());
 
     }
 

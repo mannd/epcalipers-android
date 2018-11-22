@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -219,7 +220,7 @@ public class Caliper {
         this.selected = false;
         this.touchedBar = TouchedBar.NONE;
         this.marching = false;
-        this.textPosition = TextPosition.Left;
+        this.textPosition = TextPosition.Right;
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
@@ -227,9 +228,8 @@ public class Caliper {
         paint.setStrokeWidth(3.0f);
         paint.setAntiAlias(true);
         paint.setTypeface(Typeface.DEFAULT);
-        /// TODO: can it all be Paint.Align.Center?
-        paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
-                Paint.Align.LEFT);
+        // We will use CENTER alignment for all text position calculations.
+        paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(SMALL_FONT);
         marchingPaint = new Paint(paint);
         setMarchingPaintStrokeWidth(paint);
@@ -350,86 +350,116 @@ public class Caliper {
     public void caliperText(Canvas canvas) {
         String text = measurement();
         Rect bounds = getTextBounds(text);
-        PointF textPositionPoint = caliperTextPosition(bounds, canvas.getWidth(), textPosition);
+        PointF textPositionPoint = caliperTextPosition(Math.min(bar1Position, bar2Position),
+                Math.max(bar1Position, bar2Position), crossBarPosition, bounds, canvas.getWidth(), textPosition);
         // Note x and y for draw text depend of the alignment property of paint
         canvas.drawText(text, textPositionPoint.x, textPositionPoint.y, paint);
     }
 
-    protected PointF caliperTextPosition(Rect bounds, float width, TextPosition textPosition) {
-        float x = 0;
-        float y = 0;
+    /**
+     * Calculates caliper text position and optimizes text position for horizontal type calipers as
+     * needed to avoid caliper text going off screen.  A lot of parameters are passed to allow
+     * the same method to be used for both time calipers and the triangle base of angle calipers.
+     *
+     * @param left left-most caliper bar position, i.e. minimum x position of caliper
+     * @param right right-most caliper bar position, i.e. maximum x position of caliper
+     * @param center crossbar position, i.e. y position
+     * @param bounds bounds of the text block
+     * @param canvasWidth width of the canvas
+     * @param textPosition TextPosition of text
+     * @return
+     */
+    //
+    protected PointF caliperTextPosition(float left, float right, float center,
+                                         Rect bounds, float canvasWidth, TextPosition textPosition) {
+        // Position of our text, based on Paint.Align.CENTER.
+        // This assumes X is the center of the text block, and Y is the text baseline.
+        PointF textOrigin = new PointF();
+        // This is the point used as the origin from which to calculate the textOrigin.
+        // This will vary depending on the TextPosition.
+        PointF origin = new PointF();
         float textHeight = bounds.height();
         float textWidth = bounds.width();
         float yOffset = 12;
-        float xOffset = 5;
-        float yTweakOffset = 4;
-        float xTweakOffset = 10;
+        float xOffset = 12;
         if (direction == Direction.HORIZONTAL) {
             // Guard against the margin obscuring left and right labels.
-            TextPosition optimizedPosition = textPosition;
+            TextPosition optimizedPosition = getOptimizedTextPosition(left, right,
+                    canvasWidth, textPosition, textWidth);
+            origin.y = center;
             switch (optimizedPosition) {
                 case CenterAbove:
-                case CenterBelow:
-                    break;
-                case Left:
-                    if (textWidth > leftOrTopMostBarPosition()) {
-                        if (textWidth + rightOrBottomMostBarPosition() > width) {
-                            optimizedPosition = TextPosition.CenterAbove;
-                        }
-                        else {
-                            optimizedPosition = TextPosition.Right;
-                        }
-                    }
-                case Right:
-                    if (textWidth + rightOrBottomMostBarPosition() > width) {
-                        if (textWidth > leftOrTopMostBarPosition()) {
-                            optimizedPosition = TextPosition.CenterAbove;
-                        }
-                        else {
-                            optimizedPosition = TextPosition.Left;
-                        }
-                    }
-            }
-            switch (optimizedPosition) {
-                case CenterAbove:
-                    /// TODO: make this in terms of textHeight.
-                    yOffset = 12;
-                    x = bar1Position + (bar2Position - bar1Position) / 2;
-                    y = crossBarPosition - yOffset;
+                    origin.x = left + (right - left) / 2;
+                    textOrigin.x = origin.x;
+                    textOrigin.y = origin.y - yOffset;
                     break;
                 case CenterBelow:
-                    yOffset = -(textHeight + yTweakOffset);
-                    x = bar1Position + (bar2Position - bar1Position) / 2;
-                    y = crossBarPosition - yOffset;
+                    origin.x = left + (right - left) / 2;
+                    textOrigin.x = origin.x;
+                    textOrigin.y = origin.y + yOffset + textHeight;
                     break;
                 case Left:
-                    x = leftOrTopMostBarPosition() - xTweakOffset - textWidth / 2;
-                    y = crossBarPosition - yTweakOffset;
+                    origin.x = left;
+                    textOrigin.x = origin.x - xOffset - textWidth / 2;
+                    textOrigin.y = origin.y - yOffset;
                     break;
                 case Right:
-                    x = rightOrBottomMostBarPosition() + xTweakOffset + textWidth / 2;
-                    y = crossBarPosition - yTweakOffset;
+                    origin.x = right;
+                    textOrigin.x = origin.x + xOffset + textWidth / 2;
+                    textOrigin.y = origin.y - yOffset;
                     break;
                 default:
                     break;
             }
         }
         else {  // Vertical (amplitude) caliper
+            textOrigin.y = left + (right - left) / 2;
             switch (textPosition) {
                 case CenterAbove:
                 case CenterBelow:
-                    x = crossBarPosition + xOffset;
+                    textOrigin.x = center + xOffset;
                     break;
                 case Left:
-                    x = crossBarPosition - xTweakOffset - textWidth / 2;
+                    textOrigin.x = center - xOffset - textWidth / 2;
                     break;
                 case Right:
-                    x = crossBarPosition + xTweakOffset + textWidth / 2;
+                    textOrigin.x = center + xOffset + textWidth / 2;
                     break;
             }
-            y = bar1Position + (bar2Position - bar1Position) / 2;
         }
-        return new PointF(x, y);
+        return textOrigin;
+    }
+
+    @NonNull
+    private TextPosition getOptimizedTextPosition(float left, float right, float width,
+                                                    TextPosition textPosition, float textWidth) {
+        // Allow a few pixels margin so that screen edge never obscures text.
+        float offset = 4;
+        TextPosition optimizedPosition = textPosition;
+        switch (optimizedPosition) {
+            case CenterAbove:
+            case CenterBelow:
+                break;
+            case Left:
+                if (textWidth + offset > left) {
+                    if (textWidth + right + offset > width) {
+                        optimizedPosition = TextPosition.CenterAbove;
+                    }
+                    else {
+                        optimizedPosition = TextPosition.Right;
+                    }
+                }
+            case Right:
+                if (textWidth + right + offset > width) {
+                    if (textWidth + offset > left) {
+                        optimizedPosition = TextPosition.CenterAbove;
+                    }
+                    else {
+                        optimizedPosition = TextPosition.Left;
+                    }
+                }
+        }
+        return optimizedPosition;
     }
 
     protected Rect getTextBounds(String text) {
@@ -445,16 +475,6 @@ public class Caliper {
     private float rightOrBottomMostBarPosition() {
         return bar1Position > bar2Position ? bar1Position : bar2Position;
     }
-//    private Boolean textNearScreenEdge(String text, float width) {
-//        if (textIsCentered()) {
-//            return false;
-//        }
-//        float textWidth = getTextWidth(text);
-//        switch (textPosition) {
-//            case Left:
-//                if
-//        }
-//    }
 
     private Boolean textIsCentered() {
         return textPosition == TextPosition.CenterAbove || textPosition == TextPosition.CenterBelow;
