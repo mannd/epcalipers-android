@@ -68,6 +68,8 @@ public class AngleCaliper extends Caliper {
 
     public AngleCaliper() {
         super();
+        /// TODO: angle marker always on top, but need to deal with triangle base
+        setTextPosition(TextPosition.CenterAbove);
         bar1Angle = Math.PI * 0.5;
         bar2Angle = Math.PI * 0.25;
         // bar1Position and bar2Position are equal and are the x coordinates of the vertex of the angle.
@@ -122,7 +124,7 @@ public class AngleCaliper extends Caliper {
         }
     }
 
-    // note: height is in points
+    /// TODO: handle textPosition here
     private void drawTriangleBase(Canvas canvas, double height) {
         PointF point1 = getBasePoint1ForHeight(height);
         PointF point2 = getBasePoint2ForHeight(height);

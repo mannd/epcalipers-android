@@ -6,13 +6,12 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
 
 import static org.epstudios.epcalipers.Caliper.MovementDirection.Down;
-import static org.epstudios.epcalipers.Caliper.MovementDirection.Left;
-import static org.epstudios.epcalipers.Caliper.MovementDirection.Right;
 import static org.epstudios.epcalipers.Caliper.MovementDirection.Up;
 
 /**
@@ -53,6 +52,17 @@ public class Caliper {
         Stationary
     }
 
+    public enum Direction {
+        HORIZONTAL,
+        VERTICAL
+    }
+
+    public enum TextPosition {
+        CenterAbove,
+        CenterBelow,
+        Left,
+        Right
+    }
 
     private static int differential = 0;
     private static final float DELTA = 30.0f;
@@ -115,12 +125,19 @@ public class Caliper {
         this.selected = selected;
     }
 
-    public enum Direction { HORIZONTAL, VERTICAL }
 
     private float bar1Position;
     private float bar2Position;
     private float crossBarPosition;
     private Direction direction;
+
+    public void setTextPosition(TextPosition textPosition) {
+        this.textPosition = textPosition;
+    }
+
+    private TextPosition textPosition;
+
+    private Boolean useAltLabelPosition = true;
 
     public int getUnselectedColor() {
         return unselectedColor;
@@ -198,6 +215,7 @@ public class Caliper {
         this.selected = false;
         this.touchedBar = TouchedBar.NONE;
         this.marching = false;
+        this.textPosition = TextPosition.Right;
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
@@ -207,7 +225,6 @@ public class Caliper {
         paint.setTypeface(Typeface.DEFAULT);
         paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
                 Paint.Align.LEFT);
-
         paint.setTextSize(SMALL_FONT);
         marchingPaint = new Paint(paint);
         setMarchingPaintStrokeWidth(paint);
@@ -327,14 +344,106 @@ public class Caliper {
 
     public void caliperText(Canvas canvas) {
         String text = measurement();
+        Rect bounds = getTextBounds(text);
+        PointF textPosition = caliperTextPosition(bounds, canvas.getWidth());
+        // Note x and y for draw text depend of the alignment property of paint
+        canvas.drawText(text, textPosition.x, textPosition.y, paint);
+    }
+
+    PointF caliperTextPosition(Rect bounds, float width) {
+        float x = 0;
+        float y = 0;
+        float textHeight = bounds.height();
+        float textWidth = bounds.width();
+        // Guard against the margin obscuring left and right labels.
+        TextPosition optimizedPosition = textPosition;
+        switch (textPosition) {
+            case CenterAbove:
+            case CenterBelow:
+                break;
+            case Left:
+                if (textWidth > leftOrTopMostBarPosition()) {
+                    if (textWidth + rightOrBottomMostBarPosition() > width) {
+                       optimizedPosition = TextPosition.CenterAbove;
+                    }
+                    else {
+                        optimizedPosition = TextPosition.Right;
+                    }
+                }
+                break;
+            case Right:
+                if (textWidth + rightOrBottomMostBarPosition() > width) {
+                    if (textWidth > leftOrTopMostBarPosition()) {
+                        optimizedPosition = TextPosition.CenterAbove;
+                    }
+                    else {
+                        optimizedPosition = TextPosition.Left;
+                    }
+                }
+
+        }
+
+        Log.i("EPS", "textHeight = " + textHeight + " textWidth = " + textWidth);
+        Log.i("EPS", "crossbar position = " + crossBarPosition);
+        float yOffset = 12;
+        float xOffset = 5;
         if (direction == Direction.HORIZONTAL) {
-            canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
-                    crossBarPosition - 12, paint);
+            switch (optimizedPosition) {
+                case CenterAbove:
+                    yOffset = 12;
+                    x = bar1Position + (bar2Position - bar1Position) / 2;
+                    y = crossBarPosition - yOffset;
+                    break;
+                case CenterBelow:
+                    yOffset = -(textHeight + 4);
+                    x = bar1Position + (bar2Position - bar1Position) / 2;
+                    y = crossBarPosition - yOffset;
+                    break;
+                case Left:
+                    x = leftOrTopMostBarPosition() - 10 - textWidth / 2;
+                    y = crossBarPosition - 4;
+                    break;
+                case Right:
+                    x = rightOrBottomMostBarPosition() + 10 + textWidth / 2;
+                    y = crossBarPosition - 4;
+                    break;
+                default:
+                    break;
+            }
         }
         else {
-            canvas.drawText(text, crossBarPosition + 5,
-                    bar1Position + ((bar2Position - bar1Position) / 2), paint);
+            x = crossBarPosition + xOffset;
+            y = bar1Position + (bar2Position - bar1Position) / 2;
         }
+        return new PointF(x, y);
+    }
+
+    private Rect getTextBounds(String text) {
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        return bounds;
+    }
+
+    private float leftOrTopMostBarPosition() {
+        return bar1Position <= bar2Position ? bar1Position : bar2Position;
+    }
+
+    private float rightOrBottomMostBarPosition() {
+        return bar1Position > bar2Position ? bar1Position : bar2Position;
+    }
+//    private Boolean textNearScreenEdge(String text, float width) {
+//        if (textIsCentered()) {
+//            return false;
+//        }
+//        float textWidth = getTextWidth(text);
+//        switch (textPosition) {
+//            case Left:
+//                if
+//        }
+//    }
+
+    private Boolean textIsCentered() {
+        return textPosition == TextPosition.CenterAbove || textPosition == TextPosition.CenterBelow;
     }
 
     public float barCoord(PointF p) {
