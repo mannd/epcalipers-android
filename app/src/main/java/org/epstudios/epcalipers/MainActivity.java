@@ -191,11 +191,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private float landscapeHeight;
     private boolean showStartImage;
     private boolean roundMsecRate;
-
-    /// TODO: use these variables
-    private Caliper.TextPosition timeCaliperTextPosition;
-    private Caliper.TextPosition amplitudeCaliperTextPosition;
-    
     private boolean allowTweakDuringQtc;
     private boolean inQtc = false;
     private int currentCaliperColor;
@@ -234,6 +229,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Bazett has the been the only option in previous versions of EP Calipers,
     // so it is now the default.  Users who want to change this must opt in using Preferences.
     private QtcFormula qtcFormulaPreference = QtcFormula.qtcBzt;
+
+    private HashMap<String, Caliper.TextPosition> textPositionMap;
+    /// TODO: get some consistent defaults here
+    private Caliper.TextPosition timeCaliperTextPositionPreference = Caliper.TextPosition.CenterBelow;
+    private Caliper.TextPosition amplitudeCaliperTextPositionPreference = Caliper.TextPosition.Left;
 
     // TODO: make false for release
     private final boolean force_first_run = false;
@@ -299,6 +299,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         qtcFormulaMap.put(HODGES, QtcFormula.qtcHdg);
         qtcFormulaMap.put(FRIDERICIA, QtcFormula.qtcFrd);
         qtcFormulaMap.put(ALL, QtcFormula.qtcAll);
+
+        textPositionMap = new HashMap<>();
+        textPositionMap.put("center", Caliper.TextPosition.CenterAbove);
+        textPositionMap.put("centerAbove", Caliper.TextPosition.CenterAbove);
+        textPositionMap.put("centerBelow", Caliper.TextPosition.CenterBelow);
+        textPositionMap.put("left", Caliper.TextPosition.Left);
+        textPositionMap.put("right", Caliper.TextPosition.Right);
 
         loadSettings();
 
@@ -449,9 +456,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 /// TODO: map strings to TextPosition and finish this
-//                if (key.equals(getString(R.string.default_time_caliper_text_position_key))) {
-//                    Caliper.TextPosition textPosition = sharedPreferences.getString(key, "centerBelow");
-//                }
+                if (key.equals(getString(R.string.default_time_caliper_text_position_key))) {
+                    String timeCaliperTextPositionName = sharedPreferences.getString(key,
+                            getString(R.string.default_time_caliper_text_position_value));
+                    timeCaliperTextPositionPreference = textPositionMap.get(timeCaliperTextPositionName);
+                    for (Caliper c : calipersView.getCalipers()) {
+                        if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
+                            c.setTextPosition(timeCaliperTextPositionPreference);
+                        }
+                    }
+                }
+                if (key.equals(getString(R.string.default_amplitude_caliper_text_position_key))) {
+                    String amplitudeCaliperTextPositionName = sharedPreferences.getString(key,
+                            getString(R.string.default_amplitude_caliper_text_position_value));
+                    amplitudeCaliperTextPositionPreference = textPositionMap.get(amplitudeCaliperTextPositionName);
+                    for (Caliper c : calipersView.getCalipers()) {
+                        if (c.getDirection() == Caliper.Direction.VERTICAL) {
+                            c.setTextPosition(amplitudeCaliperTextPositionPreference);
+                        }
+                    }
+                }
+
                 calipersView.invalidate();
             }
         };
@@ -912,6 +937,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String qtcFormulaName = sharedPreferences.getString(getString(R.string.default_qtc_formula_key),
                 getString(R.string.default_qtc_formula_value));
         qtcFormulaPreference = qtcFormulaMap.get(qtcFormulaName);
+        String timeCaliperTextPositionName = sharedPreferences.getString(getString(R.string.default_time_caliper_text_position_key),
+                getString(R.string.default_time_caliper_text_position_value));
+        timeCaliperTextPositionPreference = textPositionMap.get(timeCaliperTextPositionName);
+        String amplitudeCaliperTextPositionName = sharedPreferences.getString(getString(R.string.default_amplitude_caliper_text_position_key),
+                getString(R.string.default_amplitude_caliper_text_position_value));
+        amplitudeCaliperTextPositionPreference = textPositionMap.get(amplitudeCaliperTextPositionName);
         try {
             currentCaliperColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.default_caliper_color_key),
                     Integer.valueOf(DEFAULT_CALIPER_COLOR).toString()));
@@ -2608,8 +2639,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         c.setDirection(direction);
         if (direction == Caliper.Direction.HORIZONTAL) {
             c.setCalibration(horizontalCalibration);
+            c.setTextPosition(timeCaliperTextPositionPreference);
         } else {
             c.setCalibration(verticalCalibration);
+            c.setTextPosition(amplitudeCaliperTextPositionPreference);
         }
         c.setUseLargeFont(useLargeFont);
         c.setRoundMsecRate(roundMsecRate);
@@ -2630,6 +2663,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         c.setDirection(Caliper.Direction.HORIZONTAL);
         c.setCalibration(horizontalCalibration);
         c.setVerticalCalibration(verticalCalibration);
+        c.setTextPosition(timeCaliperTextPositionPreference);
         c.setInitialPosition(rect);
         getCalipers().add(c);
         calipersView.invalidate();
