@@ -156,4 +156,30 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(result, "Mean RR = 681.8 msec\nQT = 278 msec\nQTc = 327 msec (Framingham formula)");
     }
 
+    public void testCaliperTextLocation() {
+        Caliper c = new Caliper(Caliper.Direction.HORIZONTAL, 0, 0, 0);
+        c.setTextPosition(Caliper.TextPosition.CenterAbove);
+        Rect bounds = new Rect(0, 0, 222, 45);
+        PointF point = c.caliperTextPosition(bounds, 200);
+        assertEquals(0.0f, point.x);
+        assertEquals(-12.0f, point.y);
+        c = new Caliper(Caliper.Direction.VERTICAL, 0, 0, 0);
+        point = c.caliperTextPosition(bounds, 200);
+        assertEquals(5f, point.x);
+        assertEquals(0f, point.y);
+        c = new Caliper(Caliper.Direction.HORIZONTAL, 100, 200, 150);
+        point = c.caliperTextPosition(bounds, 200);
+        assertEquals(150f, point.x);
+        assertEquals(138f, point.y);
+        c = new Caliper(Caliper.Direction.VERTICAL, 100, 200, 150);
+        point = c.caliperTextPosition(bounds, 200);
+        assertEquals(155f, point.x);
+        assertEquals(150f, point.y);
+        c = new Caliper(Caliper.Direction.HORIZONTAL, 100, 200, 150);
+        c.setTextPosition(Caliper.TextPosition.CenterBelow);
+        point = c.caliperTextPosition(bounds, 200);
+        assertEquals(150f, point.x);
+        assertEquals(199f, point.y);
+    }
+
 }

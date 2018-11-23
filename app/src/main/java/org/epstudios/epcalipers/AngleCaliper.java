@@ -65,9 +65,13 @@ public class AngleCaliper extends Caliper {
     private double bar2Angle;
     private Calibration verticalCalibration;
     private final DecimalFormat degreeDecimalFormat;
+    private TextPosition triangleBaseTextPosition;
 
     public AngleCaliper() {
         super();
+        /// TODO: angle marker always on top, but need to deal with triangle base
+        triangleBaseTextPosition = getTextPosition();
+        setTextPosition(TextPosition.CenterAbove);
         bar1Angle = Math.PI * 0.5;
         bar2Angle = Math.PI * 0.25;
         // bar1Position and bar2Position are equal and are the x coordinates of the vertex of the angle.
@@ -122,14 +126,20 @@ public class AngleCaliper extends Caliper {
         }
     }
 
-    // note: height is in points
+    /// TODO: handle textPosition here
+    /// TODO: handle switching text positions
     private void drawTriangleBase(Canvas canvas, double height) {
         PointF point1 = getBasePoint1ForHeight(height);
         PointF point2 = getBasePoint2ForHeight(height);
         double lengthInPoints = point2.x - point1.x;
         canvas.drawLine(point1.x, point1.y, point2.x, point2.y, getPaint());
-        canvas.drawText(baseMeasurement(lengthInPoints), point1.x + (point2.x - point1.x) / 2,
-                point1.y - 10, getPaint());
+        // These are coordinates for drawing label for triangle base.
+        String text = baseMeasurement(lengthInPoints);
+        Rect bounds = getTextBounds(text);
+        PointF textOrigin = caliperTextPosition(Math.min(point1.x, point2.x),
+                Math.max(point1.x, point2.x), point1.y, bounds, canvas.getWidth(),
+                triangleBaseTextPosition);
+        canvas.drawText(text, textOrigin.x, textOrigin.y, getPaint());
 
     }
 
