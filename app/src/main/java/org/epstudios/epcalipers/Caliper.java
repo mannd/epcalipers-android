@@ -413,8 +413,17 @@ public class Caliper {
             }
         }
         else {  // Vertical (amplitude) caliper
+            // To center this as best as possible would add textHeight/2, but
+            // the label is then obscured with very narrow calipers.  With the formula below
+            // the label is a little higher than then center, so it rises above the calipers when
+            // they are narrow.
             textOrigin.y = left + (right - left) / 2;
-            switch (textPosition) {
+            // Here we fool getOptimizedTextPosition so it works for vertical calipers.
+            TextPosition optimizedPosition = getOptimizedTextPosition(center, center, canvasWidth,
+                    textPosition, textWidth);
+            switch (optimizedPosition) {
+                // Centered vertical calipers are ugly, with crossbar obscuring text.
+                // So we actually do allow them in preferences.
                 case CenterAbove:
                 case CenterBelow:
                     textOrigin.x = center + xOffset;

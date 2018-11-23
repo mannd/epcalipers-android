@@ -70,7 +70,6 @@
         <item>@string/right</item>
     </string-array>
     <string-array name="amplitude_caliper_text_positions">
-        <item>@string/center</item>
         <item>@string/left</item>
         <item>@string/right</item>
     </string-array>
@@ -81,7 +80,6 @@
         <item>right</item>
     </string-array>
     <string-array name="amplitude_caliper_text_position_values">
-        <item>centerAbove</item>
         <item>left</item>
         <item>right</item>
     </string-array>

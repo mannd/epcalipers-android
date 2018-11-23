@@ -235,7 +235,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Caliper.TextPosition timeCaliperTextPositionPreference = Caliper.TextPosition.CenterBelow;
     private Caliper.TextPosition amplitudeCaliperTextPositionPreference = Caliper.TextPosition.Left;
 
-    // TODO: make false for release
+    /// TODO: make false for release
+    // NB: we don't provide quick start dialogs anymore, so keep this false.
     private final boolean force_first_run = false;
 
     public static int calculateInSampleSize(
@@ -455,7 +456,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         c.setRoundMsecRate(roundMsecRate);
                     }
                 }
-                /// TODO: map strings to TextPosition and finish this
                 if (key.equals(getString(R.string.default_time_caliper_text_position_key))) {
                     String timeCaliperTextPositionName = sharedPreferences.getString(key,
                             getString(R.string.default_time_caliper_text_position_value));
@@ -537,7 +537,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        // TODO: update BOTH quick_start_messages (there are 2 strings.xml files)
+        /// TODO: update BOTH quick_start_messages (there are 2 strings.xml files)
+        // NB: we no longer provide quick start messages, so don't update them.
         //noinspection ConstantConditions
         if (force_first_run || getFirstRun(prefs)) {
             Log.d(EPS, "firstRun");
