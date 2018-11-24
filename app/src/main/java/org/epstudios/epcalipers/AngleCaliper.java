@@ -121,7 +121,7 @@ public class AngleCaliper extends Caliper {
         canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
                 getPaint());
         // Force the angle measurement to always be center above.
-        caliperText(canvas, TextPosition.CenterAbove);
+        caliperText(canvas, TextPosition.CenterAbove, false);
 
         // triangle base for Brugadometer
         if (getVerticalCalibration() != null && getVerticalCalibration().isCalibrated() && getVerticalCalibration().unitsAreMM()) {
@@ -142,7 +142,7 @@ public class AngleCaliper extends Caliper {
         Rect bounds = getTextBounds(text);
         PointF textOrigin = caliperTextPosition(Math.min(point1.x, point2.x),
                 Math.max(point1.x, point2.x), point1.y, bounds, canvas,
-                triangleBaseTextPosition);
+                triangleBaseTextPosition, true);
         canvas.drawText(text, textOrigin.x, textOrigin.y, getPaint());
 
     }
