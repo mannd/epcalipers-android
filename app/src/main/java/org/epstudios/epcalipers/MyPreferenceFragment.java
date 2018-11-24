@@ -107,6 +107,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         defaultQtcFormulaKey = activity.getString(R.string.default_qtc_formula_key);
         defaultTimeCaliperTextPositionKey = activity.getString(R.string.default_time_caliper_text_position_key);
         defaultAmplitudeCaliperTextPositionKey = activity.getString(R.string.default_amplitude_caliper_text_position_key);
+
         defaultCaliperColor = activity.getString(R.string.default_caliper_color);
         defaultHighlightColor = activity.getString(R.string.default_highlight_color);
         defaultLineWidth = activity.getString(R.string.default_line_width);
@@ -115,6 +116,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         defaultQtcFormula = activity.getString(R.string.default_qtc_formula_value);
         defaultTimeCaliperTextPosition = activity.getString(R.string.default_time_caliper_text_position_value);
         defaultAmplitudeCaliperTextPosition = activity.getString(R.string.default_amplitude_caliper_text_position_value);
+
         addPreferencesFromResource(R.xml.settings);
 
         Preference defaultTimeCalibrationPreference = findPreference(defaultTimeCalibrationKey);

@@ -148,6 +148,16 @@ public class Caliper {
 
     private TextPosition textPosition;
 
+    public Boolean getAutoPositionText() {
+        return autoPositionText;
+    }
+
+    public void setAutoPositionText(Boolean autoPositionText) {
+        this.autoPositionText = autoPositionText;
+    }
+
+    private Boolean autoPositionText;
+
     private Boolean useAltLabelPosition = true;
 
     public int getUnselectedColor() {
@@ -227,6 +237,7 @@ public class Caliper {
         this.touchedBar = TouchedBar.NONE;
         this.marching = false;
         this.textPosition = TextPosition.Right;
+        this.autoPositionText = true;
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
@@ -459,6 +470,10 @@ public class Caliper {
     private TextPosition getOptimizedTextPosition(float left, float right, float center, Canvas canvas,
                                                   TextPosition textPosition, float textWidth,
                                                   float textHeight) {
+        // Just use textPosition if we're not auto-positioning the text.
+        if (!autoPositionText) {
+            return textPosition;
+        }
         // Allow a few pixels margin so that screen edge never obscures text.
         float offset = 4;
         TextPosition optimizedPosition = textPosition;

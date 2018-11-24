@@ -89,6 +89,13 @@
         android:key="@string/default_amplitude_caliper_text_position_key"
         android:title="@string/default_amplitude_caliper_text_position_title" />
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/default_auto_position_text_key"
+        android:title="@string/default_auto_position_text_label"
+        android:summaryOff="@string/auto_position_text_off"
+        android:summaryOn="@string/auto_position_text_on" />
+
 </PreferenceScreen>
 
 

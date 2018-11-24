@@ -191,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private float landscapeHeight;
     private boolean showStartImage;
     private boolean roundMsecRate;
+    private boolean autoPositionText;
     private boolean allowTweakDuringQtc;
     private boolean inQtc = false;
     private int currentCaliperColor;
@@ -456,6 +457,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     roundMsecRate = sharedPreferences.getBoolean(key, true);
                     for (Caliper c : calipersView.getCalipers()) {
                         c.setRoundMsecRate(roundMsecRate);
+                    }
+                }
+                if (key.equals(getString(R.string.default_auto_position_text_key))) {
+                    autoPositionText = sharedPreferences.getBoolean(key, true);
+                    for (Caliper c : calipersView.getCalipers()) {
+                        c.setAutoPositionText(autoPositionText);
                     }
                 }
                 if (key.equals(getString(R.string.default_time_caliper_text_position_key))) {
@@ -942,6 +949,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         qtcFormulaPreference = qtcFormulaMap.get(qtcFormulaName);
         String timeCaliperTextPositionName = sharedPreferences.getString(getString(R.string.default_time_caliper_text_position_key),
                 getString(R.string.default_time_caliper_text_position_value));
+
+        autoPositionText = sharedPreferences.getBoolean(getString(R.string.default_auto_position_text_key), true);
         timeCaliperTextPositionPreference = textPositionMap.get(timeCaliperTextPositionName);
         String amplitudeCaliperTextPositionName = sharedPreferences.getString(getString(R.string.default_amplitude_caliper_text_position_key),
                 getString(R.string.default_amplitude_caliper_text_position_value));
@@ -2640,6 +2649,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         c.setUseLargeFont(useLargeFont);
         c.setRoundMsecRate(roundMsecRate);
+        c.setAutoPositionText(autoPositionText);
         c.setInitialPosition(rect);
         getCalipers().add(c);
     }
@@ -2654,6 +2664,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         c.setLineWidth(currentLineWidth);
         c.setUseLargeFont(useLargeFont);
         c.setRoundMsecRate(roundMsecRate);
+        c.setAutoPositionText(autoPositionText);
         c.setDirection(Caliper.Direction.HORIZONTAL);
         c.setCalibration(horizontalCalibration);
         c.setVerticalCalibration(verticalCalibration);
