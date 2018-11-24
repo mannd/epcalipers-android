@@ -219,13 +219,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Button> upDownButtons;
     private List<Button> rightLeftButtons;
 
-//    private enum QtcFormulaPreference {
-//        Bazett,
-//        Framingham,
-//        Hodges,
-//        Fridericia,
-//        All
-//    }
     private Map<String, QtcFormula> qtcFormulaMap;
     // Bazett has the been the only option in previous versions of EP Calipers,
     // so it is now the default.  Users who want to change this must opt in using Preferences.
@@ -1211,12 +1204,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             c.setLineWidth(currentLineWidth);
             c.setUseLargeFont(useLargeFont);
             c.setRoundMsecRate(roundMsecRate);
+            c.setAutoPositionText(autoPositionText);
             c.setMarching(isMarching);
             if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
                 c.setCalibration(horizontalCalibration);
+                c.setTextPosition(timeCaliperTextPositionPreference);
             }
             else {
                 c.setCalibration(verticalCalibration);
+                c.setTextPosition(amplitudeCaliperTextPositionPreference);
             }
             if (c.isAngleCaliper()) {
                 ((AngleCaliper)c).setVerticalCalibration(verticalCalibration);

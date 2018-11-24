@@ -26,7 +26,7 @@ import android.widget.TextView;
  * along with org.epstudios.epcalipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class About extends Activity {
-    public final static String VERSION = "2.13";
+    public final static String VERSION = "2.14";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
