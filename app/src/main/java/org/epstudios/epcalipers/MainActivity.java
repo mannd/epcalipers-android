@@ -302,11 +302,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         qtcFormulaMap.put(ALL, QtcFormula.qtcAll);
 
         textPositionMap = new HashMap<>();
-        textPositionMap.put("center", Caliper.TextPosition.CenterAbove);
         textPositionMap.put("centerAbove", Caliper.TextPosition.CenterAbove);
         textPositionMap.put("centerBelow", Caliper.TextPosition.CenterBelow);
         textPositionMap.put("left", Caliper.TextPosition.Left);
         textPositionMap.put("right", Caliper.TextPosition.Right);
+        textPositionMap.put("top", Caliper.TextPosition.Top);
+        textPositionMap.put("bottom", Caliper.TextPosition.Bottom);
 
         loadSettings();
 
@@ -341,6 +342,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         calipersView = (CalipersView) findViewById(R.id.caliperView);
         calipersView.setMainActivity(this);
+
 
         shortAnimationDuration = getResources().getInteger(
                 android.R.integer.config_shortAnimTime);
@@ -984,11 +986,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        float landscapeWidth = Math.max(screenHeight, screenWidth);
 //        float portraitHeight = Math.max(screenHeight, screenWidth) - verticalSpace;
         float landscapeHeight = Math.min(screenHeight, screenWidth) - verticalSpace;
-
-//        Log.d(EPS, "ActionBar height = " + actionBarHeight + " Toolbar height = " +
-//                toolbarHeight + " StatusBar height = " + statusBarHeight);
-//        Log.d(EPS, "ImageView height = " + imageView.getHeight());
-//        Log.d(EPS, "Screen height = " + screenHeight);
         float ratio;
         if (imageWidth > imageHeight) {
             ratio = portraitWidth / imageWidth;
@@ -1002,12 +999,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         int bitmapWidth = bitmap.getWidth();
         int bitmapHeight = bitmap.getHeight();
-//        Log.d(EPS, "imageWidth = " + imageWidth + " imageHeight = " + imageHeight);
-//        Log.d(EPS, "bitmapWidth = " + bitmapWidth + " bitmapHeight = " +
-//                bitmapHeight);
         Matrix matrix = new Matrix();
         matrix.postScale(ratio, ratio);
-//        Log.d(EPS, "ratio = " + ratio);
         Bitmap scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth,
                 bitmapHeight, matrix, true);
         BitmapDrawable result = new BitmapDrawable(getResources(), scaledBitmap);

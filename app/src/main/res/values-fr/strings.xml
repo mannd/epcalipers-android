@@ -163,4 +163,12 @@
     <string name="qtc_equals">QTc =</string>
     <string name="formula_detail">(formule %s)</string>
     <string name="image_locked">IMAGE BLOQUÉE</string>
+    <string name="center_below">Centre au-dessous</string>
+    <string name="center_above">Centre au-dessus</string>
+    <string name="left">Gauche</string>
+    <string name="right">Droite</string>
+    <string name="default_time_caliper_text_position_title">Position du texte pour les compas de temps</string>
+    <string name="default_amplitude_caliper_text_position_title">Position du texte pour les compas d\'amplitude</string>
+    <string name="top">Au-dessus</string>
+    <string name="bottom">Au-dessous</string>
 </resources>

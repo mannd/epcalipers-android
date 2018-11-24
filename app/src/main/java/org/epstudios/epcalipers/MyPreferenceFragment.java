@@ -64,11 +64,12 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private Map<String, String> textPositionNames = null;
     private Map<String, String> createTextPositionNamesMap(Activity activity) {
         Map<String, String> map = new HashMap<>();
-        map.put("center", activity.getString(R.string.center));
         map.put("centerAbove", activity.getString(R.string.center_above));
         map.put("centerBelow", activity.getString(R.string.center_below));
         map.put("left", activity.getString(R.string.left));
         map.put("right", activity.getString(R.string.right));
+        map.put("top", activity.getString(R.string.top));
+        map.put("bottom", activity.getString(R.string.bottom));
         return map;
     }
 

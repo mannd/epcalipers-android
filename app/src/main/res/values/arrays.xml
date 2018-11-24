@@ -72,6 +72,8 @@
     <string-array name="amplitude_caliper_text_positions">
         <item>@string/left</item>
         <item>@string/right</item>
+        <item>@string/top</item>
+        <item>@string/bottom</item>
     </string-array>
     <string-array name="time_caliper_text_position_values">
         <item>centerAbove</item>
@@ -82,5 +84,7 @@
     <string-array name="amplitude_caliper_text_position_values">
         <item>left</item>
         <item>right</item>
+        <item>top</item>
+        <item>bottom</item>
     </string-array>
 </resources>

@@ -167,12 +167,13 @@
     <string name="center_below">Center below</string>
     <string name="left">Left</string>
     <string name="right">Right</string>
-    <string name="center">Center</string>
     <string name="center_above">Center above</string>
     <string name="default_time_caliper_text_position_value" translatable="false">centerAbove</string>
     <string name="default_time_caliper_text_position_key" translatable="false">time_caliper_text_position</string>
     <string name="default_time_caliper_text_position_title">Time caliper text position</string>
     <string name="default_amplitude_caliper_text_position_key" translatable="false">amplitude_caliper_text_position</string>
-    <string name="default_amplitude_caliper_text_position_value" translatable="false">center</string>
+    <string name="default_amplitude_caliper_text_position_value" translatable="false">right</string>
     <string name="default_amplitude_caliper_text_position_title">Amplitude caliper text position</string>
+    <string name="top">Top</string>
+    <string name="bottom">Bottom</string>
 </resources>
