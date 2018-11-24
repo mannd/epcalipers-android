@@ -6,13 +6,17 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.MotionEvent;
+
+import junit.framework.Assert;
+
+import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 
 import static org.epstudios.epcalipers.Caliper.MovementDirection.Down;
-import static org.epstudios.epcalipers.Caliper.MovementDirection.Left;
-import static org.epstudios.epcalipers.Caliper.MovementDirection.Right;
 import static org.epstudios.epcalipers.Caliper.MovementDirection.Up;
 
 /**
@@ -53,6 +57,19 @@ public class Caliper {
         Stationary
     }
 
+    public enum Direction {
+        HORIZONTAL,
+        VERTICAL
+    }
+
+    public enum TextPosition {
+        CenterAbove,
+        CenterBelow,
+        Left,
+        Right,
+        Top,
+        Bottom
+    }
 
     private static int differential = 0;
     private static final float DELTA = 30.0f;
@@ -115,12 +132,33 @@ public class Caliper {
         this.selected = selected;
     }
 
-    public enum Direction { HORIZONTAL, VERTICAL }
 
     private float bar1Position;
     private float bar2Position;
     private float crossBarPosition;
     private Direction direction;
+
+    public void setTextPosition(TextPosition textPosition) {
+        this.textPosition = textPosition;
+    }
+
+    public TextPosition getTextPosition() {
+        return textPosition;
+    }
+
+    private TextPosition textPosition;
+
+    public Boolean getAutoPositionText() {
+        return autoPositionText;
+    }
+
+    public void setAutoPositionText(Boolean autoPositionText) {
+        this.autoPositionText = autoPositionText;
+    }
+
+    private Boolean autoPositionText;
+
+    private Boolean useAltLabelPosition = true;
 
     public int getUnselectedColor() {
         return unselectedColor;
@@ -198,6 +236,8 @@ public class Caliper {
         this.selected = false;
         this.touchedBar = TouchedBar.NONE;
         this.marching = false;
+        this.textPosition = TextPosition.Right;
+        this.autoPositionText = true;
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
@@ -205,9 +245,8 @@ public class Caliper {
         paint.setStrokeWidth(3.0f);
         paint.setAntiAlias(true);
         paint.setTypeface(Typeface.DEFAULT);
-        paint.setTextAlign(direction == Direction.HORIZONTAL ? Paint.Align.CENTER :
-                Paint.Align.LEFT);
-
+        // We will use CENTER alignment for all text position calculations.
+        paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(SMALL_FONT);
         marchingPaint = new Paint(paint);
         setMarchingPaintStrokeWidth(paint);
@@ -288,7 +327,7 @@ public class Caliper {
         if (marching && direction == Direction.HORIZONTAL) {
             drawMarchingCalipers(canvas);
         }
-        caliperText(canvas);
+        caliperText(canvas, textPosition, true);
     }
 
     private void drawMarchingCalipers(Canvas canvas) {
@@ -325,16 +364,230 @@ public class Caliper {
         }
     }
 
-    public void caliperText(Canvas canvas) {
+    /**
+     * Draw caliper text, using textPosition.  Auto positioning of text is handled both by
+     * autoPositionText field and by passed parameter optimizeTextPosition.  The latter is needed
+     * by angle calipers because the position of the main text of an angle caliper is always
+     * centered above the caliper.  Angle calipers then use the textPosition parameter to
+     * handle the text for the triangle base label.
+     *
+     * @param canvas the canvas drawn upon
+     * @param textPosition a TextPosition used to position the label
+     * @param optimizeTextPosition normally true, to allow optimization of the text position
+     */
+    public void caliperText(Canvas canvas, TextPosition textPosition, Boolean optimizeTextPosition) {
         String text = measurement();
+        Rect bounds = getTextBounds(text);
+        PointF textPositionPoint = caliperTextPosition(Math.min(bar1Position, bar2Position),
+                Math.max(bar1Position, bar2Position), crossBarPosition, bounds,
+                canvas, textPosition, optimizeTextPosition);
+        // Note x and y for draw text depend of the alignment property of paint
+        canvas.drawText(text, textPositionPoint.x, textPositionPoint.y, paint);
+    }
+
+    /**
+     * Calculates caliper text position and optimizes text position for horizontal type calipers as
+     * needed to avoid caliper text going off screen.  A lot of parameters are passed to allow
+     * the same method to be used for both time calipers and the triangle base of angle calipers.
+     *
+     * @param left left-most caliper bar position, i.e. minimum x position of caliper
+     * @param right right-most caliper bar position, i.e. maximum x position of caliper
+     * @param center crossbar position, i.e. y position
+     * @param bounds bounds of the text block
+     * @param canvas the canvas you are drawing on
+     * @param textPosition TextPosition of text
+     * @param optimizeTextPosition allow optimization of the label to occur if true
+     * @return
+     */
+    //
+    protected PointF caliperTextPosition(float left, float right, float center,
+                                         Rect bounds, Canvas canvas, TextPosition textPosition,
+                                         Boolean optimizeTextPosition) {
+        // Position of our text, based on Paint.Align.CENTER.
+        // This assumes X is the center of the text block, and Y is the text baseline.
+        PointF textOrigin = new PointF();
+        // This is the point used as the origin from which to calculate the textOrigin.
+        // This will vary depending on the TextPosition.
+        PointF origin = new PointF();
+        float textHeight = bounds.height();
+        float textWidth = bounds.width();
+        float yOffset = 12;
+        float xOffset = 12;
         if (direction == Direction.HORIZONTAL) {
-            canvas.drawText(text, (bar1Position + (bar2Position - bar1Position)/ 2),
-                    crossBarPosition - 12, paint);
+            // Guard against the margin obscuring left and right labels.
+            TextPosition optimizedPosition = getOptimizedTextPosition(left, right, center,
+                    canvas, textPosition, textWidth, textHeight, optimizeTextPosition);
+            origin.y = center;
+            switch (optimizedPosition) {
+                case CenterAbove:
+                    origin.x = left + (right - left) / 2;
+                    textOrigin.x = origin.x;
+                    textOrigin.y = origin.y - yOffset;
+                    break;
+                case CenterBelow:
+                    origin.x = left + (right - left) / 2;
+                    textOrigin.x = origin.x;
+                    textOrigin.y = origin.y + yOffset + textHeight;
+                    break;
+                case Left:
+                    origin.x = left;
+                    textOrigin.x = origin.x - xOffset - textWidth / 2;
+                    textOrigin.y = origin.y - yOffset;
+                    break;
+                case Right:
+                    origin.x = right;
+                    textOrigin.x = origin.x + xOffset + textWidth / 2;
+                    textOrigin.y = origin.y - yOffset;
+                    break;
+                default:
+                    if (BuildConfig.DEBUG) {
+                        throw new AssertionError("Invalid TextPosition.");
+                    }
+                    break;
+            }
         }
-        else {
-            canvas.drawText(text, crossBarPosition + 5,
-                    bar1Position + ((bar2Position - bar1Position) / 2), paint);
+        else {  // Vertical (amplitude) caliper
+            textOrigin.y = textHeight / 2 + left + (right - left) / 2;
+            TextPosition optimizedPosition = getOptimizedTextPosition(left, right, center, canvas,
+                    textPosition, textWidth, textHeight, optimizeTextPosition);
+            switch (optimizedPosition) {
+                case Left:
+                    textOrigin.x = center - xOffset - textWidth / 2;
+                    break;
+                case Right:
+                    textOrigin.x = center + xOffset + textWidth / 2;
+                    break;
+                case Top:
+                    textOrigin.y = left - yOffset;
+                    textOrigin.x = center;
+                    break;
+                case Bottom:
+                    textOrigin.y = right + yOffset + textHeight;
+                    textOrigin.x = center;
+                    break;
+                default:
+                    if (BuildConfig.DEBUG) {
+                        throw new AssertionError("Invalid TextPosition.");
+                    }
+                    break;
+            }
         }
+        return textOrigin;
+    }
+
+    @NonNull
+    private TextPosition getOptimizedTextPosition(float left, float right, float center, Canvas canvas,
+                                                  TextPosition textPosition, float textWidth,
+                                                  float textHeight, Boolean optimizeTextPosition) {
+        // Just use textPosition if we're not auto-positioning the text.
+        if (!autoPositionText || !optimizeTextPosition) {
+            return textPosition;
+        }
+        // Allow a few pixels margin so that screen edge never obscures text.
+        float offset = 4;
+        TextPosition optimizedPosition = textPosition;
+        if (direction == Direction.HORIZONTAL) {
+            switch (optimizedPosition) {
+                case CenterAbove:
+                case CenterBelow:
+                    // avoid squeezing label
+                    if (textWidth + offset > right - left) {
+                        if (textWidth + right + offset > canvas.getWidth()) {
+                            optimizedPosition = TextPosition.Left;
+                        }
+                        else {
+                            optimizedPosition = TextPosition.Right;
+                        }
+                    }
+                    break;
+                case Left:
+                    if (textWidth + offset > left) {
+                        if (textWidth + right + offset > canvas.getWidth()) {
+                            optimizedPosition = TextPosition.CenterAbove;
+                        } else {
+                            optimizedPosition = TextPosition.Right;
+                        }
+                    }
+                    break;
+                case Right:
+                    if (textWidth + right + offset > canvas.getWidth()) {
+                        if (textWidth + offset > left) {
+                            optimizedPosition = TextPosition.CenterAbove;
+                        } else {
+                            optimizedPosition = TextPosition.Left;
+                        }
+                    }
+                    break;
+                default:
+                    optimizedPosition = textPosition;
+            }
+        }
+        else if (direction == Direction.VERTICAL) {
+            // watch for squeeze
+            if ((optimizedPosition == TextPosition.Left || optimizedPosition == TextPosition.Right)
+                    && (textHeight + offset > right - left)) {
+                if (left - textHeight - offset < 0) {
+                    optimizedPosition = TextPosition.Bottom;
+                }
+                else {
+                    optimizedPosition = TextPosition.Top;
+                }
+            }
+            else {
+                switch (optimizedPosition) {
+                    case Left:
+                        if (textWidth + offset > center) {
+                            optimizedPosition = TextPosition.Right;
+                        }
+                        break;
+                    case Right:
+                        if (textWidth + center + offset > canvas.getWidth()) {
+                            optimizedPosition = TextPosition.Left;
+                        }
+                        break;
+                    case Top:
+                        if (left - textHeight - offset < 0) {
+                            if (right + textHeight + offset > canvas.getHeight()) {
+                                optimizedPosition = TextPosition.Right;
+                            } else {
+                                optimizedPosition = TextPosition.Bottom;
+                            }
+                        }
+                        break;
+                    case Bottom:
+                        if (right + textHeight + offset > canvas.getHeight()) {
+                            if (left - textHeight - offset < 0) {
+                                optimizedPosition = TextPosition.Right;
+                            } else {
+                                optimizedPosition = TextPosition.Top;
+                            }
+                        }
+                        break;
+                    default:
+                        optimizedPosition = textPosition;
+                }
+            }
+
+        }
+        return optimizedPosition;
+    }
+
+    protected Rect getTextBounds(String text) {
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        return bounds;
+    }
+
+    private float leftOrTopMostBarPosition() {
+        return bar1Position <= bar2Position ? bar1Position : bar2Position;
+    }
+
+    private float rightOrBottomMostBarPosition() {
+        return bar1Position > bar2Position ? bar1Position : bar2Position;
+    }
+
+    private Boolean textIsCentered() {
+        return textPosition == TextPosition.CenterAbove || textPosition == TextPosition.CenterBelow;
     }
 
     public float barCoord(PointF p) {

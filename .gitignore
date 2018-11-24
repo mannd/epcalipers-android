@@ -13,4 +13,5 @@
 *~
 *.swp
 /sample
-.idea/caches/build_file_checksums.ser
+.idea
+*.iml
