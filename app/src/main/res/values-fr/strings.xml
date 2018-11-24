@@ -167,8 +167,11 @@
     <string name="center_above">Centre au-dessus</string>
     <string name="left">Gauche</string>
     <string name="right">Droite</string>
-    <string name="default_time_caliper_text_position_title">Position du texte pour les compas de temps</string>
-    <string name="default_amplitude_caliper_text_position_title">Position du texte pour les compas d\'amplitude</string>
+    <string name="default_time_caliper_text_position_title">Position de texte de compas de temps</string>
+    <string name="default_amplitude_caliper_text_position_title">Position de texte de compas d\'amplitude</string>
     <string name="top">Au-dessus</string>
     <string name="bottom">Au-dessous</string>
+    <string name="default_auto_position_text_label">Auto-positionner le texte de compas</string>
+    <string name="auto_position_text_off">Le texte est fixé</string>
+    <string name="auto_position_text_on">Le texte est mobile</string>
 </resources>

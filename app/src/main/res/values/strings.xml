@@ -176,8 +176,8 @@
     <string name="default_amplitude_caliper_text_position_title">Amplitude caliper text position</string>
     <string name="top">Top</string>
     <string name="bottom">Bottom</string>
-    <string name="default_auto_position_text_key">auto_position_text</string>
-    <string name="default_auto_position_text_label">Automatically position caliper labels</string>
-    <string name="auto_position_text_off">Caliper labels are fixed in position</string>
-    <string name="auto_position_text_on">Caliper labels will move out of the way</string>
+    <string name="default_auto_position_text_key" translatable="false">auto_position_text</string>
+    <string name="default_auto_position_text_label">Automatically position caliper text</string>
+    <string name="auto_position_text_off">Text fixed in position</string>
+    <string name="auto_position_text_on">Text is mobile</string>
 </resources>
