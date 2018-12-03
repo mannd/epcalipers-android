@@ -9,7 +9,7 @@ android:
     - yes | sdkmanager --licenses
 
 script:
-  - gradle test
+  - ./gradlew test
   
 # before_script:
 #     - echo no | android create avd --force -n test -t android-26 --abi google_apis/armeabi-v7a
