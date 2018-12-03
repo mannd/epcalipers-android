@@ -1,4 +1,9 @@
-## Description
+EP Calipers
+===========
+
+[![Build Status](https://travis-ci.org/mannd/epcalipers-android.svg?branch=master)](https://travis-ci.org/mannd/epcalipers-android)
+
+## Electronic calipers
 EP Calipers is an Android application that provides
 electronic calipers for making measurements on images of ECGs or other
 recordings.  Calculations such as mean heart rate and corrected

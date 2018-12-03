@@ -7,17 +7,9 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.MotionEvent;
 
-import junit.framework.Assert;
-
-import org.w3c.dom.Text;
-
 import java.text.DecimalFormat;
-
-import static org.epstudios.epcalipers.Caliper.MovementDirection.Down;
-import static org.epstudios.epcalipers.Caliper.MovementDirection.Up;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -762,7 +754,7 @@ public class Caliper {
         if (getDirection() == Direction.VERTICAL) {
             direction = swapDirection(direction);
         }
-        if (direction == Up || direction == Down) {
+        if (direction == MovementDirection.Up || direction == MovementDirection.Down) {
             crossBarPosition += delta;
         }
         else {
