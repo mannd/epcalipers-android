@@ -180,4 +180,11 @@
     <string name="default_auto_position_text_label">Automatically position caliper text</string>
     <string name="auto_position_text_off">Text fixed in position</string>
     <string name="auto_position_text_on">Text is mobile</string>
+    <string name="drawer_take_photo">Take photo</string>
+    <string name="drawer_select_image">Select image</string>
+    <string name="drawer_lock_image">Lock image</string>
+    <string name="drawer_sample_ecg">Sample ECG</string>
+    <string name="drawer_preferences">Preferences</string>
+    <string name="drawer_help">Help</string>
+    <string name="drawer_about">About EP Calipers</string>
 </resources>

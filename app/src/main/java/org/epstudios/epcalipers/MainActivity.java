@@ -33,9 +33,12 @@ import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -50,6 +53,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -180,7 +184,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean calipersMode;
     private PhotoViewAttacher attacher;
     private String currentPhotoPath;
-    private RelativeLayout layout;
+    private FrameLayout layout;
+    private DrawerLayout drawerLayout;
     private double rrIntervalForQTc;
     private float sizeDiffWidth;
     private float sizeDiffHeight;
@@ -280,6 +285,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         useLargeFont = false;
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        final NavigationView navigationView = findViewById(R.id.nav_view);
+        drawerLayout = findViewById(R.id.activity_main_id);
 
         noSavedInstance = (savedInstanceState == null);
 
@@ -341,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         shortAnimationDuration = getResources().getInteger(
                 android.R.integer.config_shortAnimTime);
 
-        actionBar = (Toolbar) findViewById(R.id.action_bar);
+        actionBar = findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
         android.support.v7.app.ActionBar supportActionBar = getSupportActionBar();
         supportActionBar.setDisplayHomeAsUpEnabled(true);
@@ -366,6 +373,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             updateImageView(externalImageBitmap);
             externalImageLoad = false;
         }
+        // Note the sample ECG loaded as a drawable in activity_main.xml is too poor
+        // a quality to be used on a high-res device, so we load a high quality image here.
+        else if (showStartImage) {
+            loadSampleEcg();
+        }
+
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                        menuItem.setChecked(true);
+
+                        int id = menuItem.getItemId();
+                        switch(id) {
+                            case R.id.nav_camera:
+                                takePhoto();
+                                break;
+                            case R.id.nav_image:
+                                selectImageFromGallery();
+                                break;
+                            case R.id.nav_lock_image:
+                                lockImage();
+                                break;
+                            case R.id.nav_sample_ecg:
+                                loadSampleEcg();
+                                break;
+                            case R.id.nav_about:
+                                about();
+                                break;
+                            case R.id.nav_help:
+                                showHelp();
+                                break;
+                            case R.id.nav_preferences:
+                                changeSettings();
+                                break;
+                        }
+
+                        drawerLayout.closeDrawers();
+
+                        return true;
+                    }
+                }
+        );
 
 
         // OnSharedPreferenceListener must be a class field, i.e. strong reference
@@ -490,7 +540,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         prefs.registerOnSharedPreferenceChangeListener(listener);
 
-        layout = (RelativeLayout)findViewById(R.id.activity_main_id);
+        layout = (FrameLayout)findViewById(R.id.frame_layout);
         ViewTreeObserver viewTreeObserver = layout.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @SuppressLint("NewApi")
@@ -1729,7 +1779,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.add_caliper) {
+            Log.i("EPS", "Add calipers");
             selectAddCaliperMenu();
+            return true;
+        }
+        if (id == android.R.id.home) {
+            drawerLayout.openDrawer(GravityCompat.START);
+            Log.i("EPS","Open drawer");
             return true;
         }
 //        if (id == R.id.action_switch) {
