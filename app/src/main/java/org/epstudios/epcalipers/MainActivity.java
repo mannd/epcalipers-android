@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -115,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String IMAGE_TYPE = "image/";
     private static final String APPLICATION_PDF_TYPE = "application/pdf";
 
-    private Button addCaliperButton;
     private Button calibrateButton;
     private Button intervalRateButton;
     private Button meanRateButton;
@@ -343,6 +343,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         actionBar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
+        android.support.v7.app.ActionBar supportActionBar = getSupportActionBar();
+        supportActionBar.setDisplayHomeAsUpEnabled(true);
+        supportActionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
 
@@ -1264,9 +1267,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v == addCaliperButton) {
-            selectAddCaliperMenu();
-        } else if (v == cancelAddCaliperButton) {
+        if (v == cancelAddCaliperButton) {
             selectMainMenu();
         } else if (v == adjustImageButton) {
             selectAdjustImageMenu();
@@ -1360,7 +1361,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void createButtons() {
         // Main/Caliper menu
-        addCaliperButton = createButton(getString(R.string.add_caliper_button_title));
         calibrateButton = createButton(getString(R.string.calibrate_button_title));
         intervalRateButton = createButton(getString(R.string.interval_rate_button_title));
         meanRateButton = createButton(getString(R.string.mean_rate_button_title));
@@ -1431,7 +1431,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void createMainMenu() {
         ArrayList<TextView> buttons = new ArrayList<>();
-        buttons.add(addCaliperButton);
         buttons.add(calibrateButton);
         buttons.add(intervalRateButton);
         buttons.add(meanRateButton);
@@ -1729,22 +1728,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            changeSettings();
+        if (id == R.id.add_caliper) {
+            selectAddCaliperMenu();
             return true;
         }
-        if (id == R.id.action_switch) {
-            toggleMode();
-            return true;
-        }
-        if (id == R.id.help) {
-            showHelp();
-            return true;
-        }
-        if (id == R.id.about) {
-            about();
-            return true;
-        }
+//        if (id == R.id.action_switch) {
+//            toggleMode();
+//            return true;
+//        }
+//        if (id == R.id.help) {
+//            showHelp();
+//            return true;
+//        }
+//        if (id == R.id.about) {
+//            about();
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -1775,27 +1774,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setMode() {
         // imageView is always enabled now that touch events pass through
         // imageView.setEnabled(!calipersMode);
-        calipersView.setEnabled(calipersMode);
-
-        MenuItem switchModeMenuItem = menu.findItem(R.id.action_switch);
-
-        if (calipersMode) {
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
-                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.primary)));
-            }
-            unfadeCalipersView();
-            switchModeMenuItem.setTitle(R.string.image_button_title);
-            selectMainMenu();
-        } else {
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(getString(R.string.image_mode_title));
-                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
-            }
-            fadeCalipersView();
-            switchModeMenuItem.setTitle(R.string.measure_button_title);
-            selectImageMenu();
-        }
+//        calipersView.setEnabled(calipersMode);
+//
+//        MenuItem switchModeMenuItem = menu.findItem(R.id.action_switch);
+//
+//        if (calipersMode) {
+//            if (getSupportActionBar() != null) {
+//                getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
+//                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.primary)));
+//            }
+//            unfadeCalipersView();
+//            switchModeMenuItem.setTitle(R.string.image_button_title);
+//            selectMainMenu();
+//        } else {
+//            if (getSupportActionBar() != null) {
+//                getSupportActionBar().setTitle(getString(R.string.image_mode_title));
+//                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+//            }
+//            fadeCalipersView();
+//            switchModeMenuItem.setTitle(R.string.measure_button_title);
+//            selectImageMenu();
+//        }
     }
 
     private void changeSettings() {
