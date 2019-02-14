@@ -187,4 +187,23 @@
     <string name="drawer_preferences">Preferences</string>
     <string name="drawer_help">Help</string>
     <string name="drawer_about">About EP Calipers</string>
+
+
+    <!--Tooltips-->
+    <string name="add_tooltip">Add calipers</string>
+    <string name="clear_calibration_tooltip">Clear all calibration</string>
+    <string name="int_rate_tooltip">Toggle between interval and heart rate</string>
+    <string name="longpress_tooltip">Long press on image or caliper to show additional options</string>
+    <string name="mean_rate_tooltip">Measure 2 or more intervals and calculate mean rate and interval</string>
+    <string name="measurement_tooltip">Use measurement toolbar to calibrate calipers, then make measurements</string>
+    <string name="move_caliper_tooltip">Move caliper by dragging crossbar.  Expand and contract it by dragging sidebars.
+	Tap to select it for measurements.  Double-tap to delete it.</string>
+    <string name="move_image_tooltip">Pinch to zoom and drag to reposition image </string>
+    <string name="qtc_step_1_tooltip">Measure 1 or more RR intervals</string>
+    <string name="qtc_step_2_tooltip">Measure the QT interval</string>
+    <string name="qtc_tooltip">Calculate the QTc</string>
+    <string name="set_calibration_tooltip">Measure a known interval with selected caliper.</string>
+    <string name="setup_calibration_tooltip">Select a caliper by tapping it.
+	Use it to measure a known interval (e.g. 1000 msec).</string>
+    <string name="side_menu_tooltip">Load a new image, change preferences, get help</string>
 </resources>

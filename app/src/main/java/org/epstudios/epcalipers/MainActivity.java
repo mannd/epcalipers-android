@@ -1409,13 +1409,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    @SuppressLint("NewApi")
+    private void addToolTip(Button button, CharSequence text) {
+        // Ignore tooltips in unsupported versions
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            button.setTooltipText(text);
+        }
+    }
+
     private void createButtons() {
         // Main/Caliper menu
         calibrateButton = createButton(getString(R.string.calibrate_button_title));
+        addToolTip(calibrateButton, getString(R.string.setup_calibration_tooltip));
         intervalRateButton = createButton(getString(R.string.interval_rate_button_title));
+	addToolTip(intervalRateButton, getString(R.string.int_rate_tooltip));
         meanRateButton = createButton(getString(R.string.mean_rate_button_title));
+	addToolTip(meanRateButton, getString(R.string.mean_rate_tooltip));
         qtcButton = createButton(getString(R.string.qtc_button_title));
-        // Image menuº
+	addToolTip(qtcButton, getString(R.string.qtc_tooltip));
+        // Image menu
         cameraButton = createButton(getString(R.string.camera_button_title));
         cameraButton.setEnabled(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA));
         selectImageButton = createButton(getString(R.string.select_image_button_title));
@@ -1440,12 +1452,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         backToImageMenuButton = createButton(getString(R.string.done_button_title));
         // Calibration menu
         setCalibrationButton = createButton(getString(R.string.set_calibration_button_title));
+	addToolTip(setCalibrationButton, getString(R.string.set_calibration_tooltip));
         clearCalibrationButton = createButton(getString(R.string.clear_calibration_button_title));
+	addToolTip(clearCalibrationButton, getString(R.string.clear_calibration_tooltip));
         doneCalibrationButton = createButton(getString(R.string.done_button_title));
         // QTc menu
         measureRRButton = createButton(getString(R.string.measure_button_label));
+	addToolTip(measureRRButton, getString(R.string.qtc_step_1_tooltip));
         cancelQTcButton = createButton(getString(R.string.cancel_button_title));
         measureQTButton = createButton(getString(R.string.measure_button_label));
+	addToolTip(measureQTButton, getString(R.string.qtc_step_2_tooltip));
         cancelQTcMeasurementButton = createButton(getString(R.string.cancel_button_title));
         // Color menu
         colorButton = createButton(getString(R.string.color_label));
