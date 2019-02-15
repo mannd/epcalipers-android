@@ -264,37 +264,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         Log.d(EPS, "onCreate");
-
-//        // see: https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-//            StrictMode.setVmPolicy(builder.build());
-//        }
-
-
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
+
+        noSavedInstance = (savedInstanceState == null);
+
+        setContentView(R.layout.activity_main);
+        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+
+        final NavigationView navigationView = findViewById(R.id.nav_view);
+        drawerLayout = findViewById(R.id.activity_main_id);
+        Menu menuNav = navigationView.getMenu();
+        MenuItem cameraMenuItem = menuNav.findItem(R.id.nav_camera);
+        // Disable camera button if no camera present
+        cameraMenuItem.setEnabled(getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_CAMERA));
+        // Make navigation (hamburger) menu do things.
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                        menuItem.setChecked(true);
+
+                        int id = menuItem.getItemId();
+                        switch(id) {
+                            case R.id.nav_camera:
+                                takePhoto();
+                                break;
+                            case R.id.nav_image:
+                                selectImageFromGallery();
+                                break;
+                            case R.id.nav_lock_image:
+                                lockImage();
+                                break;
+                            case R.id.nav_sample_ecg:
+                                loadSampleEcg();
+                                break;
+                            case R.id.nav_about:
+                                about();
+                                break;
+                            case R.id.nav_help:
+                                showHelp();
+                                break;
+                            case R.id.nav_preferences:
+                                changeSettings();
+                                break;
+                        }
+                        drawerLayout.closeDrawers();
+                        return true;
+                    }
+                }
+        );
+
+
         externalImageLoad = false;
         currentPdfUri = null;
         numberOfPdfPages = 0;
         currentPdfPageNumber = 0;
         useLargeFont = false;
-        setContentView(R.layout.activity_main);
-        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-        final NavigationView navigationView = findViewById(R.id.nav_view);
-        drawerLayout = findViewById(R.id.activity_main_id);
-
-        noSavedInstance = (savedInstanceState == null);
-
-
         currentCaliperColor = DEFAULT_CALIPER_COLOR;
         currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
         currentLineWidth = DEFAULT_LINE_WIDTH;
 
+        // QTc formulas
         qtcFormulaMap = new HashMap<>();
         qtcFormulaMap.put(BAZETT, QtcFormula.qtcBzt);
         qtcFormulaMap.put(FRAMINGHAM, QtcFormula.qtcFrm);
@@ -302,6 +336,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         qtcFormulaMap.put(FRIDERICIA, QtcFormula.qtcFrd);
         qtcFormulaMap.put(ALL, QtcFormula.qtcAll);
 
+        // Caliper text positions
         textPositionMap = new HashMap<>();
         textPositionMap.put("centerAbove", Caliper.TextPosition.CenterAbove);
         textPositionMap.put("centerBelow", Caliper.TextPosition.CenterBelow);
@@ -348,14 +383,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         shortAnimationDuration = getResources().getInteger(
                 android.R.integer.config_shortAnimTime);
 
+        // Set up action bar up top.  Note that icon on left for hamburger menu.
         actionBar = findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
         android.support.v7.app.ActionBar supportActionBar = getSupportActionBar();
         supportActionBar.setDisplayHomeAsUpEnabled(true);
         supportActionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
+        // Menu toolbar is on the bottom.
         menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
 
+        // Create the myriad of buttons including tooltips as supported in
+        // Lollipop and beyond.
         createButtons();
 
         horizontalCalibration = new Calibration(Caliper.Direction.HORIZONTAL, this);
@@ -365,7 +404,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         totalRotation = 0.0f;
 
+        // Deprecated
         calipersMode = true;
+
         selectMainMenu();
 
         // entry point to load external pics/pdfs
@@ -373,49 +414,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             updateImageView(externalImageBitmap);
             externalImageLoad = false;
         }
+        ///TODO: make sure code below doesn't interfere with rotation.
         // Note the sample ECG loaded as a drawable in activity_main.xml is too poor
         // a quality to be used on a high-res device, so we load a high quality image here.
         else if (showStartImage) {
             loadSampleEcg();
         }
-
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        menuItem.setChecked(true);
-
-                        int id = menuItem.getItemId();
-                        switch(id) {
-                            case R.id.nav_camera:
-                                takePhoto();
-                                break;
-                            case R.id.nav_image:
-                                selectImageFromGallery();
-                                break;
-                            case R.id.nav_lock_image:
-                                lockImage();
-                                break;
-                            case R.id.nav_sample_ecg:
-                                loadSampleEcg();
-                                break;
-                            case R.id.nav_about:
-                                about();
-                                break;
-                            case R.id.nav_help:
-                                showHelp();
-                                break;
-                            case R.id.nav_preferences:
-                                changeSettings();
-                                break;
-                        }
-
-                        drawerLayout.closeDrawers();
-
-                        return true;
-                    }
-                }
-        );
 
 
         // OnSharedPreferenceListener must be a class field, i.e. strong reference

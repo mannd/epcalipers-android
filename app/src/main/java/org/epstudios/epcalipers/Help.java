@@ -35,8 +35,10 @@ import java.util.Locale;
  */
 
 public class Help extends AppCompatActivity {
-
-    private static final String englishHelpPath = "file:///android_asset/help.html";
+private static final String englishHelpPath =
+        "https:///mannd.github.io/epcalipers/en.lproj/EPCalipers-help/newhelp.html";
+//        "https://mannd.github.io/epcalipers/%@.lproj/EPCalipers-help/newhelp.html#%@";
+//    private static final String englishHelpPath = "file:///android_asset/help.html";
     private static final String frenchHelpPath = "file:///android_asset/fr/help.html";
 
     @Override

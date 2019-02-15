@@ -68,6 +68,7 @@ public class HelpTopics extends AppCompatActivity {
             public void onClick(View view, int position) {
                 String text = helpTopics[position];
                 Log.i("EPS", text);
+                showHelp();
             }
 
             @Override
@@ -95,6 +96,9 @@ public class HelpTopics extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void showHelp() {
+        startActivity(new Intent(this, Help.class));
+    }
 }
 
 
