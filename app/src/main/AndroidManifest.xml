@@ -67,6 +67,10 @@
         <activity
             android:name=".Prefs"
             android:label="@string/settings_title"/>
+        <activity
+            android:name=".HelpTopics"
+            android:label="@string/topics" />
+
     </application>
 
 </manifest>

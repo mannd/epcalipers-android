@@ -2144,7 +2144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showHelp() {
-        startActivity(new Intent(this, Help.class));
+        startActivity(new Intent(this, HelpTopics.class));
     }
 
     private void about() {

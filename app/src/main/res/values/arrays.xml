@@ -87,4 +87,23 @@
         <item>top</item>
         <item>bottom</item>
     </string-array>
+    <string-array name="help_topics">
+      <item>@string/quick_start_ht</item>
+      <item>@string/loading_image_ht</item>
+      <item>@string/adjusting_image_ht</item>
+      <item>@string/lock_image_ht</item>
+      <item>@string/moving_calipers_ht</item>
+      <item>@string/adding_deleting_calipers_ht</item>
+      <item>@string/selecting_caliper_ht</item>
+      <item>@string/more_caliper_options_ht</item>
+      <item>@string/calibration_ht</item>
+      <item>@string/changing_calibration_ht</item>
+      <item>@string/making_measurements_ht</item>
+      <item>@string/interval_rate_ht</item>
+      <item>@string/mean_rate_ht</item>@string/
+      <item>@string/qtc_ht</item>
+      <item>@string/brugadometer_ht</item>
+      <item>@string/preferences_ht</item>
+      <item>@string/acknowledgments_ht</item>
+    </string-array>
 </resources>

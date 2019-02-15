@@ -206,4 +206,34 @@
     <string name="setup_calibration_tooltip">Select a caliper by tapping it.
 	Use it to measure a known interval (e.g. 1000 msec).</string>
     <string name="side_menu_tooltip">Load a new image, change preferences, get help</string>
+
+    <!-- Onboard labels -->
+    <string name="move_caliper_label">Drag crossbar, drag sidebars</string>
+    <string name="single_tap_caliper_label">Tap to select</string>
+    <string name="double_tap_caliper_label">Double-tap to delete</string>
+    <string name="zoom_ecg_label">Pinch to zoom, drag to move image</string>
+    <string name="longpress_label">Long press caliper or image for more options</string>
+
+    <!-- Help Topics -->
+    <string name="quick_start_ht">Quick start</string>
+    <string name="loading_image_ht">Loading an image</string>
+    <string name="adjusting_image_ht">Adjusting the image</string>
+    <string name="lock_image_ht">Lock the image in place</string>
+    <string name="moving_calipers_ht">Moving calipers</string>
+    <string name="adding_deleting_calipers_ht">Adding and deleting calipers</string>
+    <string name="selecting_caliper_ht">Selecting a caliper</string>
+    <string name="more_caliper_options_ht">More caliper options</string>
+    <string name="calibration_ht">Calibration</string>
+    <string name="changing_calibration_ht">Changing calibration</string>
+    <string name="making_measurements_ht">Making measurements</string>
+    <string name="interval_rate_ht">Interval/Rate</string>
+    <string name="mean_rate_ht">Mean rate and interval calculation</string>
+    <string name="qtc_ht">QTc calculation</string>
+    <string name="brugadometer_ht">Brugadometer</string>
+    <string name="preferences_ht">Preferences</string>
+    <string name="acknowledgments_ht">Acknowledgments</string>
+
+    <!-- Side menu -->
+    <string name="topics">Topics</string>
+
 </resources>
