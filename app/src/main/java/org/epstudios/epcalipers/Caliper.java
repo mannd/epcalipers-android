@@ -1,5 +1,6 @@
 package org.epstudios.epcalipers;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -7,6 +8,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
@@ -66,8 +68,9 @@ public class Caliper {
     private static int differential = 0;
     private static final float DELTA = 30.0f;
 
-    private final float SMALL_FONT = 32.0f;
-    private final float LARGE_FONT = 48.0f;
+    public void setFontSize(float fontSize) {
+        paint.setTextSize(fontSize);
+    }
 
     private final float MIN_DISTANCE_FOR_MARCH = 20.0f;
     private final int MAX_MARCHING_CALIPERS = 20;
@@ -218,7 +221,7 @@ public class Caliper {
 
 
     public Caliper(Direction direction, float bar1Position, float bar2Position,
-                   float crossBarPosition) {
+                   float crossBarPosition, float fontSize) {
         this.direction = direction;
         this.bar1Position = bar1Position;
         this.bar2Position = bar2Position;
@@ -230,6 +233,7 @@ public class Caliper {
         this.marching = false;
         this.textPosition = TextPosition.Right;
         this.autoPositionText = true;
+
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
@@ -239,13 +243,13 @@ public class Caliper {
         paint.setTypeface(Typeface.DEFAULT);
         // We will use CENTER alignment for all text position calculations.
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(SMALL_FONT);
+        paint.setTextSize(fontSize);
         marchingPaint = new Paint(paint);
         setMarchingPaintStrokeWidth(paint);
     }
 
     public Caliper() {
-        this(Direction.HORIZONTAL, 0, 0, 100);
+        this(Direction.HORIZONTAL, 0, 0, 100, 16);
     }
 
     private void setMarchingPaintStrokeWidth(Paint paint) {
@@ -269,15 +273,6 @@ public class Caliper {
 
     public float getLineWidth() {
         return paint.getStrokeWidth();
-    }
-
-    public void setUseLargeFont(boolean useLargeFont) {
-        if (useLargeFont) {
-            paint.setTextSize(LARGE_FONT);
-        }
-        else {
-            paint.setTextSize(SMALL_FONT);
-        }
     }
 
     public void setInitialPosition(Rect rect) {

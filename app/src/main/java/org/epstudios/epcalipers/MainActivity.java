@@ -218,6 +218,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
     private final float max_zoom = 10.0f;
     private boolean imageIsLocked = false;
+    private float smallFontSize;
+    private float largeFontSize;
 
     private Bitmap previousBitmap = null;
 
@@ -265,11 +267,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(EPS, "onCreate");
+
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
 
         noSavedInstance = (savedInstanceState == null);
+
+        smallFontSize = getResources().getDimension(R.dimen.small_font_size);
+        largeFontSize = getResources().getDimension(R.dimen.large_font_size);
+        Log.i("EPS", "Small font size = " + smallFontSize + " large font size = "
+        + largeFontSize);
 
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -500,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (key.equals(getString(R.string.use_large_font_key))) {
                     useLargeFont = sharedPreferences.getBoolean(key, false);
                     for (Caliper c : calipersView.getCalipers()) {
-                        c.setUseLargeFont(useLargeFont);
+                        c.setFontSize(useLargeFont ? largeFontSize : smallFontSize);
                     }
                 }
                 if (key.equals(getString(R.string.round_msec_rate_key))) {
@@ -597,6 +605,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         /// TODO: update BOTH quick_start_messages (there are 2 strings.xml files)
+        /// TODO: Reactivate this and make sure this works with version updates.
         // NB: we no longer provide quick start messages, so don't update them.
         //noinspection ConstantConditions
         if (force_first_run || getFirstRun(prefs)) {
@@ -641,10 +650,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else {
             proceedToHandleSentImage();
         }
-    }
-
-    private void epsLog(String s) {
-        Log.d(EPS, s);
     }
 
     private void proceedToHandleImage() {
@@ -1259,7 +1264,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             c.setSelectedColor(currentHighlightColor);
             c.setColor(c.isSelected() ? currentHighlightColor : unselectedColor);
             c.setLineWidth(currentLineWidth);
-            c.setUseLargeFont(useLargeFont);
+            c.setFontSize(useLargeFont ? largeFontSize : smallFontSize);
             c.setRoundMsecRate(roundMsecRate);
             c.setAutoPositionText(autoPositionText);
             c.setMarching(isMarching);
@@ -1410,17 +1415,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == marchingButton) {
             toggleMarchingCalipers();
         }
-
     }
 
-    @SuppressLint("NewApi")
     private void addToolTip(Button button, CharSequence text) {
         // Ignore tooltips in unsupported versions
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             button.setTooltipText(text);
         }
     }
 
+    /// TODO: clean out unused buttons and menus.
     private void createButtons() {
         // Main/Caliper menu
         calibrateButton = createButton(getString(R.string.calibrate_button_title));
@@ -2718,7 +2722,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             c.setCalibration(verticalCalibration);
             c.setTextPosition(amplitudeCaliperTextPositionPreference);
         }
-        c.setUseLargeFont(useLargeFont);
+        c.setFontSize(useLargeFont ? largeFontSize : smallFontSize);
         c.setRoundMsecRate(roundMsecRate);
         c.setAutoPositionText(autoPositionText);
         c.setInitialPosition(rect);
@@ -2733,13 +2737,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         c.setSelectedColor(currentHighlightColor);
         c.setColor(currentCaliperColor);
         c.setLineWidth(currentLineWidth);
-        c.setUseLargeFont(useLargeFont);
+        c.setFontSize(useLargeFont ? largeFontSize : smallFontSize);
         c.setRoundMsecRate(roundMsecRate);
         c.setAutoPositionText(autoPositionText);
         c.setDirection(Caliper.Direction.HORIZONTAL);
         c.setCalibration(horizontalCalibration);
         c.setVerticalCalibration(verticalCalibration);
         c.setTextPosition(timeCaliperTextPositionPreference);
+        c.setFontSize(useLargeFont ? largeFontSize : smallFontSize);
         c.setInitialPosition(rect);
         getCalipers().add(c);
         calipersView.invalidate();
