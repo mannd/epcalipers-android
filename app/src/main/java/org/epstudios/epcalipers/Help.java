@@ -2,6 +2,7 @@ package org.epstudios.epcalipers;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -35,25 +36,37 @@ import java.util.Locale;
  */
 
 public class Help extends AppCompatActivity {
-private static final String englishHelpPath =
-        "https:///mannd.github.io/epcalipers/en.lproj/EPCalipers-help/newhelp.html";
-//        "https://mannd.github.io/epcalipers/%@.lproj/EPCalipers-help/newhelp.html#%@";
-//    private static final String englishHelpPath = "file:///android_asset/help.html";
-    private static final String frenchHelpPath = "file:///android_asset/fr/help.html";
 
+    // Logic here is that passed URL is null, use the Help URL and add the anchor,
+    // otherwise use the passed URL and ignore anchor.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.help);
-        String url;
-        if (usingFrenchLanguage()) {
-            url = frenchHelpPath;
+        Bundle extras = getIntent().getExtras();
+        String url = "";
+        if (extras != null) {
+            url = extras.getString("URL");
+            String anchor = extras.getString("Anchor");
+            if (url == null) {
+                String lang = getString(R.string.lang);
+                url = "https://mannd.github.io/epcalipers/"
+                        + lang
+                        + ".lproj/EPCalipers-help/newhelp.html#"
+                        + anchor;
+            }
         }
-        else {
-            url = englishHelpPath;
-        }
-        WebView webView = (WebView) findViewById(R.id.webView);
-        webView.loadUrl(url);
+        final WebView webView = (WebView) findViewById(R.id.webView);
+        Log.i("EPS", "URL = " + url);
+        // Anchors don't work properly off the shelf in Android.  Need to add
+        // a delay for page rendering so that the anchors work.
+        // See https://stackoverflow.com/questions/3039555/android-webview-anchor-link-jump-link-not-working
+        Handler handler = new Handler();
+        final String finalUrl = url;
+        // Variables inside closure must be final.
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                webView.loadUrl(finalUrl);} }, 400);
 
         Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
@@ -63,22 +76,12 @@ private static final String englishHelpPath =
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.help_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 // NavUtils.navigateUpFromSameTask(this);
                 finish();
-                return true;
-            case R.id.about:
-                startActivity(new Intent(this, About.class));
                 return true;
         }
 

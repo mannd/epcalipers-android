@@ -106,4 +106,24 @@
       <item>@string/preferences_ht</item>
       <item>@string/acknowledgments_ht</item>
     </string-array>
+    <string-array name="help_anchors">
+      <item>quick-start-id</item>
+      <item>loading-image-id</item>
+      <item>adjusting-image-id</item>
+      <item>lock-image-id</item>
+      <item>moving-calipers-id</item>
+      <item>adding-deleting-calipers-id</item>
+      <item>selecting-caliper-id</item>
+      <item>more-caliper-options-id</item>
+      <item>calibration-id</item>
+      <item>changing-calibration-id</item>
+      <item>making-measurements-id</item>
+      <item>interval-rate-id</item>
+      <item>mean-rate-id</item>@string/
+      <item>qtc-id</item>
+      <item>brugadometer-id</item>
+      <item>preferences-id</item>
+      <item>acknowledgments-id</item>
+    </string-array>
+
 </resources>

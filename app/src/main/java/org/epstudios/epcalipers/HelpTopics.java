@@ -58,7 +58,8 @@ public class HelpTopics extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        final String [] helpTopics = getResources().getStringArray(R.array.help_topics);
+        final String[] helpTopics = getResources().getStringArray(R.array.help_topics);
+        final String[] helpAnchors = getResources().getStringArray(R.array.help_anchors);
         adapter = new HelpTopicAdapter(helpTopics);
         recyclerView.setAdapter(adapter);
 
@@ -68,7 +69,7 @@ public class HelpTopics extends AppCompatActivity {
             public void onClick(View view, int position) {
                 String text = helpTopics[position];
                 Log.i("EPS", text);
-                showHelp();
+                showHelp(null, helpAnchors[position]);
             }
 
             @Override
@@ -96,8 +97,11 @@ public class HelpTopics extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void showHelp() {
-        startActivity(new Intent(this, Help.class));
+    private void showHelp(String url, String anchor) {
+        Intent intent = new Intent(this, Help.class);
+        intent.putExtra("URL", url);
+        intent.putExtra("Anchor", anchor);
+        startActivity(intent);
     }
 }
 
