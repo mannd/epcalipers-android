@@ -9,6 +9,7 @@ import android.graphics.PointF;
 import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -105,9 +106,6 @@ public class CalipersView extends View {
 
     private boolean aCaliperIsMarching = false;
 
-
-
-
     public CalipersView(Context context) {
         super(context);
         init(context);
@@ -184,6 +182,7 @@ public class CalipersView extends View {
 
         @Override
         public void onLongPress(MotionEvent e) {
+            Log.i("EPS", "long click on caliper");
             PointF point = new PointF(e.getX(), e.getY());
             if (allowColorChange) {
                 changeColor(point);

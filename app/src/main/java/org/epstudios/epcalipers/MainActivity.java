@@ -44,6 +44,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.util.Pair;
+import android.view.ActionMode;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -144,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button microTweakImageLeftButton;
     private Button resetImageButton;
     private Button backToImageMenuButton;
+    private Button backToMainMenuButton;
     private Button horizontalCaliperButton;
     private Button verticalCaliperButton;
     private Button angleCaliperButton;
@@ -235,6 +237,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /// TODO: get some consistent defaults here
     private Caliper.TextPosition timeCaliperTextPositionPreference = Caliper.TextPosition.CenterBelow;
     private Caliper.TextPosition amplitudeCaliperTextPositionPreference = Caliper.TextPosition.Left;
+
+    private ActionMode currentActionMode;
+
+    private ActionMode.Callback modeCallBack = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            currentActionMode = mode;
+            mode.setTitle(getString(R.string.image_button_title));
+            getMenuInflater().inflate(R.menu.image_context_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            MenuItem pdfMenuItem = menu.findItem(R.id.menu_pdf);
+            // Disable camera button if no camera present
+            pdfMenuItem.setVisible(numberOfPdfPages > 0);
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_rotate:
+                    selectAdjustImageMenu();
+                    mode.finish();;
+                    return true;
+                case R.id.menu_pdf:
+                    Log.i("EPS", "PDF");
+                    selectImageMenu();
+                    mode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            currentActionMode = null;
+        }
+    };
 
     /// TODO: make false for release
     // NB: we don't provide quick start dialogs anymore, so keep this false.
@@ -369,6 +413,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // since the former only fires when scale has completely changed and
         // the latter fires while the scale is changing, so is inaccurate.
         attacher.setOnMatrixChangeListener(new MatrixChangeListener());
+        attacher.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.i("EPS", "long click on image");
+                if (currentActionMode != null) {
+                    return false;
+                }
+                startActionMode(modeCallBack);
+                v.setSelected(true);
+                return true;
+            }
+        });
 
         if (noSavedInstance && Intent.ACTION_SEND.equals(action) && type != null) {
             if (type.startsWith(IMAGE_TYPE)) {
@@ -963,6 +1019,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showNextPage() {
+        Log.i("EPS", "Show next page");
         if (currentPdfUri == null) {
             return;
         }
@@ -1332,6 +1389,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectAdjustImageMenu();
         } else if (v == backToImageMenuButton) {
             selectImageMenu();
+        } else if (v == backToMainMenuButton) {
+            selectMainMenu();
         } else if (v == calibrateButton) {
             setupCalibration();
         } else if (v == doneCalibrationButton) {
@@ -1458,6 +1517,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         microTweakImageLeftButton = createButton(getString(R.string.micro_tweak_image_left_button_title));
         resetImageButton = createButton(getString(R.string.reset_image_button_title));
         backToImageMenuButton = createButton(getString(R.string.done_button_title));
+        backToMainMenuButton = createButton("Done");
         // Calibration menu
         setCalibrationButton = createButton(getString(R.string.set_calibration_button_title));
 	addToolTip(setCalibrationButton, getString(R.string.set_calibration_tooltip));
@@ -1517,13 +1577,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void createImageMenu() {
         ArrayList<TextView> buttons = new ArrayList<>();
-        buttons.add(cameraButton);
-        buttons.add(selectImageButton);
-        buttons.add(adjustImageButton);
-        buttons.add(imageLockButton);
-        buttons.add(sampleEcgButton);
         buttons.add(previousPageButton);
         buttons.add(nextPageButton);
+        buttons.add(backToMainMenuButton);
         imageMenu = createMenu(buttons);
     }
 
@@ -1545,7 +1601,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(microTweakImageLeftButton);
         buttons.add(microTweakImageRightButton);
         buttons.add(resetImageButton);
-        buttons.add(backToImageMenuButton);
+        buttons.add(backToMainMenuButton);
         adjustImageMenu = createMenu(buttons);
     }
 

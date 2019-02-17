@@ -7,6 +7,8 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/primary_dark</item>
+        <!-- This is a life-saver, otherwise action mode bar resizes/resets image -->
+        <item name="windowActionModeOverlay">true</item>
 
     </style>
 
