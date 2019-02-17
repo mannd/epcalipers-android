@@ -238,4 +238,6 @@
 
     <!-- lang -->
     <string name="lang">en</string>
+    <string name="go_to_page">Go to page</string>
+    <string name="rotate_button_title">Rotate</string>
 </resources>

@@ -5,7 +5,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,7 +19,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
@@ -58,7 +56,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -137,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button sampleEcgButton;
     private Button previousPageButton;
     private Button nextPageButton;
+    private Button gotoPageButton;
     private Button rotateImageRightButton;
     private Button rotateImageLeftButton;
     private Button tweakImageRightButton;
@@ -170,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private HorizontalScrollView mainMenu;
     private HorizontalScrollView imageMenu;
     private HorizontalScrollView addCaliperMenu;
-    private HorizontalScrollView adjustImageMenu;
+    private HorizontalScrollView rotateImageMenu;
     private HorizontalScrollView calibrationMenu;
     private HorizontalScrollView qtcStep1Menu;
     private HorizontalScrollView qtcStep2Menu;
@@ -261,8 +259,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.menu_rotate:
-                    selectAdjustImageMenu();
-                    mode.finish();;
+                    selectRotateImageMenu();
+                    mode.finish();
+                    startActionMode(modeRotateCallBack);
                     return true;
                 case R.id.menu_pdf:
                     Log.i("EPS", "PDF");
@@ -276,6 +275,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
+            currentActionMode = null;
+        }
+    };
+
+    private ActionMode.Callback modeRotateCallBack = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            currentActionMode = mode;
+            mode.setTitle(getString(R.string.rotate_button_title));
+            getMenuInflater().inflate(R.menu.rotate_context_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_reset:
+                    resetImage();
+                    // stay in ActionMode in case further rotation is done.
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            selectMainMenu();
             currentActionMode = null;
         }
     };
@@ -1019,7 +1051,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showNextPage() {
-        Log.i("EPS", "Show next page");
         if (currentPdfUri == null) {
             return;
         }
@@ -1030,6 +1061,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         UriPage uriPage = new UriPage();
         uriPage.uri = null;
         uriPage.pageNumber = currentPdfPageNumber;
+        loadPDFAsynchronously(uriPage);
+    }
+
+    private void gotoPage() {
+        if (currentPdfUri == null) {
+            return;
+        }
+        // get page number from dialog
+        // if page number < 0 or > number of pages, adjust
+        int pageNumber = 3;   // for example
+        UriPage uriPage = new UriPage();
+        uriPage.uri = null;
+        uriPage.pageNumber = pageNumber;
         loadPDFAsynchronously(uriPage);
     }
 
@@ -1386,7 +1430,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (v == cancelAddCaliperButton) {
             selectMainMenu();
         } else if (v == adjustImageButton) {
-            selectAdjustImageMenu();
+            selectRotateImageMenu();
         } else if (v == backToImageMenuButton) {
             selectImageMenu();
         } else if (v == backToMainMenuButton) {
@@ -1445,6 +1489,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showPreviousPage();
         } else if (v == nextPageButton) {
             showNextPage();
+        } else if (v == gotoPageButton) {
+            gotoPage();
         } else if (v == colorButton) {
             selectColorMenu();
         } else if (v == colorDoneButton) {
@@ -1503,6 +1549,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sampleEcgButton = createButton(getString(R.string.sample_label));
         previousPageButton = createButton(getString(R.string.previous_button_label));
         nextPageButton = createButton(getString(R.string.next_button_label));
+        gotoPageButton = createButton(getString(R.string.go_to_page));
         // Add Caliper menu
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
@@ -1579,6 +1626,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ArrayList<TextView> buttons = new ArrayList<>();
         buttons.add(previousPageButton);
         buttons.add(nextPageButton);
+        buttons.add(gotoPageButton);
         buttons.add(backToMainMenuButton);
         imageMenu = createMenu(buttons);
     }
@@ -1592,7 +1640,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addCaliperMenu = createMenu(buttons);
     }
 
-    private void createAdjustImageMenu() {
+    private void createRotateImageMenu() {
         ArrayList<TextView> buttons = new ArrayList<>();
         buttons.add(rotateImageLeftButton);
         buttons.add(rotateImageRightButton);
@@ -1600,9 +1648,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(tweakImageRightButton);
         buttons.add(microTweakImageLeftButton);
         buttons.add(microTweakImageRightButton);
-        buttons.add(resetImageButton);
-        buttons.add(backToMainMenuButton);
-        adjustImageMenu = createMenu(buttons);
+        rotateImageMenu = createMenu(buttons);
     }
 
     private void createCalibrationMenu() {
@@ -1711,11 +1757,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         selectMenu(addCaliperMenu);
     }
 
-    private void selectAdjustImageMenu() {
-        if (adjustImageMenu == null) {
-            createAdjustImageMenu();
+    private void selectRotateImageMenu() {
+        if (rotateImageMenu == null) {
+            createRotateImageMenu();
         }
-        selectMenu(adjustImageMenu);
+        selectMenu(rotateImageMenu);
     }
 
     private void selectCalibrationMenu() {
