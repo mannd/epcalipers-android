@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_rotate"
-          android:title="Rotate"
+          android:title="@string/rotate_button_title"
           android:icon="@drawable/ic_rotate" />
     <item android:id="@+id/menu_pdf"
-          android:title="PDF"
+          android:title="@string/pdf"
           android:icon="@drawable/ic_pdf" />
 </menu>

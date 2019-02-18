@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             currentActionMode = mode;
-            mode.setTitle(getString(R.string.image_button_title));
+            mode.setTitle(R.string.image_actions_title);
             getMenuInflater().inflate(R.menu.image_context_menu, menu);
             return true;
         }
@@ -261,7 +261,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case R.id.menu_rotate:
                     selectRotateImageMenu();
                     mode.finish();
-                    startActionMode(modeRotateCallBack);
                     return true;
                 case R.id.menu_pdf:
                     Log.i("EPS", "PDF");
@@ -275,39 +274,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            currentActionMode = null;
-        }
-    };
-
-    private ActionMode.Callback modeRotateCallBack = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            currentActionMode = mode;
-            mode.setTitle(getString(R.string.rotate_button_title));
-            getMenuInflater().inflate(R.menu.rotate_context_menu, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.menu_reset:
-                    resetImage();
-                    // stay in ActionMode in case further rotation is done.
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            selectMainMenu();
             currentActionMode = null;
         }
     };
@@ -449,7 +415,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public boolean onLongClick(View v) {
                 Log.i("EPS", "long click on image");
-                if (currentActionMode != null) {
+                if (currentActionMode != null || calipersView.isTweakingOrColoring()) {
                     return false;
                 }
                 startActionMode(modeCallBack);
@@ -1494,6 +1460,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == colorButton) {
             selectColorMenu();
         } else if (v == colorDoneButton) {
+            calipersView.setTweakingOrColoring(false);
             selectMainMenu();
         } else if (v == tweakButton) {
             selectTweakMenu();
@@ -1616,9 +1583,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(intervalRateButton);
         buttons.add(meanRateButton);
         buttons.add(qtcButton);
-        buttons.add(colorButton);
-        buttons.add(tweakButton);
-        buttons.add(marchingButton);
         mainMenu = createMenu(buttons);
     }
 
@@ -1648,6 +1612,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(tweakImageRightButton);
         buttons.add(microTweakImageLeftButton);
         buttons.add(microTweakImageRightButton);
+        buttons.add(resetImageButton);
+        buttons.add(backToMainMenuButton);
         rotateImageMenu = createMenu(buttons);
     }
 
@@ -1726,6 +1692,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.setAllowTweakPosition(false);
         calipersView.setAllowColorChange(false);
         inQtc = false;
+        setTitle(R.string.app_name);
     }
 
     private void selectImageMenu() {
@@ -1762,6 +1729,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createRotateImageMenu();
         }
         selectMenu(rotateImageMenu);
+        setTitle(R.string.rotate_image_title);
     }
 
     private void selectCalibrationMenu() {
@@ -1787,7 +1755,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.setAllowTweakPosition(allowTweakDuringQtc);
     }
 
-    private void selectColorMenu() {
+    public void selectColorMenu() {
         if (!thereAreCalipers()) {
             noCalipersAlert();
             return;
@@ -1796,10 +1764,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createColorMenu();
         }
         selectMenu(colorMenu);
+        setTitle(R.string.choose_color_title);
         calipersView.setAllowColorChange(true);
     }
 
-    private void selectTweakMenu() {
+    public void selectTweakMenu() {
         if (!thereAreCalipers()) {
             noCalipersAlert();
             return;
@@ -1808,8 +1777,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createTweakMenu();
         }
         selectMenu(tweakMenu);
+        setTitle(R.string.tweak_position_title);
         calipersView.setAllowTweakPosition(true);
-
     }
 
 
@@ -2493,10 +2462,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void tweakDone() {
+        calipersView.setTweakingOrColoring(false);
         selectMainMenu();
     }
 
     private void microDone() {
+        calipersView.setTweakingOrColoring(false);
         if (inQtc && allowTweakDuringQtc) {
             selectQTcStep2Menu();
         }
@@ -2797,7 +2768,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return (n == 1) ? c : null;
     }
 
-    private void toggleMarchingCalipers() {
+    public void toggleMarchingCalipers() {
         calipersView.toggleShowMarchingCaliper();
         calipersView.invalidate();
     }

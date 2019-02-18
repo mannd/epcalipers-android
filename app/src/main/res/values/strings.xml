@@ -240,4 +240,10 @@
     <string name="lang">en</string>
     <string name="go_to_page">Go to page</string>
     <string name="rotate_button_title">Rotate</string>
+    <string name="pdf">PDF</string>
+    <string name="rotate_image_title">Rotate image</string>
+    <string name="tweak_position_title">Tweak caliper position</string>
+    <string name="image_actions_title">Image actions</string>
+    <string name="caliper_actions_title">Caliper actions</string>
+    <string name="choose_color_title">Choose caliper color</string>
 </resources>

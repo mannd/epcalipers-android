@@ -10,7 +10,11 @@ import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -43,46 +47,42 @@ import java.util.ArrayList;
  */
 public class CalipersView extends View {
 
+    Context context;
+
     private GestureDetectorCompat gestureDetector;
 
     private Caliper touchedCaliper;
+    private ArrayList<Caliper> calipers;
 
     public ArrayList<Caliper> getCalipers() {
         return calipers;
     }
-
     public void setCalipers(ArrayList<Caliper> calipers) {
         this.calipers = calipers;
     }
 
-    private ArrayList<Caliper> calipers;
 
     public boolean isLocked() {
         return locked;
     }
-
     public void setLocked(boolean locked) {
         this.locked = locked;
     }
-
-    boolean locked;
+    private boolean locked;
 
     public void setLockImage(boolean lockImage) {
         this.lockImage = lockImage;
     }
-
     private boolean lockImage;
 
     public void setMainActivity(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
-
     private MainActivity mainActivity;
 
     public Caliper.Component getPressedComponent() {
         return pressedComponent;
     }
-
     private Caliper.Component pressedComponent = Caliper.Component.None;
 
     public void setAllowColorChange(boolean allowColorChange) {
@@ -99,12 +99,68 @@ public class CalipersView extends View {
     public boolean isACaliperIsMarching() {
         return aCaliperIsMarching;
     }
-
     public void setACaliperIsMarching(boolean aCaliperIsMarching) {
         this.aCaliperIsMarching = aCaliperIsMarching;
     }
-
     private boolean aCaliperIsMarching = false;
+
+    public void setTweakingOrColoring(boolean tweakingOrColoring) {
+        this.tweakingOrColoring = tweakingOrColoring;
+    }
+
+    public boolean isTweakingOrColoring() {
+        return tweakingOrColoring;
+    }
+
+    private boolean tweakingOrColoring = false;
+
+
+    private ActionMode currentActionMode;
+
+    private ActionMode.Callback modeCallBack = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            currentActionMode = mode;
+            tweakingOrColoring = false;
+            mode.setTitle(R.string.caliper_actions_title);
+            new MenuInflater(context).inflate(R.menu.caliper_context_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            MenuItem marchingMenuItem = menu.findItem(R.id.menu_march);
+            marchingMenuItem.setVisible(touchedCaliper.isTimeCaliper());
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_color:
+                    mainActivity.selectColorMenu();
+                    tweakingOrColoring = true;
+                    mode.finish();
+                    return true;
+                case R.id.menu_tweak:
+                    mainActivity.selectTweakMenu();
+                    tweakingOrColoring = true;
+                    mode.finish();
+                    return true;
+                case R.id.menu_march:
+                    mainActivity.toggleMarchingCalipers();
+                    mode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            currentActionMode = null;
+        }
+    };
 
     public CalipersView(Context context) {
         super(context);
@@ -122,6 +178,7 @@ public class CalipersView extends View {
     }
 
     private void init(Context context) {
+        this.context = context;
         locked = false;
         lockImage = false;
         calipers = new ArrayList<>();
@@ -152,6 +209,9 @@ public class CalipersView extends View {
                     return true;
                 }
             }
+            // Note returning false here allows the event to pass to the imageView below.
+            // However, not handling the event also triggers the onLongPress event in this
+            // GestureListener.
             return false;
         }
 
@@ -184,61 +244,71 @@ public class CalipersView extends View {
         public void onLongPress(MotionEvent e) {
             Log.i("EPS", "long click on caliper");
             PointF point = new PointF(e.getX(), e.getY());
+            if (currentActionMode == null && !tweakingOrColoring && caliperPressed(point) != null) {
+                startActionMode(modeCallBack);
+            }
             if (allowColorChange) {
                 changeColor(point);
-            }
-            else if (allowTweakPosition) {
+            } else if (allowTweakPosition) {
                 microMove(point);
             }
         }
     }
 
-        private void changeColor(PointF point) {
-            for (Caliper c : calipers) {
-                if (c.pointNearCaliper(point)) {
-                    final Caliper pressedCaliper = c;
-                    // better if unselected color is shown after color change
-                    c.setSelected(false);
-                    // https://github.com/QuadFlask/colorpicker
-                    ColorPickerDialogBuilder
-                            .with(getContext())
-                            .setTitle(getContext().getString(R.string.choose_color_label))
-                            .initialColor(pressedCaliper.getUnselectedColor())
-                            .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
-                            .density(12)
-                            .setPositiveButton(getContext().getString(R.string.ok_title), new ColorPickerClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int chosenColor, Integer[] allColors) {
-                                    if (!pressedCaliper.isSelected()) {
-                                        pressedCaliper.setColor(chosenColor);
-                                    }
-                                    pressedCaliper.setUnselectedColor(chosenColor);
-                                    invalidate();
-                                }
-                            })
-                            .setNegativeButton(getContext().getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .build()
-                            .show();
-                    break;
-                }
+    // Returns caliper if point near it, otherwise returns null
+    public Caliper caliperPressed(PointF point) {
+        for (Caliper c : calipers) {
+            if (c.pointNearCaliper(point)) {
+               return c;
             }
         }
+        return null;
+    }
+
+    private void changeColor(PointF point) {
+        for (Caliper c : calipers) {
+            if (c.pointNearCaliper(point)) {
+                final Caliper pressedCaliper = c;
+                // better if unselected color is shown after color change
+                c.setSelected(false);
+                // https://github.com/QuadFlask/colorpicker
+                ColorPickerDialogBuilder
+                        .with(getContext())
+                        .setTitle(getContext().getString(R.string.choose_color_label))
+                        .initialColor(pressedCaliper.getUnselectedColor())
+                        .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
+                        .density(12)
+                        .setPositiveButton(getContext().getString(R.string.ok_title), new ColorPickerClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int chosenColor, Integer[] allColors) {
+                                if (!pressedCaliper.isSelected()) {
+                                    pressedCaliper.setColor(chosenColor);
+                                }
+                                pressedCaliper.setUnselectedColor(chosenColor);
+                                invalidate();
+                            }
+                        })
+                        .setNegativeButton(getContext().getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .build()
+                        .show();
+                break;
+            }
+        }
+    }
 
     private void microMove(PointF point) {
         for (Caliper c : calipers) {
             if (c.pointNearBar1(point)) {
                 setupMicroMovements(c, Caliper.Component.Bar1);
                 break;
-            }
-            else if (c.pointNearBar2(point)) {
+            } else if (c.pointNearBar2(point)) {
                 setupMicroMovements(c, Caliper.Component.Bar2);
                 break;
-            }
-            else if (c.pointNearCrossBar(point)) {
+            } else if (c.pointNearCrossBar(point)) {
                 setupMicroMovements(c, Caliper.Component.Crossbar);
                 break;
             }
@@ -263,7 +333,6 @@ public class CalipersView extends View {
             c.setLineWidth(lineWidth);
         }
     }
-
 
 
     @Override
@@ -309,11 +378,9 @@ public class CalipersView extends View {
                 touchedCaliper.setTouchedBar(Caliper.TouchedBar.NONE);
                 if (touchedCaliper.pointNearCrossBar(p)) {
                     touchedCaliper.setTouchedBar(Caliper.TouchedBar.CROSSBAR);
-                }
-                else if (touchedCaliper.pointNearBar1(p)) {
+                } else if (touchedCaliper.pointNearBar1(p)) {
                     touchedCaliper.setTouchedBar(Caliper.TouchedBar.BAR1);
-                }
-                else if (touchedCaliper.pointNearBar2(p)) {
+                } else if (touchedCaliper.pointNearBar2(p)) {
                     touchedCaliper.setTouchedBar(Caliper.TouchedBar.BAR2);
                 }
             }
@@ -413,8 +480,7 @@ public class CalipersView extends View {
                 } else {
                     selectCaliper(calipers.get(i));
                 }
-            }
-            else {
+            } else {
                 unselectCaliper(calipers.get(i));
             }
         }
@@ -449,11 +515,9 @@ public class CalipersView extends View {
         }
         if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.CROSSBAR) {
             touchedCaliper.moveCrossBar(distanceX, distanceY);
-        }
-        else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR1) {
+        } else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR1) {
             touchedCaliper.moveBar1(distanceX, distanceY, event);
-        }
-        else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR2) {
+        } else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR2) {
             touchedCaliper.moveBar2(distanceX, distanceY, event);
         }
         invalidate();
