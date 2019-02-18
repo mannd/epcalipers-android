@@ -315,12 +315,15 @@ public class CalipersView extends View {
         }
     }
 
+
+
     private void setupMicroMovements(Caliper c, Caliper.Component component) {
-        locked = true;
-        selectCaliper(c);
-        unselectCalipersExcept(c);
+        unchooseAllCalipersAndComponents();
         pressedComponent = component;
+        c.setChosen(true);
+        c.setChosenComponent(component);
         mainActivity.selectMicroMovementMenu(c, component);
+        invalidate();
     }
 
     public void setPaint(int caliperColor, int highlightColor, int lineWidth) {
@@ -375,13 +378,13 @@ public class CalipersView extends View {
         for (int i = calipersCount() - 1; i >= 0; i--) {
             if (calipers.get(i).pointNearCaliper(p) && touchedCaliper == null) {
                 touchedCaliper = calipers.get(i);
-                touchedCaliper.setTouchedBar(Caliper.TouchedBar.NONE);
+                touchedCaliper.setTouchedBar(Caliper.Component.None);
                 if (touchedCaliper.pointNearCrossBar(p)) {
-                    touchedCaliper.setTouchedBar(Caliper.TouchedBar.CROSSBAR);
+                    touchedCaliper.setTouchedBar(Caliper.Component.Crossbar);
                 } else if (touchedCaliper.pointNearBar1(p)) {
-                    touchedCaliper.setTouchedBar(Caliper.TouchedBar.BAR1);
+                    touchedCaliper.setTouchedBar(Caliper.Component.Bar1);
                 } else if (touchedCaliper.pointNearBar2(p)) {
-                    touchedCaliper.setTouchedBar(Caliper.TouchedBar.BAR2);
+                    touchedCaliper.setTouchedBar(Caliper.Component.Bar2);
                 }
             }
         }
@@ -426,6 +429,32 @@ public class CalipersView extends View {
             }
         }
         return c;
+    }
+
+    public Caliper chosenCaliper() {
+        for (Caliper c : calipers) {
+            if (c.isChosen()) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public void unchooseAllCalipers() {
+        for (Caliper c : calipers) {
+            c.setChosen(false);
+        }
+    }
+
+    public void unchooseAllComponents() {
+        for (Caliper c : calipers) {
+            c.setChosenComponent(Caliper.Component.None);
+        }
+    }
+
+    public void unchooseAllCalipersAndComponents() {
+        unchooseAllCalipers();
+        unchooseAllComponents();
     }
 
     public void selectCaliperAndUnselectOthers(Caliper c) {
@@ -513,11 +542,11 @@ public class CalipersView extends View {
             distanceX = distanceY;
             distanceY = tmp;
         }
-        if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.CROSSBAR) {
+        if (touchedCaliper.getTouchedBar() == Caliper.Component.Crossbar) {
             touchedCaliper.moveCrossBar(distanceX, distanceY);
-        } else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR1) {
+        } else if (touchedCaliper.getTouchedBar() == Caliper.Component.Bar1) {
             touchedCaliper.moveBar1(distanceX, distanceY, event);
-        } else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR2) {
+        } else if (touchedCaliper.getTouchedBar() == Caliper.Component.Bar2) {
             touchedCaliper.moveBar2(distanceX, distanceY, event);
         }
         invalidate();

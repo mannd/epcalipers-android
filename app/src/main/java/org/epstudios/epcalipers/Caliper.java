@@ -1,6 +1,5 @@
 package org.epstudios.epcalipers;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,7 +7,6 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
@@ -75,38 +73,46 @@ public class Caliper {
     private final float MIN_DISTANCE_FOR_MARCH = 20.0f;
     private final int MAX_MARCHING_CALIPERS = 20;
 
-    public enum TouchedBar {NONE, BAR1, BAR2, CROSSBAR}
-
-    public TouchedBar getTouchedBar() {
+    public Component getTouchedBar() {
         return touchedBar;
     }
-
-    public void setTouchedBar(TouchedBar touchedBar) {
+    public void setTouchedBar(Component touchedBar) {
         this.touchedBar = touchedBar;
     }
+    private Component touchedBar;
 
-    private TouchedBar touchedBar;
+    // This is the component chosen during tweaking.  It is highlighted visually.
+    public void setChosenComponent(Component chosenComponent) {
+        this.chosenComponent = chosenComponent;
+    }
+    public Component getChosenComponent() {
+        return chosenComponent;
+    }
+    private Component chosenComponent;
+
+    public boolean isChosen() {
+        return chosen;
+    }
+    public void setChosen(boolean chosen) {
+        this.chosen = chosen;
+    }
+    private boolean chosen;  // Caliper is chosen for tweaking
 
     public float getBar1Position() {
         return bar1Position;
     }
-
     public void setBar1Position(float bar1Position) {
         this.bar1Position = bar1Position;
     }
-
     public float getBar2Position() {
         return bar2Position;
     }
-
     public void setBar2Position(float bar2Position) {
         this.bar2Position = bar2Position;
     }
-
     public float getCrossbarPosition() {
         return crossBarPosition;
     }
-
     public void setCrossbarPosition(float crossBarPosition) {
         this.crossBarPosition = crossBarPosition;
     }
@@ -229,7 +235,8 @@ public class Caliper {
         this.unselectedColor = Color.BLUE;
         this.selectedColor = Color.RED;
         this.selected = false;
-        this.touchedBar = TouchedBar.NONE;
+        this.touchedBar = Component.None;
+        this.chosenComponent = Component.None;
         this.marching = false;
         this.textPosition = TextPosition.Right;
         this.autoPositionText = true;
@@ -315,6 +322,8 @@ public class Caliper {
             drawMarchingCalipers(canvas);
         }
         caliperText(canvas, textPosition, true);
+
+        drawChosenComponent(canvas);
     }
 
     private void drawMarchingCalipers(Canvas canvas) {
@@ -370,6 +379,46 @@ public class Caliper {
                 canvas, textPosition, optimizeTextPosition);
         // Note x and y for draw text depend of the alignment property of paint
         canvas.drawText(text, textPositionPoint.x, textPositionPoint.y, paint);
+    }
+
+    private void drawChosenComponent(Canvas canvas) {
+        if (chosenComponent == chosenComponent.None) {
+            return;
+        }
+        // chosenComponent has opposite color from rest of caliper.
+        int chosenComponentColor = selected ? unselectedColor : selectedColor;
+        paint.setColor(chosenComponentColor);
+        switch (chosenComponent) {
+            case Bar1:
+                if (direction == Direction.HORIZONTAL) {
+                    canvas.drawLine(bar1Position, 0, bar1Position, canvas.getHeight(), paint);
+                }
+                else {
+                    canvas.drawLine(0, bar1Position, canvas.getWidth(), bar1Position, paint);
+                }
+                break;
+            case Bar2:
+                if (direction == Direction.HORIZONTAL) {
+                    canvas.drawLine(bar2Position, 0, bar2Position, canvas.getHeight(), paint);
+                }
+                else {
+                    canvas.drawLine(0, bar2Position, canvas.getWidth(), bar2Position, paint);
+                }
+                break;
+            case Crossbar:
+                if (direction == Direction.HORIZONTAL) {
+                    canvas.drawLine(bar2Position, crossBarPosition, bar1Position, crossBarPosition, paint);
+                }
+                else {
+                    canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
+                }
+                break;
+            case None:
+            default:
+                break;
+        }
+        // reset paint color
+        paint.setColor(selected ? selectedColor : unselectedColor);
     }
 
     /**

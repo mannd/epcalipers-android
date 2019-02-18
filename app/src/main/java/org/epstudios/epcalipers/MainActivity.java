@@ -2430,35 +2430,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void left() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -1f, Caliper.MovementDirection.Left);
+        microMoveBar(calipersView.chosenCaliper(), calipersView.getPressedComponent(), -1f, Caliper.MovementDirection.Left);
     }
 
     private void right() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 1f, Caliper.MovementDirection.Right);
+        microMoveBar(calipersView.chosenCaliper(), calipersView.getPressedComponent(), 1f, Caliper.MovementDirection.Right);
     }
 
     private void microLeft() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -0.1f, Caliper.MovementDirection.Left);
+        microMoveBar(calipersView.chosenCaliper(), calipersView.getPressedComponent(), -0.1f, Caliper.MovementDirection.Left);
     }
 
     private void microRight() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Right);
+        microMoveBar(calipersView.chosenCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Right);
     }
 
     private void up() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -1f, Caliper.MovementDirection.Up);
+        microMoveBar(calipersView.chosenCaliper(), calipersView.getPressedComponent(), -1f, Caliper.MovementDirection.Up);
     }
 
     private void down() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 1f, Caliper.MovementDirection.Down);
+        microMoveBar(calipersView.chosenCaliper(), calipersView.getPressedComponent(), 1f, Caliper.MovementDirection.Down);
     }
 
     private void microUp() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), -0.1f, Caliper.MovementDirection.Up);
+        microMoveBar(calipersView.chosenCaliper(), calipersView.getPressedComponent(), -0.1f, Caliper.MovementDirection.Up);
     }
 
     private void microDown() {
-        microMoveBar(calipersView.activeCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Down);
+        microMoveBar(calipersView.chosenCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Down);
     }
 
     private void tweakDone() {
@@ -2468,6 +2468,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void microDone() {
         calipersView.setTweakingOrColoring(false);
+        calipersView.unchooseAllCalipersAndComponents();
+        calipersView.invalidate();
         if (inQtc && allowTweakDuringQtc) {
             selectQTcStep2Menu();
         }
