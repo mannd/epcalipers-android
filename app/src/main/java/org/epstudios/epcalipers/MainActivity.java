@@ -294,30 +294,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    private ActionMode.Callback calibrationCallBack = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            currentActionMode = mode;
-            mode.setTitle("Set or clear calibration");
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return true;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            currentActionMode = null;
-            selectMenu(previousToolbarMenu);
-        }
-    };
     /// TODO: make false for release
     // NB: we don't provide quick start dialogs anymore, so keep this false.
     private final boolean force_first_run = false;
@@ -459,7 +435,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return false;
                 }
                 startActionMode(imageCallBack);
-                v.setSelected(true);
                 return true;
             }
         });
@@ -1770,6 +1745,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     
     private void selectMainMenu() {
+        Log.i("EPS", "selectMainMenu called");
         if (mainMenu == null) {
             createMainMenu();
         }
@@ -2611,7 +2587,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             noCalipersAlert();
         }
         else {
-            startActionMode(calibrationCallBack);
             selectCalibrationMenu();
             calipersView.selectCaliperIfNoneSelected();
             // ok to change selected calipers in this menu
