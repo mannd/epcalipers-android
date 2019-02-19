@@ -37,6 +37,9 @@ public class AngleCaliper extends Caliper {
     // this constant is number of mm for height of Brugada triangle
     private final double brugada_triangle_height = 5.0;
 
+    private PointF endPointBar1 = new PointF();
+    private PointF endPointBar2 = new PointF();
+
     public double getBar1Angle() {
         return bar1Angle;
     }
@@ -111,19 +114,19 @@ public class AngleCaliper extends Caliper {
         setBar1Position(Math.max(getBar1Position(), delta));
         setBar2Position(getBar1Position());
 
-        PointF endPointBar1 = endPointForPosition(new PointF(getBar1Position(), getCrossbarPosition()),
+        endPointBar1 = endPointForPosition(new PointF(getBar1Position(), getCrossbarPosition()),
                 bar1Angle, length);
         canvas.drawLine(getBar1Position(), getCrossbarPosition(), endPointBar1.x, endPointBar1.y,
                 getPaint());
 
-        PointF endPointBar2 = endPointForPosition(new PointF(getBar2Position(), getCrossbarPosition()),
+        endPointBar2 = endPointForPosition(new PointF(getBar2Position(), getCrossbarPosition()),
                 bar2Angle, length);
         canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
                 getPaint());
         // Force the angle measurement to always be center above.
         caliperText(canvas, TextPosition.CenterAbove, false);
-        // TODO: implement below for tweaking
-//        drawChosenComponent(canvas);
+
+        drawChosenComponent(canvas);
 
         // triangle base for Brugadometer
         if (getVerticalCalibration() != null && getVerticalCalibration().isCalibrated() && getVerticalCalibration().unitsAreMM()) {
@@ -133,6 +136,38 @@ public class AngleCaliper extends Caliper {
             }
         }
     }
+
+    private void drawChosenComponent(Canvas canvas) {
+        if (getChosenComponent() == Component.None) {
+            return;
+        }
+        // chosenComponent has opposite color from rest of caliper.
+        int chosenComponentColor = isSelected() ? getUnselectedColor() : getSelectedColor();
+        getPaint().setColor(chosenComponentColor);
+        switch (getChosenComponent()) {
+            case Bar1:
+                    canvas.drawLine(getBar1Position(), getCrossbarPosition(), endPointBar1.x, endPointBar1.y,
+                            getPaint());
+                break;
+            case Bar2:
+                    canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
+                            getPaint());
+                break;
+            case Crossbar:
+                canvas.drawLine(getBar1Position(), getCrossbarPosition(), endPointBar1.x, endPointBar1.y,
+                        getPaint());
+                canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
+                        getPaint());
+
+                break;
+            case None:
+            default:
+                break;
+        }
+        // reset paint color
+        getPaint().setColor(isSelected() ? getSelectedColor() : getUnselectedColor());
+    }
+
 
     private void drawTriangleBase(Canvas canvas, double height) {
         PointF point1 = getBasePoint1ForHeight(height);

@@ -480,7 +480,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public boolean onLongClick(View v) {
                 Log.i("EPS", "long click on image");
-                if (currentActionMode != null || calipersView.isTweakingOrColoring()) {
+                if (currentActionMode != null) { // || calipersView.isTweakingOrColoring()) {
                     return false;
                 }
                 startActionMode(imageCallBack);
@@ -1801,7 +1801,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // remove ActionModes if present
         if (currentActionMode != null) {
             currentActionMode.finish();
+            currentActionMode = null;
         }
+        calipersView.setTweakingOrColoring(false);
         selectMenu(mainMenu);
         updateToolbarMenu(ToolbarMenu.Main);
         boolean enable = horizontalCalibration.canDisplayRate();
@@ -1842,7 +1844,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createAddCaliperMenu();
         }
         if (currentToolbarMenu == ToolbarMenu.AddCaliper) {
-            selectMainMenu();
+            // Shouldn't happen, but just in case...
+            if (previousToolbarMenu == ToolbarMenu.AddCaliper) {
+                selectMainMenu();
+            }
+            else {
+                selectMenu(previousToolbarMenu);
+            }
         }
         else {
             updateToolbarMenu(ToolbarMenu.AddCaliper);

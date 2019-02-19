@@ -382,7 +382,7 @@ public class Caliper {
     }
 
     private void drawChosenComponent(Canvas canvas) {
-        if (chosenComponent == chosenComponent.None) {
+        if (chosenComponent == Component.None) {
             return;
         }
         // chosenComponent has opposite color from rest of caliper.
