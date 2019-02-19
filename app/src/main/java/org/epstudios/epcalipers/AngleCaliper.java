@@ -122,6 +122,8 @@ public class AngleCaliper extends Caliper {
                 getPaint());
         // Force the angle measurement to always be center above.
         caliperText(canvas, TextPosition.CenterAbove, false);
+        // TODO: implement below for tweaking
+//        drawChosenComponent(canvas);
 
         // triangle base for Brugadometer
         if (getVerticalCalibration() != null && getVerticalCalibration().isCalibrated() && getVerticalCalibration().unitsAreMM()) {

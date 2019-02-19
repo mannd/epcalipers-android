@@ -302,8 +302,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             currentActionMode = mode;
-            calipersView.setTweakingOrColoring(true);
             mode.setTitle(R.string.caliper_actions_title);
+            calipersView.setTweakingOrColoring(true);
             getMenuInflater().inflate(R.menu.caliper_context_menu, menu);
             return true;
         }
@@ -1812,7 +1812,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.setAllowTweakPosition(false);
         calipersView.setAllowColorChange(false);
         inQtc = false;
-        setTitle(R.string.app_name);
     }
 
     private void selectPDFMenu() {
@@ -1857,7 +1856,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         updateToolbarMenu(ToolbarMenu.Rotate);
         selectMenu(rotateImageMenu);
-        setTitle(R.string.rotate_image_title);
     }
 
     private void selectCalibrationMenu() {
@@ -1896,7 +1894,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         updateToolbarMenu(ToolbarMenu.Color);
         selectMenu(colorMenu);
-        setTitle(R.string.choose_color_title);
         calipersView.setAllowColorChange(true);
     }
 
@@ -1910,7 +1907,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         updateToolbarMenu(ToolbarMenu.Tweak);
         selectMenu(tweakMenu);
-        setTitle(R.string.tweak_position_title);
         calipersView.setAllowTweakPosition(true);
     }
 
