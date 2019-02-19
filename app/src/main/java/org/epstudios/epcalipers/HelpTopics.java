@@ -69,7 +69,13 @@ public class HelpTopics extends AppCompatActivity {
             public void onClick(View view, int position) {
                 String text = helpTopics[position];
                 Log.i("EPS", text);
-                showHelp(null, helpAnchors[position]);
+                if (helpAnchors[position].equals("acknowledgments-id")) {
+                    showHelp("https://mannd.github.io/epcalipers/"
+                            + getString(R.string.lang) + ".lproj/EPCalipers-help/acknowledgments_android.html", null);
+                }
+                else {
+                    showHelp(null, helpAnchors[position]);
+                }
             }
 
             @Override
