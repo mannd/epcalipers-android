@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button microDoneButton;
     private TextView microTextView;
     private HorizontalScrollView mainMenu;
-    private HorizontalScrollView imageMenu;
+    private HorizontalScrollView pdfMenu;
     private HorizontalScrollView addCaliperMenu;
     private HorizontalScrollView rotateImageMenu;
     private HorizontalScrollView calibrationMenu;
@@ -236,9 +236,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Caliper.TextPosition timeCaliperTextPositionPreference = Caliper.TextPosition.CenterBelow;
     private Caliper.TextPosition amplitudeCaliperTextPositionPreference = Caliper.TextPosition.Left;
 
+    private ToolbarMenu currentToolbarMenu = ToolbarMenu.Main;
+    private ToolbarMenu previousToolbarMenu = ToolbarMenu.Main;
+
+    private enum ToolbarMenu {
+        Main,
+        AddCaliper,
+        Calibration,
+        QTc1,
+        QTc2,
+        Rotate,
+        PDF,
+        Color,
+        Tweak,
+        Move
+    }
+    
     private ActionMode currentActionMode;
 
-    private ActionMode.Callback modeCallBack = new ActionMode.Callback() {
+    private ActionMode.Callback imageCallBack = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             currentActionMode = mode;
@@ -264,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return true;
                 case R.id.menu_pdf:
                     Log.i("EPS", "PDF");
-                    selectImageMenu();
+                    selectPDFMenu();
                     mode.finish();
                     return true;
                 default:
@@ -278,6 +294,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
+    private ActionMode.Callback calibrationCallBack = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            currentActionMode = mode;
+            mode.setTitle("Set or clear calibration");
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            currentActionMode = null;
+            selectMenu(previousToolbarMenu);
+        }
+    };
     /// TODO: make false for release
     // NB: we don't provide quick start dialogs anymore, so keep this false.
     private final boolean force_first_run = false;
@@ -418,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (currentActionMode != null || calipersView.isTweakingOrColoring()) {
                     return false;
                 }
-                startActionMode(modeCallBack);
+                startActionMode(imageCallBack);
                 v.setSelected(true);
                 return true;
             }
@@ -1398,7 +1438,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == adjustImageButton) {
             selectRotateImageMenu();
         } else if (v == backToImageMenuButton) {
-            selectImageMenu();
+            selectPDFMenu();
         } else if (v == backToMainMenuButton) {
             selectMainMenu();
         } else if (v == calibrateButton) {
@@ -1586,13 +1626,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainMenu = createMenu(buttons);
     }
 
-    private void createImageMenu() {
+    private void createPDFMenu() {
         ArrayList<TextView> buttons = new ArrayList<>();
         buttons.add(previousPageButton);
         buttons.add(nextPageButton);
         buttons.add(gotoPageButton);
         buttons.add(backToMainMenuButton);
-        imageMenu = createMenu(buttons);
+        pdfMenu = createMenu(buttons);
     }
 
     private void createAddCaliperMenu() {
@@ -1679,11 +1719,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         microMovementMenu = createMenu(items);
     }
 
+    private void updateToolbarMenu(ToolbarMenu newToolbarMenu) {
+        previousToolbarMenu = currentToolbarMenu;
+        currentToolbarMenu = newToolbarMenu;
+        Log.i("EPS", "Previous menu = " + previousToolbarMenu.toString());
+        Log.i("EPS", "Current menu = " + currentToolbarMenu.toString());
+    }
+
+    // Select menus
+    public void selectPreviousMenu() {
+        selectMenu(previousToolbarMenu);
+    }
+
+    public void selectMenu(ToolbarMenu menu) {
+        switch (menu) {
+            case Main:
+                selectMainMenu();
+                break;
+            case AddCaliper:
+                selectAddCaliperMenu();
+                break;
+            case Rotate:
+                selectRotateImageMenu();
+                break;
+            case PDF:
+                selectPDFMenu();
+                break;
+            case Color:
+                selectColorMenu();
+                break;
+            case QTc1:
+                selectQTcStep1Menu();
+                break;
+            case QTc2:
+                selectQTcStep2Menu();
+                break;
+            case Calibration:
+                selectCalibrationMenu();
+                break;
+            case Tweak:
+                selectTweakMenu();
+                break;
+            case Move:
+                // FIXME: can't select micromovement menu
+                break;
+            default:
+                selectMainMenu();
+                break;
+        }
+    }
+    
     private void selectMainMenu() {
         if (mainMenu == null) {
             createMainMenu();
         }
+        // remove ActionModes if present
+        if (currentActionMode != null) {
+            currentActionMode.finish();
+        }
         selectMenu(mainMenu);
+        updateToolbarMenu(ToolbarMenu.Main);
         boolean enable = horizontalCalibration.canDisplayRate();
         intervalRateButton.setEnabled(enable);
         meanRateButton.setEnabled(enable);
@@ -1695,13 +1790,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setTitle(R.string.app_name);
     }
 
-    private void selectImageMenu() {
-        if (imageMenu == null) {
-            createImageMenu();
+    private void selectPDFMenu() {
+        if (pdfMenu == null) {
+            createPDFMenu();
         }
+        updateToolbarMenu(ToolbarMenu.PDF);
         boolean enable = (numberOfPdfPages  > 0);
         enablePageButtons(enable);
-        selectMenu(imageMenu);
+        selectMenu(pdfMenu);
     }
 
     private void enablePageButtons(boolean enable) {
@@ -1721,13 +1817,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (addCaliperMenu == null) {
             createAddCaliperMenu();
         }
-        selectMenu(addCaliperMenu);
+        if (currentToolbarMenu == ToolbarMenu.AddCaliper) {
+            selectMainMenu();
+        }
+        else {
+            updateToolbarMenu(ToolbarMenu.AddCaliper);
+            selectMenu(addCaliperMenu);
+        }
     }
 
     private void selectRotateImageMenu() {
         if (rotateImageMenu == null) {
             createRotateImageMenu();
         }
+        updateToolbarMenu(ToolbarMenu.Rotate);
         selectMenu(rotateImageMenu);
         setTitle(R.string.rotate_image_title);
     }
@@ -1736,6 +1839,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (calibrationMenu == null) {
             createCalibrationMenu();
         }
+        updateToolbarMenu(ToolbarMenu.Calibration);
         selectMenu(calibrationMenu);
     }
 
@@ -1743,6 +1847,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (qtcStep1Menu == null) {
             createQTcStep1Menu();
         }
+        updateToolbarMenu(ToolbarMenu.QTc1);
         selectMenu(qtcStep1Menu);
     }
 
@@ -1750,6 +1855,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (qtcStep2Menu == null) {
             createQTcStep2Menu();
         }
+        updateToolbarMenu(ToolbarMenu.QTc2);
         selectMenu(qtcStep2Menu);
         inQtc = true;
         calipersView.setAllowTweakPosition(allowTweakDuringQtc);
@@ -1763,6 +1869,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (colorMenu == null) {
             createColorMenu();
         }
+        updateToolbarMenu(ToolbarMenu.Color);
         selectMenu(colorMenu);
         setTitle(R.string.choose_color_title);
         calipersView.setAllowColorChange(true);
@@ -1776,6 +1883,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (tweakMenu == null) {
             createTweakMenu();
         }
+        updateToolbarMenu(ToolbarMenu.Tweak);
         selectMenu(tweakMenu);
         setTitle(R.string.tweak_position_title);
         calipersView.setAllowTweakPosition(true);
@@ -1788,6 +1896,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (microMovementMenu == null) {
             createMicroMovementMenu();
         }
+        updateToolbarMenu(ToolbarMenu.Move);
         selectMenu(microMovementMenu);
         if (component == Caliper.Component.Crossbar) {
             setButtonsVisibility(upDownButtons, View.VISIBLE);
@@ -1883,19 +1992,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i("EPS","Open drawer");
             return true;
         }
-//        if (id == R.id.action_switch) {
-//            toggleMode();
-//            return true;
-//        }
-//        if (id == R.id.help) {
-//            showHelp();
-//            return true;
-//        }
-//        if (id == R.id.about) {
-//            about();
-//            return true;
-//        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -1944,7 +2040,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            }
 //            fadeCalipersView();
 //            switchModeMenuItem.setTitle(R.string.measure_button_title);
-//            selectImageMenu();
+//            selectPDFMenu();
 //        }
     }
 
@@ -2515,6 +2611,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             noCalipersAlert();
         }
         else {
+            startActionMode(calibrationCallBack);
             selectCalibrationMenu();
             calipersView.selectCaliperIfNoneSelected();
             // ok to change selected calipers in this menu

@@ -117,7 +117,7 @@ public class CalipersView extends View {
 
     private ActionMode currentActionMode;
 
-    private ActionMode.Callback modeCallBack = new ActionMode.Callback() {
+    private ActionMode.Callback calipersActionCallback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             currentActionMode = mode;
@@ -158,6 +158,7 @@ public class CalipersView extends View {
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
+            mainActivity.selectPreviousMenu();
             currentActionMode = null;
         }
     };
@@ -245,7 +246,7 @@ public class CalipersView extends View {
             Log.i("EPS", "long click on caliper");
             PointF point = new PointF(e.getX(), e.getY());
             if (currentActionMode == null && !tweakingOrColoring && caliperPressed(point) != null) {
-                startActionMode(modeCallBack);
+                startActionMode(calipersActionCallback);
             }
             if (allowColorChange) {
                 changeColor(point);
