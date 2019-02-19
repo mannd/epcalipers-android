@@ -51,6 +51,10 @@ public class CalipersView extends View {
 
     private GestureDetectorCompat gestureDetector;
 
+    public Caliper getTouchedCaliper() {
+        return touchedCaliper;
+    }
+
     private Caliper touchedCaliper;
     private ArrayList<Caliper> calipers;
 
@@ -113,55 +117,6 @@ public class CalipersView extends View {
     }
 
     private boolean tweakingOrColoring = false;
-
-
-    private ActionMode currentActionMode;
-
-    private ActionMode.Callback calipersActionCallback = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            currentActionMode = mode;
-            tweakingOrColoring = false;
-            mode.setTitle(R.string.caliper_actions_title);
-            new MenuInflater(context).inflate(R.menu.caliper_context_menu, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            MenuItem marchingMenuItem = menu.findItem(R.id.menu_march);
-            marchingMenuItem.setVisible(touchedCaliper.isTimeCaliper());
-            return true;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.menu_color:
-                    mainActivity.selectColorMenu();
-                    tweakingOrColoring = true;
-                    mode.finish();
-                    return true;
-                case R.id.menu_tweak:
-                    mainActivity.selectTweakMenu();
-                    tweakingOrColoring = true;
-                    mode.finish();
-                    return true;
-                case R.id.menu_march:
-                    mainActivity.toggleMarchingCalipers();
-                    mode.finish();
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            mainActivity.selectPreviousMenu();
-            currentActionMode = null;
-        }
-    };
 
     public CalipersView(Context context) {
         super(context);
@@ -245,8 +200,8 @@ public class CalipersView extends View {
         public void onLongPress(MotionEvent e) {
             Log.i("EPS", "long click on caliper");
             PointF point = new PointF(e.getX(), e.getY());
-            if (currentActionMode == null && !tweakingOrColoring && caliperPressed(point) != null) {
-                startActionMode(calipersActionCallback);
+            if (mainActivity.getCurrentActionMode() == null && !tweakingOrColoring && caliperPressed(point) != null) {
+                startActionMode(mainActivity.calipersActionCallback);
             }
             if (allowColorChange) {
                 changeColor(point);

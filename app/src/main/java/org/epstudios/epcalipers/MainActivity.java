@@ -251,7 +251,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Tweak,
         Move
     }
-    
+
+    public ActionMode getCurrentActionMode() {
+        return currentActionMode;
+    }
+
     private ActionMode currentActionMode;
 
     private ActionMode.Callback imageCallBack = new ActionMode.Callback() {
@@ -281,6 +285,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case R.id.menu_pdf:
                     Log.i("EPS", "PDF");
                     selectPDFMenu();
+                    mode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            currentActionMode = null;
+        }
+    };
+
+    public ActionMode.Callback calipersActionCallback = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            currentActionMode = mode;
+            calipersView.setTweakingOrColoring(true);
+            mode.setTitle(R.string.caliper_actions_title);
+            getMenuInflater().inflate(R.menu.caliper_context_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            MenuItem marchingMenuItem = menu.findItem(R.id.menu_march);
+            marchingMenuItem.setVisible(calipersView.getTouchedCaliper().isTimeCaliper());
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_color:
+                    selectColorMenu();
+                    calipersView.setTweakingOrColoring(true);
+                    mode.finish();
+                    return true;
+                case R.id.menu_tweak:
+                    selectTweakMenu();
+                    calipersView.setTweakingOrColoring(true);
+                    mode.finish();
+                    return true;
+                case R.id.menu_march:
+                    toggleMarchingCalipers();
                     mode.finish();
                     return true;
                 default:
