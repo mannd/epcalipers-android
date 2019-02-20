@@ -139,6 +139,17 @@ public class Caliper {
     private float crossBarPosition;
     private Direction direction;
 
+    public void setxOffset(float xOffset) {
+        this.xOffset = xOffset;
+    }
+
+    public void setyOffset(float yOffset) {
+        this.yOffset = yOffset;
+    }
+
+    private float xOffset;
+    private float yOffset;
+
     public void setTextPosition(TextPosition textPosition) {
         this.textPosition = textPosition;
     }
@@ -447,8 +458,6 @@ public class Caliper {
         PointF origin = new PointF();
         float textHeight = bounds.height();
         float textWidth = bounds.width();
-        float yOffset = ApplicationContextProvider.getContext().getResources().getDimension(R.dimen.caliper_text_offset);
-        float xOffset = ApplicationContextProvider.getContext().getResources().getDimension(R.dimen.caliper_text_offset);
         if (direction == Direction.HORIZONTAL) {
             // Guard against the margin obscuring left and right labels.
             TextPosition optimizedPosition = getOptimizedTextPosition(left, right, center,

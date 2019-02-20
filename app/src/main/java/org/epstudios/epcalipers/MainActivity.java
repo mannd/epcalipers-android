@@ -70,6 +70,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -822,10 +823,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void loadPDFAsynchronously(UriPage uriPage) {
         Log.i("EPS", "loadPDFAsynchronously");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            new NougatAsyncLoadPDF().execute(uriPage);
+            new NougatAsyncLoadPDF(this).execute(uriPage);
         }
         else {
-            new AsyncLoadPDF().execute(uriPage);
+            new AsyncLoadPDF(this).execute(uriPage);
         }
     }
 
@@ -867,16 +868,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @TargetApi(25)
-    private class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
+    private static class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
+        private WeakReference<MainActivity> activityWeakReference;
+
         private boolean isNewPdf;
         private String exceptionMessage = "";
+
+        NougatAsyncLoadPDF(MainActivity context) {
+            activityWeakReference = new WeakReference<>(context);
+        }
 
         @Override
         protected void onPreExecute() {
             Log.i("EPS", "opPreExecute");
             super.onPreExecute();
-            findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-            Toast toast = Toast.makeText(getApplicationContext(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
+            activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+            Toast toast = Toast.makeText(activityWeakReference.get(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
             toast.show();
 
         }
@@ -886,41 +893,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             UriPage uriPage = params[0];
             Uri pdfUri = uriPage.uri;
             if (pdfUri == null) {
-                if (currentPdfUri == null) {
+                if (activityWeakReference.get().currentPdfUri == null) {
                     // can't do anything if all is null
                     return null;
                 }
                 // use currently opened PDF
-                pdfUri = currentPdfUri;
+                pdfUri = activityWeakReference.get().currentPdfUri;
                 isNewPdf = false;
             }
             else {
                 // change Uri to a real file path
-                pdfUri = getTempUri(pdfUri);
+                pdfUri = activityWeakReference.get().getTempUri(pdfUri);
                 // if getTempUri returns null then exception was thrown
                 if (pdfUri == null) {
                     return null;
                 }
                 // close old currentPdfUri if possible
-                if (currentPdfUri != null) {
-                    File file = new File(currentPdfUri.getPath());
+                if (activityWeakReference.get().currentPdfUri != null) {
+                    File file = new File(activityWeakReference.get().currentPdfUri.getPath());
                     if (file.exists()) {
                         //noinspection ResultOfMethodCallIgnored
                         file.delete();
                     }
                 }
                 // retain PDF Uri for future page changes
-                currentPdfUri = pdfUri;
-                Log.i("EPS", "currentPdfUri assigned and = " + currentPdfUri);
+                activityWeakReference.get().currentPdfUri = pdfUri;
+                Log.i("EPS", "currentPdfUri assigned and = " + activityWeakReference.get().currentPdfUri);
                 isNewPdf = true;
             }
             try {
                 File file = new File(pdfUri.getPath());
                 ParcelFileDescriptor fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
                 PdfRenderer renderer = new PdfRenderer(fd);
-                numberOfPdfPages = renderer.getPageCount();
-                currentPdfPageNumber = uriPage.pageNumber;
-                PdfRenderer.Page page = renderer.openPage(currentPdfPageNumber);
+                activityWeakReference.get().numberOfPdfPages = renderer.getPageCount();
+                activityWeakReference.get().currentPdfPageNumber = uriPage.pageNumber;
+                PdfRenderer.Page page = renderer.openPage(activityWeakReference.get().currentPdfPageNumber);
 
                 int width = page.getWidth();
                 int height = page.getHeight();
@@ -944,37 +951,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         protected void onPostExecute(Bitmap bitmap) {
+            MainActivity activity = activityWeakReference.get();
+            if (activity == null || activity.isFinishing()) {
+                return;
+            }
             if (bitmap != null) {
                 // Set pdf bitmap directly, scaling screws it up
-                imageView.setImageBitmap(bitmap);
+                activityWeakReference.get().imageView.setImageBitmap(bitmap);
                 // must set visibility as imageview will be hidden if started with sample ecg hidden
-                imageView.setVisibility(View.VISIBLE);
-                attacher.update();
-                attacher.setScale(attacher.getMinimumScale());
+                activityWeakReference.get().imageView.setVisibility(View.VISIBLE);
+                activityWeakReference.get().attacher.update();
+                activityWeakReference.get().attacher.setScale(activityWeakReference.get().attacher.getMinimumScale());
                 if (isNewPdf) {
-                    clearCalibration();
+                    activityWeakReference.get().clearCalibration();
                 }
             }
             else {
-                Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.pdf_error_message) +
+                Toast toast = Toast.makeText(activityWeakReference.get(), activityWeakReference.get().getString(R.string.pdf_error_message) +
                         LF + exceptionMessage, Toast.LENGTH_SHORT);
                 toast.show();
             }
-            findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+            activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
     }
 
 
-    private class AsyncLoadPDF extends AsyncTask<UriPage,
+    private static class AsyncLoadPDF extends AsyncTask<UriPage,
             Void, Bitmap> {
         private boolean isNewPdf;
         private String exceptionMessage = "";
 
+        private WeakReference<MainActivity> activityWeakReference;
+
+
+        AsyncLoadPDF(MainActivity context) {
+            activityWeakReference = new WeakReference<>(context);
+        }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-            Toast toast = Toast.makeText(getApplicationContext(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
+            activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+            Toast toast = Toast.makeText(activityWeakReference.get(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
             toast.show();
 
         }
@@ -982,42 +1000,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected Bitmap doInBackground(UriPage... params) {
             DecodeServiceBase decodeService = new DecodeServiceBase(new PdfContext());
-            decodeService.setContentResolver(getContentResolver());
+            decodeService.setContentResolver(activityWeakReference.get().getContentResolver());
             UriPage uriPage = params[0];
             Uri pdfUri = uriPage.uri;
             if (pdfUri == null) {
-                if (currentPdfUri == null) {
+                if (activityWeakReference.get().currentPdfUri == null) {
                     // can't do anything if all is null
                     return null;
                 }
                 // use currently opened PDF
-                pdfUri = currentPdfUri;
+                pdfUri = activityWeakReference.get().currentPdfUri;
                 isNewPdf = false;
             }
             else {
                 // change Uri to a real file path
-                pdfUri = getTempUri(pdfUri);
+                pdfUri = activityWeakReference.get().getTempUri(pdfUri);
                 // if getTempUri returns null then exception was thrown
                 if (pdfUri == null) {
                     return null;
                 }
                 // close old currentPdfUri if possible
-                if (currentPdfUri != null) {
-                    File file = new File(currentPdfUri.getPath());
+                if (activityWeakReference.get().currentPdfUri != null) {
+                    File file = new File(activityWeakReference.get().currentPdfUri.getPath());
                     if (file.exists()) {
                         //noinspection ResultOfMethodCallIgnored
                         file.delete();
                     }
                 }
                 // retain PDF Uri for future page changes
-                currentPdfUri = pdfUri;
+                activityWeakReference.get().currentPdfUri = pdfUri;
                 isNewPdf = true;
             }
             try {
                 decodeService.open(pdfUri);
-                numberOfPdfPages = decodeService.getPageCount();
-                currentPdfPageNumber = uriPage.pageNumber;
-                PdfPage page = (PdfPage) decodeService.getPage(currentPdfPageNumber);
+                activityWeakReference.get().numberOfPdfPages = decodeService.getPageCount();
+                activityWeakReference.get().currentPdfPageNumber = uriPage.pageNumber;
+                PdfPage page = (PdfPage) decodeService.getPage(activityWeakReference.get().currentPdfPageNumber);
 
                 int width = page.getWidth();
                 int height = page.getHeight();
@@ -1039,23 +1057,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         protected void onPostExecute(Bitmap bitmap) {
+            MainActivity activity = activityWeakReference.get();
+            if (activity == null || activity.isFinishing()) {
+                return;
+            }
             if (bitmap != null) {
                 // Set pdf bitmap directly, scaling screws it up
-                imageView.setImageBitmap(bitmap);
+                activityWeakReference.get().imageView.setImageBitmap(bitmap);
                 // must set visibility as imageview will be hidden if started with sample ecg hidden
-                imageView.setVisibility(View.VISIBLE);
-                attacher.update();
-                attacher.setScale(attacher.getMinimumScale());
+                activityWeakReference.get().imageView.setVisibility(View.VISIBLE);
+                activityWeakReference.get().attacher.update();
+                activityWeakReference.get().attacher.setScale(activityWeakReference.get().attacher.getMinimumScale());
                 if (isNewPdf) {
-                    clearCalibration();
+                    activityWeakReference.get().clearCalibration();
                 }
             }
             else {
-                Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.pdf_error_message) +
+                Toast toast = Toast.makeText(activityWeakReference.get(), activityWeakReference.get().getString(R.string.pdf_error_message) +
                         LF + exceptionMessage, Toast.LENGTH_SHORT);
                 toast.show();
             }
-            findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+            activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
         }
     }
 
@@ -1423,7 +1445,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 c = new Caliper();
             }
             c.setDirection(direction);
-
+            c.setxOffset(getResources().getDimension(R.dimen.caliper_text_offset));
+            c.setyOffset(getResources().getDimension(R.dimen.caliper_text_offset));
             c.setBar1Position(bar1Position);
             c.setBar2Position(bar2Position);
             c.setCrossbarPosition(crossbarPosition);
@@ -2976,6 +2999,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         c.setSelectedColor(currentHighlightColor);
         c.setColor(currentCaliperColor);
         c.setLineWidth(currentLineWidth);
+        c.setxOffset(getResources().getDimension(R.dimen.caliper_text_offset));
+        c.setyOffset(getResources().getDimension(R.dimen.caliper_text_offset));
         c.setDirection(direction);
         if (direction == Caliper.Direction.HORIZONTAL) {
             c.setCalibration(horizontalCalibration);
@@ -3000,6 +3025,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         c.setColor(currentCaliperColor);
         c.setLineWidth(currentLineWidth);
         c.setFontSize(useLargeFont ? largeFontSize : smallFontSize);
+        c.setxOffset(getResources().getDimension(R.dimen.caliper_text_offset));
+        c.setyOffset(getResources().getDimension(R.dimen.caliper_text_offset));
         c.setRoundMsecRate(roundMsecRate);
         c.setAutoPositionText(autoPositionText);
         c.setDirection(Caliper.Direction.HORIZONTAL);
