@@ -147,7 +147,14 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         String defaultLineWidthValue = getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultLineWidthKey, defaultLineWidth);
-        String defaultLineWidthName = names.get(Integer.parseInt(defaultLineWidthValue));
+        int lineWidth;
+        try {
+            lineWidth = Integer.parseInt(defaultLineWidthValue);
+        }
+        catch (Exception ex) {
+            lineWidth = Integer.parseInt(defaultLineWidth);
+        }
+        String defaultLineWidthName = names.get(lineWidth);
         defaultLineWidthPreference.setSummary(defaultLineWidthName);
 
         Preference defaultQtcFormulaPreference = findPreference(defaultQtcFormulaKey);

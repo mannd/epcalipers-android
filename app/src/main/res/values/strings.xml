@@ -67,7 +67,7 @@
     <string name="use_large_font_on_summary">Use large font</string>
     <string name="default_caliper_color">Blue</string>
     <string name="default_highlight_color">Red</string>
-    <string name="default_line_width">2 points</string>
+    <string name="default_line_width">2</string>
     <string name="number_of_intervals_dialog_title">Enter Number of Intervals</string>
     <string name="number_of_intervals_dialog_message">How many intervals is this caliper measuring?</string>
     <string name="mean_rr_dialog_hint">Number of intervals measured</string>
