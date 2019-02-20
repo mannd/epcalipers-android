@@ -447,8 +447,8 @@ public class Caliper {
         PointF origin = new PointF();
         float textHeight = bounds.height();
         float textWidth = bounds.width();
-        float yOffset = 12;
-        float xOffset = 12;
+        float yOffset = (float)ApplicationContextProvider.getContext().getResources().getDimension(R.dimen.caliper_text_offset);
+        float xOffset = (float)ApplicationContextProvider.getContext().getResources().getDimension(R.dimen.caliper_text_offset);
         if (direction == Direction.HORIZONTAL) {
             // Guard against the margin obscuring left and right labels.
             TextPosition optimizedPosition = getOptimizedTextPosition(left, right, center,
