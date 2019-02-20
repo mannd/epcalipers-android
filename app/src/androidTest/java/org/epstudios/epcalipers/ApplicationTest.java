@@ -1,24 +1,21 @@
 package org.epstudios.epcalipers;
 
-import android.app.Application;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.test.ApplicationTestCase;
 
-/**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
- */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
-    }
+import static android.support.test.InstrumentationRegistry.getContext;
+import static org.junit.Assert.*;
 
+public class ApplicationTest {
+
+    @org.junit.Test
     public void test() throws Exception {
         final int expected = 1;
         final int reality = 1;
         assertEquals(expected, reality);
     }
 
+    @org.junit.Test
     public void testCanDisplayRate() {
         Calibration cal = new Calibration(getContext());
         cal.setCalibrated(true);
@@ -47,6 +44,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     }
 
+    @org.junit.Test
     public void testCurrentHorizontalCalFactor() {
         Calibration cal = new Calibration(getContext());
         cal.setOriginalZoom(1.0f);
@@ -57,6 +55,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(cal.getCurrentCalFactor(), 0.25f);
     }
 
+    @org.junit.Test
     public void testInitialCaliperPosition() {
         Caliper c = new Caliper();
         c.setInitialPosition(new Rect(0, 0, 600, 600));
@@ -70,6 +69,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(c.getCrossbarPosition(), 315.0f, 0.001);
     }
 
+    @org.junit.Test
     public void testBarCoord() {
         Caliper c = new Caliper();
         assertEquals(c.getBar1Position(), 0, 0.001);
@@ -81,6 +81,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(c.barCoord(p),50.0f, 0.001);
     }
 
+    @org.junit.Test
     public void testUnitsAreMM() {
         Calibration cal = new Calibration(getContext());
         cal.setCalibrated(true);
@@ -103,6 +104,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertFalse(cal.unitsAreMM());
     }
 
+    @org.junit.Test
     public void testRadiansToDegrees() {
         double angle = 0;
         assert(AngleCaliper.radiansToDegrees(angle) == 0.0);
@@ -112,6 +114,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assert(AngleCaliper.radiansToDegrees(angle) == 180.0);
     }
 
+    @org.junit.Test
     public void testIsAngleCaliper() {
         Caliper caliper = new Caliper();
         assertTrue(caliper.requiresCalibration());
@@ -140,6 +143,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 //        }
 //    }
 
+    @org.junit.Test
     public void testQTc() {
         QtcCalculator calc = new QtcCalculator(QtcCalculator.QtcFormula.qtcBzt, getContext());
         String result = calc.calculate(0.278, 0.6818, false, "sec");
