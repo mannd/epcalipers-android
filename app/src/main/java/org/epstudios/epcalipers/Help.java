@@ -56,7 +56,7 @@ public class Help extends AppCompatActivity {
                         + anchor;
             }
         }
-        final WebView webView = (WebView) findViewById(R.id.webView);
+        final WebView webView = findViewById(R.id.webView);
         Log.i("EPS", "URL = " + url);
         // Anchors don't work properly off the shelf in Android.  Need to add
         // a delay for page rendering so that the anchors work.
@@ -68,7 +68,7 @@ public class Help extends AppCompatActivity {
             public void run() {
                 webView.loadUrl(finalUrl);} }, 400);
 
-        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
+        Toolbar actionBar = findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

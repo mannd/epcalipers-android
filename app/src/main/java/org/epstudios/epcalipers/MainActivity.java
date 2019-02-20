@@ -238,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private ToolbarMenu currentToolbarMenu = ToolbarMenu.Main;
     private ToolbarMenu previousToolbarMenu = ToolbarMenu.Main;
+    private ToolbarMenu previousPreviousToolbarMenu = ToolbarMenu.Main;
 
     private enum ToolbarMenu {
         Main,
@@ -463,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         loadSettings();
 
-        imageView = (ImageView) findViewById(R.id.imageView);
+        imageView = findViewById(R.id.imageView);
         imageView.setEnabled(true);
         if (!showStartImage && noSavedInstance) {
             imageView.setVisibility(View.INVISIBLE);
@@ -502,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
-        calipersView = (CalipersView) findViewById(R.id.caliperView);
+        calipersView = findViewById(R.id.caliperView);
         calipersView.setMainActivity(this);
 
 
@@ -517,7 +518,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         supportActionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         // Menu toolbar is on the bottom.
-        menuToolbar = (Toolbar) findViewById(R.id.menu_toolbar);
+        menuToolbar = findViewById(R.id.menu_toolbar);
 
         // Create the myriad of buttons including tooltips as supported in
         // Lollipop and beyond.
@@ -664,7 +665,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         prefs.registerOnSharedPreferenceChangeListener(listener);
 
-        layout = (FrameLayout)findViewById(R.id.frame_layout);
+        layout = findViewById(R.id.frame_layout);
         ViewTreeObserver viewTreeObserver = layout.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @SuppressLint("NewApi")
@@ -1561,7 +1562,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectColorMenu();
         } else if (v == colorDoneButton) {
             calipersView.setTweakingOrColoring(false);
-            selectMainMenu();
+            gotoPreviousMenu();
         } else if (v == tweakButton) {
             selectTweakMenu();
         } else if (v == tweakDoneButton) {
@@ -1780,8 +1781,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateToolbarMenu(ToolbarMenu newToolbarMenu) {
+        previousPreviousToolbarMenu = previousToolbarMenu;
         previousToolbarMenu = currentToolbarMenu;
         currentToolbarMenu = newToolbarMenu;
+        Log.i("EPS", "Previous previous menu = " + previousPreviousToolbarMenu.toString());
         Log.i("EPS", "Previous menu = " + previousToolbarMenu.toString());
         Log.i("EPS", "Current menu = " + currentToolbarMenu.toString());
     }
@@ -1789,6 +1792,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Select menus
     public void selectPreviousMenu() {
         selectMenu(previousToolbarMenu);
+    }
+
+    public void selectPreviousPreviousMenu() {
+        selectMenu(previousPreviousToolbarMenu);
     }
 
     public void selectMenu(ToolbarMenu menu) {
@@ -1873,6 +1880,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 nextPageButton.setEnabled(false);
             }
         }
+    }
+
+    private void gotoPreviousMenu() {
+        Log.i("EPS", "Previous menu = " + previousToolbarMenu);
+        Log.i("EPS", "Current menu = " + currentToolbarMenu);
+        // If can't go back, default to main menu
+        if (previousToolbarMenu == currentToolbarMenu) {
+            selectMainMenu();
+        }
+        selectMenu(previousToolbarMenu);
+    }
+
+    private void gotoPreviousPreviousMenu() {
+        if (previousPreviousToolbarMenu == currentToolbarMenu) {
+            selectMainMenu();
+        }
+        selectMenu(previousPreviousToolbarMenu);
     }
 
     private void selectAddCaliperMenu() {
@@ -2627,20 +2651,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void tweakDone() {
         calipersView.setTweakingOrColoring(false);
-        selectMainMenu();
+        if (previousToolbarMenu == ToolbarMenu.Move) {
+            gotoPreviousPreviousMenu();
+        }
+        else {
+            gotoPreviousMenu();
+        }
     }
 
     private void microDone() {
         calipersView.setTweakingOrColoring(false);
         calipersView.unchooseAllCalipersAndComponents();
         calipersView.invalidate();
-        if (inQtc && allowTweakDuringQtc) {
-            selectQTcStep2Menu();
-        }
-        else {
-            calipersView.setLocked(false);
-            selectMainMenu();
-        }
+        gotoPreviousMenu();
     }
 
     private int calipersCount() {

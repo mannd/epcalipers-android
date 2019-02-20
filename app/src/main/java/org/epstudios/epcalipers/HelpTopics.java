@@ -49,7 +49,7 @@ public class HelpTopics extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.help_topics);
-        recyclerView = (RecyclerView) findViewById(R.id.help_topics_recyclerview);
+        recyclerView = findViewById(R.id.help_topics_recyclerview);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
@@ -84,7 +84,7 @@ public class HelpTopics extends AppCompatActivity {
             }
         }));
 
-        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
+        Toolbar actionBar = findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);

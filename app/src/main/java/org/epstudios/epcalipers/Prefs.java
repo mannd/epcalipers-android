@@ -40,7 +40,7 @@ public class Prefs extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.prefs);
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.action_bar);
+        Toolbar toolbar = findViewById(R.id.action_bar);
         setSupportActionBar(toolbar);
 		if (getSupportActionBar() != null) {
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);

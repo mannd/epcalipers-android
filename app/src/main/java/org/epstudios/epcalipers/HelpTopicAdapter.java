@@ -37,7 +37,7 @@ public class HelpTopicAdapter extends RecyclerView.Adapter<HelpTopicAdapter.Topi
 
         public TopicViewHolder(View view) {
             super(view);
-            textView = (TextView) view.findViewById(R.id.help_topic_textView);
+            textView = view.findViewById(R.id.help_topic_textView);
         }
     }
 
