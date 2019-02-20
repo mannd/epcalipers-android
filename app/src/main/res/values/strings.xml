@@ -246,4 +246,7 @@
     <string name="image_actions_title">Image actions</string>
     <string name="caliper_actions_title">Caliper actions</string>
     <string name="choose_color_title">Choose caliper color</string>
+    <string name="go_to_page_title">Go to page</string>
+    <string name="page_message">Page</string>
+    <string name="page_number_hint">Page number</string>
 </resources>

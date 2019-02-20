@@ -269,9 +269,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            Log.i("EPS", "numberOfPdfPages = " + numberOfPdfPages);
+            Log.i("EPS", "currentPdfUri = " + currentPdfUri);
             MenuItem pdfMenuItem = menu.findItem(R.id.menu_pdf);
-            // Disable camera button if no camera present
-            pdfMenuItem.setVisible(numberOfPdfPages > 0);
+            pdfMenuItem.setVisible(currentPdfUri != null && numberOfPdfPages > 0);
             return true;
         }
 
@@ -463,7 +464,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loadSettings();
 
         imageView = (ImageView) findViewById(R.id.imageView);
-        // imageView always enabled in v2.0+
         imageView.setEnabled(true);
         if (!showStartImage && noSavedInstance) {
             imageView.setVisibility(View.INVISIBLE);
@@ -537,16 +537,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // entry point to load external pics/pdfs
         if (externalImageLoad) {
+            Log.i("EPS", "externalImageLoad is true and calling updateImageView");
             updateImageView(externalImageBitmap);
             externalImageLoad = false;
         }
-        ///TODO: make sure code below doesn't interfere with rotation.
-        // Note the sample ECG loaded as a drawable in activity_main.xml is too poor
-        // a quality to be used on a high-res device, so we load a high quality image here.
-        else if (showStartImage) {
-            loadSampleEcg();
-        }
-
 
         // OnSharedPreferenceListener must be a class field, i.e. strong reference
         // as otherwise it is a weak reference and will be garbage collected, thus
@@ -800,6 +794,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // from http://stackoverflow.com/questions/10698360/how-to-convert-a-pdf-page-to-an-image-in-android
     private void handlePDF() {
+        Log.i("EPS", "handlePDF()");
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -813,6 +808,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void proceedToHandlePDF() {
+        Log.i("EPS", "proceedToHandlePDF");
         Uri pdfUri = getIntent().getData();
         if (pdfUri != null) {
             UriPage uriPage = new UriPage();
@@ -823,6 +819,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadPDFAsynchronously(UriPage uriPage) {
+        Log.i("EPS", "loadPDFAsynchronously");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             new NougatAsyncLoadPDF().execute(uriPage);
         }
@@ -875,6 +872,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPreExecute() {
+            Log.i("EPS", "opPreExecute");
             super.onPreExecute();
             findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
             Toast toast = Toast.makeText(getApplicationContext(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
@@ -912,6 +910,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 // retain PDF Uri for future page changes
                 currentPdfUri = pdfUri;
+                Log.i("EPS", "currentPdfUri assigned and = " + currentPdfUri);
                 isNewPdf = true;
             }
             try {
@@ -1099,12 +1098,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         // get page number from dialog
-        // if page number < 0 or > number of pages, adjust
-        int pageNumber = 3;   // for example
-        UriPage uriPage = new UriPage();
-        uriPage.uri = null;
-        uriPage.pageNumber = pageNumber;
-        loadPDFAsynchronously(uriPage);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.go_to_page_title);
+        final EditText input = new EditText(this);
+        input.setLines(1);
+        input.setMaxLines(1);
+        input.setSingleLine(true);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setHint(R.string.page_number_hint);
+        input.setSelection(0);
+        builder.setView(input);
+        builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialogResult = input.getText().toString();
+                int pageNumber;
+                try {
+                    pageNumber = Integer.parseInt(dialogResult);
+                } catch (Exception ex) {
+                    dialog.cancel();
+                    return;
+                }
+                Log.i("EPS", "numberOfPdfPages = " + numberOfPdfPages);
+                if (pageNumber > numberOfPdfPages) {
+                    pageNumber = numberOfPdfPages;
+                }
+                if (pageNumber < 1) {
+                    pageNumber = 1;
+                }
+                currentPdfPageNumber = pageNumber - 1;
+                enablePageButtons(true);
+                UriPage uriPage = new UriPage();
+                uriPage.uri = null;
+                uriPage.pageNumber = currentPdfPageNumber;
+                loadPDFAsynchronously(uriPage);
+            }
+        });
+        builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
     }
 
     public boolean getFirstRun(SharedPreferences prefs) {
@@ -2079,6 +2115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadSampleEcg() {
+        Log.i("EPS", "loadSampleEcg called");
         Bitmap image = BitmapFactory.decodeResource(this.getResources(),
                 R.drawable.sample_ecg);
         updateImageView(image);
@@ -2286,7 +2323,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Log.i("EPS", "onActivityResult called");
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
             if (selectedImage == null) {
@@ -2311,11 +2348,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateImageViewWithPath(String path) {
+        Log.i("EPS", "updateImageViewWithPath called, string = " + path);
         Bitmap bitmap = getScaledBitmap(path);
         updateImageView(bitmap);
     }
 
     private void updateImageView(Bitmap bitmap) {
+        Log.i("EPS", "updateImageView called, bitmap = " + bitmap);
         imageView.setImageBitmap(bitmap);
         scaleImageForImageView();
         imageView.setVisibility(View.VISIBLE);
@@ -2984,6 +3023,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 }
-
 
 
