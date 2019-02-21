@@ -94,9 +94,9 @@ public class AngleCaliper extends Caliper {
 
     @Override
     public void setInitialPosition(Rect rect) {
-        setBar1Position(rect.width() / 3 + differential);
+        setBar1Position(rect.width() / 3f + differential);
         setBar2Position(getBar1Position());
-        setCrossbarPosition(rect.height() / 3 + differential * 1.5f);
+        setCrossbarPosition(rect.height() / 3f + differential * 1.5f);
         differential += 20.0f;
         if (differential > 100.0f) {
             differential = 0.0f;

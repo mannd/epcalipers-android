@@ -1,9 +1,7 @@
 package org.epstudios.epcalipers;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -11,13 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
 
 /**
  * Copyright (C) 2019 EP Studios, Inc.
@@ -41,26 +34,23 @@ import android.widget.TextView;
  * along with epcalipers-android.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class HelpTopics extends AppCompatActivity {
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.help_topics);
-        recyclerView = findViewById(R.id.help_topics_recyclerview);
+        RecyclerView recyclerView = findViewById(R.id.help_topics_recyclerview);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
 
-        layoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
         final String[] helpTopics = getResources().getStringArray(R.array.help_topics);
         final String[] helpAnchors = getResources().getStringArray(R.array.help_anchors);
-        adapter = new HelpTopicAdapter(helpTopics);
+        RecyclerView.Adapter adapter = new HelpTopicAdapter(helpTopics);
         recyclerView.setAdapter(adapter);
 
         recyclerView.addOnItemTouchListener(new HelpRecyclerTouchListener(getApplicationContext(),

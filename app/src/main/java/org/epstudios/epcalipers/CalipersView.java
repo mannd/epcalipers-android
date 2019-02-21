@@ -10,11 +10,7 @@ import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.GestureDetector;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -495,6 +491,7 @@ public class CalipersView extends View {
         }
         if (touchedCaliper.getDirection() == Caliper.Direction.VERTICAL) {
             float tmp = distanceX;
+            //noinspection SuspiciousNameCombination
             distanceX = distanceY;
             distanceY = tmp;
         }

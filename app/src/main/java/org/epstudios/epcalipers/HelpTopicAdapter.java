@@ -29,13 +29,13 @@ import android.widget.TextView;
  * along with epcalipers-android.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class HelpTopicAdapter extends RecyclerView.Adapter<HelpTopicAdapter.TopicViewHolder> {
-    private String[] helpTopics;
+    private final String[] helpTopics;
 
     public static class TopicViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView textView;
+        final TextView textView;
 
-        public TopicViewHolder(View view) {
+        TopicViewHolder(View view) {
             super(view);
             textView = view.findViewById(R.id.help_topic_textView);
         }
@@ -51,8 +51,7 @@ public class HelpTopicAdapter extends RecyclerView.Adapter<HelpTopicAdapter.Topi
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.help_topic_layout, parent, false);
 
-        TopicViewHolder vh = new TopicViewHolder(view);
-        return vh;
+        return new TopicViewHolder(view);
     }
 
     @Override

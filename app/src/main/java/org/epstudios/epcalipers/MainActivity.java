@@ -81,6 +81,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -214,10 +215,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Uri currentPdfUri;
     private int numberOfPdfPages;
     private int currentPdfPageNumber;
-    private Menu menu;
     private boolean useLargeFont;
-    private SharedPreferences.OnSharedPreferenceChangeListener listener;
-    private final float max_zoom = 10.0f;
     private boolean imageIsLocked = false;
     private float smallFontSize;
     private float largeFontSize;
@@ -260,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private ActionMode currentActionMode;
 
-    private ActionMode.Callback imageCallBack = new ActionMode.Callback() {
+    private final ActionMode.Callback imageCallBack = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             currentActionMode = mode;
@@ -301,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    public ActionMode.Callback calipersActionCallback = new ActionMode.Callback() {
+    public final ActionMode.Callback calipersActionCallback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             currentActionMode = mode;
@@ -472,6 +470,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         attacher = new PhotoViewAttacher(imageView);
         attacher.setScaleType(ImageView.ScaleType.CENTER);
+        float max_zoom = 10.0f;
         attacher.setMaximumScale(max_zoom);
         attacher.setMinimumScale(0.3f);
         // We need to use MatrixChangeListener and not ScaleChangeListener
@@ -514,7 +513,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Set up action bar up top.  Note that icon on left for hamburger menu.
         actionBar = findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
-        android.support.v7.app.ActionBar supportActionBar = getSupportActionBar();
+        android.support.v7.app.ActionBar supportActionBar = Objects.requireNonNull(getSupportActionBar(),
+                "Actionbar must not be null!");
         supportActionBar.setDisplayHomeAsUpEnabled(true);
         supportActionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
@@ -548,10 +548,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // as otherwise it is a weak reference and will be garbage collected, thus
         // making it stop working.
         // See http://stackoverflow.com/questions/2542938/sharedpreferences-onsharedpreferencechangelistener-not-being-called-consistently
-        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 // show start image only has effect with restart
+                Objects.requireNonNull(sharedPreferences, "Shared preferences must not be null!");
                 Log.d(EPS, "onSharedPreferenceChangeListener");
                 if (key.equals(getString(R.string.show_start_image_key))) {
                     return;
@@ -581,13 +582,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 if (key.equals(getString(R.string.default_caliper_color_key))) {
                     try {
-                        int color = Integer.parseInt(sharedPreferences.getString(key,
+                        currentCaliperColor = Integer.parseInt(sharedPreferences.getString(key,
                                 getString(R.string.default_caliper_color)));
-                        currentCaliperColor = color;
-                        // We don't change already drawn calipers anymore,
-                        // since we want to keep the custom colors that
-                        // have already been applied.  Only new calipers
-                        // will have the currentCaliperColor
                     } catch (Exception ex) {
                         return;
                     }
@@ -863,13 +859,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private class UriPage {
-        public Uri uri;
-        public int pageNumber;
+        Uri uri;
+        int pageNumber;
     }
 
     @TargetApi(25)
     private static class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
-        private WeakReference<MainActivity> activityWeakReference;
+        private final WeakReference<MainActivity> activityWeakReference;
 
         private boolean isNewPdf;
         private String exceptionMessage = "";
@@ -981,7 +977,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private boolean isNewPdf;
         private String exceptionMessage = "";
 
-        private WeakReference<MainActivity> activityWeakReference;
+        private final WeakReference<MainActivity> activityWeakReference;
 
 
         AsyncLoadPDF(MainActivity context) {
@@ -2080,9 +2076,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onCreateOptionsMenu(Menu menu) {
         Log.d(EPS, "onCreateOptionsMenu");
         // Inflate the menu; this adds items to the action bar if it is present.
-        this.menu = menu;
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        setMode();
         return true;
     }
 
@@ -2107,12 +2101,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    private void toggleMode() {
-        calipersMode = !calipersMode;
-        setMode();
-    }
-
-
     private void lockImage() {
         imageIsLocked = !imageIsLocked;
         lockImage(imageIsLocked);
@@ -2128,32 +2116,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             imageLockButton.setText(getString(R.string.lock_label));
         }
         calipersView.invalidate();
-    }
-
-    private void setMode() {
-        // imageView is always enabled now that touch events pass through
-        // imageView.setEnabled(!calipersMode);
-//        calipersView.setEnabled(calipersMode);
-//
-//        MenuItem switchModeMenuItem = menu.findItem(R.id.action_switch);
-//
-//        if (calipersMode) {
-//            if (getSupportActionBar() != null) {
-//                getSupportActionBar().setTitle(getString(R.string.ep_calipers_title));
-//                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.primary)));
-//            }
-//            unfadeCalipersView();
-//            switchModeMenuItem.setTitle(R.string.image_button_title);
-//            selectMainMenu();
-//        } else {
-//            if (getSupportActionBar() != null) {
-//                getSupportActionBar().setTitle(getString(R.string.image_mode_title));
-//                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
-//            }
-//            fadeCalipersView();
-//            switchModeMenuItem.setTitle(R.string.measure_button_title);
-//            selectPDFMenu();
-//        }
     }
 
     private void changeSettings() {
@@ -2938,14 +2900,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-    private void fadeCalipersView() {
-        calipersView.setAlpha(0.5f);
-    }
-
-    private void unfadeCalipersView() {
-        calipersView.setAlpha(1.0f);
-    }
-
     public boolean thereAreCalipers() {
         return calipersView.getCalipers().size() > 0;
     }
@@ -3052,9 +3006,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private class CalibrationResult {
-        public boolean success;
-        public float value;
-        public String units;
+        boolean success;
+        float value;
+        String units;
 
         CalibrationResult() {
             success = false;

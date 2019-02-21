@@ -28,9 +28,9 @@ import android.view.View;
  * You should have received a copy of the GNU General Public License
  * along with epcalipers-android.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class HelpRecyclerTouchListener implements RecyclerView.OnItemTouchListener {
-    private GestureDetector gestureDetector;
-    private ClickListener clickListener;
+class HelpRecyclerTouchListener implements RecyclerView.OnItemTouchListener {
+    private final GestureDetector gestureDetector;
+    private final ClickListener clickListener;
 
     public HelpRecyclerTouchListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener) {
         this.clickListener = clickListener;
@@ -44,7 +44,7 @@ public class HelpRecyclerTouchListener implements RecyclerView.OnItemTouchListen
             public void onLongPress(MotionEvent e) {
                 View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
                 if (child != null && clickListener != null) {
-                    clickListener.onLongClick(child, recyclerView.getChildPosition(child));
+                    clickListener.onLongClick(child, recyclerView.getChildAdapterPosition(child));
                 }
             }
         });
@@ -54,7 +54,7 @@ public class HelpRecyclerTouchListener implements RecyclerView.OnItemTouchListen
     public boolean onInterceptTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent motionEvent) {
         View child = recyclerView.findChildViewUnder(motionEvent.getX(), motionEvent.getY());
         if (child != null && clickListener != null && gestureDetector.onTouchEvent(motionEvent)) {
-            clickListener.onClick(child, recyclerView.getChildPosition(child));
+            clickListener.onClick(child, recyclerView.getChildAdapterPosition(child));
         }
         return false;
     }

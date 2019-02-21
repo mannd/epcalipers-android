@@ -187,7 +187,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
             pref.setSummary(sharedPreferences.getString(key, defaultTimeCalibration));
         }
         else if (key.equals(defaultAmplitudeCalibrationKey)) {
-            pref.setSummary(sharedPreferences.getString(key, defaultTimeCalibration));
+            pref.setSummary(sharedPreferences.getString(key, defaultAmplitudeCalibration));
         }
         else if (key.equals(defaultCaliperColorKey)) {
             pref.setSummary(getNameFromKey(sharedPreferences, key, defaultCaliperColor));
@@ -217,7 +217,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
 
     private String getNameFromKey(SharedPreferences sharedPreferences, String key, String defaultName) {
         try {
-            Integer value = Integer.parseInt(sharedPreferences.getString(key, defaultName));
+            int value = Integer.parseInt(sharedPreferences.getString(key, defaultName));
             return names.get(value);
         } catch (Exception ex) {
             //noinspection SuspiciousMethodCalls
