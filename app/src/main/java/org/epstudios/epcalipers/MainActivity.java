@@ -74,9 +74,11 @@ import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -124,16 +126,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button intervalRateButton;
     private Button meanRateButton;
     private Button qtcButton;
-    private Button colorButton;
     private Button colorDoneButton;
-    private Button tweakButton;
     private Button tweakDoneButton;
-    private Button marchingButton;
-    private Button cameraButton;
-    private Button selectImageButton;
-    private Button adjustImageButton;
     private Button imageLockButton;
-    private Button sampleEcgButton;
     private Button previousPageButton;
     private Button nextPageButton;
     private Button gotoPageButton;
@@ -144,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button microTweakImageRightButton;
     private Button microTweakImageLeftButton;
     private Button resetImageButton;
-    private Button backToImageMenuButton;
     private Button backToMainMenuButton;
     private Button horizontalCaliperButton;
     private Button verticalCaliperButton;
@@ -167,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button microDownButton;
     private Button microDoneButton;
     private TextView microTextView;
+    // Toolbar menus
     private HorizontalScrollView mainMenu;
     private HorizontalScrollView pdfMenu;
     private HorizontalScrollView addCaliperMenu;
@@ -177,17 +172,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private HorizontalScrollView colorMenu;
     private HorizontalScrollView tweakMenu;
     private HorizontalScrollView microMovementMenu;
+    // Calibration
     private Calibration horizontalCalibration;
     private Calibration verticalCalibration;
+    // Views
     private ImageView imageView;
     private CalipersView calipersView;
+    private PhotoViewAttacher attacher;
     private Toolbar menuToolbar;
     private Toolbar actionBar;
+
     private boolean calipersMode;
-    private PhotoViewAttacher attacher;
     private String currentPhotoPath;
     private FrameLayout layout;
     private DrawerLayout drawerLayout;
+
     private double rrIntervalForQTc;
     private float sizeDiffWidth;
     private float sizeDiffHeight;
@@ -199,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean showStartImage;
     private boolean roundMsecRate;
     private boolean autoPositionText;
-    private boolean allowTweakDuringQtc;
     private boolean inQtc = false;
     private int currentCaliperColor;
     private int currentHighlightColor;
@@ -226,8 +224,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Button> rightLeftButtons;
 
     private Map<String, QtcFormula> qtcFormulaMap;
-    // Bazett has the been the only option in previous versions of EP Calipers,
-    // so it is now the default.  Users who want to change this must opt in using Preferences.
     private QtcFormula qtcFormulaPreference = QtcFormula.qtcBzt;
 
     private HashMap<String, Caliper.TextPosition> textPositionMap;
@@ -235,9 +231,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Caliper.TextPosition timeCaliperTextPositionPreference = Caliper.TextPosition.CenterBelow;
     private Caliper.TextPosition amplitudeCaliperTextPositionPreference = Caliper.TextPosition.Left;
 
-    private ToolbarMenu currentToolbarMenu = ToolbarMenu.Main;
-    private ToolbarMenu previousToolbarMenu = ToolbarMenu.Main;
-    private ToolbarMenu previousPreviousToolbarMenu = ToolbarMenu.Main;
+    private Deque<ToolbarMenu> toolbarMenuDeque = new ArrayDeque<ToolbarMenu>();
 
     private enum ToolbarMenu {
         Main,
@@ -555,11 +549,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Objects.requireNonNull(sharedPreferences, "Shared preferences must not be null!");
                 Log.d(EPS, "onSharedPreferenceChangeListener");
                 if (key.equals(getString(R.string.show_start_image_key))) {
-                    return;
-                }
-                if (key.equals(getString(R.string.tweak_during_qtc_key))) {
-                    allowTweakDuringQtc = sharedPreferences.getBoolean(key,
-                            false);
                     return;
                 }
                 if (key.equals(getString(R.string.default_time_calibration_key))) {
@@ -1184,7 +1173,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         defaultAmplitudeCalibration = sharedPreferences.getString(
                 getString(R.string.default_amplitude_calibration_key), getString(R.string.default_amplitude_calibration_value));
         useLargeFont = sharedPreferences.getBoolean(getString(R.string.use_large_font_key), false);
-        allowTweakDuringQtc = sharedPreferences.getBoolean(getString(R.string.tweak_during_qtc_key), false);
         String qtcFormulaName = sharedPreferences.getString(getString(R.string.default_qtc_formula_key),
                 getString(R.string.default_qtc_formula_value));
         qtcFormulaPreference = qtcFormulaMap.get(qtcFormulaName);
@@ -1515,10 +1503,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v == cancelAddCaliperButton) {
             selectMainMenu();
-        } else if (v == adjustImageButton) {
-            selectRotateImageMenu();
-        } else if (v == backToImageMenuButton) {
-            selectPDFMenu();
         } else if (v == backToMainMenuButton) {
             selectMainMenu();
         } else if (v == calibrateButton) {
@@ -1545,10 +1529,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             addCaliperWithDirection(Caliper.Direction.VERTICAL);
         } else if (v == angleCaliperButton) {
             addAngleCaliper();
-        } else if (v == selectImageButton) {
-            selectImageFromGallery();
-        } else if (v == cameraButton) {
-            takePhoto();
         } else if (v == setCalibrationButton) {
             setCalibration();
         } else if (v == clearCalibrationButton) {
@@ -1569,21 +1549,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectMainMenu();
         } else if (v == imageLockButton) {
             lockImage();
-        } else if (v == sampleEcgButton) {
-            loadSampleEcg();
         } else if (v == previousPageButton) {
             showPreviousPage();
         } else if (v == nextPageButton) {
             showNextPage();
         } else if (v == gotoPageButton) {
             gotoPage();
-        } else if (v == colorButton) {
-            selectColorMenu();
         } else if (v == colorDoneButton) {
             calipersView.setTweakingOrColoring(false);
             gotoPreviousMenu();
-        } else if (v == tweakButton) {
-            selectTweakMenu();
         } else if (v == tweakDoneButton) {
             tweakDone();
         } else if (v == leftButton) {
@@ -1604,8 +1578,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             microDown();
         } else if (v == microDoneButton) {
             microDone();
-        } else if (v == marchingButton) {
-            toggleMarchingCalipers();
         }
     }
 
@@ -1628,12 +1600,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         qtcButton = createButton(getString(R.string.qtc_button_title));
 	addToolTip(qtcButton, getString(R.string.qtc_tooltip));
         // Image menu
-        cameraButton = createButton(getString(R.string.camera_button_title));
-        cameraButton.setEnabled(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA));
-        selectImageButton = createButton(getString(R.string.select_image_button_title));
-        adjustImageButton = createButton(getString(R.string.adjust_image_button_title));
         imageLockButton = createButton(getString(R.string.lock_label));
-        sampleEcgButton = createButton(getString(R.string.sample_label));
         previousPageButton = createButton(getString(R.string.previous_button_label));
         nextPageButton = createButton(getString(R.string.next_button_label));
         gotoPageButton = createButton(getString(R.string.go_to_page));
@@ -1650,8 +1617,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         microTweakImageRightButton = createButton(getString(R.string.micro_tweak_image_right_button_title));
         microTweakImageLeftButton = createButton(getString(R.string.micro_tweak_image_left_button_title));
         resetImageButton = createButton(getString(R.string.reset_image_button_title));
-        backToImageMenuButton = createButton(getString(R.string.done_button_title));
-        backToMainMenuButton = createButton("Done");
+        backToMainMenuButton = createButton(getString(R.string.done_button_title));
         // Calibration menu
         setCalibrationButton = createButton(getString(R.string.set_calibration_button_title));
 	addToolTip(setCalibrationButton, getString(R.string.set_calibration_tooltip));
@@ -1666,13 +1632,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	addToolTip(measureQTButton, getString(R.string.qtc_step_2_tooltip));
         cancelQTcMeasurementButton = createButton(getString(R.string.cancel_button_title));
         // Color menu
-        colorButton = createButton(getString(R.string.color_label));
         colorDoneButton = createButton(getString(R.string.done_button_title));
         // Tweak menu
-        tweakButton = createButton(getString(R.string.tweak_label));
         tweakDoneButton = createButton(getString(R.string.done_button_title));
-        // Marching calipers
-        marchingButton = createButton(getString(R.string.marching_label));
         // MicroMovement menu
         leftButton = createButton(getString(R.string.left_label));
         rightButton = createButton(getString(R.string.right_label));
@@ -1799,24 +1761,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         microMovementMenu = createMenu(items);
     }
 
-    private void updateToolbarMenu(ToolbarMenu newToolbarMenu) {
-        previousPreviousToolbarMenu = previousToolbarMenu;
-        previousToolbarMenu = currentToolbarMenu;
-        currentToolbarMenu = newToolbarMenu;
-        Log.i("EPS", "Previous previous menu = " + previousPreviousToolbarMenu.toString());
-        Log.i("EPS", "Previous menu = " + previousToolbarMenu.toString());
-        Log.i("EPS", "Current menu = " + currentToolbarMenu.toString());
+    private void pushToolbarMenuStack(ToolbarMenu menu) {
+        Log.i("EPS", "Pushing menu " + menu);
+        toolbarMenuDeque.addLast(menu);
+    }
+
+    private ToolbarMenu popToolbarMenuStack() {
+        ToolbarMenu menu = toolbarMenuDeque.pollLast();
+        if (menu == null) {
+            Log.i("EPS", "Menu stack is empty, returning MainMenu");
+            return ToolbarMenu.Main;
+        }
+        Log.i("EPS", "Popping menu " + menu);
+        return menu;
+    }
+
+    private void clearToolbarMenuStack() {
+        Log.i("EPS", "Clearing menu stack");
+        toolbarMenuDeque.clear();
     }
 
     // Select menus
-    public void selectPreviousMenu() {
-        selectMenu(previousToolbarMenu);
-    }
-
-    public void selectPreviousPreviousMenu() {
-        selectMenu(previousPreviousToolbarMenu);
-    }
-
     public void selectMenu(ToolbarMenu menu) {
         switch (menu) {
             case Main:
@@ -1867,7 +1832,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         calipersView.setTweakingOrColoring(false);
         selectMenu(mainMenu);
-        updateToolbarMenu(ToolbarMenu.Main);
+        clearToolbarMenuStack();
+        pushToolbarMenuStack(ToolbarMenu.Main);
         boolean enable = horizontalCalibration.canDisplayRate();
         intervalRateButton.setEnabled(enable);
         meanRateButton.setEnabled(enable);
@@ -1882,7 +1848,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (pdfMenu == null) {
             createPDFMenu();
         }
-        updateToolbarMenu(ToolbarMenu.PDF);
+        pushToolbarMenuStack(ToolbarMenu.PDF);
         boolean enable = (numberOfPdfPages  > 0);
         enablePageButtons(enable);
         selectMenu(pdfMenu);
@@ -1902,46 +1868,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void gotoPreviousMenu() {
-        Log.i("EPS", "Previous menu = " + previousToolbarMenu);
-        Log.i("EPS", "Current menu = " + currentToolbarMenu);
-        // If can't go back, default to main menu
-        if (previousToolbarMenu == currentToolbarMenu) {
-            selectMainMenu();
-        }
-        selectMenu(previousToolbarMenu);
-    }
-
-    private void gotoPreviousPreviousMenu() {
-        if (previousPreviousToolbarMenu == currentToolbarMenu) {
-            selectMainMenu();
-        }
-        selectMenu(previousPreviousToolbarMenu);
+        ToolbarMenu menu = popToolbarMenuStack();
+        selectMenu(menu);
     }
 
     private void selectAddCaliperMenu() {
         if (addCaliperMenu == null) {
             createAddCaliperMenu();
         }
-        if (currentToolbarMenu == ToolbarMenu.AddCaliper) {
-            // Shouldn't happen, but just in case...
-            if (previousToolbarMenu == ToolbarMenu.AddCaliper) {
-                selectMainMenu();
-            }
-            else {
-                selectMenu(previousToolbarMenu);
-            }
+        if (toolbarMenuDeque.peekLast() == ToolbarMenu.AddCaliper) {
+            toolbarMenuDeque.removeLast();
+            gotoPreviousMenu();
+            return;
         }
-        else {
-            updateToolbarMenu(ToolbarMenu.AddCaliper);
-            selectMenu(addCaliperMenu);
-        }
+        pushToolbarMenuStack(ToolbarMenu.AddCaliper);
+        selectMenu(addCaliperMenu);
     }
 
     private void selectRotateImageMenu() {
         if (rotateImageMenu == null) {
             createRotateImageMenu();
         }
-        updateToolbarMenu(ToolbarMenu.Rotate);
+        pushToolbarMenuStack(ToolbarMenu.Rotate);
         selectMenu(rotateImageMenu);
     }
 
@@ -1949,7 +1897,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (calibrationMenu == null) {
             createCalibrationMenu();
         }
-        updateToolbarMenu(ToolbarMenu.Calibration);
+        pushToolbarMenuStack(ToolbarMenu.Calibration);
         selectMenu(calibrationMenu);
     }
 
@@ -1957,7 +1905,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (qtcStep1Menu == null) {
             createQTcStep1Menu();
         }
-        updateToolbarMenu(ToolbarMenu.QTc1);
+        pushToolbarMenuStack(ToolbarMenu.QTc1);
         selectMenu(qtcStep1Menu);
     }
 
@@ -1965,10 +1913,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (qtcStep2Menu == null) {
             createQTcStep2Menu();
         }
-        updateToolbarMenu(ToolbarMenu.QTc2);
+        pushToolbarMenuStack(ToolbarMenu.QTc2);
         selectMenu(qtcStep2Menu);
         inQtc = true;
-        calipersView.setAllowTweakPosition(allowTweakDuringQtc);
+	// TODO: is this needed to allow tweaking during QTc?
+        calipersView.setAllowTweakPosition(true);
+        // calipersView.setAllowTweakPosition(allowTweakDuringQtc);
     }
 
     public void selectColorMenu() {
@@ -1979,7 +1929,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (colorMenu == null) {
             createColorMenu();
         }
-        updateToolbarMenu(ToolbarMenu.Color);
+        pushToolbarMenuStack(ToolbarMenu.Color);
         selectMenu(colorMenu);
         calipersView.setAllowColorChange(true);
     }
@@ -1992,7 +1942,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (tweakMenu == null) {
             createTweakMenu();
         }
-        updateToolbarMenu(ToolbarMenu.Tweak);
+        pushToolbarMenuStack(ToolbarMenu.Tweak);
         selectMenu(tweakMenu);
         calipersView.setAllowTweakPosition(true);
     }
@@ -2004,7 +1954,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (microMovementMenu == null) {
             createMicroMovementMenu();
         }
-        updateToolbarMenu(ToolbarMenu.Move);
+        pushToolbarMenuStack(ToolbarMenu.Move);
         selectMenu(microMovementMenu);
         if (component == Caliper.Component.Crossbar) {
             setButtonsVisibility(upDownButtons, View.VISIBLE);
@@ -2636,12 +2586,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void tweakDone() {
         calipersView.setTweakingOrColoring(false);
-        if (previousToolbarMenu == ToolbarMenu.Move) {
-            gotoPreviousPreviousMenu();
-        }
-        else {
-            gotoPreviousMenu();
-        }
+        gotoPreviousMenu();
     }
 
     private void microDone() {
