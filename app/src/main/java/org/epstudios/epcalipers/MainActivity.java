@@ -31,6 +31,7 @@ import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -132,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button previousPageButton;
     private Button nextPageButton;
     private Button gotoPageButton;
+    private Button pdfDoneButton;
     private Button rotateImageRightButton;
     private Button rotateImageLeftButton;
     private Button tweakImageRightButton;
@@ -139,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button microTweakImageRightButton;
     private Button microTweakImageLeftButton;
     private Button resetImageButton;
-    private Button backToMainMenuButton;
+    private Button rotateDoneButton;
     private Button horizontalCaliperButton;
     private Button verticalCaliperButton;
     private Button angleCaliperButton;
@@ -1510,13 +1512,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (v == cancelAddCaliperButton) {
-            selectMainMenu();
-        } else if (v == backToMainMenuButton) {
+            returnFromAddCaliperMenu();
+        } else if (v == doneCalibrationButton
+                || v == cancelQTcButton
+                || v == cancelQTcMeasurementButton) {
             selectMainMenu();
         } else if (v == calibrateButton) {
             setupCalibration();
-        } else if (v == doneCalibrationButton) {
-            selectMainMenu();
         } else if (v == rotateImageLeftButton) {
             rotateImage(-90.0f);
         } else if (v == rotateImageRightButton) {
@@ -1531,10 +1533,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             rotateImage(0.1f);
         } else if (v == resetImageButton) {
             resetImage();
+        } else if (v == rotateDoneButton) {
+            gotoPreviousMenu();
         } else if (v == horizontalCaliperButton) {
-            addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
+            addTimeCaliper();
         } else if (v == verticalCaliperButton) {
-            addCaliperWithDirection(Caliper.Direction.VERTICAL);
+            addAmplitudeCaliper();
         } else if (v == angleCaliperButton) {
             addAngleCaliper();
         } else if (v == setCalibrationButton) {
@@ -1547,14 +1551,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             meanRR();
         } else if (v == qtcButton) {
             calculateQTc();
-        } else if (v == cancelQTcButton) {
-            selectMainMenu();
         } else if (v == measureRRButton) {
             qtcMeasureRR();
         } else if (v == measureQTButton) {
             doQTcCalculation();
-        } else if (v == cancelQTcMeasurementButton) {
-            selectMainMenu();
         } else if (v == imageLockButton) {
             lockImage();
         } else if (v == previousPageButton) {
@@ -1563,10 +1563,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showNextPage();
         } else if (v == gotoPageButton) {
             gotoPage();
+        } else if (v == pdfDoneButton) {
+            gotoPreviousMenu();
         } else if (v == colorDoneButton) {
             calipersView.setTweakingOrColoring(false);
             gotoPreviousMenu();
         } else if (v == tweakDoneButton) {
+            calipersView.setTweakingOrColoring(false);
             tweakDone();
         } else if (v == leftButton) {
             left();
@@ -1596,17 +1599,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /// TODO: clean out unused buttons and menus.
+    // N.B. Android doesn't allow sharing of buttons with different parents.
+    // Thus, we need separate cancel buttons, for example, all of which do
+    // the same thing, but belong to different menus.
     private void createButtons() {
         // Main/Caliper menu
         calibrateButton = createButton(getString(R.string.calibrate_button_title));
         addToolTip(calibrateButton, getString(R.string.setup_calibration_tooltip));
         intervalRateButton = createButton(getString(R.string.interval_rate_button_title));
-	addToolTip(intervalRateButton, getString(R.string.int_rate_tooltip));
+        addToolTip(intervalRateButton, getString(R.string.int_rate_tooltip));
         meanRateButton = createButton(getString(R.string.mean_rate_button_title));
-	addToolTip(meanRateButton, getString(R.string.mean_rate_tooltip));
+        addToolTip(meanRateButton, getString(R.string.mean_rate_tooltip));
         qtcButton = createButton(getString(R.string.qtc_button_title));
-	addToolTip(qtcButton, getString(R.string.qtc_tooltip));
+        addToolTip(qtcButton, getString(R.string.qtc_tooltip));
         // Image menu
         imageLockButton = createButton(getString(R.string.lock_label));
         previousPageButton = createButton(getString(R.string.previous_button_label));
@@ -1625,19 +1630,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         microTweakImageRightButton = createButton(getString(R.string.micro_tweak_image_right_button_title));
         microTweakImageLeftButton = createButton(getString(R.string.micro_tweak_image_left_button_title));
         resetImageButton = createButton(getString(R.string.reset_image_button_title));
-        backToMainMenuButton = createButton(getString(R.string.done_button_title));
         // Calibration menu
         setCalibrationButton = createButton(getString(R.string.set_calibration_button_title));
-	addToolTip(setCalibrationButton, getString(R.string.set_calibration_tooltip));
+        addToolTip(setCalibrationButton, getString(R.string.set_calibration_tooltip));
         clearCalibrationButton = createButton(getString(R.string.clear_calibration_button_title));
-	addToolTip(clearCalibrationButton, getString(R.string.clear_calibration_tooltip));
+        addToolTip(clearCalibrationButton, getString(R.string.clear_calibration_tooltip));
         doneCalibrationButton = createButton(getString(R.string.done_button_title));
         // QTc menu
         measureRRButton = createButton(getString(R.string.measure_button_label));
-	addToolTip(measureRRButton, getString(R.string.qtc_step_1_tooltip));
+        addToolTip(measureRRButton, getString(R.string.qtc_step_1_tooltip));
         cancelQTcButton = createButton(getString(R.string.cancel_button_title));
         measureQTButton = createButton(getString(R.string.measure_button_label));
-	addToolTip(measureQTButton, getString(R.string.qtc_step_2_tooltip));
+        addToolTip(measureQTButton, getString(R.string.qtc_step_2_tooltip));
         cancelQTcMeasurementButton = createButton(getString(R.string.cancel_button_title));
         // Color menu
         colorDoneButton = createButton(getString(R.string.done_button_title));
@@ -1681,7 +1685,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(previousPageButton);
         buttons.add(nextPageButton);
         buttons.add(gotoPageButton);
-        buttons.add(backToMainMenuButton);
+        buttons.add(pdfDoneButton);
         pdfMenu = createMenu(buttons);
     }
 
@@ -1703,7 +1707,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttons.add(microTweakImageLeftButton);
         buttons.add(microTweakImageRightButton);
         buttons.add(resetImageButton);
-        buttons.add(backToMainMenuButton);
+        buttons.add(rotateDoneButton);
         rotateImageMenu = createMenu(buttons);
     }
 
@@ -1893,6 +1897,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         selectMenu(addCaliperMenu);
     }
 
+    private void returnFromAddCaliperMenu() {
+        if (toolbarMenuDeque.peekLast() == ToolbarMenu.AddCaliper) {
+            toolbarMenuDeque.removeLast();
+            gotoPreviousMenu();
+        }
+        else {
+            gotoPreviousMenu();
+        }
+    }
+
     private void selectRotateImageMenu() {
         if (rotateImageMenu == null) {
             createRotateImageMenu();
@@ -1937,7 +1951,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (colorMenu == null) {
             createColorMenu();
         }
-        pushToolbarMenuStack(ToolbarMenu.Color);
         selectMenu(colorMenu);
         calipersView.setAllowColorChange(true);
     }
@@ -1950,7 +1963,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (tweakMenu == null) {
             createTweakMenu();
         }
-        pushToolbarMenuStack(ToolbarMenu.Tweak);
         selectMenu(tweakMenu);
         calipersView.setAllowTweakPosition(true);
     }
@@ -1962,7 +1974,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (microMovementMenu == null) {
             createMicroMovementMenu();
         }
-        pushToolbarMenuStack(ToolbarMenu.Move);
         selectMenu(microMovementMenu);
         if (component == Caliper.Component.Crossbar) {
             setButtonsVisibility(upDownButtons, View.VISIBLE);
@@ -2600,10 +2611,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void microDone() {
-        calipersView.setTweakingOrColoring(false);
         calipersView.unchooseAllCalipersAndComponents();
         calipersView.invalidate();
-        gotoPreviousMenu();
+        selectTweakMenu();
     }
 
     private int calipersCount() {
@@ -2898,7 +2908,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addCaliperWithDirectionAtRect(direction, new Rect(0, 0, calipersView.getWidth(),
                 calipersView.getHeight()));
         calipersView.invalidate();
-        selectMainMenu();
+        returnFromAddCaliperMenu();
     }
 
     private void addCaliperWithDirectionAtRect(Caliper.Direction direction,
@@ -2925,6 +2935,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getCalipers().add(c);
     }
 
+    private void addTimeCaliper() {
+            addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
+    }
+
+    private void addAmplitudeCaliper() {
+            addCaliperWithDirection(Caliper.Direction.VERTICAL);
+    }
+    
     private void addAngleCaliper() {
         AngleCaliper c = new AngleCaliper();
         Rect rect = new Rect(0, 0, calipersView.getWidth(),
@@ -2946,7 +2964,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         c.setInitialPosition(rect);
         getCalipers().add(c);
         calipersView.invalidate();
-        selectMainMenu();
+        returnFromAddCaliperMenu();
     }
 
     private void matrixChangedAction() {
