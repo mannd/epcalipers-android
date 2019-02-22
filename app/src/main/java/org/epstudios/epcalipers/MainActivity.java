@@ -181,7 +181,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PhotoViewAttacher attacher;
     private Toolbar menuToolbar;
     private Toolbar actionBar;
-
+    // Side menu items
+    private MenuItem lockImageMenuItem;
     private boolean calipersMode;
     private String currentPhotoPath;
     private FrameLayout layout;
@@ -391,6 +392,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Disable camera button if no camera present
         cameraMenuItem.setEnabled(getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_CAMERA));
+        lockImageMenuItem = menuNav.findItem(R.id.nav_lock_image);
         // Make navigation (hamburger) menu do things.
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -402,15 +404,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         switch(id) {
                             case R.id.nav_camera:
                                 takePhoto();
+                                // Reset to main menu with new image
+                                selectMainMenu();
                                 break;
                             case R.id.nav_image:
                                 selectImageFromGallery();
+                                // Reset to main menu with new image
+                                selectMainMenu();
                                 break;
                             case R.id.nav_lock_image:
                                 lockImage();
                                 break;
                             case R.id.nav_sample_ecg:
                                 loadSampleEcg();
+                                // Reset to main menu with new image
+                                selectMainMenu();
                                 break;
                             case R.id.nav_about:
                                 about();
@@ -2060,10 +2068,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageView.setEnabled(!lock);
         calipersView.setLockImage(lock);
         if (lock) {
-            imageLockButton.setText(getString(R.string.unlock_label));
+            lockImageMenuItem.setTitle(getString(R.string.drawer_unlock_image));
+            lockImageMenuItem.setIcon(R.drawable.ic_lock_open);
         }
         else {
-            imageLockButton.setText(getString(R.string.lock_label));
+            lockImageMenuItem.setTitle(getString(R.string.drawer_lock_image));
+            lockImageMenuItem.setIcon(R.drawable.ic_lock);
         }
         calipersView.invalidate();
     }

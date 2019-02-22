@@ -183,6 +183,7 @@
     <string name="drawer_take_photo">Take photo</string>
     <string name="drawer_select_image">Select image</string>
     <string name="drawer_lock_image">Lock image</string>
+    <string name="drawer_unlock_image">Unlock image</string>
     <string name="drawer_sample_ecg">Sample ECG</string>
     <string name="drawer_preferences">Preferences</string>
     <string name="drawer_help">Help</string>
