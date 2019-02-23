@@ -27,7 +27,7 @@
     <string name="done_button_title">Done</string>
     <string name="set_calibration_button_title">Set</string>
     <string name="clear_calibration_button_title">Clear</string>
-    <string name="about_text">Copyright \u00a9 2015–2018 EP Studios, Inc.\nAll rights reserved.\n</string>
+    <string name="about_text">Copyright \u00a9 2015–2019 EP Studios, Inc.\nAll rights reserved.\n</string>
     <string name="about_label">EP Calipers</string>
     <string name="help_title">Help</string>
     <string name="no_time_caliper_selected_title">No Time Caliper Selected</string>
@@ -72,7 +72,7 @@
     <string name="number_of_intervals_dialog_message">How many intervals is this caliper measuring?</string>
     <string name="mean_rr_dialog_hint">Number of intervals measured</string>
     <string name="mean_rr_result_dialog_title">Mean Interval and Rate</string>
-    <string name="mean_rr_result_dialog_message">Mean interval = %s %s%nMean rate = %s bpm</string>
+    <string name="mean_rr_result_dialog_message">Mean interval = %1$s %2$s%nMean rate = %3$s bpm</string>
     <string name="select_rr_intervals_message">RR interval(s)?</string>
     <string name="measure_button_label">Measure</string>
     <string name="default_number_rr_intervals">3</string>

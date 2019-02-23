@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -123,13 +124,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String IMAGE_TYPE = "image/";
     private static final String APPLICATION_PDF_TYPE = "application/pdf";
 
+    // Store version information
+    private Version version;
+
+    // Lots of buttons
     private Button calibrateButton;
     private Button intervalRateButton;
     private Button meanRateButton;
     private Button qtcButton;
     private Button colorDoneButton;
     private Button tweakDoneButton;
-    private Button imageLockButton;
     private Button previousPageButton;
     private Button nextPageButton;
     private Button gotoPageButton;
@@ -230,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private QtcFormula qtcFormulaPreference = QtcFormula.qtcBzt;
 
     private HashMap<String, Caliper.TextPosition> textPositionMap;
+
     /// TODO: get some consistent defaults here
     private Caliper.TextPosition timeCaliperTextPositionPreference = Caliper.TextPosition.CenterBelow;
     private Caliper.TextPosition amplitudeCaliperTextPositionPreference = Caliper.TextPosition.Left;
@@ -658,8 +663,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         prefs.registerOnSharedPreferenceChangeListener(listener);
+
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        int versionCode = packageInfo.versionCode;
+        String versionName = packageInfo.versionName;
+        Log.i("EPS", "VersionCode = " + versionCode);
+        Log.i("EPS", "VersionName = " + versionName);
+        version = new Version(prefs, versionName, versionCode);
 
         layout = findViewById(R.id.frame_layout);
         ViewTreeObserver viewTreeObserver = layout.getViewTreeObserver();
@@ -1162,12 +1178,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public boolean getFirstRun(SharedPreferences prefs) {
-      return prefs.getBoolean("firstRun" + About.VERSION, true);
+      return prefs.getBoolean("firstRun" + version.getVersionName(), true);
     }
 
     public void setRunned(SharedPreferences prefs) {
         SharedPreferences.Editor edit = prefs.edit();
-        edit.putBoolean("firstRun" + About.VERSION, false);
+        edit.putBoolean("firstRun" + version.getVersionName(), false);
         edit.apply();
     }
 
@@ -1555,8 +1571,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             qtcMeasureRR();
         } else if (v == measureQTButton) {
             doQTcCalculation();
-        } else if (v == imageLockButton) {
-            lockImage();
         } else if (v == previousPageButton) {
             showPreviousPage();
         } else if (v == nextPageButton) {
@@ -1612,11 +1626,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addToolTip(meanRateButton, getString(R.string.mean_rate_tooltip));
         qtcButton = createButton(getString(R.string.qtc_button_title));
         addToolTip(qtcButton, getString(R.string.qtc_tooltip));
-        // Image menu
-        imageLockButton = createButton(getString(R.string.lock_label));
+        // PDF menu
         previousPageButton = createButton(getString(R.string.previous_button_label));
         nextPageButton = createButton(getString(R.string.next_button_label));
         gotoPageButton = createButton(getString(R.string.go_to_page));
+        pdfDoneButton = createButton(getString(R.string.done_button_title));
         // Add Caliper menu
         horizontalCaliperButton = createButton(getString(R.string.horizontal_caliper_button_title));
         verticalCaliperButton = createButton(getString(R.string.vertical_caliper_button_title));
@@ -1630,6 +1644,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         microTweakImageRightButton = createButton(getString(R.string.micro_tweak_image_right_button_title));
         microTweakImageLeftButton = createButton(getString(R.string.micro_tweak_image_left_button_title));
         resetImageButton = createButton(getString(R.string.reset_image_button_title));
+        rotateDoneButton = createButton(getString(R.string.done_button_title));
         // Calibration menu
         setCalibrationButton = createButton(getString(R.string.set_calibration_button_title));
         addToolTip(setCalibrationButton, getString(R.string.set_calibration_tooltip));
@@ -1860,7 +1875,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (pdfMenu == null) {
             createPDFMenu();
         }
-        pushToolbarMenuStack(ToolbarMenu.PDF);
         boolean enable = (numberOfPdfPages  > 0);
         enablePageButtons(enable);
         selectMenu(pdfMenu);
@@ -1911,7 +1925,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (rotateImageMenu == null) {
             createRotateImageMenu();
         }
-        pushToolbarMenuStack(ToolbarMenu.Rotate);
         selectMenu(rotateImageMenu);
     }
 
@@ -2371,7 +2384,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void about() {
-        startActivity(new Intent(this, About.class));
+        Intent i = new Intent(this, About.class);
+        i.putExtra("VersionNumber", version.getVersionName());
+        startActivity(i);
     }
 
     private void meanRR() {

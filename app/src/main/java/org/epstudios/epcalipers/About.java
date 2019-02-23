@@ -26,13 +26,12 @@ import android.widget.TextView;
  * along with org.epstudios.epcalipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class About extends Activity {
-    public final static String VERSION = "2.14";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.about);
         TextView versionTextView = findViewById(R.id.version);
-        versionTextView.setText(String.format(getString(R.string.app_version), VERSION));
+        String versionNumber = getIntent().getStringExtra("VersionNumber");
+        versionTextView.setText(String.format(getString(R.string.app_version), versionNumber));
     }
 }

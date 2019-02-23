@@ -80,7 +80,7 @@
     <string name="repeat_qt_button_title">Répéter QT</string>
     <string name="tweak_label">Régler</string>
     <string name="color_label">Couleur</string>
-    <string name="about_text">Copyright © 2015 – 2017 EP Studios, Inc.\\nTous droits réservés.</string>
+    <string name="about_text">Copyright © 2015 – 2019 EP Studios, Inc.\\nTous droits réservés.</string>
     <string name="app_version">Version %1s</string>
     <string name="continue_title">Continuer</string>
     <string name="calculated_qtc_dialog_title">QTc calculé</string>
@@ -106,7 +106,7 @@
     <string name="number_of_intervals_dialog_message">Combien d\'intervalles ce compas mesure-t-il ?</string>
     <string name="mean_rr_dialog_hint">Nombre d\'intervalles mesurés</string>
     <string name="mean_rr_result_dialog_title">Intervalle moyen et fréquence cardiaque moyenne</string>
-    <string name="mean_rr_result_dialog_message">Intervalle moyen = %s %s%nFréquence cardiaque moyenne = %s bpm</string>
+    <string name="mean_rr_result_dialog_message">Intervalle moyen = %1$s %2$s%nFréquence cardiaque moyenne = %3$s bpm</string>
     <string name="select_rr_intervals_message">Intervalle(s) RR?</string>
     <string name="measure_button_label">Mesurer</string>
     <string name="qt_interval_query">Intervalle QT?</string>
