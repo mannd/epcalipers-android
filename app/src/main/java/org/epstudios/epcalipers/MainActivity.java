@@ -33,6 +33,9 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+
+import com.github.chrisbanes.photoview.OnMatrixChangedListener;
+import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -88,8 +91,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 import static org.epstudios.epcalipers.MyPreferenceFragment.ALL;
 import static org.epstudios.epcalipers.MyPreferenceFragment.BAZETT;
@@ -182,9 +183,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Calibration horizontalCalibration;
     private Calibration verticalCalibration;
     // Views
-    private ImageView imageView;
+    private PhotoView imageView;
     private CalipersView calipersView;
-    private PhotoViewAttacher attacher;
     private Toolbar menuToolbar;
     private Toolbar actionBar;
     // Side menu items
@@ -477,16 +477,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!showStartImage && noSavedInstance) {
             imageView.setVisibility(View.INVISIBLE);
         }
-        attacher = new PhotoViewAttacher(imageView);
-        attacher.setScaleType(ImageView.ScaleType.CENTER);
+        imageView.setScaleType(ImageView.ScaleType.CENTER);
         float max_zoom = 10.0f;
-        attacher.setMaximumScale(max_zoom);
-        attacher.setMinimumScale(0.3f);
+        imageView.setMaximumScale(max_zoom);
+        imageView.setMinimumScale(0.3f);
         // We need to use MatrixChangeListener and not ScaleChangeListener
         // since the former only fires when scale has completely changed and
         // the latter fires while the scale is changing, so is inaccurate.
-        attacher.setOnMatrixChangeListener(new MatrixChangeListener());
-        attacher.setOnLongClickListener(new View.OnLongClickListener() {
+        imageView.setOnMatrixChangeListener(new MatrixChangeListener());
+        imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 Log.i("EPS", "long click on image");
@@ -725,7 +724,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             private void rotateImageView() {
-                attacher.setRotationBy(totalRotation);
+                imageView.setRotationBy(totalRotation);
             }
         });
 
@@ -971,8 +970,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 activityWeakReference.get().imageView.setImageBitmap(bitmap);
                 // must set visibility as imageview will be hidden if started with sample ecg hidden
                 activityWeakReference.get().imageView.setVisibility(View.VISIBLE);
-                activityWeakReference.get().attacher.update();
-                activityWeakReference.get().attacher.setScale(activityWeakReference.get().attacher.getMinimumScale());
+                activityWeakReference.get().imageView.setScale(activityWeakReference.get().imageView.getMinimumScale());
                 if (isNewPdf) {
                     activityWeakReference.get().clearCalibration();
                 }
@@ -1077,8 +1075,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 activityWeakReference.get().imageView.setImageBitmap(bitmap);
                 // must set visibility as imageview will be hidden if started with sample ecg hidden
                 activityWeakReference.get().imageView.setVisibility(View.VISIBLE);
-                activityWeakReference.get().attacher.update();
-                activityWeakReference.get().attacher.setScale(activityWeakReference.get().attacher.getMinimumScale());
+                activityWeakReference.get().imageView.setScale(activityWeakReference.get().imageView.getMinimumScale());
                 if (isNewPdf) {
                     activityWeakReference.get().clearCalibration();
                 }
@@ -1270,7 +1267,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         BitmapDrawable result = new BitmapDrawable(getResources(), scaledBitmap);
 
         imageView.setImageDrawable(result);
-        attacher.update();
     }
 
     private Pair<Integer, Integer> getScreenDimensions () {
@@ -1303,7 +1299,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(EPS, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putBoolean("calipersMode", calipersMode);
-        outState.putFloat("scale", attacher.getScale());
+        outState.putFloat("scale", imageView.getScale());
         outState.putFloat("totalRotation", totalRotation);
         outState.putBoolean("imageIsLocked", imageIsLocked);
         outState.putBoolean("multipagePDF", numberOfPdfPages > 0);
@@ -1404,10 +1400,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         totalRotation = savedInstanceState.getFloat("totalRotation");
 
-        attacher.update();
-        float scale = Math.max(savedInstanceState.getFloat("scale"), attacher.getMinimumScale());
-        scale = Math.min(scale, attacher.getMaximumScale());
-        attacher.setScale(scale, true);
+        float scale = Math.max(savedInstanceState.getFloat("scale"), imageView.getMinimumScale());
+        scale = Math.min(scale, imageView.getMaximumScale());
+        imageView.setScale(scale, true);
 
         // Calibration
         horizontalCalibration.setUnits(savedInstanceState.getString("hcalUnits"));
@@ -2351,7 +2346,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageView.setImageBitmap(bitmap);
         scaleImageForImageView();
         imageView.setVisibility(View.VISIBLE);
-        attacher.update();
         clearCalibration();
         // updateImageView not used for PDFs, so
         // reset all the PDF variables
@@ -2371,12 +2365,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void rotateImage(float degrees) {
         totalRotation += degrees;
-        attacher.setRotationBy(degrees);
+        imageView.setRotationBy(degrees);
     }
 
     private void resetImage() {
         totalRotation = 0.0f;
-        attacher.setRotationTo(0f);
+        imageView.setRotationTo(0f);
     }
 
     private void showHelp() {
@@ -2784,7 +2778,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (cal.getDirection() == Caliper.Direction.HORIZONTAL && cal.canDisplayRate()) {
             cal.setDisplayRate(false);
         }
-        cal.setOriginalZoom(attacher.getScale());
+        cal.setOriginalZoom(imageView.getScale());
         cal.setOriginalCalFactor(calibrationResult.value / c.getValueInPoints());
         cal.setCurrentZoom(cal.getOriginalZoom());
         cal.setCalibrated(true);
@@ -2984,7 +2978,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void matrixChangedAction() {
         //Log.d(EPS, "Matrix changed, scale = " + attacher.getScale());
-        adjustCalibrationForScale(attacher.getScale());
+        adjustCalibrationForScale(imageView.getScale());
         calipersView.invalidate();
     }
 
@@ -3005,8 +2999,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private class MatrixChangeListener implements PhotoViewAttacher.OnMatrixChangedListener {
-
+    private class MatrixChangeListener implements OnMatrixChangedListener {
         @Override
         public void onMatrixChanged(RectF rect) {
             matrixChangedAction();
