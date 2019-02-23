@@ -31,16 +31,16 @@ import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.util.Pair;
@@ -522,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Set up action bar up top.  Note that icon on left for hamburger menu.
         actionBar = findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
-        android.support.v7.app.ActionBar supportActionBar = Objects.requireNonNull(getSupportActionBar(),
+        androidx.appcompat.app.ActionBar supportActionBar = Objects.requireNonNull(getSupportActionBar(),
                 "Actionbar must not be null!");
         supportActionBar.setDisplayHomeAsUpEnabled(true);
         supportActionBar.setHomeAsUpIndicator(R.drawable.ic_menu);

@@ -3,7 +3,7 @@ package org.epstudios.epcalipers;
 import android.graphics.PointF;
 import android.graphics.Rect;
 
-import static android.support.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static org.junit.Assert.*;
 
 public class ApplicationTest {
