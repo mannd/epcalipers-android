@@ -32,7 +32,6 @@ import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 
 import com.github.chrisbanes.photoview.OnMatrixChangedListener;
 import com.github.chrisbanes.photoview.PhotoView;
@@ -127,6 +126,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Store version information
     private Version version;
+
+    // OnSharedPreferenceListener must be a strong reference
+    // as otherwise it is a weak reference and will be garbage collected, thus
+    // making it stop working.
+    // See http://stackoverflow.com/questions/2542938/sharedpreferences-onsharedpreferencechangelistener-not-being-called-consistently
+    SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
 
     // Lots of buttons
     private Button calibrateButton;
@@ -373,6 +378,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return inSampleSize;
     }
 
+    // Convert dp to pixels utility
+    private float dpTopixel(float dp) {
+        float density = getResources().getDisplayMetrics().density;
+        float pixel = dp * density;
+        return pixel;
+    }
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -552,11 +564,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             externalImageLoad = false;
         }
 
-        // OnSharedPreferenceListener must be a class field, i.e. strong reference
-        // as otherwise it is a weak reference and will be garbage collected, thus
-        // making it stop working.
-        // See http://stackoverflow.com/questions/2542938/sharedpreferences-onsharedpreferencechangelistener-not-being-called-consistently
-        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        onSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 // show start image only has effect with restart
@@ -612,7 +620,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 getString(R.string.default_line_width)));
                         currentLineWidth = lineWidth;
                         for (Caliper c : calipersView.getCalipers()) {
-                            c.setLineWidth(lineWidth);
+                            setLineWidth(c, lineWidth);
                         }
                     } catch (Exception ex) {
                         return;
@@ -662,7 +670,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.registerOnSharedPreferenceChangeListener(listener);
+        prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
 
         PackageInfo packageInfo = null;
         try {
@@ -1186,6 +1194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     void loadSettings() {
+        Log.i("EPS", "loadSettings()");
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
         showStartImage = sharedPreferences.getBoolean(
@@ -1459,7 +1468,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             c.setUnselectedColor(unselectedColor);
             c.setSelectedColor(currentHighlightColor);
             c.setColor(c.isSelected() ? currentHighlightColor : unselectedColor);
-            c.setLineWidth(currentLineWidth);
+            setLineWidth(c, currentLineWidth);
             c.setFontSize(useLargeFont ? largeFontSize : smallFontSize);
             c.setRoundMsecRate(roundMsecRate);
             c.setAutoPositionText(autoPositionText);
@@ -2920,13 +2929,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         returnFromAddCaliperMenu();
     }
 
+    private void setLineWidth(Caliper c, float width) {
+        float pixels = dpTopixel(width);
+        c.setLineWidth(pixels);
+    }
+
     private void addCaliperWithDirectionAtRect(Caliper.Direction direction,
                                                Rect rect) {
         Caliper c = new Caliper();
         c.setUnselectedColor(currentCaliperColor);
         c.setSelectedColor(currentHighlightColor);
         c.setColor(currentCaliperColor);
-        c.setLineWidth(currentLineWidth);
+        setLineWidth(c, currentLineWidth);
         c.setxOffset(getResources().getDimension(R.dimen.caliper_text_offset));
         c.setyOffset(getResources().getDimension(R.dimen.caliper_text_offset));
         c.setDirection(direction);
@@ -2959,7 +2973,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         c.setUnselectedColor(currentCaliperColor);
         c.setSelectedColor(currentHighlightColor);
         c.setColor(currentCaliperColor);
-        c.setLineWidth(currentLineWidth);
+        setLineWidth(c, currentLineWidth);
         c.setFontSize(useLargeFont ? largeFontSize : smallFontSize);
         c.setxOffset(getResources().getDimension(R.dimen.caliper_text_offset));
         c.setyOffset(getResources().getDimension(R.dimen.caliper_text_offset));
