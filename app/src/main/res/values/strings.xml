@@ -9,7 +9,6 @@
     <string name="add_caliper_button_title">+</string>
     <string name="interval_rate_button_title">I/R</string>
     <string name="mean_rate_button_title">mRate</string>
-    <string name="qtc_button_title" translatable="false">QTc</string>
     <string name="camera_button_title">Camera</string>
     <string name="select_image_button_title">Select</string>
     <string name="adjust_image_button_title">Adjust</string>
@@ -44,24 +43,17 @@
     <string name="calibrate_dialog_title">Calibrate</string>
     <string name="ok_title">OK</string>
     <string name="cancel_title">Cancel</string>
-    <string name="show_start_image_key" translatable="false">show_start_image</string>
     <string name="show_start_image_label">Show sample ECG at start?</string>
     <string name="settings_title">Settings</string>
-    <string name="default_time_calibration_key" translatable="false">default_time_calibration</string>
     <string name="default_time_calibration_label">Default time calibration</string>
     <string name="default_time_calibration_value">1000 msec</string>
     <string name="default_amplitude_calibration_value">10 mm</string>
-    <string name="default_amplitude_calibration_key" translatable="false">default_amplitude_calibration</string>
     <string name="default_amplitude_calibration_label">Default amplitude calibration</string>
-    <string name="default_caliper_color_key" translatable="false">default_caliper_color</string>
     <string name="default_caliper_color_label">Caliper color</string>
     <string name="default_highlight_color_label">Highlight color</string>
-    <string name="default_highlight_color_key" translatable="false">default_highlight_color</string>
-    <string name="default_line_width_key" translatable="false">default_line_width</string>
     <string name="default_line_width_label">Line width</string>
     <string name="show_start_image_off_summary">Don\'t show ECG</string>
     <string name="show_start_image_on_summary">Show ECG</string>
-    <string name="use_large_font_key" translatable="false">use_large_font</string>
     <string name="use_large_font_label">Use large font caliper labels?"</string>
     <string name="use_large_font_off_summary">Use normal size font</string>
     <string name="use_large_font_on_summary">Use large font</string>
@@ -89,7 +81,6 @@
     <string name="app_version">Version %s</string>
     <string name="default_number_qtc_rr_intervals">1</string>
     <string name="continue_title">Continue</string>
-    <string name="round_msec_rate_key" translatable="false">round_msec_rate</string>
     <string name="round_msec_rate_label">Round msec and heart rate</string>
     <string name="round_msec_rate_off_summary">No rounding of intervals and rates</string>
     <string name="round_msec_rate_on_summary">Msec and heart rate rounded to nearest integer</string>
@@ -99,14 +90,6 @@
         \n\nIf you want to use an angle caliper as a Brugadometer,
         you must first calibrate time and amplitude calipers.</string>
     <string name="sample_normal_ecg">sample normal ECG</string>
-    <string name="left_label" translatable="false">◀</string>
-    <string name="right_label" translatable="false">▶</string>
-    <string name="micro_left_label" translatable="false">←</string>
-    <string name="micro_right_label" translatable="false">→</string>
-    <string name="up_label" translatable="false">▲</string>
-    <string name="down_label" translatable="false">▼</string>
-    <string name="micro_up_label" translatable="false">↑</string>
-    <string name="micro_down_label" translatable="false">↓</string>
     <string name="left_bar_label">Move left bar</string>
     <string name="right_bar_label">Move right bar</string>
     <string name="up_bar_label">Move upper bar</string>
@@ -122,13 +105,7 @@
     <string name="sample_label">Sample</string>
     <string name="multipage_pdf_warning">Multipage PDF will need to be reloaded to view other pages.</string>
     <string name="temp_image_file_warning">Could not store temporary image file</string>
-    <string name="tweak_during_qtc_label">Allow tweaking during QTc</string>
-    <string name="tweak_during_qtc_key" translatable="false">tweak_during_qtc</string>
-    <string name="tweak_during_qtc_summary_off">Cannot tweak caliper during QT measurement</string>
-    <string name="tweak_during_qtc_summary_on">Long press to tweak caliper during QT measurement</string>
     <string name="default_qtc_formula_title">QTc formula</string>
-    <string name="default_qtc_formula_key" translatable="false">qtc_formula</string>
-    <string name="default_qtc_formula_value" translatable="false">bazett</string>
     <string name="marching_label">March</string>
     <string name="repeat_qt_button_title">Repeat QT</string>
     <string name="choose_color_label">Choose color</string>
@@ -162,21 +139,14 @@
     <string name="qt_equals">QT =</string>
     <string name="qtc_equals">QTc =</string>
     <string name="formula_detail">(%s formula)</string>
-    <string name="next_button_label" translatable="false">▶</string>
-    <string name="previous_button_label" translatable="false">◀</string>
     <string name="center_below">Center below</string>
     <string name="left">Left</string>
     <string name="right">Right</string>
     <string name="center_above">Center above</string>
-    <string name="default_time_caliper_text_position_value" translatable="false">centerAbove</string>
-    <string name="default_time_caliper_text_position_key" translatable="false">time_caliper_text_position</string>
     <string name="default_time_caliper_text_position_title">Time caliper text position</string>
-    <string name="default_amplitude_caliper_text_position_key" translatable="false">amplitude_caliper_text_position</string>
-    <string name="default_amplitude_caliper_text_position_value" translatable="false">right</string>
     <string name="default_amplitude_caliper_text_position_title">Amplitude caliper text position</string>
     <string name="top">Top</string>
     <string name="bottom">Bottom</string>
-    <string name="default_auto_position_text_key" translatable="false">auto_position_text</string>
     <string name="default_auto_position_text_label">Automatically position caliper text</string>
     <string name="auto_position_text_off">Text fixed in position</string>
     <string name="auto_position_text_on">Text is mobile</string>
@@ -250,4 +220,76 @@
     <string name="go_to_page_title">Go to page</string>
     <string name="page_message">Page</string>
     <string name="page_number_hint">Page number</string>
+
+    <!--Preference keys and values-->
+    <string name="show_start_image_key" translatable="false">show_start_image</string>
+    <string name="time_calibration_key" translatable="false">default_time_calibration</string>
+    <string name="amplitude_calibration_key" translatable="false">default_amplitude_calibration</string>
+    <string name="caliper_color_key" translatable="false">default_caliper_color</string>
+    <string name="highlight_color_key" translatable="false">default_highlight_color</string>
+    <string name="use_large_font_key" translatable="false">use_large_font</string>
+    <string name="line_width_key" translatable="false">default_line_width</string>
+    <string name="round_msec_rate_key" translatable="false">round_msec_rate</string>
+    <string name="qtc_formula_key" translatable="false">qtc_formula</string>
+    <string name="time_caliper_text_position_key" translatable="false">time_caliper_text_position</string>
+    <string name="amplitude_caliper_text_position_key" translatable="false">amplitude_caliper_text_position</string>
+    <string name="auto_position_text_key" translatable="false">auto_position_text</string>
+    <string name="app_version_key" translatable="false">app_version_key</string>
+
+    <string name="time_caliper_text_position_value" translatable="false">centerAbove</string>
+    <string name="amplitude_caliper_text_position_value" translatable="false">right</string>
+    <string name="qtc_formula_value" translatable="false">bazett</string>
+
+    <!--Save and restore instance state keys-->
+    <string name="imageview_scale_key" translatable="false">scale</string>
+    <string name="total_rotation_key" translatable="false">totalRotation</string>
+    <string name="image_locked_key" translatable="false">imageIsLocked</string>
+    <string name="multipage_pdf_key" translatable="false">multipagePDF</string>
+    <string name="a_caliper_is_marching_key" translatable="false">aCaliperIsMarching</string>
+    <string name="hcal_units_key" translatable="false">hcalUnits</string>
+    <string name="hcal_string_key" translatable="false">hcalCalibrationString</string>
+    <string name="hcal_display_rate_key" translatable="false">hcalDisplayRate</string>
+    <string name="hcal_original_zoom_key" translatable="false">hcalOriginalZoom</string>
+    <string name="hcal_current_zoom_key" translatable="false">hcalCurrentZoom</string>
+    <string name="hcal_is_calibrated_key" translatable="false">hcalCalibrated</string>
+    <string name="hcal_original_cal_factor_key" translatable="false">hcalOriginalCalFactor</string>
+    <string name="vcal_units_key" translatable="false">vcalUnits</string>
+    <string name="vcal_string_key" translatable="false">vcalCalibrationString</string>
+    <string name="vcal_display_rate_key" translatable="false">vcalDisplayRate</string>
+    <string name="vcal_original_zoom_key" translatable="false">vcalOriginalZoom</string>
+    <string name="vcal_current_zoom_key" translatable="false">vcalCurrentZoom</string>
+    <string name="vcal_is_calibrated_key" translatable="false">vcalCalibrated</string>
+    <string name="vcal_original_cal_factor_key" translatable="false">vcalOriginalCalFactor</string>
+    <string name="caliper_direction_key" translatable="false">CaliperDirection</string>
+    <string name="caliper_bar1_position_key" translatable="false">CaliperBar1Position</string>
+    <string name="caliper_bar2_position_key" translatable="false">CaliperBar2Position</string>
+    <string name="caliper_crossbar_position_key" translatable="false">CaliperCrossbarPosition</string>
+    <string name="caliper_selected_key" translatable="false">CaliperSelected</string>
+    <string name="is_angle_caliper_key" translatable="false">IsAngleCaliper</string>
+    <string name="unselected_color_restore_key" translatable="false">UnselectedColor</string>
+    <string name="marching_caliper_restore_key" translatable="false">MarchingCaliper</string>
+    <string name="calipers_count_key" translatable="false">CalipersCount</string>
+    <string name="angle_b1_key" translatable="false">angleB1</string>
+    <string name="angle_b2_key" translatable="false">angleB2</string>
+
+    <!--Other non-translatable keys, strings-->
+    <string name="temp_bitmap_file_name" translatable="false">/tempEPCalipersImageBitmap.png</string>
+    <string name="application_pdf_type" translatable="false">application/pdf</string>
+    <string name="image_type" translatable="false">image/</string>
+    <string name="horizontal_direction" translatable="false">Horizontal</string>
+    <string name="vertical_direction" translatable="false">Vertical</string>
+
+    <!--Non-translatable button text image labels-->
+    <string name="next_button_label" translatable="false">▶</string>
+    <string name="previous_button_label" translatable="false">◀</string>
+    <string name="left_label" translatable="false">◀</string>
+    <string name="right_label" translatable="false">▶</string>
+    <string name="micro_left_label" translatable="false">←</string>
+    <string name="micro_right_label" translatable="false">→</string>
+    <string name="up_label" translatable="false">▲</string>
+    <string name="down_label" translatable="false">▼</string>
+    <string name="micro_up_label" translatable="false">↑</string>
+    <string name="micro_down_label" translatable="false">↓</string>
+    <string name="qtc_button_title" translatable="false">QTc</string>
+
 </resources>

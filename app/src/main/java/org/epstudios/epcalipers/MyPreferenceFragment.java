@@ -99,23 +99,23 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         names = createMap(activity);
         formulaNames = createFormulaNamesMap(activity);
         textPositionNames = createTextPositionNamesMap(activity);
-        defaultTimeCalibrationKey = activity.getString(R.string.default_time_calibration_key);
-        defaultAmplitudeCalibrationKey = activity.getString(R.string.default_amplitude_calibration_key);
-        defaultCaliperColorKey = activity.getString(R.string.default_caliper_color_key);
-        defaultHighlightColorKey = activity.getString(R.string.default_highlight_color_key);
-        defaultLineWidthKey = activity.getString(R.string.default_line_width_key);
-        defaultQtcFormulaKey = activity.getString(R.string.default_qtc_formula_key);
-        defaultTimeCaliperTextPositionKey = activity.getString(R.string.default_time_caliper_text_position_key);
-        defaultAmplitudeCaliperTextPositionKey = activity.getString(R.string.default_amplitude_caliper_text_position_key);
+        defaultTimeCalibrationKey = activity.getString(R.string.time_calibration_key);
+        defaultAmplitudeCalibrationKey = activity.getString(R.string.amplitude_calibration_key);
+        defaultCaliperColorKey = activity.getString(R.string.caliper_color_key);
+        defaultHighlightColorKey = activity.getString(R.string.highlight_color_key);
+        defaultLineWidthKey = activity.getString(R.string.line_width_key);
+        defaultQtcFormulaKey = activity.getString(R.string.qtc_formula_key);
+        defaultTimeCaliperTextPositionKey = activity.getString(R.string.time_caliper_text_position_key);
+        defaultAmplitudeCaliperTextPositionKey = activity.getString(R.string.amplitude_caliper_text_position_key);
 
         defaultCaliperColor = activity.getString(R.string.default_caliper_color);
         defaultHighlightColor = activity.getString(R.string.default_highlight_color);
         defaultLineWidth = activity.getString(R.string.default_line_width);
         defaultTimeCalibration = activity.getString(R.string.default_time_calibration_value);
         defaultAmplitudeCalibration = activity.getString(R.string.default_amplitude_calibration_value);
-        defaultQtcFormula = activity.getString(R.string.default_qtc_formula_value);
-        defaultTimeCaliperTextPosition = activity.getString(R.string.default_time_caliper_text_position_value);
-        defaultAmplitudeCaliperTextPosition = activity.getString(R.string.default_amplitude_caliper_text_position_value);
+        defaultQtcFormula = activity.getString(R.string.qtc_formula_value);
+        defaultTimeCaliperTextPosition = activity.getString(R.string.time_caliper_text_position_value);
+        defaultAmplitudeCaliperTextPosition = activity.getString(R.string.amplitude_caliper_text_position_value);
 
         addPreferencesFromResource(R.xml.settings);
 
