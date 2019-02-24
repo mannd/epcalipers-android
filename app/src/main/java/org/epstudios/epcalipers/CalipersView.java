@@ -194,7 +194,6 @@ public class CalipersView extends View {
 
         @Override
         public void onLongPress(MotionEvent e) {
-            Log.i("EPS", "long click on caliper");
             PointF point = new PointF(e.getX(), e.getY());
             if (mainActivity.getCurrentActionMode() == null && !tweakingOrColoring && caliperPressed(point) != null) {
                 startActionMode(mainActivity.calipersActionCallback);

@@ -58,7 +58,6 @@ public class HelpTopics extends AppCompatActivity {
             @Override
             public void onClick(View view, int position) {
                 String text = helpTopics[position];
-                Log.i("EPS", text);
                 if (helpAnchors[position].equals("acknowledgments-id")) {
                     showHelp("https://mannd.github.io/epcalipers/"
                             + getString(R.string.lang) + ".lproj/EPCalipers-help/acknowledgments_android.html", null);
@@ -69,9 +68,7 @@ public class HelpTopics extends AppCompatActivity {
             }
 
             @Override
-            public void onLongClick(View view, int position) {
-                Log.i("EPS", "long click");
-            }
+            public void onLongClick(View view, int position) { }
         }));
 
         Toolbar actionBar = findViewById(R.id.action_bar);

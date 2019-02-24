@@ -291,5 +291,6 @@
     <string name="micro_up_label" translatable="false">↑</string>
     <string name="micro_down_label" translatable="false">↓</string>
     <string name="qtc_button_title" translatable="false">QTc</string>
+    <string name="version_number">VersionNumber</string>
 
 </resources>

@@ -54,7 +54,6 @@ public class Help extends AppCompatActivity {
             }
         }
         final WebView webView = findViewById(R.id.webView);
-        Log.i("EPS", "URL = " + url);
         // Anchors don't work properly off the shelf in Android.  Need to add
         // a delay for page rendering so that the anchors work.
         // See https://stackoverflow.com/questions/3039555/android-webview-anchor-link-jump-link-not-working

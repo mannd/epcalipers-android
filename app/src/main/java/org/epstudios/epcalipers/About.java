@@ -31,7 +31,7 @@ public class About extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.about);
         TextView versionTextView = findViewById(R.id.version);
-        String versionNumber = getIntent().getStringExtra("VersionNumber");
+        String versionNumber = getIntent().getStringExtra(getString(R.string.version_number));
         versionTextView.setText(String.format(getString(R.string.app_version), versionNumber));
     }
 }

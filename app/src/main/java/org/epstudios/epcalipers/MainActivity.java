@@ -101,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // TODO: regex below includes Cyrillic and must be updated with new alphabets
     private static final String calibrationRegex = "[.,0-9]+|[a-zA-ZА-яЁё]+";
     private static final Pattern VALID_PATTERN = Pattern.compile(calibrationRegex);
-    private static final String EPS = "EPS";
     private static final String LF = "\n";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
@@ -185,6 +184,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private CalipersView calipersView;
     private Toolbar menuToolbar;
     private Toolbar actionBar;
+    private NavigationView navigationView;
     // Side menu items
     private MenuItem lockImageMenuItem;
     private String currentPhotoPath;
@@ -268,8 +268,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            Log.i("EPS", "numberOfPdfPages = " + numberOfPdfPages);
-            Log.i("EPS", "currentPdfUri = " + currentPdfUri);
             MenuItem pdfMenuItem = menu.findItem(R.id.menu_pdf);
             pdfMenuItem.setVisible(currentPdfUri != null && numberOfPdfPages > 0);
             return true;
@@ -283,7 +281,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mode.finish();
                     return true;
                 case R.id.menu_pdf:
-                    Log.i("EPS", "PDF");
                     selectPDFMenu();
                     mode.finish();
                     return true;
@@ -379,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(EPS, "onCreate");
+        EPSLog.log("onCreate");
 
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -389,13 +386,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         smallFontSize = getResources().getDimension(R.dimen.small_font_size);
         largeFontSize = getResources().getDimension(R.dimen.large_font_size);
-        Log.i("EPS", "Small font size = " + smallFontSize + " large font size = "
-        + largeFontSize);
+        EPSLog.log("Small font size = " + smallFontSize + " large font size = " + largeFontSize);
 
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
 
-        final NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         drawerLayout = findViewById(R.id.activity_main_id);
         Menu menuNav = navigationView.getMenu();
         MenuItem cameraMenuItem = menuNav.findItem(R.id.nav_camera);
@@ -491,7 +487,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                Log.i("EPS", "long click on image");
                 if (currentActionMode != null) { // || calipersView.isTweakingOrColoring()) {
                     return false;
                 }
@@ -547,7 +542,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // entry point to load external pics/pdfs
         if (externalImageLoad) {
-            Log.i("EPS", "externalImageLoad is true and calling updateImageView");
             updateImageView(externalImageBitmap);
             externalImageLoad = false;
         }
@@ -557,7 +551,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 // show start image only has effect with restart
                 Objects.requireNonNull(sharedPreferences, "Shared preferences must not be null!");
-                Log.d(EPS, "onSharedPreferenceChangeListener");
                 if (key.equals(getString(R.string.show_start_image_key))) {
                     return;
                 }
@@ -668,8 +661,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         int versionCode = packageInfo.versionCode;
         String versionName = packageInfo.versionName;
-        Log.i("EPS", "VersionCode = " + versionCode);
-        Log.i("EPS", "VersionName = " + versionName);
+        EPSLog.log("VersionCode = " + versionCode);
+        EPSLog.log("VersionName = " + versionName);
         version = new Version(prefs, versionName, versionCode);
         if (version.isNewInstallation() || version.isUpgrade()) {
             SharedPreferences.Editor editor = prefs.edit();
@@ -690,12 +683,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     layout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
-                //scaleImageForImageView();
-                Log.d(EPS, "onGlobalLayoutListener called");
 
                 if (noSavedInstance) {
                     addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
-                    Log.d(EPS, "ScaleImageForImageView()");
                     scaleImageForImageView();
                 }
                 // else adjust the caliper positions, now that calipersView is created
@@ -707,8 +697,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         float maxY = c.getDirection() == Caliper.Direction.HORIZONTAL
                                 ? calipersView.getHeight()
                                 : calipersView.getWidth();
-                        Log.d(EPS, "calipersView.getWidth() = " + calipersView.getWidth()
-                                + " calipersView.getHeight() = " + calipersView.getHeight());
                         c.setBar1Position(untransformCoordinate(c.getBar1Position(), maxX));
                         c.setBar2Position(untransformCoordinate(c.getBar2Position(), maxX));
                         c.setCrossbarPosition(untransformCoordinate(c.getCrossbarPosition(), maxY));
@@ -729,12 +717,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        /// TODO: update BOTH quick_start_messages (there are 2 strings.xml files)
         /// TODO: Reactivate this and make sure this works with version updates.
         // NB: we no longer provide quick start messages, so don't update them.
         //noinspection ConstantConditions
         if (force_first_run || getFirstRun(prefs)) {
-            Log.d(EPS, "firstRun");
             setRunned(prefs);
             // We no longer show update dialog after app updated.
 //            AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -750,7 +736,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void handleImage() {
-        Log.d(EPS, "handleImage");
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -764,7 +749,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void handleSentImage() {
-        Log.d(EPS, "handleSentImage");
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -781,7 +765,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             Uri imageUri = getIntent().getData();
             if (imageUri != null) {
-                Log.d(EPS, "imageUri = " + imageUri.toString());
                 externalImageLoad = true;
                 externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
             }
@@ -795,7 +778,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
             if (imageUri != null) {
-                Log.d(EPS, "imageUri = " + imageUri.toString());
                 externalImageLoad = true;
                 externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
             }
@@ -807,7 +789,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // from http://stackoverflow.com/questions/10698360/how-to-convert-a-pdf-page-to-an-image-in-android
     private void handlePDF() {
-        Log.i("EPS", "handlePDF()");
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -821,7 +802,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void proceedToHandlePDF() {
-        Log.i("EPS", "proceedToHandlePDF");
         Uri pdfUri = getIntent().getData();
         if (pdfUri != null) {
             UriPage uriPage = new UriPage();
@@ -832,7 +812,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadPDFAsynchronously(UriPage uriPage) {
-        Log.i("EPS", "loadPDFAsynchronously");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             new NougatAsyncLoadPDF(this).execute(uriPage);
         }
@@ -843,7 +822,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Uri getTempUri(Uri uri) {
         try {
-            Log.d(EPS, "File uri is " + uri.getPath());
             InputStream is = getContentResolver().openInputStream(uri);
             ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
@@ -860,7 +838,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 byteBuffer.write(buffer, 0, len);
             }
             byte[] bytes = byteBuffer.toByteArray();
-            Log.d(EPS, "bytes length is " + bytes.length);
             File file = createTmpPdfFile();
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
             bos.write(bytes);
@@ -891,7 +868,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPreExecute() {
-            Log.i("EPS", "opPreExecute");
             super.onPreExecute();
             activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
             Toast toast = Toast.makeText(activityWeakReference.get(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
@@ -929,7 +905,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 // retain PDF Uri for future page changes
                 activityWeakReference.get().currentPdfUri = pdfUri;
-                Log.i("EPS", "currentPdfUri assigned and = " + activityWeakReference.get().currentPdfUri);
                 isNewPdf = true;
             }
             try {
@@ -1151,7 +1126,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     dialog.cancel();
                     return;
                 }
-                Log.i("EPS", "numberOfPdfPages = " + numberOfPdfPages);
                 if (pageNumber > numberOfPdfPages) {
                     pageNumber = numberOfPdfPages;
                 }
@@ -1187,7 +1161,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     void loadSettings() {
-        Log.i("EPS", "loadSettings()");
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
         showStartImage = sharedPreferences.getBoolean(
@@ -1226,8 +1199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(EPS, "onResume");
-
+        EPSLog.log("onResume");
     }
 
     private void scaleImageForImageView() {
@@ -1298,7 +1270,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        Log.d(EPS, "onSaveInstanceState");
+        EPSLog.log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putFloat(getString(R.string.imageview_scale_key), imageView.getScale());
         outState.putFloat(getString(R.string.total_rotation_key), totalRotation);
@@ -1382,7 +1354,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.d(EPS, "onRestoreInstanceState");
+        EPSLog.log("onRestoreInstanceState");
         imageIsLocked = savedInstanceState.getBoolean(getString(R.string.image_locked_key));
         lockImage(imageIsLocked);
         calipersView.setACaliperIsMarching(savedInstanceState.getBoolean(getString(R.string.a_caliper_is_marching_key)));
@@ -1498,7 +1470,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         catch (Exception ex) {
             Toast toast = Toast.makeText(this, R.string.temp_image_file_warning, Toast.LENGTH_SHORT);
             toast.show();
-            Log.d(EPS, "Could not store temp file");
+            EPSLog.log("Could not store temp file");
         }
     }
 
@@ -1781,22 +1753,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void pushToolbarMenuStack(ToolbarMenu menu) {
-        Log.i("EPS", "Pushing menu " + menu);
         toolbarMenuDeque.addLast(menu);
     }
 
     private ToolbarMenu popToolbarMenuStack() {
         ToolbarMenu menu = toolbarMenuDeque.pollLast();
         if (menu == null) {
-            Log.i("EPS", "Menu stack is empty, returning MainMenu");
             return ToolbarMenu.Main;
         }
-        Log.i("EPS", "Popping menu " + menu);
         return menu;
     }
 
     private void clearToolbarMenuStack() {
-        Log.i("EPS", "Clearing menu stack");
         toolbarMenuDeque.clear();
     }
 
@@ -1840,7 +1808,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     
     private void selectMainMenu() {
-        Log.i("EPS", "selectMainMenu called");
+        EPSLog.log("selectMainMenu called");
         if (mainMenu == null) {
             createMainMenu();
         }
@@ -2048,7 +2016,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(EPS, "onCreateOptionsMenu");
+        EPSLog.log("onCreateOptionsMenu");
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
@@ -2063,13 +2031,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.add_caliper) {
-            Log.i("EPS", "Add calipers");
             selectAddCaliperMenu();
             return true;
         }
         if (id == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START);
-            Log.i("EPS","Open drawer");
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -2100,7 +2066,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadSampleEcg() {
-        Log.i("EPS", "loadSampleEcg called");
         Bitmap image = BitmapFactory.decodeResource(this.getResources(),
                 R.drawable.sample_ecg);
         updateImageView(image);
@@ -2183,14 +2148,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(EPS, "Camera permission granted");
+                    EPSLog.log("Camera permission granted");
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
+                    enableCameraMenuItem(true);
                     proceedToTakePhoto();
                 } else {
-                    Log.d(EPS, "Camera permission denied");
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    EPSLog.log("Camera permission denied");
+                    enableCameraMenuItem(false);
                 }
                 break;
             }
@@ -2198,65 +2163,62 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(EPS, "Write External storage permission granted");
+                    EPSLog.log("Write External storage permission granted");
                     proceedToSelectImageFromGallery();
                 } else {
-                    Log.d(EPS, "Write external storage permission denied");
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    EPSLog.log("Write external storage permission denied");
+                    // We won't disable the select image button, but will just keep asking about
+                    // this every time the button is pressed.
                 }
                 break;
             }
             case MY_PERMISSIONS_REQUEST_STARTUP_IMAGE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(EPS, "Write External storage permission granted");
+                    EPSLog.log("Write External storage permission granted");
                     proceedToHandleImage();
                 } else {
-                    Log.d(EPS, "Write external storage permission denied");
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    EPSLog.log("Write external storage permission denied");
                 }
                 break;
             }
             case MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(EPS, "Write External storage permission granted");
+                    EPSLog.log("Write External storage permission granted");
                     proceedToHandleSentImage();
                 } else {
-                    Log.d(EPS, "Write external storage permission denied");
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    EPSLog.log("Write external storage permission denied");
                 }
                 break;
             }
             case MY_PERMISSIONS_REQUEST_STARTUP_PDF: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(EPS, "Write External storage permission granted");
+                    EPSLog.log("Write External storage permission granted");
                     proceedToHandlePDF();
                 } else {
-                    Log.d(EPS, "Write external storage permission denied");
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    EPSLog.log("Write external storage permission denied");
                 }
                 break;
             }
             case MY_PERMISSIONS_REQUEST_STORE_BITMAP: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(EPS, "Write External storage permission granted");
+                    EPSLog.log("Write External storage permission granted");
                     proceedToStoreBitmap();
                 } else {
-                    Log.d(EPS, "Write external storage permission denied");
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    EPSLog.log("Write external storage permission denied");
                 }
                 break;
             }
-
         }
+    }
+
+    private void enableCameraMenuItem(boolean enable) {
+        Menu menuNav = navigationView.getMenu();
+        MenuItem cameraMenuItem = menuNav.findItem(R.id.nav_camera);
+        cameraMenuItem.setEnabled(enable);
     }
 
     private boolean deviceHasCamera(Intent takePictureIntent) {
@@ -2308,7 +2270,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("EPS", "onActivityResult called");
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
             if (selectedImage == null) {
@@ -2333,13 +2294,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateImageViewWithPath(String path) {
-        Log.i("EPS", "updateImageViewWithPath called, string = " + path);
         Bitmap bitmap = getScaledBitmap(path);
         updateImageView(bitmap);
     }
 
     private void updateImageView(Bitmap bitmap) {
-        Log.i("EPS", "updateImageView called, bitmap = " + bitmap);
         imageView.setImageBitmap(bitmap);
         scaleImageForImageView();
         imageView.setVisibility(View.VISIBLE);
@@ -2376,7 +2335,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void about() {
         Intent i = new Intent(this, About.class);
-        i.putExtra("VersionNumber", version.getVersionName());
+        i.putExtra(getString(R.string.version_number), version.getVersionName());
         startActivity(i);
     }
 
@@ -2751,7 +2710,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void processCalibration() {
-        Log.d(EPS, "process calibration...");
         if (dialogResult.length() < 1) {
             return;
         }
@@ -2791,7 +2749,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return calibrationResult;
         }
         List<String> chunks = parse(in);
-        Log.d(EPS, "chunks = " + chunks);
         if (chunks.size() < 1) {
             return calibrationResult;
         }
@@ -2800,7 +2757,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Number number = format.parse(chunks.get(0));
             calibrationResult.value = number.floatValue();
         } catch (Exception ex) {
-            Log.d(EPS, "exception = " + ex.toString());
+            EPSLog.log("exception = " + ex.toString());
             return calibrationResult;
         }
         if (chunks.size() > 1) {
