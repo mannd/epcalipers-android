@@ -72,7 +72,6 @@ public class AngleCaliper extends Caliper {
 
     public AngleCaliper() {
         super();
-        /// TODO: angle marker always on top, but need to deal with triangle base
         triangleBaseTextPosition = getTextPosition();
         bar1Angle = Math.PI * 0.5;
         bar2Angle = Math.PI * 0.25;

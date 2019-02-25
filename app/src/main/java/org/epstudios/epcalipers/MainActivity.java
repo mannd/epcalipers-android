@@ -78,6 +78,7 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -99,6 +100,7 @@ import static org.epstudios.epcalipers.MyPreferenceFragment.FRIDERICIA;
 import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
     // TODO: regex below includes Cyrillic and must be updated with new alphabets
     @SuppressWarnings("HardCodedStringLiteral")
     private static final String calibrationRegex = "[.,0-9]+|[a-zA-ZА-яЁё]+";
@@ -568,19 +570,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     qtcFormulaPreference = qtcFormulaMap.get(qtcFormulaName);
                     return;  // no need to invalidate calipersView
                 }
-                // TODO: fix these defaults for colors (they have to equal the string version of the color int)
                 if (key.equals(getString(R.string.caliper_color_key))) {
                     try {
                         currentCaliperColor = Integer.parseInt(sharedPreferences.getString(key,
-                                getString(R.string.default_caliper_color)));
+                                Integer.valueOf(DEFAULT_CALIPER_COLOR).toString()));
                     } catch (NumberFormatException ex) {
+                        currentCaliperColor = DEFAULT_CALIPER_COLOR;
                         return;
                     }
                 }
                 if (key.equals(getString(R.string.highlight_color_key))) {
                     try {
                         int color = Integer.parseInt(sharedPreferences.getString(key,
-                                getString(R.string.default_highlight_color)));
+                                Integer.valueOf(DEFAULT_HIGHLIGHT_COLOR).toString()));
                         currentHighlightColor = color;
                         for (Caliper c : calipersView.getCalipers()) {
                             c.setSelectedColor(color);
@@ -589,6 +591,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         }
                     } catch (NumberFormatException ex) {
+                        currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
+                        for (Caliper c : calipersView.getCalipers()) {
+                            c.setSelectedColor(currentHighlightColor);
+                            if (c.isSelected()) {
+                                c.setColor(currentHighlightColor);
+                            }
+                        }
                         return;
                     }
                 }
@@ -601,6 +610,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             setLineWidth(c, lineWidth);
                         }
                     } catch (NumberFormatException ex) {
+                        currentLineWidth = DEFAULT_LINE_WIDTH;
+                        for (Caliper c : calipersView.getCalipers()) {
+                            setLineWidth(c, currentLineWidth);
+                        }
                         return;
                     }
                 }
@@ -642,7 +655,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 }
-
                 calipersView.invalidate();
             }
         };
@@ -1910,9 +1922,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pushToolbarMenuStack(ToolbarMenu.QTc2);
         selectMenu(qtcStep2Menu);
         inQtc = true;
-	// TODO: is this needed to allow tweaking during QTc?
-        calipersView.setAllowTweakPosition(true);
-        // calipersView.setAllowTweakPosition(allowTweakDuringQtc);
     }
 
     public void selectColorMenu() {
@@ -2755,8 +2764,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             Number number = format.parse(chunks.get(0));
             calibrationResult.value = number.floatValue();
-        } catch (Exception ex) {
-            EPSLog.log("exception = " + ex.toString());
+        } catch (ParseException ex) {
+            EPSLog.log("Exception = " + ex.toString());
             return calibrationResult;
         }
         if (chunks.size() > 1) {

@@ -4,7 +4,6 @@ package org.epstudios.epcalipers;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -13,7 +12,7 @@ import android.util.SparseArray;
 import java.util.HashMap;
 import java.util.Map;
 
-
+// TODO: Why not store colors as Integers?
 public class MyPreferenceFragment extends PreferenceFragment implements
         OnSharedPreferenceChangeListener {
 
@@ -84,8 +83,8 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultCaliperColorName;
     private String defaultHighlightColorName;
     private String defaultLineWidthName;
-    private String defaultTimeCalibration;
-    private String defaultAmplitudeCalibration;
+    private String defaultTimeCalibrationName;
+    private String defaultAmplitudeCalibrationName;
     private String defaultQtcFormula;
     private String defaultTimeCaliperTextPosition;
     private String defaultAmplitudeCaliperTextPosition;
@@ -108,8 +107,8 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         defaultCaliperColorName = activity.getString(R.string.default_caliper_color);
         defaultHighlightColorName = activity.getString(R.string.default_highlight_color);
         defaultLineWidthName = activity.getString(R.string.default_line_width);
-        defaultTimeCalibration = activity.getString(R.string.default_time_calibration_value);
-        defaultAmplitudeCalibration = activity.getString(R.string.default_amplitude_calibration_value);
+        defaultTimeCalibrationName = activity.getString(R.string.default_time_calibration_value);
+        defaultAmplitudeCalibrationName = activity.getString(R.string.default_amplitude_calibration_value);
         defaultQtcFormula = activity.getString(R.string.qtc_formula_value);
         defaultTimeCaliperTextPosition = activity.getString(R.string.time_caliper_text_position_value);
         defaultAmplitudeCaliperTextPosition = activity.getString(R.string.amplitude_caliper_text_position_value);
@@ -119,12 +118,12 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         Preference defaultTimeCalibrationPreference = findPreference(defaultTimeCalibrationKey);
         defaultTimeCalibrationPreference.setSummary(getPreferenceScreen()
                 .getSharedPreferences()
-                .getString(defaultTimeCalibrationKey, defaultTimeCalibration));
+                .getString(defaultTimeCalibrationKey, defaultTimeCalibrationName));
 
         Preference defaultAmplitudeCalibrationPreference = findPreference(defaultAmplitudeCalibrationKey);
         defaultAmplitudeCalibrationPreference.setSummary(getPreferenceScreen()
                 .getSharedPreferences()
-                .getString(defaultAmplitudeCalibrationKey, defaultAmplitudeCalibration));
+                .getString(defaultAmplitudeCalibrationKey, defaultAmplitudeCalibrationName));
 
         Preference defaultCaliperColorPreference = findPreference(defaultCaliperColorKey);
         String defaultCaliperColorValue = getPreferenceScreen()
@@ -181,10 +180,10 @@ public class MyPreferenceFragment extends PreferenceFragment implements
                                           String key) {
         Preference pref = findPreference(key);
         if (key.equals(defaultTimeCalibrationKey)) {
-            pref.setSummary(sharedPreferences.getString(key, defaultTimeCalibration));
+            pref.setSummary(sharedPreferences.getString(key, defaultTimeCalibrationName));
         }
         else if (key.equals(defaultAmplitudeCalibrationKey)) {
-            pref.setSummary(sharedPreferences.getString(key, defaultAmplitudeCalibration));
+            pref.setSummary(sharedPreferences.getString(key, defaultAmplitudeCalibrationName));
         }
         else if (key.equals(defaultCaliperColorKey)) {
             pref.setSummary(getNameFromKey(sharedPreferences, key, defaultCaliperColorName));
