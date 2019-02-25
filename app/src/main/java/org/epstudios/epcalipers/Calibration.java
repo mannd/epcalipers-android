@@ -27,8 +27,11 @@ import java.util.regex.Pattern;
  * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Calibration {
+    @SuppressWarnings("HardCodedStringLiteral")
     private static final String secRegex = "(?:^sec|^сек|^s$|^с$)";
+    @SuppressWarnings("HardCodedStringLiteral")
     private static final String msecRegex = "(?:^msec|^millis|^мсек|^миллис|^ms$|^мс$)";
+    @SuppressWarnings("HardCodedStringLiteral")
     private static final String mmRegex = "(?:^millim|^миллим|^mm$|^мм$)";
 
     private Caliper.Direction direction;

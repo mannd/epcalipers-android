@@ -43,14 +43,11 @@ public class Help extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         String url = "";
         if (extras != null) {
-            url = extras.getString("URL");
-            String anchor = extras.getString("Anchor");
+            url = extras.getString(getString(R.string.url_extra_key));
+            String anchor = extras.getString(getString(R.string.anchor_extra_key));
             if (url == null) {
                 String lang = getString(R.string.lang);
-                url = "https://mannd.github.io/epcalipers/"
-                        + lang
-                        + ".lproj/EPCalipers-help/newhelp.html#"
-                        + anchor;
+                url = getString(R.string.help_url, lang, anchor);
             }
         }
         final WebView webView = findViewById(R.id.webView);
@@ -82,13 +79,5 @@ public class Help extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private boolean usingFrenchLanguage() {
-        return getLocaleLanguageString().equals("fr");
-    }
-
-    private String getLocaleLanguageString() {
-        return Locale.getDefault().getLanguage();
     }
 }

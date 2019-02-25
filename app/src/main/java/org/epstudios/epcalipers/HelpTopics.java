@@ -59,8 +59,9 @@ public class HelpTopics extends AppCompatActivity {
             public void onClick(View view, int position) {
                 String text = helpTopics[position];
                 if (helpAnchors[position].equals("acknowledgments-id")) {
-                    showHelp("https://mannd.github.io/epcalipers/"
-                            + getString(R.string.lang) + ".lproj/EPCalipers-help/acknowledgments_android.html", null);
+                    String lang = getString(R.string.lang);
+                    showHelp(getString(R.string.acknowledgments_url, lang), null);
+                    EPSLog.log(getString(R.string.acknowledgments_url, lang));
                 }
                 else {
                     showHelp(null, helpAnchors[position]);
@@ -92,8 +93,8 @@ public class HelpTopics extends AppCompatActivity {
 
     private void showHelp(String url, String anchor) {
         Intent intent = new Intent(this, Help.class);
-        intent.putExtra("URL", url);
-        intent.putExtra("Anchor", anchor);
+        intent.putExtra(getString(R.string.url_extra_key), url);
+        intent.putExtra(getString(R.string.anchor_extra_key), anchor);
         startActivity(intent);
     }
 }

@@ -278,6 +278,10 @@
     <string name="image_type" translatable="false">image/</string>
     <string name="horizontal_direction" translatable="false">Horizontal</string>
     <string name="vertical_direction" translatable="false">Vertical</string>
+    <string name="help_url" translatable="false">
+        https://mannd.github.io/epcalipers/%1$s.lproj/EPCalipers-help/newhelp.html#%2$s</string>
+    <string name="acknowledgments_url" translatable="false">
+        https://mannd.github.io/epcalipers/%s.lproj/EPCalipers-help/acknowledgments_android.html</string>
 
     <!--Non-translatable button text image labels-->
     <string name="next_button_label" translatable="false">▶</string>
@@ -291,6 +295,8 @@
     <string name="micro_up_label" translatable="false">↑</string>
     <string name="micro_down_label" translatable="false">↓</string>
     <string name="qtc_button_title" translatable="false">QTc</string>
-    <string name="version_number">VersionNumber</string>
+    <string name="version_number" translatable="false">VersionNumber</string>
+    <string name="url_extra_key" translatable="false">URL</string>
+    <string name="anchor_extra_key">Anchor</string>
 
 </resources>

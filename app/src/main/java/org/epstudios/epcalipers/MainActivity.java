@@ -71,6 +71,7 @@ import org.vudroid.pdfdroid.codec.PdfPage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,6 +100,7 @@ import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     // TODO: regex below includes Cyrillic and must be updated with new alphabets
+    @SuppressWarnings("HardCodedStringLiteral")
     private static final String calibrationRegex = "[.,0-9]+|[a-zA-ZА-яЁё]+";
     private static final Pattern VALID_PATTERN = Pattern.compile(calibrationRegex);
     private static final String LF = "\n";
@@ -192,13 +194,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DrawerLayout drawerLayout;
 
     private double rrIntervalForQTc;
-    private float sizeDiffWidth;
-    private float sizeDiffHeight;
-    private boolean isRotatedImage;
-    private float portraitWidth;
-    private float portraitHeight;
-    private float landscapeWidth;
-    private float landscapeHeight;
     private boolean showStartImage;
     private boolean roundMsecRate;
     private boolean autoPositionText;
@@ -219,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int currentPdfPageNumber;
     private boolean useLargeFont;
     private boolean imageIsLocked = false;
+
     private float smallFontSize;
     private float largeFontSize;
 
@@ -572,11 +568,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     qtcFormulaPreference = qtcFormulaMap.get(qtcFormulaName);
                     return;  // no need to invalidate calipersView
                 }
+                // TODO: fix these defaults for colors (they have to equal the string version of the color int)
                 if (key.equals(getString(R.string.caliper_color_key))) {
                     try {
                         currentCaliperColor = Integer.parseInt(sharedPreferences.getString(key,
                                 getString(R.string.default_caliper_color)));
-                    } catch (Exception ex) {
+                    } catch (NumberFormatException ex) {
                         return;
                     }
                 }
@@ -591,7 +588,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 c.setColor(color);
                             }
                         }
-                    } catch (Exception ex) {
+                    } catch (NumberFormatException ex) {
                         return;
                     }
                 }
@@ -603,7 +600,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         for (Caliper c : calipersView.getCalipers()) {
                             setLineWidth(c, lineWidth);
                         }
-                    } catch (Exception ex) {
+                    } catch (NumberFormatException ex) {
                         return;
                     }
                 }
@@ -663,7 +660,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String versionName = packageInfo.versionName;
         EPSLog.log("VersionCode = " + versionCode);
         EPSLog.log("VersionName = " + versionName);
-        version = new Version(prefs, versionName, versionCode);
+        version = new Version(this, prefs, versionName, versionCode);
         if (version.isNewInstallation() || version.isUpgrade()) {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(getString(R.string.app_version_key), version.getVersionName());
@@ -769,7 +766,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
             }
         }
-        catch (Exception e) {
+        catch (java.io.IOException e) {
             showFileErrorAlert();
         }
     }
@@ -782,7 +779,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
             }
         }
-        catch (Exception e) {
+        catch (java.io.IOException e) {
             showFileErrorAlert();
         }
     }
@@ -845,7 +842,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bos.close();
             return Uri.fromFile(file);
         }
-        catch (Exception e) {
+        catch (java.io.IOException e) {
             return null;
         }
     }
@@ -929,7 +926,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 renderer.close();
                 fd.close();
                 return bitmap;
-            } catch (Exception e) {
+            } catch (java.io.IOException e) {
                 // catch out of memory errors and just don't load rather than crash
                 exceptionMessage = e.getMessage();
                 return null;
@@ -1016,6 +1013,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 activityWeakReference.get().currentPdfUri = pdfUri;
                 isNewPdf = true;
             }
+            // Not clear if this code can throw out of memory exception --
+            // not well documented, so we'll be careful and catch any exception.
             try {
                 decodeService.open(pdfUri);
                 activityWeakReference.get().numberOfPdfPages = decodeService.getPageCount();
@@ -1122,7 +1121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int pageNumber;
                 try {
                     pageNumber = Integer.parseInt(dialogResult);
-                } catch (Exception ex) {
+                } catch (NumberFormatException ex) {
                     dialog.cancel();
                     return;
                 }
@@ -1189,7 +1188,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Integer.valueOf(DEFAULT_HIGHLIGHT_COLOR).toString()));
             currentLineWidth = Integer.parseInt(sharedPreferences.getString(getString(R.string.line_width_key),
                     Integer.valueOf(DEFAULT_LINE_WIDTH).toString()));
-        } catch (Exception ex) {
+        } catch (NumberFormatException ex) {
             currentCaliperColor = DEFAULT_CALIPER_COLOR;
             currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
             currentLineWidth = DEFAULT_LINE_WIDTH;
@@ -1467,7 +1466,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             fOut.flush();
             fOut.close();
         }
-        catch (Exception ex) {
+        catch (java.io.IOException ex) {
             Toast toast = Toast.makeText(this, R.string.temp_image_file_warning, Toast.LENGTH_SHORT);
             toast.show();
             EPSLog.log("Could not store temp file");
@@ -2393,7 +2392,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int divisor;
         try {
             divisor = Integer.parseInt(dialogResult);
-        } catch (Exception ex) {
+        } catch (NumberFormatException ex) {
             return;
         }
         if (divisor > 0) {

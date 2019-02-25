@@ -1,5 +1,6 @@
 package org.epstudios.epcalipers;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -26,6 +27,7 @@ import android.content.pm.PackageManager;
  * along with epcalipers-android.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Version {
+    private Context context;
     private SharedPreferences prefs;
 
     public String getVersionName() {
@@ -39,14 +41,15 @@ public class Version {
     private String versionName;
     private int versionCode;
 
-    Version(SharedPreferences prefs, String versionName, int versionCode) {
+    Version(Context context, SharedPreferences prefs, String versionName, int versionCode) {
+        this.context = context;
         this.prefs = prefs;
         this.versionName = versionName;
         this.versionCode = versionCode;
     }
 
     public String getPreviousAppVersion() {
-	String previousVersion = prefs.getString("PreviousAppVersion", null);
+	String previousVersion = prefs.getString(context.getString(R.string.app_version_key), null);
 	return previousVersion;
     }
 
