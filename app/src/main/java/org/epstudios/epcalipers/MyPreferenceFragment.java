@@ -22,20 +22,9 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     public static final String FRIDERICIA = "fridericia";
     public static final String ALL = "all";
 
-    private SparseArray<String> names = null;
-    private SparseArray<String> createPrefsMap(Activity activity) {
+    private SparseArray<String> lineWidthNames = null;
+    private SparseArray<String> createLineWidthMap(Activity activity) {
         SparseArray<String> map = new SparseArray<>();
-        // color names
-        map.put(-16777216, activity.getString(R.string.black_color));
-        map.put(-65281, getString(R.string.magenta_color));
-        map.put(-3355444, getString(R.string.light_gray_color));
-        map.put(-16776961, getString(R.string.blue_color));
-        map.put(-16711936, getString(R.string.green_color));
-        map.put(-1, getString(R.string.white_color));
-        // highlight names
-        map.put(-65536, getString(R.string.red_color));
-        map.put(-256, getString(R.string.yellow_color));
-        map.put(-12303292, getString(R.string.dark_gray_color));
         // line widths
         map.put(1, getString(R.string.one_point));
         map.put(2, getString(R.string.two_points));
@@ -73,15 +62,11 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     //keys
     private String defaultTimeCalibrationKey;
     private String defaultAmplitudeCalibrationKey;
-    private String defaultCaliperColorKey;
-    private String defaultHighlightColorKey;
     private String defaultLineWidthKey;
     private String defaultQtcFormulaKey;
     private String defaultTimeCaliperTextPositionKey;
     private String defaultAmplitudeCaliperTextPositionKey;
 
-    private String defaultCaliperColorName;
-    private String defaultHighlightColorName;
     private String defaultLineWidthName;
     private String defaultTimeCalibrationName;
     private String defaultAmplitudeCalibrationName;
@@ -93,19 +78,15 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Activity activity = getActivity();
-        names = createPrefsMap(activity);
+        lineWidthNames = createLineWidthMap(activity);
         formulaNames = createFormulaNamesMap(activity);
         textPositionNames = createTextPositionNamesMap(activity);
         defaultTimeCalibrationKey = activity.getString(R.string.time_calibration_key);
         defaultAmplitudeCalibrationKey = activity.getString(R.string.amplitude_calibration_key);
-        defaultCaliperColorKey = activity.getString(R.string.caliper_color_key);
-        defaultHighlightColorKey = activity.getString(R.string.highlight_color_key);
         defaultLineWidthKey = activity.getString(R.string.line_width_key);
         defaultQtcFormulaKey = activity.getString(R.string.qtc_formula_key);
         defaultTimeCaliperTextPositionKey = activity.getString(R.string.time_caliper_text_position_key);
         defaultAmplitudeCaliperTextPositionKey = activity.getString(R.string.amplitude_caliper_text_position_key);
-        defaultCaliperColorName = activity.getString(R.string.default_caliper_color);
-        defaultHighlightColorName = activity.getString(R.string.default_highlight_color);
         defaultLineWidthName = activity.getString(R.string.default_line_width);
         defaultTimeCalibrationName = activity.getString(R.string.default_time_calibration_value);
         defaultAmplitudeCalibrationName = activity.getString(R.string.default_amplitude_calibration_value);
@@ -125,20 +106,6 @@ public class MyPreferenceFragment extends PreferenceFragment implements
                 .getSharedPreferences()
                 .getString(defaultAmplitudeCalibrationKey, defaultAmplitudeCalibrationName));
 
-        Preference defaultCaliperColorPreference = findPreference(defaultCaliperColorKey);
-        String defaultCaliperColorValue = getPreferenceScreen()
-                .getSharedPreferences()
-                .getString(defaultCaliperColorKey, defaultCaliperColorName);
-        String caliperColorName = names.get(Integer.parseInt(defaultCaliperColorValue));
-        defaultCaliperColorPreference.setSummary(caliperColorName);
-
-        Preference defaultHighlightColorPreference = findPreference(defaultHighlightColorKey);
-        String defaultHighlightColorValue = getPreferenceScreen()
-                .getSharedPreferences()
-                .getString(defaultHighlightColorKey, defaultHighlightColorName);
-        String highlightColorName = names.get(Integer.parseInt(defaultHighlightColorValue));
-        defaultHighlightColorPreference.setSummary(highlightColorName);
-
         Preference defaultLineWidthPreference = findPreference(defaultLineWidthKey);
         String defaultLineWidthValue = getPreferenceScreen()
                 .getSharedPreferences()
@@ -150,7 +117,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         catch (Exception ex) {
             lineWidth = Integer.parseInt(defaultLineWidthName);
         }
-        String defaultLineWidthName = names.get(lineWidth);
+        String defaultLineWidthName = lineWidthNames.get(lineWidth);
         defaultLineWidthPreference.setSummary(defaultLineWidthName);
 
         Preference defaultQtcFormulaPreference = findPreference(defaultQtcFormulaKey);
@@ -185,12 +152,6 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         else if (key.equals(defaultAmplitudeCalibrationKey)) {
             pref.setSummary(sharedPreferences.getString(key, defaultAmplitudeCalibrationName));
         }
-        else if (key.equals(defaultCaliperColorKey)) {
-            pref.setSummary(getNameFromKey(sharedPreferences, key, defaultCaliperColorName));
-        }
-        else if (key.equals(defaultHighlightColorKey)) {
-            pref.setSummary(getNameFromKey(sharedPreferences, key, defaultHighlightColorName));
-        }
         else if (key.equals(defaultLineWidthKey)) {
             pref.setSummary(getNameFromKey(sharedPreferences, key, defaultLineWidthName));
         }
@@ -214,7 +175,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String getNameFromKey(SharedPreferences sharedPreferences, String key, String defaultName) {
         try {
             int value = Integer.parseInt(sharedPreferences.getString(key, defaultName));
-            return names.get(value);
+            return lineWidthNames.get(value);
         } catch (NumberFormatException ex) {
             //noinspection SuspiciousMethodCalls
             return getString(R.string.error);

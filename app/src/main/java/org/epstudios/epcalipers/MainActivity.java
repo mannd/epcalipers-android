@@ -108,8 +108,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String LF = "\n";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
-    private static final int DEFAULT_CALIPER_COLOR = Color.BLUE;
-    private static final int DEFAULT_HIGHLIGHT_COLOR = Color.RED;
     private static final int DEFAULT_LINE_WIDTH = 2;
 
     // new permissions for Android >= 6.0
@@ -446,8 +444,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         numberOfPdfPages = 0;
         currentPdfPageNumber = 0;
         useLargeFont = false;
-        currentCaliperColor = DEFAULT_CALIPER_COLOR;
-        currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
+        currentCaliperColor = R.color.default_caliper_color;
+        currentHighlightColor = R.color.default_highlight_color;
         currentLineWidth = DEFAULT_LINE_WIDTH;
 
         // QTc formulas
@@ -570,36 +568,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     qtcFormulaPreference = qtcFormulaMap.get(qtcFormulaName);
                     return;  // no need to invalidate calipersView
                 }
-                if (key.equals(getString(R.string.caliper_color_key))) {
-                    try {
-                        currentCaliperColor = Integer.parseInt(sharedPreferences.getString(key,
-                                Integer.valueOf(DEFAULT_CALIPER_COLOR).toString()));
-                    } catch (NumberFormatException ex) {
-                        currentCaliperColor = DEFAULT_CALIPER_COLOR;
-                        return;
-                    }
+                if (key.equals(getString(R.string.new_caliper_color_key))) {
+                    currentCaliperColor = sharedPreferences.getInt(key,
+                            R.color.default_caliper_color);
+                    return;
                 }
-                if (key.equals(getString(R.string.highlight_color_key))) {
-                    try {
-                        int color = Integer.parseInt(sharedPreferences.getString(key,
-                                Integer.valueOf(DEFAULT_HIGHLIGHT_COLOR).toString()));
-                        currentHighlightColor = color;
-                        for (Caliper c : calipersView.getCalipers()) {
-                            c.setSelectedColor(color);
-                            if (c.isSelected()) {
-                                c.setColor(color);
-                            }
+                if (key.equals(getString(R.string.new_highlight_color_key))) {
+                    currentHighlightColor = sharedPreferences.getInt(key,
+                            R.color.default_highlight_color);
+                    for (Caliper c : calipersView.getCalipers()) {
+                        c.setSelectedColor(currentHighlightColor);
+                        if (c.isSelected()) {
+                            c.setColor(currentHighlightColor);
                         }
-                    } catch (NumberFormatException ex) {
-                        currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
-                        for (Caliper c : calipersView.getCalipers()) {
-                            c.setSelectedColor(currentHighlightColor);
-                            if (c.isSelected()) {
-                                c.setColor(currentHighlightColor);
-                            }
-                        }
-                        return;
                     }
+                    return;
                 }
                 if (key.equals(getString(R.string.line_width_key))) {
                     try {
@@ -1193,16 +1176,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String amplitudeCaliperTextPositionName = sharedPreferences.getString(getString(R.string.amplitude_caliper_text_position_key),
                 getString(R.string.amplitude_caliper_text_position_value));
         amplitudeCaliperTextPositionPreference = textPositionMap.get(amplitudeCaliperTextPositionName);
+        currentCaliperColor = sharedPreferences.getInt(getString(R.string.new_caliper_color_key),
+                R.color.default_caliper_color);
+        currentHighlightColor = sharedPreferences.getInt(getString(R.string.new_highlight_color_key),
+                R.color.default_highlight_color);
         try {
-            currentCaliperColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.caliper_color_key),
-                    Integer.valueOf(DEFAULT_CALIPER_COLOR).toString()));
-            currentHighlightColor = Integer.parseInt(sharedPreferences.getString(getString(R.string.highlight_color_key),
-                    Integer.valueOf(DEFAULT_HIGHLIGHT_COLOR).toString()));
             currentLineWidth = Integer.parseInt(sharedPreferences.getString(getString(R.string.line_width_key),
                     Integer.valueOf(DEFAULT_LINE_WIDTH).toString()));
         } catch (NumberFormatException ex) {
-            currentCaliperColor = DEFAULT_CALIPER_COLOR;
-            currentHighlightColor = DEFAULT_HIGHLIGHT_COLOR;
             currentLineWidth = DEFAULT_LINE_WIDTH;
         }
     }

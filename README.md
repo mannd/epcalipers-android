@@ -28,7 +28,10 @@ of Joan Zapata which is licensed under the
 [GNU GPL v3 license.](http://www.gnu.org/licenses/gpl.html) The color
 selector is copyright 2014-2017
 [QuadFlask](https://github.com/QuadFlask/colorpicker) and is licensed
-under the Apache 2.0 license.
+under the Apache 2.0 license.  The
+[preferences color selector](https://github.com/kizitonwose/colorpreference)
+is copyright 216 Kizito Nwose and is licensed under the Apache 2.0
+license.
 
 
 ## Copyright

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
 
     <CheckBoxPreference
         android:defaultValue="true"
@@ -26,18 +29,16 @@
         android:maxLines="1"
         android:singleLine="true" />
 
-    <ListPreference
-        android:defaultValue="-16776961"
-        android:entries="@array/caliper_color_names"
-        android:entryValues="@array/caliper_color_values"
-        android:key="@string/caliper_color_key"
+    <com.kizitonwose.colorpreference.ColorPreference
+        android:defaultValue="@color/default_caliper_color"
+        android:key="@string/new_caliper_color_key"
+        app:colorChoices="@array/color_choices"
         android:title="@string/default_caliper_color_label" />
 
-    <ListPreference
-        android:defaultValue="-65536"
-        android:entries="@array/highlight_color_names"
-        android:entryValues="@array/highlight_color_values"
-        android:key="@string/highlight_color_key"
+    <com.kizitonwose.colorpreference.ColorPreference
+        android:defaultValue="@color/default_highlight_color"
+        android:key="@string/new_highlight_color_key"
+        app:colorChoices="@array/color_choices"
         android:title="@string/default_highlight_color_label" />
 
     <ListPreference
