@@ -1,4 +1,5 @@
-EP Calipers ===========
+EP Calipers
+===========
 
 [![Build Status](https://travis-ci.org/mannd/epcalipers-android.svg?branch=master)](https://travis-ci.org/mannd/epcalipers-android)
 

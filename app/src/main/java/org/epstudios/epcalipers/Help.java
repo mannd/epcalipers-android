@@ -4,11 +4,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.util.Log;
+
 import android.view.MenuItem;
 import android.webkit.WebView;
-
-import java.util.Locale;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.

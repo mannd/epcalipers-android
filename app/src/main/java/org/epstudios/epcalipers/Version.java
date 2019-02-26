@@ -2,8 +2,6 @@ package org.epstudios.epcalipers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 
 /**
  * Copyright (C) 2019 EP Studios, Inc.
@@ -27,8 +25,8 @@ import android.content.pm.PackageManager;
  * along with epcalipers-android.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Version {
-    private Context context;
-    private SharedPreferences prefs;
+    private final Context context;
+    private final SharedPreferences prefs;
 
     public String getVersionName() {
         return versionName;
@@ -38,8 +36,8 @@ public class Version {
         return versionCode;
     }
 
-    private String versionName;
-    private int versionCode;
+    private final String versionName;
+    private final int versionCode;
 
     Version(Context context, SharedPreferences prefs, String versionName, int versionCode) {
         this.context = context;
@@ -49,8 +47,7 @@ public class Version {
     }
 
     public String getPreviousAppVersion() {
-	String previousVersion = prefs.getString(context.getString(R.string.app_version_key), null);
-	return previousVersion;
+        return prefs.getString(context.getString(R.string.app_version_key), null);
     }
 
     public boolean isNewInstallation() {

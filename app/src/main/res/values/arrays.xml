@@ -3,32 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation" >
 
-    <string-array name="caliper_color_names">
-        <item>@string/black_color</item>
-        <item>@string/magenta_color</item>
-        <item>@string/light_gray_color</item>
-        <item>@string/blue_color</item>
-        <item>@string/green_color</item>
-        <item>@string/white_color</item>
-    </string-array>
-    <string-array name="caliper_color_values">
-        <item>-16777216</item>
-        <item>-65281</item>
-        <item>-3355444</item>
-        <item>-16776961</item>
-        <item>-16711936</item>
-        <item>-1</item>
-    </string-array>
-    <string-array name="highlight_color_names">
-        <item>@string/red_color</item>
-        <item>@string/yellow_color</item>
-        <item>@string/dark_gray_color</item>
-    </string-array>
-    <string-array name="highlight_color_values">
-        <item>-65536</item>
-        <item>-256</item>
-        <item>-12303292</item>
-    </string-array>
     <string-array name="line_width_names">
         <item>@string/one_point</item>
         <item>@string/two_points</item>
@@ -122,6 +96,4 @@
       <item>acknowledgments-id</item>
     </string-array>
 
-    <string name="nine_points">9 points</string>
-    <string name="ten_points">10 points</string>
 </resources>

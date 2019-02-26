@@ -235,7 +235,9 @@
     <string name="amplitude_caliper_text_position_key" translatable="false">amplitude_caliper_text_position</string>
     <string name="auto_position_text_key" translatable="false">auto_position_text</string>
     <string name="app_version_key" translatable="false">app_version_key</string>
-
+    <string name="anchor_extra_key" translatable="false">Anchor</string>
+    <string name="new_caliper_color_key" translatable="false">new_caliper_color_key</string>
+    <string name="new_highlight_color_key" translatable="false">new_highlight_color_key</string>
     <string name="time_caliper_text_position_value" translatable="false">centerAbove</string>
     <string name="amplitude_caliper_text_position_value" translatable="false">right</string>
     <string name="qtc_formula_value" translatable="false">bazett</string>
@@ -297,8 +299,5 @@
     <string name="qtc_button_title" translatable="false">QTc</string>
     <string name="version_number" translatable="false">VersionNumber</string>
     <string name="url_extra_key" translatable="false">URL</string>
-    <string name="anchor_extra_key">Anchor</string>
-    <string name="new_caliper_color_key">new_caliper_color_key</string>
-    <string name="new_highlight_color_key">new_highlight_color_key</string>
 
 </resources>

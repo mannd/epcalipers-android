@@ -23,7 +23,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     public static final String ALL = "all";
 
     private SparseArray<String> lineWidthNames = null;
-    private SparseArray<String> createLineWidthMap(Activity activity) {
+    private SparseArray<String> createLineWidthMap() {
         SparseArray<String> map = new SparseArray<>();
         // line widths
         map.put(1, getString(R.string.one_point));
@@ -37,25 +37,25 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     }
 
     private Map<String, String> formulaNames = null;
-    private Map<String, String> createFormulaNamesMap(Activity activity) {
+    private Map<String, String> createFormulaNamesMap() {
         Map<String, String> map = new HashMap<>();
-        map.put(BAZETT, activity.getString(R.string.bazett_formula));
-        map.put(FRAMINGHAM, activity.getString(R.string.framingham_formula));
-        map.put(HODGES, activity.getString(R.string.hodges_formula));
-        map.put(FRIDERICIA, activity.getString(R.string.fridericia_formula));
-        map.put(ALL, activity.getString(R.string.all_formulas));
+        map.put(BAZETT, getString(R.string.bazett_formula));
+        map.put(FRAMINGHAM, getString(R.string.framingham_formula));
+        map.put(HODGES, getString(R.string.hodges_formula));
+        map.put(FRIDERICIA, getString(R.string.fridericia_formula));
+        map.put(ALL, getString(R.string.all_formulas));
         return map;
     }
 
     private Map<String, String> textPositionNames = null;
-    private Map<String, String> createTextPositionNamesMap(Activity activity) {
+    private Map<String, String> createTextPositionNamesMap() {
         Map<String, String> map = new HashMap<>();
-        map.put("centerAbove", activity.getString(R.string.center_above));
-        map.put("centerBelow", activity.getString(R.string.center_below));
-        map.put("left", activity.getString(R.string.left));
-        map.put("right", activity.getString(R.string.right));
-        map.put("top", activity.getString(R.string.top));
-        map.put("bottom", activity.getString(R.string.bottom));
+        map.put("centerAbove", getString(R.string.center_above));
+        map.put("centerBelow", getString(R.string.center_below));
+        map.put("left", getString(R.string.left));
+        map.put("right", getString(R.string.right));
+        map.put("top", getString(R.string.top));
+        map.put("bottom", getString(R.string.bottom));
         return map;
     }
 
@@ -78,9 +78,9 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Activity activity = getActivity();
-        lineWidthNames = createLineWidthMap(activity);
-        formulaNames = createFormulaNamesMap(activity);
-        textPositionNames = createTextPositionNamesMap(activity);
+        lineWidthNames = createLineWidthMap();
+        formulaNames = createFormulaNamesMap();
+        textPositionNames = createTextPositionNamesMap();
         defaultTimeCalibrationKey = activity.getString(R.string.time_calibration_key);
         defaultAmplitudeCalibrationKey = activity.getString(R.string.amplitude_calibration_key);
         defaultLineWidthKey = activity.getString(R.string.line_width_key);

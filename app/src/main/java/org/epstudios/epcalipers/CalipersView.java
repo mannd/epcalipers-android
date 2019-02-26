@@ -9,7 +9,6 @@ import android.graphics.PointF;
 import android.graphics.Typeface;
 import androidx.core.view.GestureDetectorCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;

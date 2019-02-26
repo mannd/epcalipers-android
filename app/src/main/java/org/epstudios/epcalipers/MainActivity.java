@@ -14,7 +14,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -44,7 +43,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.text.InputType;
-import android.util.Log;
 import android.util.Pair;
 import android.view.ActionMode;
 import android.view.Display;
@@ -71,7 +69,6 @@ import org.vudroid.pdfdroid.codec.PdfPage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -232,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Caliper.TextPosition timeCaliperTextPositionPreference = Caliper.TextPosition.CenterBelow;
     private Caliper.TextPosition amplitudeCaliperTextPositionPreference = Caliper.TextPosition.Left;
 
-    private Deque<ToolbarMenu> toolbarMenuDeque = new ArrayDeque<ToolbarMenu>();
+    private final Deque<ToolbarMenu> toolbarMenuDeque = new ArrayDeque<>();
 
     private enum ToolbarMenu {
         Main,
@@ -365,8 +362,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Convert dp to pixels utility
     private float dpToPixel(float dp) {
         float density = getResources().getDisplayMetrics().density;
-        float pixel = dp * density;
-        return pixel;
+        return dp * density;
     }
 
     @Override
@@ -597,8 +593,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         for (Caliper c : calipersView.getCalipers()) {
                             setLineWidth(c, currentLineWidth);
                         }
-                        return;
                     }
+                    return;
                 }
                 if (key.equals(getString(R.string.use_large_font_key))) {
                     useLargeFont = sharedPreferences.getBoolean(key, false);
@@ -646,13 +642,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
 
         PackageInfo packageInfo = null;
+        int versionCode = 0;
+        String versionName = "";
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionCode = packageInfo.versionCode;
+            versionName = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        int versionCode = packageInfo.versionCode;
-        String versionName = packageInfo.versionName;
         EPSLog.log("VersionCode = " + versionCode);
         EPSLog.log("VersionName = " + versionName);
         version = new Version(this, prefs, versionName, versionCode);
