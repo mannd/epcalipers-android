@@ -332,9 +332,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    /// TODO: make false for release
-    // NB: we don't provide quick start dialogs anymore, so keep this false.
-    private final boolean force_first_run = false;
+    // TODO: Make sure the 1st part of this conditional never changes.  force_first_run
+    // MUST be false for a release.  The 2nd part of the condition can be set true to
+    // test onboarding with each startup.
+    private final boolean force_first_run = !BuildConfig.DEBUG ? false : true;
 
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -374,7 +375,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String action = intent.getAction();
         String type = intent.getType();
 
-        startActivity(new Intent(this, Onboarder.class));
 
         noSavedInstance = (savedInstanceState == null);
 
@@ -709,17 +709,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        /// TODO: Reactivate this and make sure this works with version updates.
-        // NB: we no longer provide quick start messages, so don't update them.
         //noinspection ConstantConditions
-        if (force_first_run || getFirstRun(prefs)) {
-            setRunned(prefs);
-            // We no longer show update dialog after app updated.
-//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//            builder.setTitle(getString(R.string.quick_start_title));
-//            builder.setMessage(getString(R.string.quick_start_message));
-//            builder.setPositiveButton(getString(R.string.ok_title), null);
-//            builder.show();
+        if (force_first_run || version.isUpgrade() || version.isNewInstallation()) {
+            startActivity(new Intent(this, Onboarder.class));
+            version.saveVersion();
         }
 
         if (externalImageLoad) {
@@ -1143,17 +1136,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.show();
     }
 
-    public boolean getFirstRun(SharedPreferences prefs) {
-      return prefs.getBoolean("firstRun" + version.getVersionName(), true);
-    }
-
-    public void setRunned(SharedPreferences prefs) {
-        SharedPreferences.Editor edit = prefs.edit();
-        edit.putBoolean("firstRun" + version.getVersionName(), false);
-        edit.apply();
-    }
-
-
     void loadSettings() {
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
@@ -1536,10 +1518,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v == pdfDoneButton) {
             gotoPreviousMenu();
         } else if (v == colorDoneButton) {
-            calipersView.setTweakingOrColoring(false);
-            gotoPreviousMenu();
+            colorDone();
         } else if (v == tweakDoneButton) {
-            calipersView.setTweakingOrColoring(false);
             tweakDone();
         } else if (v == leftButton) {
             left();
@@ -1791,7 +1771,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 selectTweakMenu();
                 break;
             case Move:
-                // FIXME: can't select micromovement menu
+                // This menu can't be called by selectMenu, so just...
                 break;
             default:
                 selectMainMenu();
@@ -1913,6 +1893,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (colorMenu == null) {
             createColorMenu();
         }
+        pushToolbarMenuStack(ToolbarMenu.Color);
         selectMenu(colorMenu);
         calipersView.setAllowColorChange(true);
     }
@@ -1925,6 +1906,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (tweakMenu == null) {
             createTweakMenu();
         }
+        pushToolbarMenuStack(ToolbarMenu.Tweak);
         selectMenu(tweakMenu);
         calipersView.setAllowTweakPosition(true);
     }
@@ -2559,9 +2541,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         microMoveBar(calipersView.chosenCaliper(), calipersView.getPressedComponent(), 0.1f, Caliper.MovementDirection.Down);
     }
 
+    private void colorDone() {
+        calipersView.setTweakingOrColoring(false);
+        popToolbarMenuStack();
+        gotoPreviousMenu();
+    }
+
     private void tweakDone() {
         calipersView.setTweakingOrColoring(false);
-        gotoPreviousMenu();
+        // go back until we are at the last menu before the tweak menu
+        ToolbarMenu menu;
+        do {
+            menu = popToolbarMenuStack();
+        } while (menu == ToolbarMenu.Tweak);
+        selectMenu(menu);
     }
 
     private void microDone() {

@@ -5,6 +5,11 @@
     <color name="accent">#40c4ff</color>
     <color name="default_caliper_color">#3f51b5</color>
     <color name="default_highlight_color">#ff0000</color>
+    <color name="onboard_page1_color">#3f51b5</color>
+    <color name="onboard_page2_color">#ff0000</color>
+    <color name="onboard_page3_color">#4caf50</color>
+    <color name="onboard_page4_color">#ff9800</color>
+    <color name="onboard_page5_color">#9c27b0</color>
 
 
     <string-array name="color_choices">

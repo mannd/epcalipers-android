@@ -39,28 +39,27 @@ public class Onboarder extends OnboarderActivity implements OnboarderPageChangeL
         List<OnboarderPage> pages = Arrays.asList(
                 new OnboarderPage.Builder()
                         .title(getString(R.string.move_caliper_label))
-                        .description("This is a test description")
-                        .backgroundColor(R.color.default_caliper_color)
+                        .backgroundColor(R.color.onboard_page1_color)
                         .imageResourceId(R.drawable.move_caliper)
                         .build(),
                 new OnboarderPage.Builder()
                         .title(getString(R.string.single_tap_caliper_label))
-                        .backgroundColor(R.color.default_highlight_color)
+                        .backgroundColor(R.color.onboard_page2_color)
                         .imageResourceId(R.drawable.single_tap_caliper)
                         .build(),
                 new OnboarderPage.Builder()
                         .title(getString(R.string.double_tap_caliper_label))
                         .imageResourceId(R.drawable.double_tap_caliper)
-                        .backgroundColor(R.color.default_caliper_color)
+                        .backgroundColor(R.color.onboard_page3_color)
                         .build(),
                 new OnboarderPage.Builder()
                         .title(getString(R.string.zoom_ecg_label))
-                        .backgroundColor(R.color.default_caliper_color)
+                        .backgroundColor(R.color.onboard_page4_color)
                         .imageResourceId(R.drawable.zoom_ecg)
                         .build(),
                 new OnboarderPage.Builder()
                         .title(getString(R.string.longpress_label))
-                        .backgroundColor(R.color.default_caliper_color)
+                        .backgroundColor(R.color.onboard_page5_color)
                         .imageResourceId(R.drawable.longpress)
                         .build()
         );

@@ -50,9 +50,15 @@ public class Version {
         return prefs.getString(context.getString(R.string.app_version_key), null);
     }
 
+    public void saveVersion() {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(context.getString(R.string.app_version_key), null);
+        editor.apply();
+    }
+
     public boolean isNewInstallation() {
 	String previousVersion = getPreviousAppVersion();
-	return (previousVersion != null);
+	return (previousVersion == null);
     }
 
     public boolean isUpgrade() {
