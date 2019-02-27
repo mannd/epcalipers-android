@@ -36,6 +36,7 @@ dependencies {
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
     implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha02'
     implementation 'com.github.kizitonwose.colorpreference:core:1.1.0'
+    implementation 'com.cuneytayyildiz:onboarder:1.0.3'
     // Required for local unit tests (JUnit 4 framework)
     testImplementation 'junit:junit:4.12'
     // Required for instrumented tests

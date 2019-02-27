@@ -74,6 +74,7 @@
         <activity
             android:name=".HelpTopics"
             android:label="@string/topics" />
+        <activity android:name=".Onboarder" />
     </application>
 
 </manifest>

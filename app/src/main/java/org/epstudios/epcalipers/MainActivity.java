@@ -374,6 +374,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String action = intent.getAction();
         String type = intent.getType();
 
+        startActivity(new Intent(this, Onboarder.class));
+
         noSavedInstance = (savedInstanceState == null);
 
         smallFontSize = getResources().getDimension(R.dimen.small_font_size);
