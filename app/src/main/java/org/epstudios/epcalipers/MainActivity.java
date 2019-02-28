@@ -164,7 +164,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button microUpButton;
     private Button microDownButton;
     private Button microDoneButton;
-    private TextView microTextView;
     // Toolbar menus
     private HorizontalScrollView mainMenu;
     private HorizontalScrollView pdfMenu;
@@ -1714,8 +1713,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void createMicroMovementMenu() {
         ArrayList<TextView> items = new ArrayList<>();
-        microTextView = new TextView(this);
-        items.add(microTextView);
         items.add(leftButton);
         items.add(rightButton);
         items.add(upButton);
@@ -1794,6 +1791,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             currentActionMode = null;
         }
         calipersView.setTweakingOrColoring(false);
+        // Ensure we don't leave a caliper with a chosen component highlighted,
+        // in case we get back to the main menu via a shortcut while tweaking,
+        // e.g. trying to select a new image.
+        calipersView.unchooseAllCalipersAndComponents();
         selectMenu(mainMenu);
         clearToolbarMenuStack();
         pushToolbarMenuStack(ToolbarMenu.Main);
@@ -1926,35 +1927,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (component == Caliper.Component.Crossbar) {
             setButtonsVisibility(upDownButtons, View.VISIBLE);
             setButtonsVisibility(rightLeftButtons, View.VISIBLE);
-            microTextView.setText(c.isAngleCaliper() ? getString(R.string.move_angle_apex_text) : getString(R.string.move_crossbar_text));
         }
         else if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
             setButtonsVisibility(upDownButtons, View.GONE);
             setButtonsVisibility(rightLeftButtons, View.VISIBLE);
-            switch (component) {
-                case Bar1:
-                    microTextView.setText(getString(R.string.left_bar_label));
-                    break;
-                case Bar2:
-                    microTextView.setText(getString(R.string.right_bar_label));
-                    break;
-                default:
-                    break;
-            }
         }
         else {      // vertical caliper
             setButtonsVisibility(upDownButtons, View.VISIBLE);
             setButtonsVisibility(rightLeftButtons, View.GONE);
-            switch (component) {
-                case Bar1:
-                    microTextView.setText(getString(R.string.up_bar_label));
-                    break;
-                case Bar2:
-                    microTextView.setText(getString(R.string.down_bar_label));
-                    break;
-                default:
-                    break;
-            }
         }
     }
 
@@ -2646,8 +2626,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else {
             example = getString(R.string.example_time_measurement);
         }
-        String message = String.format(getString(R.string.calibration_dialog_message),
-                example);
+        String message = String.format(getString(R.string.calibration_dialog_message), example);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.calibrate_dialog_title));
         builder.setMessage(message);
@@ -2706,7 +2685,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         Caliper c = calipersView.activeCaliper();
-        if (c == null || c.getValueInPoints() <= 0) {
+        if (c == null) {
+            return;
+        }
+        if (c.getValueInPoints() <= 0) {
+            EPSLog.log("Negatively valued caliper");
+            showSimpleAlert(R.string.negative_caliper_title, R.string.negative_caliper_message);
             return;
         }
         Calibration cal;

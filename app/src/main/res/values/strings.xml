@@ -1,127 +1,117 @@
 <resources>
-    <string name="app_name">EP Calipers</string>
-    <string name="bpm">bpm</string>
-    <string name="points">points</string>
-    <string name="calibrate_button_title">Calibrate</string>
-    <string name="interval_rate_button_title">I/R</string>
-    <string name="mean_rate_button_title">mRate</string>
-    <string name="horizontal_caliper_button_title">Time</string>
-    <string name="vertical_caliper_button_title">Amplitude</string>
-    <string name="angle_caliper_button_title">Angle</string>
-    <string name="cancel_button_title">Cancel</string>
-    <string name="rotate_image_right_button_title">90°R</string>
-    <string name="rotate_image_left_button_title">90°L</string>
-    <string name="tweak_image_right_button_title">1°R</string>
-    <string name="tweak_image_left_button_title">1°L</string>
-    <string name="micro_tweak_image_right_button_title">0.1°R</string>
-    <string name="micro_tweak_image_left_button_title">0.1°L</string>
-    <string name="reset_image_button_title">Reset</string>
-    <string name="done_button_title">Done</string>
-    <string name="set_calibration_button_title">Set</string>
-    <string name="clear_calibration_button_title">Clear</string>
-    <string name="about_text">Copyright \u00a9 2015–2019 EP Studios, Inc.\nAll rights reserved.\n</string>
     <string name="about_label">EP Calipers</string>
-    <string name="help_title">Help</string>
-    <string name="no_time_caliper_selected_title">No Time Caliper Selected</string>
-    <string name="no_time_caliper_selected_message">Select a time caliper to
-        measure one or more RR intervals.</string>
-    <string name="no_calipers_alert_title">No Calipers To Use</string>
-    <string name="no_calipers_alert_message">Add one or more calipers first
-        before proceeding.</string>
-    <string name="no_caliper_selected_alert_title">No Caliper Selected</string>
-    <string name="no_caliper_selected_alert_message">Select a caliper by single-tapping it. Move the caliper to a known interval. Touch Set to enter the calibration measurement.</string>
-    <string name="calibration_dialog_message">Enter measurement (e.g. %s):</string>
-    <string name="example_amplitude_measurement">1 mV</string>
-    <string name="example_time_measurement">500 msec</string>
+    <string name="about_text">Copyright \u00a9 2015–2019 EP Studios, Inc.\nAll rights reserved.\n</string>
+    <string name="all_formulas">All</string>
+    <string name="angle_caliper_button_title">Angle</string>
+    <string name="angle_caliper_calibration_message">Angle calipers don\'t require calibration. Only time or amplitude calipers need to be calibrated. \n\nIf you want to use an angle caliper as a Brugadometer, you must first calibrate time and amplitude calipers.</string>
+    <string name="angle_caliper_title">Angle Caliper</string>
+    <string name="app_name">EP Calipers</string>
+    <string name="app_version">Version %s</string>
+    <string name="auto_position_text_off">Text fixed in position</string>
+    <string name="auto_position_text_on">Text is mobile</string>
+    <string name="bazett_formula">Bazett</string>
+    <string name="bottom">Bottom</string>
+    <string name="bpm">bpm</string>
+    <string name="calculated_qtc_dialog_title">Calculated QTc</string>
+    <string name="calibrate_button_title">Calibrate</string>
     <string name="calibrate_dialog_title">Calibrate</string>
-    <string name="ok_title">OK</string>
+    <string name="calibration_dialog_hint">Enter calibration measurement.</string>
+    <string name="calibration_dialog_message">Enter measurement (e.g. %s):</string>
+    <string name="cancel_button_title">Cancel</string>
     <string name="cancel_title">Cancel</string>
-    <string name="show_start_image_label">Show sample ECG at start?</string>
-    <string name="settings_title">Settings</string>
-    <string name="default_time_calibration_label">Default time calibration</string>
-    <string name="default_time_calibration_value">1000 msec</string>
-    <string name="default_amplitude_calibration_value">10 mm</string>
+    <string name="center_above">Center above</string>
+    <string name="center_below">Center below</string>
+    <string name="choose_color_label">Choose color</string>
+    <string name="clear_calibration_button_title">Clear</string>
+    <string name="color_label">Color</string>
+    <string name="color_menu_text">Long press caliper</string>
+    <string name="continue_title">Continue</string>
     <string name="default_amplitude_calibration_label">Default amplitude calibration</string>
+    <string name="default_amplitude_calibration_value">10 mm</string>
+    <string name="default_amplitude_caliper_text_position_title">Amplitude caliper text</string>
+    <string name="default_auto_position_text_label">Automatically position caliper text</string>
     <string name="default_caliper_color_label">Caliper color</string>
     <string name="default_highlight_color_label">Highlight color</string>
+    <string name="default_line_width" translatable="false">2</string>
     <string name="default_line_width_label">Line width</string>
-    <string name="show_start_image_off_summary">Don\'t show ECG</string>
-    <string name="show_start_image_on_summary">Show ECG</string>
-    <string name="use_large_font_label">Use large font caliper labels?"</string>
-    <string name="use_large_font_off_summary">Use normal size font</string>
-    <string name="use_large_font_on_summary">Use large font</string>
-    <string name="default_line_width">2</string>
-    <string name="number_of_intervals_dialog_title">Enter Number of Intervals</string>
-    <string name="number_of_intervals_dialog_message">How many intervals is this caliper measuring?</string>
-    <string name="mean_rr_dialog_hint">Number of intervals measured</string>
-    <string name="mean_rr_result_dialog_title">Mean Interval and Rate</string>
-    <string name="mean_rr_result_dialog_message">Mean interval = %1$s %2$s%nMean rate = %3$s bpm</string>
-    <string name="select_rr_intervals_message">RR interval(s)?</string>
-    <string name="measure_button_label">Measure</string>
-    <string name="default_number_rr_intervals">3</string>
-    <string name="qt_interval_query">QT interval?</string>
-    <string name="calculated_qtc_dialog_title">Calculated QTc</string>
-    <string name="opening_pdf_message">Opening PDF</string>
+    <string name="default_number_qtc_rr_intervals" translatable="false">1</string>
+    <string name="default_number_rr_intervals" translatable="false">3</string>
+    <string name="default_qtc_formula_title">QTc formula</string>
+    <string name="default_time_calibration_label">Default time calibration</string>
+    <string name="default_time_calibration_value">1000 msec</string>
+    <string name="default_time_caliper_text_position_title">Time caliper text</string>
+    <string name="done_button_title">Done</string>
+    <string name="error">Error</string>
+    <string name="example_amplitude_measurement">1 mV</string>
+    <string name="example_time_measurement">500 msec</string>
     <string name="file_load_error">File load error</string>
     <string name="file_load_message">File could not be loaded</string>
-    <string name="app_version">Version %s</string>
-    <string name="default_number_qtc_rr_intervals">1</string>
-    <string name="continue_title">Continue</string>
+    <string name="five_points">5 points</string>
+    <string name="formula_detail">(%s formula)</string>
+    <string name="four_points">4 points</string>
+    <string name="framingham_formula">Framingham</string>
+    <string name="fridericia_formula">Fridericia</string>
+    <string name="help_title">Help</string>
+    <string name="hodges_formula">Hodges</string>
+    <string name="horizontal_caliper_button_title">Time</string>
+    <string name="image_locked">IMAGE LOCKED</string>
+    <string name="interval_rate_button_title">I/R</string>
+    <string name="left">Left</string>
+    <string name="marching_label">March</string>
+    <string name="mean_rate_button_title">mRate</string>
+    <string name="mean_rr_dialog_hint">Number of intervals measured</string>
+    <string name="mean_rr_equals">Mean RR =</string>
+    <string name="mean_rr_result_dialog_message">Mean interval = %1$s %2$s%nMean rate = %3$s bpm</string>
+    <string name="mean_rr_result_dialog_title">Mean Interval and Rate</string>
+    <string name="measure_button_label">Measure</string>
+    <string name="micro_tweak_image_left_button_title">0.1°L</string>
+    <string name="micro_tweak_image_right_button_title">0.1°R</string>
+    <string name="multipage_pdf_warning">Multipage PDF will need to be reloaded to view other pages.</string>
+    <string name="no_caliper_selected_alert_message">Select a caliper by single-tapping it. Move the caliper to a known interval. Touch Set to enter the calibration measurement.</string>
+    <string name="no_caliper_selected_alert_title">No Caliper Selected</string>
+    <string name="no_calipers_alert_message">Add one or more calipers first before proceeding.</string>
+    <string name="no_calipers_alert_title">No Calipers To Use</string>
+    <string name="no_time_caliper_selected_message">Select a time caliper to measure one or more RR intervals.</string>
+    <string name="no_time_caliper_selected_title">No Time Caliper Selected</string>
+    <string name="number_of_intervals_dialog_message">How many intervals is this caliper measuring?</string>
+    <string name="number_of_intervals_dialog_title">Enter Number of Intervals</string>
+    <string name="ok_title">OK</string>
+    <string name="one_point">1 point</string>
+    <string name="opening_pdf_message">Opening PDF</string>
+    <string name="pdf_error_message">Could not open PDF</string>
+    <string name="points">points</string>
+    <string name="qt_equals">QT =</string>
+    <string name="qt_interval_query">QT interval?</string>
+    <string name="qtc_equals">QTc =</string>
+    <string name="repeat_qt_button_title">Repeat QT</string>
+    <string name="reset_image_button_title">Reset</string>
+    <string name="right">Right</string>
+    <string name="rotate_image_left_button_title">90°L</string>
+    <string name="rotate_image_right_button_title">90°R</string>
     <string name="round_msec_rate_label">Round msec and heart rate</string>
     <string name="round_msec_rate_off_summary">No rounding of intervals and rates</string>
     <string name="round_msec_rate_on_summary">Msec and heart rate rounded to nearest integer</string>
-    <string name="angle_caliper_title">Angle Caliper</string>
-    <string name="angle_caliper_calibration_message">Angle calipers don\'t require calibration.
-        Only time or amplitude calipers need to be calibrated.
-        \n\nIf you want to use an angle caliper as a Brugadometer,
-        you must first calibrate time and amplitude calipers.</string>
-    <string name="sample_normal_ecg">sample normal ECG</string>
-    <string name="left_bar_label">Move left bar</string>
-    <string name="right_bar_label">Move right bar</string>
-    <string name="up_bar_label">Move upper bar</string>
-    <string name="down_bar_label">Move lower bar</string>
-    <string name="color_label">Color</string>
-    <string name="tweak_label">Tweak</string>
-    <string name="color_menu_text">Long press caliper to change color</string>
-    <string name="tweak_menu_text">Long press caliper component to tweak position</string>
-    <string name="move_angle_apex_text">Move angle apex</string>
-    <string name="move_crossbar_text">Move crossbar</string>
-    <string name="multipage_pdf_warning">Multipage PDF will need to be reloaded to view other pages.</string>
-    <string name="temp_image_file_warning">Could not store temporary image file</string>
-    <string name="default_qtc_formula_title">QTc formula</string>
-    <string name="marching_label">March</string>
-    <string name="repeat_qt_button_title">Repeat QT</string>
-    <string name="choose_color_label">Choose color</string>
-    <string name="calibration_dialog_hint">Enter calibration measurement.</string>
-    <string name="pdf_error_message">Could not open PDF</string>
-    <string name="one_point">1 point</string>
-    <string name="two_points">2 points</string>
-    <string name="three_points">3 points</string>
-    <string name="four_points">4 points</string>
-    <string name="five_points">5 points</string>
+    <string name="select_rr_intervals_message">RR interval(s)?</string>
+    <string name="set_calibration_button_title">Set</string>
+    <string name="settings_title">Settings</string>
+    <string name="show_start_image_label">Show sample ECG at start?</string>
+    <string name="show_start_image_off_summary">Don\'t show ECG</string>
+    <string name="show_start_image_on_summary">Show ECG</string>
     <string name="six_points">6 points</string>
-    <string name="bazett_formula">Bazett</string>
-    <string name="framingham_formula">Framingham</string>
-    <string name="fridericia_formula">Fridericia</string>
-    <string name="hodges_formula">Hodges</string>
-    <string name="all_formulas">All</string>
-    <string name="error">Error</string>
-    <string name="image_locked">IMAGE LOCKED</string>
-    <string name="mean_rr_equals">Mean RR =</string>
-    <string name="qt_equals">QT =</string>
-    <string name="qtc_equals">QTc =</string>
-    <string name="formula_detail">(%s formula)</string>
-    <string name="center_below">Center below</string>
-    <string name="left">Left</string>
-    <string name="right">Right</string>
-    <string name="center_above">Center above</string>
-    <string name="default_time_caliper_text_position_title">Time caliper text position</string>
-    <string name="default_amplitude_caliper_text_position_title">Amplitude caliper text position</string>
+    <string name="temp_image_file_warning">Could not store temporary image file</string>
+    <string name="three_points">3 points</string>
     <string name="top">Top</string>
-    <string name="bottom">Bottom</string>
-    <string name="default_auto_position_text_label">Automatically position caliper text</string>
-    <string name="auto_position_text_off">Text fixed in position</string>
-    <string name="auto_position_text_on">Text is mobile</string>
+    <string name="tweak_image_left_button_title">1°L</string>
+    <string name="tweak_image_right_button_title">1°R</string>
+    <string name="tweak_label">Tweak</string>
+    <string name="tweak_menu_text">Long press caliper component to tweak position</string>
+    <string name="two_points">2 points</string>
+    <string name="use_large_font_label">Use large font caliper labels?"</string>
+    <string name="use_large_font_off_summary">Use normal size font</string>
+    <string name="use_large_font_on_summary">Use large font</string>
+    <string name="vertical_caliper_button_title">Amplitude</string>
+
+    <!-- Drawer menu -->
     <string name="drawer_take_photo">Take photo</string>
     <string name="drawer_select_image">Select image</string>
     <string name="drawer_lock_image">Lock image</string>
@@ -137,8 +127,8 @@
     <string name="clear_calibration_tooltip">Clear all calibration</string>
     <string name="int_rate_tooltip">Toggle between interval and heart rate</string>
     <string name="mean_rate_tooltip">Measure 2 or more intervals and calculate mean rate and interval</string>
-    <string name="qtc_step_1_tooltip">Measure 1 or more RR intervals</string>
-    <string name="qtc_step_2_tooltip">Measure the QT interval</string>
+    <string name="qtc_step_1_tooltip">RR interval(s)?</string>
+    <string name="qtc_step_2_tooltip">QT interval?</string>
     <string name="qtc_tooltip">Calculate the QTc</string>
     <string name="set_calibration_tooltip">Measure a known interval with selected caliper.</string>
     <string name="setup_calibration_tooltip">Select a caliper by tapping it.
@@ -264,4 +254,6 @@
     <string name="version_number" translatable="false">VersionNumber</string>
     <string name="url_extra_key" translatable="false">URL</string>
     <string name="version_code" translatable="false">VersionCode</string>
+    <string name="negative_caliper_title">Negatively Valued Caliper</string>
+    <string name="negative_caliper_message">Select a caliper with a positive value, or change this caliper to a positive value, and then repeat calibration.</string>
 </resources>
