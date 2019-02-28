@@ -144,7 +144,9 @@
     <string name="setup_calibration_tooltip">Select a caliper by tapping it.
 	Use it to measure a known interval (e.g. 1000 msec).</string>
 
-    <!-- Onboard labels -->
+    <!-- Onboard labels and buttons -->
+    <string name="skip_button_title">Skip</string>
+    <string name="finish_button_title">Finish</string>
     <string name="move_caliper_label">Drag crossbar, drag sidebars</string>
     <string name="single_tap_caliper_label">Tap to select</string>
     <string name="double_tap_caliper_label">Double-tap to delete</string>
@@ -169,6 +171,8 @@
     <string name="brugadometer_ht">Brugadometer</string>
     <string name="preferences_ht">Settings</string>
     <string name="acknowledgments_ht">Acknowledgments</string>
+
+
 
     <!-- Side menu -->
     <string name="topics">Topics</string>

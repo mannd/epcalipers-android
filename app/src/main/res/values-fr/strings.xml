@@ -191,4 +191,6 @@
     <string name="page_number_hint">Numéro de page</string>
     <string name="go_to_page_title">Aller à page</string>
     <string name="image_actions_title">Actions d\'image</string>
+    <string name="skip_button_title">Sauter</string>
+    <string name="finish_button_title">Finir</string>
 </resources>

@@ -35,7 +35,8 @@ public class Onboarder extends OnboarderActivity implements OnboarderPageChangeL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setSkipButtonTitle(getString(R.string.skip_button_title));
+        setFinishButtonTitle(getString(R.string.finish_button_title));
         List<OnboarderPage> pages = Arrays.asList(
                 new OnboarderPage.Builder()
                         .title(getString(R.string.move_caliper_label))
