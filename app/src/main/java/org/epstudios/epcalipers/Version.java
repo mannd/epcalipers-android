@@ -52,7 +52,7 @@ public class Version {
 
     public void saveVersion() {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(context.getString(R.string.app_version_key), null);
+        editor.putString(context.getString(R.string.app_version_key), versionName);
         editor.apply();
     }
 
