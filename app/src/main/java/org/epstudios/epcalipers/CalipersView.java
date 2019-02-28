@@ -42,8 +42,6 @@ import java.util.ArrayList;
  */
 public class CalipersView extends View {
 
-    Context context;
-
     private GestureDetectorCompat gestureDetector;
 
     public Caliper getTouchedCaliper() {
@@ -61,7 +59,7 @@ public class CalipersView extends View {
     }
 
 
-    public boolean isLocked() {
+    private boolean isLocked() {
         return locked;
     }
     public void setLocked(boolean locked) {
@@ -129,7 +127,7 @@ public class CalipersView extends View {
     }
 
     private void init(Context context) {
-        this.context = context;
+        Context context1 = context;
         locked = false;
         lockImage = false;
         calipers = new ArrayList<>();
@@ -206,7 +204,7 @@ public class CalipersView extends View {
     }
 
     // Returns caliper if point near it, otherwise returns null
-    public Caliper caliperPressed(PointF point) {
+    private Caliper caliperPressed(PointF point) {
         for (Caliper c : calipers) {
             if (c.pointNearCaliper(point)) {
                return c;
@@ -340,13 +338,13 @@ public class CalipersView extends View {
         }
     }
 
-    public void selectCaliper(Caliper c) {
+    private void selectCaliper(Caliper c) {
         c.setColor(c.getSelectedColor());
         c.setSelected(true);
         invalidate();
     }
 
-    public void unselectCaliper(Caliper c) {
+    private void unselectCaliper(Caliper c) {
         c.setColor(c.getUnselectedColor());
         c.setSelected(false);
         invalidate();
@@ -390,13 +388,13 @@ public class CalipersView extends View {
         return null;
     }
 
-    public void unchooseAllCalipers() {
+    private void unchooseAllCalipers() {
         for (Caliper c : calipers) {
             c.setChosen(false);
         }
     }
 
-    public void unchooseAllComponents() {
+    private void unchooseAllComponents() {
         for (Caliper c : calipers) {
             c.setChosenComponent(Caliper.Component.None);
         }
@@ -446,7 +444,7 @@ public class CalipersView extends View {
     // Single tap initially highlights (selects) caliper,
     // second tap unselects it.  Quick double tap is used
     // to delete caliper.  This is new behavior with v2.0+.
-    public void singleTap(PointF pointF) {
+    private void singleTap(PointF pointF) {
         if (isLocked()) {
             return;
         }
@@ -467,7 +465,7 @@ public class CalipersView extends View {
 
     // Need a separate procedure for doubleTap, unlike in iOS,
     // since two fast taps won't count as two singleTaps.
-    public void doubleTap(PointF pointF) {
+    private void doubleTap(PointF pointF) {
         if (isLocked()) {
             return;
         }
@@ -483,7 +481,7 @@ public class CalipersView extends View {
         }
     }
 
-    public void move(MotionEvent event, float distanceX, float distanceY) {
+    private void move(MotionEvent event, float distanceX, float distanceY) {
         if (touchedCaliper == null) {
             return;
         }

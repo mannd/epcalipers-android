@@ -122,7 +122,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // as otherwise it is a weak reference and will be garbage collected, thus
     // making it stop working.
     // See http://stackoverflow.com/questions/2542938/sharedpreferences-onsharedpreferencechangelistener-not-being-called-consistently
-    SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
+    @SuppressWarnings("FieldCanBeLocal")
+    private SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
 
     // Lots of buttons
     private Button calibrateButton;
@@ -338,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // test onboarding with each startup.
     private final boolean force_first_run = !BuildConfig.DEBUG ? false : false;
 
-    public static int calculateInSampleSize(
+    private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
@@ -535,7 +536,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         selectMainMenu();
 
-        // entry point to load external pics/pdfs
+        // entry point to load external pics/PDFs
         if (externalImageLoad) {
             updateImageView(externalImageBitmap);
             externalImageLoad = false;
@@ -585,8 +586,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 if (key.equals(getString(R.string.line_width_key))) {
                     try {
-                        int lineWidth = Integer.parseInt(sharedPreferences.getString(key,
-                                getString(R.string.default_line_width)));
+                        String lineWidthString = sharedPreferences.getString(key,
+                                getString(R.string.default_line_width));
+                        int lineWidth = DEFAULT_LINE_WIDTH;
+                        if (lineWidthString != null) {
+                            lineWidth = Integer.parseInt(lineWidthString);
+                        }
                         currentLineWidth = lineWidth;
                         for (Caliper c : calipersView.getCalipers()) {
                             setLineWidth(c, lineWidth);
@@ -644,7 +649,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
 
-        PackageInfo packageInfo = null;
+        PackageInfo packageInfo;
         int versionCode = 0;
         String versionName = "";
         try {
@@ -1130,7 +1135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.show();
     }
 
-    void loadSettings() {
+    private void loadSettings() {
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
         showStartImage = sharedPreferences.getBoolean(
@@ -1157,8 +1162,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         currentHighlightColor = sharedPreferences.getInt(getString(R.string.new_highlight_color_key),
                 R.color.default_highlight_color);
         try {
-            currentLineWidth = Integer.parseInt(sharedPreferences.getString(getString(R.string.line_width_key),
-                    Integer.valueOf(DEFAULT_LINE_WIDTH).toString()));
+            String lineWidthString = sharedPreferences.getString(getString(R.string.line_width_key),
+                    Integer.valueOf(DEFAULT_LINE_WIDTH).toString());
+            int lineWidth = DEFAULT_LINE_WIDTH;
+            if (lineWidthString != null) {
+                lineWidth = Integer.parseInt(lineWidthString);
+            }
+            currentLineWidth = lineWidth;
         } catch (NumberFormatException ex) {
             currentLineWidth = DEFAULT_LINE_WIDTH;
         }
@@ -1237,7 +1247,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         EPSLog.log("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putFloat(getString(R.string.imageview_scale_key), imageView.getScale());
@@ -1735,7 +1745,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // Select menus
-    public void selectMenu(ToolbarMenu menu) {
+    private void selectMenu(ToolbarMenu menu) {
         switch (menu) {
             case Main:
                 selectMainMenu();
@@ -1879,7 +1889,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         inQtc = true;
     }
 
-    public void selectColorMenu() {
+    private void selectColorMenu() {
         if (!thereAreCalipers()) {
             noCalipersAlert();
             return;
@@ -1892,7 +1902,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.setAllowColorChange(true);
     }
 
-    public void selectTweakMenu() {
+    private void selectTweakMenu() {
         if (!thereAreCalipers()) {
             noCalipersAlert();
             return;
@@ -2052,8 +2062,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @SuppressLint("IntentReset")
     private void proceedToSelectImageFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK,
+        @SuppressLint("IntentReset") Intent intent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         startActivityForResult(intent, RESULT_LOAD_IMAGE);
@@ -2301,6 +2312,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void about() {
         Intent i = new Intent(this, About.class);
         i.putExtra(getString(R.string.version_number), version.getVersionName());
+        i.putExtra(getString(R.string.version_code), version.getVersionCode());
         startActivity(i);
     }
 
@@ -2804,7 +2816,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-    public boolean thereAreCalipers() {
+    private boolean thereAreCalipers() {
         return calipersView.getCalipers().size() > 0;
     }
 
@@ -2838,7 +2850,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return (n == 1) ? c : null;
     }
 
-    public void toggleMarchingCalipers() {
+    private void toggleMarchingCalipers() {
         calipersView.toggleShowMarchingCaliper();
         calipersView.invalidate();
     }
@@ -2912,7 +2924,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void matrixChangedAction() {
-        //Log.d(EPS, "Matrix changed, scale = " + attacher.getScale());
         adjustCalibrationForScale(imageView.getScale());
         calipersView.invalidate();
     }

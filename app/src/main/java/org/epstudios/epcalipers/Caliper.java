@@ -234,8 +234,8 @@ public class Caliper {
     private boolean marching;
 
 
-    public Caliper(Direction direction, float bar1Position, float bar2Position,
-                   float crossBarPosition, float fontSize) {
+    private Caliper(Direction direction, float bar1Position, float bar2Position,
+                    float crossBarPosition, float fontSize) {
         this.direction = direction;
         this.bar1Position = bar1Position;
         this.bar2Position = bar2Position;
@@ -703,15 +703,6 @@ public class Caliper {
     private boolean pointNearBar(PointF p, float barPosition) {
         return barCoord(p) > barPosition - DELTA && barCoord(p) < barPosition + DELTA;
     }
-
-
-//    +    // avoid overlapping deltas inside calipers that prevent crossbar touch when short interval
-//            if (self.direction == Horizontal) {
-//        -        nearBar = (p.x > fminf(self.bar1Position, self.bar2Position) + delta && p.x < fmaxf(self.bar2Position, self.bar1Position) - delta && p.y > self.crossBarPosition - delta && p.y < self.crossBarPosition + delta);
-//        +        nearBar = (p.x > fminf(self.bar1Position, self.bar2Position) && p.x < fmaxf(self.bar2Position, self.bar1Position) && p.y > self.crossBarPosition - delta && p.y < self.crossBarPosition + delta);
-//    } else {
-//        -        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) + delta && p.y < fmaxf(self.bar2Position, self.bar1Position) - delta && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
-//        +        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) && p.y < fmaxf(self.bar2Position, self.bar1Position) && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
 
     public boolean pointNearBar1(PointF p) {
         return pointNearBar(p, bar1Position);

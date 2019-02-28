@@ -24,7 +24,7 @@ import android.content.SharedPreferences;
  * You should have received a copy of the GNU General Public License
  * along with epcalipers-android.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class Version {
+class Version {
     private final Context context;
     private final SharedPreferences prefs;
 
@@ -46,7 +46,7 @@ public class Version {
         this.versionCode = versionCode;
     }
 
-    public String getPreviousAppVersion() {
+    private String getPreviousAppVersion() {
         return prefs.getString(context.getString(R.string.app_version_key), null);
     }
 

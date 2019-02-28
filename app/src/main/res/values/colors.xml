@@ -2,7 +2,6 @@
 <resources>
     <color name="primary">#03a9f4</color>
     <color name="primary_dark">#0288d1</color>
-    <color name="accent">#40c4ff</color>
     <color name="default_caliper_color">#3f51b5</color>
     <color name="default_highlight_color">#ff0000</color>
     <color name="onboard_page1_color">#3f51b5</color>

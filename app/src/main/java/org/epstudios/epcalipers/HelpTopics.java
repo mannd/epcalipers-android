@@ -57,7 +57,6 @@ public class HelpTopics extends AppCompatActivity {
                 recyclerView, new HelpRecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                String text = helpTopics[position];
                 if (helpAnchors[position].equals("acknowledgments-id")) {
                     String lang = getString(R.string.lang);
                     showHelp(getString(R.string.acknowledgments_url, lang), null);

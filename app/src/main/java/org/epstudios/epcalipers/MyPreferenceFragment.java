@@ -15,6 +15,7 @@ import java.util.Map;
 // TODO: Why not store colors as Integers?
 public class MyPreferenceFragment extends PreferenceFragment implements
         OnSharedPreferenceChangeListener {
+    private final int DEFAULT_LINE_WIDTH = 2;
 
     public static final String BAZETT = "bazett";
     public static final String FRAMINGHAM = "framingham";
@@ -110,12 +111,14 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         String defaultLineWidthValue = getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultLineWidthKey, defaultLineWidthName);
-        int lineWidth;
+        int lineWidth = DEFAULT_LINE_WIDTH;
         try {
-            lineWidth = Integer.parseInt(defaultLineWidthValue);
+            if (defaultLineWidthValue != null) {
+                lineWidth = Integer.parseInt(defaultLineWidthValue);
+            }
         }
         catch (Exception ex) {
-            lineWidth = Integer.parseInt(defaultLineWidthName);
+            // just leave lineWidth as DEFAULT_LINE_WIDTH
         }
         String defaultLineWidthName = lineWidthNames.get(lineWidth);
         defaultLineWidthPreference.setSummary(defaultLineWidthName);
@@ -174,7 +177,11 @@ public class MyPreferenceFragment extends PreferenceFragment implements
 
     private String getNameFromKey(SharedPreferences sharedPreferences, String key, String defaultName) {
         try {
-            int value = Integer.parseInt(sharedPreferences.getString(key, defaultName));
+            String lineWidthString = sharedPreferences.getString(key, defaultName);
+            int value = DEFAULT_LINE_WIDTH;
+            if (lineWidthString != null) {
+                value = Integer.parseInt(lineWidthString);
+            }
             return lineWidthNames.get(value);
         } catch (NumberFormatException ex) {
             //noinspection SuspiciousMethodCalls

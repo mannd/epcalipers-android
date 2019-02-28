@@ -32,10 +32,6 @@ import java.text.DecimalFormat;
 public class AngleCaliper extends Caliper {
 
     private static float differential = 0.0f;
-    private final double angle_delta = 0.15;
-    private final float delta = 20.0f;
-    // this constant is number of mm for height of Brugada triangle
-    private final double brugada_triangle_height = 5.0;
 
     private PointF endPointBar1 = new PointF();
     private PointF endPointBar2 = new PointF();
@@ -56,7 +52,7 @@ public class AngleCaliper extends Caliper {
         this.bar2Angle = bar2Angle;
     }
 
-    public Calibration getVerticalCalibration() {
+    private Calibration getVerticalCalibration() {
         return verticalCalibration;
     }
 
@@ -107,6 +103,7 @@ public class AngleCaliper extends Caliper {
         //        CGFloat length = MAX(rect.size.height, rect.size.height) * 2;
         float length = Math.max(canvas.getHeight(), canvas.getHeight() * 2);
 
+        float delta = 20.0f;
         setCrossbarPosition(Math.min(getCrossbarPosition(), canvas.getHeight() - delta));
         setCrossbarPosition(Math.max(getCrossbarPosition(), delta));
         setBar1Position(Math.min(getBar1Position(), canvas.getWidth() - delta));
@@ -131,6 +128,8 @@ public class AngleCaliper extends Caliper {
         if (getVerticalCalibration() != null && getVerticalCalibration().isCalibrated() && getVerticalCalibration().unitsAreMM()) {
             if (angleInSouthernHemisphere(bar1Angle) && angleInSouthernHemisphere(bar2Angle)) {
                 double pointsPerMM = 1.0 / getVerticalCalibration().multiplier();
+                // this constant is number of mm for height of Brugada triangle
+                double brugada_triangle_height = 5.0;
                 drawTriangleBase(canvas, brugada_triangle_height * pointsPerMM);
             }
         }
@@ -223,6 +222,7 @@ public class AngleCaliper extends Caliper {
 
     private boolean pointNearBar(PointF p, double barAngle) {
         double theta = relativeTheta(p);
+        double angle_delta = 0.15;
         return theta < barAngle + angle_delta && theta > barAngle - angle_delta;
     }
 
@@ -269,6 +269,7 @@ public class AngleCaliper extends Caliper {
         return radians * 180.0 / Math.PI;
     }
 
+    @SuppressWarnings("WeakerAccess")
     static public double degreesToRadians(double degrees) {
         return (degrees * Math.PI) / 180.0;
     }
