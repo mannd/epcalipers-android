@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">ЭФИ калипер</string>
     <string name="bpm">уд/мин</string>
-    <string name="about_text">Авторские права © 2015-2019 EP Studios, Inc.\\nВсе права защищены. \\nВерсия %@</string>
+    <string name="about_text">Авторские права © 2015-2019 EP Studios, Inc.  Все права защищены.\n</string>
     <string name="about_label">ЭФИ калипер</string>
     <string name="acknowledgments_ht">Благодарности</string>
     <string name="adding_deleting_calipers_ht">"Добавляйте и удаляйте калиперы "</string>
@@ -111,7 +111,7 @@
     <string name="default_auto_position_text_label">авто-позиционирование текста</string>
     <string name="example_amplitude_measurement">1 милливольт</string>
     <string name="example_time_measurement">500 мсек</string>
-    <string name="formula_detail">(формула %@)</string>
+    <string name="formula_detail">(формула %s)</string>
     <string name="framingham_formula">Фрамингема</string>
     <string name="fridericia_formula">Фредерика</string>
     <string name="int_rate_tooltip">Переключение между интервалом и частотой сердца</string>

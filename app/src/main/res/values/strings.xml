@@ -1,6 +1,6 @@
 <resources>
     <string name="about_label">EP Calipers</string>
-    <string name="about_text">Copyright \u00a9 2015–2019 EP Studios, Inc.\nAll rights reserved.\n</string>
+    <string name="about_text">Copyright \u00a9 2015–2019 EP Studios, Inc.  All rights reserved.\n</string>
     <string name="all_formulas">All</string>
     <string name="angle_caliper_button_title">Angle</string>
     <string name="angle_caliper_calibration_message">Angle calipers don\'t require calibration. Only time or amplitude calipers need to be calibrated. \n\nIf you want to use an angle caliper as a Brugadometer, you must first calibrate time and amplitude calipers.</string>
@@ -90,7 +90,7 @@
     <string name="rotate_image_right_button_title">90°R</string>
     <string name="round_msec_rate_label">Round msec and heart rate</string>
     <string name="round_msec_rate_off_summary">No rounding of intervals and rates</string>
-    <string name="round_msec_rate_on_summary">Msec and heart rate rounded to nearest integer</string>
+    <string name="round_msec_rate_on_summary">Intervals and rate rounded</string>
     <string name="select_rr_intervals_message">RR interval(s)?</string>
     <string name="set_calibration_button_title">Set</string>
     <string name="settings_title">Settings</string>
@@ -106,7 +106,7 @@
     <string name="tweak_label">Tweak</string>
     <string name="tweak_menu_text">Long press caliper component to tweak position</string>
     <string name="two_points">2 points</string>
-    <string name="use_large_font_label">Use large font caliper labels?"</string>
+    <string name="use_large_font_label">Use large font caliper text?</string>
     <string name="use_large_font_off_summary">Use normal size font</string>
     <string name="use_large_font_on_summary">Use large font</string>
     <string name="vertical_caliper_button_title">Amplitude</string>

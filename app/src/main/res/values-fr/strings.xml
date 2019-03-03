@@ -70,7 +70,7 @@
     <string name="repeat_qt_button_title">Répéter QT</string>
     <string name="tweak_label">Régler</string>
     <string name="color_label">Couleur</string>
-    <string name="about_text">Copyright © 2015 – 2019 EP Studios, Inc.\\nTous droits réservés.</string>
+    <string name="about_text">Copyright © 2015 – 2019 EP Studios, Inc.  Tous droits réservés.\n</string>
     <string name="app_version">Version %1s</string>
     <string name="continue_title">Continuer</string>
     <string name="calculated_qtc_dialog_title">QTc calculé</string>
@@ -99,13 +99,13 @@
     <string name="qt_interval_query">Intervalle QT?</string>
     <string name="color_menu_text">Appuyer sur un compas</string>
     <string name="tweak_menu_text">Appuyer sur un composant d\'un compas</string>
-    <string name="round_msec_rate_off_summary">Ne pas arrondir msec et bpm</string>
-    <string name="round_msec_rate_on_summary">Arrondir msec et bpm au nombre entier</string>
+    <string name="round_msec_rate_off_summary">Ne pas arrondir les intervalles et bpm</string>
+    <string name="round_msec_rate_on_summary">Arrondir les intervalles et bpm</string>
     <string name="pdf_error_message">Impossible de charger le PDF</string>
     <string name="temp_image_file_warning">"Ne pas pouvoir enregistrer le fichier image temporaire "</string>
     <string name="opening_pdf_message">Chargant PDF</string>
     <string name="file_load_error">Erreur de charge</string>
-    <string name="file_load_message">Erreur de charge</string>
+    <string name="file_load_message">Le fichier ne peut pas être chargé</string>
     <string name="one_point">1 point</string>
     <string name="two_points">2 points</string>
     <string name="three_points">3 points</string>
