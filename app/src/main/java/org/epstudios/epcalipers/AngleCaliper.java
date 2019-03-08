@@ -29,6 +29,8 @@ import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
 
+import androidx.annotation.NonNull;
+
 public class AngleCaliper extends Caliper {
 
     private static float differential = 0.0f;

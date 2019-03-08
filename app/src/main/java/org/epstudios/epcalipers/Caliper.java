@@ -1,5 +1,7 @@
 package org.epstudios.epcalipers;
 
+import android.app.Application;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -691,7 +693,7 @@ public class Caliper {
         }
     }
 
-    private double intervalInMsec(double interval) {
+    public double intervalInMsec(double interval) {
         if (calibration.unitsAreMsec()) {
             return interval;
         }
