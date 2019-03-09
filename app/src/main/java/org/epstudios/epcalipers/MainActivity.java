@@ -2390,12 +2390,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (noTimeCaliperSelected()) {
             showNoTimeCaliperSelectedAlert();
-//            calipersView.setLocked(true);
         }
         else {
             rrIntervalForQTc = 0.0;
             selectQTcStep1Menu();
-//            calipersView.setLocked(true);
         }
     }
 
@@ -2592,8 +2590,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else {
             selectCalibrationMenu();
             calipersView.selectCaliperIfNoneSelected();
-            // ok to change selected calipers in this menu
-//            calipersView.setLocked(false);
         }
     }
 

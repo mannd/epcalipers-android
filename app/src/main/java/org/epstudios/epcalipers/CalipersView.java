@@ -58,15 +58,6 @@ public class CalipersView extends View {
         this.calipers = calipers;
     }
 
-
-    private boolean isLocked() {
-        return locked;
-    }
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
-    private boolean locked;
-
     public void setLockImage(boolean lockImage) {
         this.lockImage = lockImage;
     }
@@ -128,7 +119,6 @@ public class CalipersView extends View {
 
     private void init(Context context) {
         Context context1 = context;
-        locked = false;
         lockImage = false;
         calipers = new ArrayList<>();
         touchedCaliper = null;
@@ -445,9 +435,6 @@ public class CalipersView extends View {
     // second tap unselects it.  Quick double tap is used
     // to delete caliper.  This is new behavior with v2.0+.
     private void singleTap(PointF pointF) {
-        if (isLocked()) {
-            return;
-        }
         boolean caliperToggled = false;
         for (int i = calipersCount() - 1; i >= 0; i--) {
             if (calipers.get(i).pointNearCaliper(pointF) && !caliperToggled) {
@@ -466,9 +453,6 @@ public class CalipersView extends View {
     // Need a separate procedure for doubleTap, unlike in iOS,
     // since two fast taps won't count as two singleTaps.
     private void doubleTap(PointF pointF) {
-        if (isLocked()) {
-            return;
-        }
         for (int i = calipersCount() - 1; i >= 0; i--) {
             if (calipers.get(i).pointNearCaliper(pointF)) {
                 calipers.remove(i);
