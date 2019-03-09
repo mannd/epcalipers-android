@@ -1428,6 +1428,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             calipersView.getCalipers().add(c);
 
         }
+        // To avoid weird situations, rather than restore active menu,
+        // go back to Main Menu with rotation.  This avoids problems
+        // with rotation while in QTc, tweaking, etc.
+        selectMainMenu();
         if (isMultipagePdf) {
             Toast toast = Toast.makeText(this, R.string.multipage_pdf_warning,
                     Toast.LENGTH_LONG);
@@ -1773,6 +1777,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case Move:
                 // This menu can't be called by selectMenu, so just...
+                selectMainMenu();
                 break;
             default:
                 selectMainMenu();
