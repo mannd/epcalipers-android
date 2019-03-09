@@ -202,6 +202,17 @@ public class ApplicationTest {
     }
 
     @org.junit.Test
+    public void testVersion() {
+	String testVersionName = "2.1.3";
+	int testVersionCode = 300;
+	Version version = new Version(null, null, testVersionName, testVersionCode);
+	assertEquals(version.getVersionName(), testVersionName);
+	assertEquals(version.getVersionCode(), testVersionCode);
+    }
+	
+	
+
+    @org.junit.Test
     public void testMiscCaliperTests() {
         Caliper c = new Caliper();
         c.setBar1Position(100);
@@ -231,10 +242,5 @@ public class ApplicationTest {
         assertFalse(c.isTimeCaliper());
         c.setDirection(Caliper.Direction.HORIZONTAL);
         assertTrue(c.isTimeCaliper());
-
-
-
-
     }
-
 }

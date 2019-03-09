@@ -336,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // TODO: Make sure the 1st part of this conditional never changes.  force_first_run
     // MUST be false for a release.  The 2nd part of the condition can be set true to
     // test onboarding with each startup.
-    private final boolean force_first_run = !BuildConfig.DEBUG ? false : true;
+    private final boolean force_first_run = !BuildConfig.DEBUG ? false : false;
 
     private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
