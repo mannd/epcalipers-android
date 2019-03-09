@@ -1807,7 +1807,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intervalRateButton.setEnabled(enable);
         meanRateButton.setEnabled(enable);
         qtcButton.setEnabled(enable);
-        calipersView.setLocked(false);
+//        calipersView.setLocked(false);
         calipersView.setAllowTweakPosition(false);
         calipersView.setAllowColorChange(false);
         inQtc = false;
@@ -2390,12 +2390,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (noTimeCaliperSelected()) {
             showNoTimeCaliperSelectedAlert();
-            calipersView.setLocked(true);
+//            calipersView.setLocked(true);
         }
         else {
             rrIntervalForQTc = 0.0;
             selectQTcStep1Menu();
-            calipersView.setLocked(true);
+//            calipersView.setLocked(true);
         }
     }
 
@@ -2593,7 +2593,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectCalibrationMenu();
             calipersView.selectCaliperIfNoneSelected();
             // ok to change selected calipers in this menu
-            calipersView.setLocked(false);
+//            calipersView.setLocked(false);
         }
     }
 
