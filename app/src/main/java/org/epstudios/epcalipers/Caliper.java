@@ -1,12 +1,14 @@
 package org.epstudios.epcalipers;
 
+import android.app.Application;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
@@ -66,44 +68,50 @@ public class Caliper {
     private static int differential = 0;
     private static final float DELTA = 30.0f;
 
-    private final float SMALL_FONT = 32.0f;
-    private final float LARGE_FONT = 48.0f;
+    public void setFontSize(float fontSize) {
+        paint.setTextSize(fontSize);
+    }
 
-    private final float MIN_DISTANCE_FOR_MARCH = 20.0f;
-    private final int MAX_MARCHING_CALIPERS = 20;
-
-    public enum TouchedBar {NONE, BAR1, BAR2, CROSSBAR}
-
-    public TouchedBar getTouchedBar() {
+    public Component getTouchedBar() {
         return touchedBar;
     }
-
-    public void setTouchedBar(TouchedBar touchedBar) {
+    public void setTouchedBar(Component touchedBar) {
         this.touchedBar = touchedBar;
     }
+    private Component touchedBar;
 
-    private TouchedBar touchedBar;
+    // This is the component chosen during tweaking.  It is highlighted visually.
+    public void setChosenComponent(Component chosenComponent) {
+        this.chosenComponent = chosenComponent;
+    }
+    Component getChosenComponent() {
+        return chosenComponent;
+    }
+    private Component chosenComponent;
+
+    public boolean isChosen() {
+        return chosen;
+    }
+    public void setChosen(boolean chosen) {
+        this.chosen = chosen;
+    }
+    private boolean chosen;  // Caliper is chosen for tweaking
 
     public float getBar1Position() {
         return bar1Position;
     }
-
     public void setBar1Position(float bar1Position) {
         this.bar1Position = bar1Position;
     }
-
     public float getBar2Position() {
         return bar2Position;
     }
-
     public void setBar2Position(float bar2Position) {
         this.bar2Position = bar2Position;
     }
-
     public float getCrossbarPosition() {
         return crossBarPosition;
     }
-
     public void setCrossbarPosition(float crossBarPosition) {
         this.crossBarPosition = crossBarPosition;
     }
@@ -130,11 +138,22 @@ public class Caliper {
     private float crossBarPosition;
     private Direction direction;
 
+    public void setxOffset(float xOffset) {
+        this.xOffset = xOffset;
+    }
+
+    public void setyOffset(float yOffset) {
+        this.yOffset = yOffset;
+    }
+
+    private float xOffset;
+    private float yOffset;
+
     public void setTextPosition(TextPosition textPosition) {
         this.textPosition = textPosition;
     }
 
-    public TextPosition getTextPosition() {
+    TextPosition getTextPosition() {
         return textPosition;
     }
 
@@ -173,13 +192,13 @@ public class Caliper {
     private int selectedColor;
     private boolean selected;
 
-    public DecimalFormat getDecimalFormat() {
+    DecimalFormat getDecimalFormat() {
         return decimalFormat;
     }
 
     private final DecimalFormat decimalFormat;
 
-    public Paint getPaint() {
+    Paint getPaint() {
         return paint;
     }
 
@@ -190,7 +209,7 @@ public class Caliper {
         this.roundMsecRate = roundMsecRate;
     }
 
-    public boolean isRoundMsecRate() {
+    boolean isRoundMsecRate() {
         return roundMsecRate;
     }
 
@@ -217,8 +236,8 @@ public class Caliper {
     private boolean marching;
 
 
-    public Caliper(Direction direction, float bar1Position, float bar2Position,
-                   float crossBarPosition) {
+    private Caliper(Direction direction, float bar1Position, float bar2Position,
+                    float crossBarPosition, float fontSize) {
         this.direction = direction;
         this.bar1Position = bar1Position;
         this.bar2Position = bar2Position;
@@ -226,10 +245,12 @@ public class Caliper {
         this.unselectedColor = Color.BLUE;
         this.selectedColor = Color.RED;
         this.selected = false;
-        this.touchedBar = TouchedBar.NONE;
+        this.touchedBar = Component.None;
+        this.chosenComponent = Component.None;
         this.marching = false;
         this.textPosition = TextPosition.Right;
         this.autoPositionText = true;
+
         // below uses default local decimal separator
         decimalFormat = new DecimalFormat("@@@##");
         paint = new Paint();
@@ -239,13 +260,13 @@ public class Caliper {
         paint.setTypeface(Typeface.DEFAULT);
         // We will use CENTER alignment for all text position calculations.
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(SMALL_FONT);
+        paint.setTextSize(fontSize);
         marchingPaint = new Paint(paint);
         setMarchingPaintStrokeWidth(paint);
     }
 
     public Caliper() {
-        this(Direction.HORIZONTAL, 0, 0, 100);
+        this(Direction.HORIZONTAL, 0, 0, 100, 16);
     }
 
     private void setMarchingPaintStrokeWidth(Paint paint) {
@@ -271,25 +292,16 @@ public class Caliper {
         return paint.getStrokeWidth();
     }
 
-    public void setUseLargeFont(boolean useLargeFont) {
-        if (useLargeFont) {
-            paint.setTextSize(LARGE_FONT);
-        }
-        else {
-            paint.setTextSize(SMALL_FONT);
-        }
-    }
-
     public void setInitialPosition(Rect rect) {
         if (direction == Direction.HORIZONTAL) {
-            bar1Position = (rect.width()/3) + differential;
-            bar2Position = (2 * rect.width()/3) + differential;
-            crossBarPosition = (rect.height()/2) + differential;
+            bar1Position = (rect.width()/3f) + differential;
+            bar2Position = (2 * rect.width()/3f) + differential;
+            crossBarPosition = (rect.height()/2f) + differential;
         }
         else {
-            bar1Position = (rect.height()/3) + differential;
-            bar2Position = ((2 * rect.height())/3) + differential;
-            crossBarPosition = (rect.width()/2) + differential;
+            bar1Position = (rect.height()/3f) + differential;
+            bar2Position = ((2 * rect.height())/3f) + differential;
+            crossBarPosition = (rect.width()/2f) + differential;
         }
         differential += 15;
         if (differential > 80) {
@@ -320,15 +332,19 @@ public class Caliper {
             drawMarchingCalipers(canvas);
         }
         caliperText(canvas, textPosition, true);
+
+        drawChosenComponent(canvas);
     }
 
     private void drawMarchingCalipers(Canvas canvas) {
         float difference = Math.abs(bar1Position - bar2Position);
+        float MIN_DISTANCE_FOR_MARCH = 20.0f;
         if (difference < MIN_DISTANCE_FOR_MARCH) {
             return;
         }
         float greaterBar = Math.max(bar1Position, bar2Position);
         float lesserBar = Math.min(bar1Position, bar2Position);
+        int MAX_MARCHING_CALIPERS = 20;
         float[] biggerBars = new float[MAX_MARCHING_CALIPERS];
         float[] smallerBars = new float[MAX_MARCHING_CALIPERS];
         float point = greaterBar + difference;
@@ -367,7 +383,7 @@ public class Caliper {
      * @param textPosition a TextPosition used to position the label
      * @param optimizeTextPosition normally true, to allow optimization of the text position
      */
-    public void caliperText(Canvas canvas, TextPosition textPosition, Boolean optimizeTextPosition) {
+    void caliperText(Canvas canvas, TextPosition textPosition, Boolean optimizeTextPosition) {
         String text = measurement();
         Rect bounds = getTextBounds(text);
         PointF textPositionPoint = caliperTextPosition(Math.min(bar1Position, bar2Position),
@@ -375,6 +391,46 @@ public class Caliper {
                 canvas, textPosition, optimizeTextPosition);
         // Note x and y for draw text depend of the alignment property of paint
         canvas.drawText(text, textPositionPoint.x, textPositionPoint.y, paint);
+    }
+
+    private void drawChosenComponent(Canvas canvas) {
+        if (chosenComponent == Component.None) {
+            return;
+        }
+        // chosenComponent has opposite color from rest of caliper.
+        int chosenComponentColor = selected ? unselectedColor : selectedColor;
+        paint.setColor(chosenComponentColor);
+        switch (chosenComponent) {
+            case Bar1:
+                if (direction == Direction.HORIZONTAL) {
+                    canvas.drawLine(bar1Position, 0, bar1Position, canvas.getHeight(), paint);
+                }
+                else {
+                    canvas.drawLine(0, bar1Position, canvas.getWidth(), bar1Position, paint);
+                }
+                break;
+            case Bar2:
+                if (direction == Direction.HORIZONTAL) {
+                    canvas.drawLine(bar2Position, 0, bar2Position, canvas.getHeight(), paint);
+                }
+                else {
+                    canvas.drawLine(0, bar2Position, canvas.getWidth(), bar2Position, paint);
+                }
+                break;
+            case Crossbar:
+                if (direction == Direction.HORIZONTAL) {
+                    canvas.drawLine(bar2Position, crossBarPosition, bar1Position, crossBarPosition, paint);
+                }
+                else {
+                    canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
+                }
+                break;
+            case None:
+            default:
+                break;
+        }
+        // reset paint color
+        paint.setColor(selected ? selectedColor : unselectedColor);
     }
 
     /**
@@ -389,12 +445,12 @@ public class Caliper {
      * @param canvas the canvas you are drawing on
      * @param textPosition TextPosition of text
      * @param optimizeTextPosition allow optimization of the label to occur if true
-     * @return
+     * @return PointF giving text position
      */
     //
-    protected PointF caliperTextPosition(float left, float right, float center,
-                                         Rect bounds, Canvas canvas, TextPosition textPosition,
-                                         Boolean optimizeTextPosition) {
+    PointF caliperTextPosition(float left, float right, float center,
+                               Rect bounds, Canvas canvas, TextPosition textPosition,
+                               Boolean optimizeTextPosition) {
         // Position of our text, based on Paint.Align.CENTER.
         // This assumes X is the center of the text block, and Y is the text baseline.
         PointF textOrigin = new PointF();
@@ -403,8 +459,6 @@ public class Caliper {
         PointF origin = new PointF();
         float textHeight = bounds.height();
         float textWidth = bounds.width();
-        float yOffset = 12;
-        float xOffset = 12;
         if (direction == Direction.HORIZONTAL) {
             // Guard against the margin obscuring left and right labels.
             TextPosition optimizedPosition = getOptimizedTextPosition(left, right, center,
@@ -564,7 +618,7 @@ public class Caliper {
         return optimizedPosition;
     }
 
-    protected Rect getTextBounds(String text) {
+    Rect getTextBounds(String text) {
         Rect bounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), bounds);
         return bounds;
@@ -586,7 +640,7 @@ public class Caliper {
         return (direction == Direction.HORIZONTAL ? p.x : p.y);
     }
 
-    protected String measurement() {
+    String measurement() {
         String result;
         if (roundMsecRate && (calibration.getDisplayRate() || calibration.unitsAreMsec())) {
             result = String.valueOf((int) Math.round(calibratedResult()));
@@ -639,7 +693,7 @@ public class Caliper {
         }
     }
 
-    private double intervalInMsec(double interval) {
+    public double intervalInMsec(double interval) {
         if (calibration.unitsAreMsec()) {
             return interval;
         }
@@ -651,15 +705,6 @@ public class Caliper {
     private boolean pointNearBar(PointF p, float barPosition) {
         return barCoord(p) > barPosition - DELTA && barCoord(p) < barPosition + DELTA;
     }
-
-
-//    +    // avoid overlapping deltas inside calipers that prevent crossbar touch when short interval
-//            if (self.direction == Horizontal) {
-//        -        nearBar = (p.x > fminf(self.bar1Position, self.bar2Position) + delta && p.x < fmaxf(self.bar2Position, self.bar1Position) - delta && p.y > self.crossBarPosition - delta && p.y < self.crossBarPosition + delta);
-//        +        nearBar = (p.x > fminf(self.bar1Position, self.bar2Position) && p.x < fmaxf(self.bar2Position, self.bar1Position) && p.y > self.crossBarPosition - delta && p.y < self.crossBarPosition + delta);
-//    } else {
-//        -        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) + delta && p.y < fmaxf(self.bar2Position, self.bar1Position) - delta && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
-//        +        nearBar = (p.y > fminf(self.bar1Position, self.bar2Position) && p.y < fmaxf(self.bar2Position, self.bar1Position) && p.x > self.crossBarPosition - delta && p.x < self.crossBarPosition + delta);
 
     public boolean pointNearBar1(PointF p) {
         return pointNearBar(p, bar1Position);
@@ -750,7 +795,7 @@ public class Caliper {
         }
     }
 
-    protected void moveCrossbarDirectionally(float delta, MovementDirection direction) {
+    void moveCrossbarDirectionally(float delta, MovementDirection direction) {
         if (getDirection() == Direction.VERTICAL) {
             direction = swapDirection(direction);
         }

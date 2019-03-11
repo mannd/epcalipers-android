@@ -29,13 +29,14 @@ import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
 
+import androidx.annotation.NonNull;
+
 public class AngleCaliper extends Caliper {
 
     private static float differential = 0.0f;
-    private final double angle_delta = 0.15;
-    private final float delta = 20.0f;
-    // this constant is number of mm for height of Brugada triangle
-    private final double brugada_triangle_height = 5.0;
+
+    private PointF endPointBar1 = new PointF();
+    private PointF endPointBar2 = new PointF();
 
     public double getBar1Angle() {
         return bar1Angle;
@@ -53,7 +54,7 @@ public class AngleCaliper extends Caliper {
         this.bar2Angle = bar2Angle;
     }
 
-    public Calibration getVerticalCalibration() {
+    private Calibration getVerticalCalibration() {
         return verticalCalibration;
     }
 
@@ -69,7 +70,6 @@ public class AngleCaliper extends Caliper {
 
     public AngleCaliper() {
         super();
-        /// TODO: angle marker always on top, but need to deal with triangle base
         triangleBaseTextPosition = getTextPosition();
         bar1Angle = Math.PI * 0.5;
         bar2Angle = Math.PI * 0.25;
@@ -91,9 +91,9 @@ public class AngleCaliper extends Caliper {
 
     @Override
     public void setInitialPosition(Rect rect) {
-        setBar1Position(rect.width() / 3 + differential);
+        setBar1Position(rect.width() / 3f + differential);
         setBar2Position(getBar1Position());
-        setCrossbarPosition(rect.height() / 3 + differential * 1.5f);
+        setCrossbarPosition(rect.height() / 3f + differential * 1.5f);
         differential += 20.0f;
         if (differential > 100.0f) {
             differential = 0.0f;
@@ -105,32 +105,69 @@ public class AngleCaliper extends Caliper {
         //        CGFloat length = MAX(rect.size.height, rect.size.height) * 2;
         float length = Math.max(canvas.getHeight(), canvas.getHeight() * 2);
 
+        float delta = 20.0f;
         setCrossbarPosition(Math.min(getCrossbarPosition(), canvas.getHeight() - delta));
         setCrossbarPosition(Math.max(getCrossbarPosition(), delta));
         setBar1Position(Math.min(getBar1Position(), canvas.getWidth() - delta));
         setBar1Position(Math.max(getBar1Position(), delta));
         setBar2Position(getBar1Position());
 
-        PointF endPointBar1 = endPointForPosition(new PointF(getBar1Position(), getCrossbarPosition()),
+        endPointBar1 = endPointForPosition(new PointF(getBar1Position(), getCrossbarPosition()),
                 bar1Angle, length);
         canvas.drawLine(getBar1Position(), getCrossbarPosition(), endPointBar1.x, endPointBar1.y,
                 getPaint());
 
-        PointF endPointBar2 = endPointForPosition(new PointF(getBar2Position(), getCrossbarPosition()),
+        endPointBar2 = endPointForPosition(new PointF(getBar2Position(), getCrossbarPosition()),
                 bar2Angle, length);
         canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
                 getPaint());
         // Force the angle measurement to always be center above.
         caliperText(canvas, TextPosition.CenterAbove, false);
 
+        drawChosenComponent(canvas);
+
         // triangle base for Brugadometer
         if (getVerticalCalibration() != null && getVerticalCalibration().isCalibrated() && getVerticalCalibration().unitsAreMM()) {
             if (angleInSouthernHemisphere(bar1Angle) && angleInSouthernHemisphere(bar2Angle)) {
                 double pointsPerMM = 1.0 / getVerticalCalibration().multiplier();
+                // this constant is number of mm for height of Brugada triangle
+                double brugada_triangle_height = 5.0;
                 drawTriangleBase(canvas, brugada_triangle_height * pointsPerMM);
             }
         }
     }
+
+    private void drawChosenComponent(Canvas canvas) {
+        if (getChosenComponent() == Component.None) {
+            return;
+        }
+        // chosenComponent has opposite color from rest of caliper.
+        int chosenComponentColor = isSelected() ? getUnselectedColor() : getSelectedColor();
+        getPaint().setColor(chosenComponentColor);
+        switch (getChosenComponent()) {
+            case Bar1:
+                    canvas.drawLine(getBar1Position(), getCrossbarPosition(), endPointBar1.x, endPointBar1.y,
+                            getPaint());
+                break;
+            case Bar2:
+                    canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
+                            getPaint());
+                break;
+            case Crossbar:
+                canvas.drawLine(getBar1Position(), getCrossbarPosition(), endPointBar1.x, endPointBar1.y,
+                        getPaint());
+                canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
+                        getPaint());
+
+                break;
+            case None:
+            default:
+                break;
+        }
+        // reset paint color
+        getPaint().setColor(isSelected() ? getSelectedColor() : getUnselectedColor());
+    }
+
 
     private void drawTriangleBase(Canvas canvas, double height) {
         PointF point1 = getBasePoint1ForHeight(height);
@@ -187,6 +224,7 @@ public class AngleCaliper extends Caliper {
 
     private boolean pointNearBar(PointF p, double barAngle) {
         double theta = relativeTheta(p);
+        double angle_delta = 0.15;
         return theta < barAngle + angle_delta && theta > barAngle - angle_delta;
     }
 
@@ -233,6 +271,7 @@ public class AngleCaliper extends Caliper {
         return radians * 180.0 / Math.PI;
     }
 
+    @SuppressWarnings("WeakerAccess")
     static public double degreesToRadians(double degrees) {
         return (degrees * Math.PI) / 180.0;
     }

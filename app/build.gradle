@@ -3,15 +3,16 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "org.epstudios.epcalipers"
-        minSdkVersion 14
-        targetSdkVersion 26
-        versionCode 30
-        versionName "2.14"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 32
+        versionName "3.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -28,8 +29,17 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation project(':library')
+    implementation 'androidx.appcompat:appcompat:1.1.0-alpha02'
+    implementation 'com.google.android.material:material:1.1.0-alpha03'
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
     implementation 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha02'
+    implementation 'com.github.kizitonwose.colorpreference:core:1.1.0'
+    implementation 'com.cuneytayyildiz:onboarder:1.0.3'
+    // Required for local unit tests (JUnit 4 framework)
+    testImplementation 'junit:junit:4.12'
+    // Required for instrumented tests
+    androidTestImplementation 'androidx.annotation:annotation:1.1.0-alpha01'
+    androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'
 }

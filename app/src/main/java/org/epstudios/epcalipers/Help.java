@@ -1,16 +1,12 @@
 package org.epstudios.epcalipers;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.os.Handler;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.MenuItem;
 import android.webkit.WebView;
-
-import java.util.Locale;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -36,35 +32,38 @@ import java.util.Locale;
 
 public class Help extends AppCompatActivity {
 
-    private static final String englishHelpPath = "file:///android_asset/help.html";
-    private static final String frenchHelpPath = "file:///android_asset/fr/help.html";
-
+    // Logic here is that passed URL is null, use the Help URL and add the anchor,
+    // otherwise use the passed URL and ignore anchor.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.help);
-        String url;
-        if (usingFrenchLanguage()) {
-            url = frenchHelpPath;
+        Bundle extras = getIntent().getExtras();
+        String url = "";
+        if (extras != null) {
+            url = extras.getString(getString(R.string.url_extra_key));
+            String anchor = extras.getString(getString(R.string.anchor_extra_key));
+            if (url == null) {
+                String lang = getString(R.string.lang);
+                url = getString(R.string.help_url, lang, anchor);
+            }
         }
-        else {
-            url = englishHelpPath;
-        }
-        WebView webView = (WebView) findViewById(R.id.webView);
-        webView.loadUrl(url);
+        final WebView webView = findViewById(R.id.webView);
+        // Anchors don't work properly off the shelf in Android.  Need to add
+        // a delay for page rendering so that the anchors work.
+        // See https://stackoverflow.com/questions/3039555/android-webview-anchor-link-jump-link-not-working
+        Handler handler = new Handler();
+        final String finalUrl = url;
+        // Variables inside closure must be final.
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                webView.loadUrl(finalUrl);} }, 400);
 
-        Toolbar actionBar = (Toolbar) findViewById(R.id.action_bar);
+        Toolbar actionBar = findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.help_menu, menu);
-        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -75,19 +74,8 @@ public class Help extends AppCompatActivity {
                 // NavUtils.navigateUpFromSameTask(this);
                 finish();
                 return true;
-            case R.id.about:
-                startActivity(new Intent(this, About.class));
-                return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private boolean usingFrenchLanguage() {
-        return getLocaleLanguageString().equals("fr");
-    }
-
-    private String getLocaleLanguageString() {
-        return Locale.getDefault().getLanguage();
     }
 }

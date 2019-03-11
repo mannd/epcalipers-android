@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_color"
+          android:title="@string/color_label"
+          android:icon="@drawable/ic_color" />
+    <item android:id="@+id/menu_tweak"
+          android:title="@string/tweak_label"
+          android:icon="@drawable/ic_adjust" />
+    <item android:id="@+id/menu_march"
+          android:title="@string/marching_label"
+          android:icon="@drawable/ic_march" />
+</menu>

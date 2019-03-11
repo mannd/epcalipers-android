@@ -12,9 +12,9 @@ import android.util.SparseArray;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class MyPreferenceFragment extends PreferenceFragment implements
         OnSharedPreferenceChangeListener {
+    private final int DEFAULT_LINE_WIDTH = 2;
 
     public static final String BAZETT = "bazett";
     public static final String FRAMINGHAM = "framingham";
@@ -22,21 +22,9 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     public static final String FRIDERICIA = "fridericia";
     public static final String ALL = "all";
 
-    private SparseArray<String> names = null;
-
-    private SparseArray<String> createMap(Activity activity) {
+    private SparseArray<String> lineWidthNames = null;
+    private SparseArray<String> createLineWidthMap() {
         SparseArray<String> map = new SparseArray<>();
-        // caliper names
-        map.put(-16777216, activity.getString(R.string.black_color));
-        map.put(-65281, getString(R.string.magenta_color));
-        map.put(-3355444, getString(R.string.light_gray_color));
-        map.put(-16776961, getString(R.string.blue_color));
-        map.put(-16711936, getString(R.string.green_color));
-        map.put(-1, getString(R.string.white_color));
-        // highlight names
-        map.put(-65536, getString(R.string.red_color));
-        map.put(-256, getString(R.string.yellow_color));
-        map.put(-12303292, getString(R.string.dark_gray_color));
         // line widths
         map.put(1, getString(R.string.one_point));
         map.put(2, getString(R.string.two_points));
@@ -44,50 +32,44 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         map.put(4, getString(R.string.four_points));
         map.put(5, getString(R.string.five_points));
         map.put(6, getString(R.string.six_points));
-        map.put(7, getString(R.string.seven_points));
-        map.put(8, getString(R.string.eight_points));
 
         return map;
     }
 
     private Map<String, String> formulaNames = null;
-    private Map<String, String> createFormulaNamesMap(Activity activity) {
+    private Map<String, String> createFormulaNamesMap() {
         Map<String, String> map = new HashMap<>();
-        map.put(BAZETT, activity.getString(R.string.bazett_formula));
-        map.put(FRAMINGHAM, activity.getString(R.string.framingham_formula));
-        map.put(HODGES, activity.getString(R.string.hodges_formula));
-        map.put(FRIDERICIA, activity.getString(R.string.fridericia_formula));
-        map.put(ALL, activity.getString(R.string.all_formulas));
+        map.put(BAZETT, getString(R.string.bazett_formula));
+        map.put(FRAMINGHAM, getString(R.string.framingham_formula));
+        map.put(HODGES, getString(R.string.hodges_formula));
+        map.put(FRIDERICIA, getString(R.string.fridericia_formula));
+        map.put(ALL, getString(R.string.all_formulas));
         return map;
     }
 
     private Map<String, String> textPositionNames = null;
-    private Map<String, String> createTextPositionNamesMap(Activity activity) {
+    private Map<String, String> createTextPositionNamesMap() {
         Map<String, String> map = new HashMap<>();
-        map.put("centerAbove", activity.getString(R.string.center_above));
-        map.put("centerBelow", activity.getString(R.string.center_below));
-        map.put("left", activity.getString(R.string.left));
-        map.put("right", activity.getString(R.string.right));
-        map.put("top", activity.getString(R.string.top));
-        map.put("bottom", activity.getString(R.string.bottom));
+        map.put("centerAbove", getString(R.string.center_above));
+        map.put("centerBelow", getString(R.string.center_below));
+        map.put("left", getString(R.string.left));
+        map.put("right", getString(R.string.right));
+        map.put("top", getString(R.string.top));
+        map.put("bottom", getString(R.string.bottom));
         return map;
     }
 
     //keys
     private String defaultTimeCalibrationKey;
     private String defaultAmplitudeCalibrationKey;
-    private String defaultCaliperColorKey;
-    private String defaultHighlightColorKey;
     private String defaultLineWidthKey;
     private String defaultQtcFormulaKey;
     private String defaultTimeCaliperTextPositionKey;
     private String defaultAmplitudeCaliperTextPositionKey;
 
-    private String defaultCaliperColor;
-    private String defaultHighlightColor;
-    private String defaultLineWidth;
-    private String defaultTimeCalibration;
-    private String defaultAmplitudeCalibration;
+    private String defaultLineWidthName;
+    private String defaultTimeCalibrationName;
+    private String defaultAmplitudeCalibrationName;
     private String defaultQtcFormula;
     private String defaultTimeCaliperTextPosition;
     private String defaultAmplitudeCaliperTextPosition;
@@ -96,58 +78,48 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Activity activity = getActivity();
-        names = createMap(activity);
-        formulaNames = createFormulaNamesMap(activity);
-        textPositionNames = createTextPositionNamesMap(activity);
-        defaultTimeCalibrationKey = activity.getString(R.string.default_time_calibration_key);
-        defaultAmplitudeCalibrationKey = activity.getString(R.string.default_amplitude_calibration_key);
-        defaultCaliperColorKey = activity.getString(R.string.default_caliper_color_key);
-        defaultHighlightColorKey = activity.getString(R.string.default_highlight_color_key);
-        defaultLineWidthKey = activity.getString(R.string.default_line_width_key);
-        defaultQtcFormulaKey = activity.getString(R.string.default_qtc_formula_key);
-        defaultTimeCaliperTextPositionKey = activity.getString(R.string.default_time_caliper_text_position_key);
-        defaultAmplitudeCaliperTextPositionKey = activity.getString(R.string.default_amplitude_caliper_text_position_key);
-
-        defaultCaliperColor = activity.getString(R.string.default_caliper_color);
-        defaultHighlightColor = activity.getString(R.string.default_highlight_color);
-        defaultLineWidth = activity.getString(R.string.default_line_width);
-        defaultTimeCalibration = activity.getString(R.string.default_time_calibration_value);
-        defaultAmplitudeCalibration = activity.getString(R.string.default_amplitude_calibration_value);
-        defaultQtcFormula = activity.getString(R.string.default_qtc_formula_value);
-        defaultTimeCaliperTextPosition = activity.getString(R.string.default_time_caliper_text_position_value);
-        defaultAmplitudeCaliperTextPosition = activity.getString(R.string.default_amplitude_caliper_text_position_value);
+        lineWidthNames = createLineWidthMap();
+        formulaNames = createFormulaNamesMap();
+        textPositionNames = createTextPositionNamesMap();
+        defaultTimeCalibrationKey = activity.getString(R.string.time_calibration_key);
+        defaultAmplitudeCalibrationKey = activity.getString(R.string.amplitude_calibration_key);
+        defaultLineWidthKey = activity.getString(R.string.line_width_key);
+        defaultQtcFormulaKey = activity.getString(R.string.qtc_formula_key);
+        defaultTimeCaliperTextPositionKey = activity.getString(R.string.time_caliper_text_position_key);
+        defaultAmplitudeCaliperTextPositionKey = activity.getString(R.string.amplitude_caliper_text_position_key);
+        defaultLineWidthName = activity.getString(R.string.default_line_width);
+        defaultTimeCalibrationName = activity.getString(R.string.default_time_calibration_value);
+        defaultAmplitudeCalibrationName = activity.getString(R.string.default_amplitude_calibration_value);
+        defaultQtcFormula = activity.getString(R.string.qtc_formula_value);
+        defaultTimeCaliperTextPosition = activity.getString(R.string.time_caliper_text_position_value);
+        defaultAmplitudeCaliperTextPosition = activity.getString(R.string.amplitude_caliper_text_position_value);
 
         addPreferencesFromResource(R.xml.settings);
 
         Preference defaultTimeCalibrationPreference = findPreference(defaultTimeCalibrationKey);
         defaultTimeCalibrationPreference.setSummary(getPreferenceScreen()
                 .getSharedPreferences()
-                .getString(defaultTimeCalibrationKey, defaultTimeCalibration));
+                .getString(defaultTimeCalibrationKey, defaultTimeCalibrationName));
 
         Preference defaultAmplitudeCalibrationPreference = findPreference(defaultAmplitudeCalibrationKey);
         defaultAmplitudeCalibrationPreference.setSummary(getPreferenceScreen()
                 .getSharedPreferences()
-                .getString(defaultAmplitudeCalibrationKey, defaultAmplitudeCalibration));
-
-        Preference defaultCaliperColorPreference = findPreference(defaultCaliperColorKey);
-        String defaultCaliperColorValue = getPreferenceScreen()
-                .getSharedPreferences()
-                .getString(defaultCaliperColorKey, defaultCaliperColor);
-        String defaultCaliperColorName = names.get(Integer.parseInt(defaultCaliperColorValue));
-        defaultCaliperColorPreference.setSummary(defaultCaliperColorName);
-
-        Preference defaultHighlightColorPreference = findPreference(defaultHighlightColorKey);
-        String defaultHighlightColorValue = getPreferenceScreen()
-                .getSharedPreferences()
-                .getString(defaultHighlightColorKey, defaultHighlightColor);
-        String defaultHighlightColorName = names.get(Integer.parseInt(defaultHighlightColorValue));
-        defaultHighlightColorPreference.setSummary(defaultHighlightColorName);
+                .getString(defaultAmplitudeCalibrationKey, defaultAmplitudeCalibrationName));
 
         Preference defaultLineWidthPreference = findPreference(defaultLineWidthKey);
         String defaultLineWidthValue = getPreferenceScreen()
                 .getSharedPreferences()
-                .getString(defaultLineWidthKey, defaultLineWidth);
-        String defaultLineWidthName = names.get(Integer.parseInt(defaultLineWidthValue));
+                .getString(defaultLineWidthKey, defaultLineWidthName);
+        int lineWidth = DEFAULT_LINE_WIDTH;
+        try {
+            if (defaultLineWidthValue != null) {
+                lineWidth = Integer.parseInt(defaultLineWidthValue);
+            }
+        }
+        catch (Exception ex) {
+            // just leave lineWidth as DEFAULT_LINE_WIDTH
+        }
+        String defaultLineWidthName = lineWidthNames.get(lineWidth);
         defaultLineWidthPreference.setSummary(defaultLineWidthName);
 
         Preference defaultQtcFormulaPreference = findPreference(defaultQtcFormulaKey);
@@ -177,19 +149,13 @@ public class MyPreferenceFragment extends PreferenceFragment implements
                                           String key) {
         Preference pref = findPreference(key);
         if (key.equals(defaultTimeCalibrationKey)) {
-            pref.setSummary(sharedPreferences.getString(key, defaultTimeCalibration));
+            pref.setSummary(sharedPreferences.getString(key, defaultTimeCalibrationName));
         }
         else if (key.equals(defaultAmplitudeCalibrationKey)) {
-            pref.setSummary(sharedPreferences.getString(key, defaultTimeCalibration));
-        }
-        else if (key.equals(defaultCaliperColorKey)) {
-            pref.setSummary(getNameFromKey(sharedPreferences, key, defaultCaliperColor));
-        }
-        else if (key.equals(defaultHighlightColorKey)) {
-            pref.setSummary(getNameFromKey(sharedPreferences, key, defaultHighlightColor));
+            pref.setSummary(sharedPreferences.getString(key, defaultAmplitudeCalibrationName));
         }
         else if (key.equals(defaultLineWidthKey)) {
-            pref.setSummary(getNameFromKey(sharedPreferences, key, defaultLineWidth));
+            pref.setSummary(getNameFromKey(sharedPreferences, key, defaultLineWidthName));
         }
         else if (key.equals(defaultQtcFormulaKey)) {
             String formulaName = sharedPreferences.getString(key, defaultQtcFormula);
@@ -210,9 +176,13 @@ public class MyPreferenceFragment extends PreferenceFragment implements
 
     private String getNameFromKey(SharedPreferences sharedPreferences, String key, String defaultName) {
         try {
-            Integer value = Integer.parseInt(sharedPreferences.getString(key, defaultName));
-            return names.get(value);
-        } catch (Exception ex) {
+            String lineWidthString = sharedPreferences.getString(key, defaultName);
+            int value = DEFAULT_LINE_WIDTH;
+            if (lineWidthString != null) {
+                value = Integer.parseInt(lineWidthString);
+            }
+            return lineWidthNames.get(value);
+        } catch (NumberFormatException ex) {
             //noinspection SuspiciousMethodCalls
             return getString(R.string.error);
         }

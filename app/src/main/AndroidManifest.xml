@@ -8,20 +8,24 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false"/>
-    <uses-feature android:name="android.hardware.camera.autofocus"/>
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false"/>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -67,6 +71,10 @@
         <activity
             android:name=".Prefs"
             android:label="@string/settings_title"/>
+        <activity
+            android:name=".HelpTopics"
+            android:label="@string/topics" />
+        <activity android:name=".Onboarder" />
     </application>
 
 </manifest>

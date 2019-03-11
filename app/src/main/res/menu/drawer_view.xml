@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/ic_camera"
+            android:title="@string/drawer_take_photo" />
+        <item
+            android:id="@+id/nav_image"
+            android:icon="@drawable/ic_image"
+            android:title="@string/drawer_select_image" />
+        <item
+            android:id="@+id/nav_lock_image"
+            android:icon="@drawable/ic_lock"
+            android:title="@string/drawer_lock_image" />
+        <item
+            android:id="@+id/nav_sample_ecg"
+            android:icon="@drawable/ic_favorite"
+            android:title="@string/drawer_sample_ecg" />
+        <item
+            android:id="@+id/nav_preferences"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/drawer_settings" />
+        <item
+            android:id="@+id/nav_help"
+            android:icon="@drawable/ic_help"
+            android:title="@string/drawer_help" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_info"
+            android:title="@string/drawer_about" />
+    </group>
+</menu>

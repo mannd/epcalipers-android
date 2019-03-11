@@ -7,7 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Typeface;
-import android.support.v4.view.GestureDetectorCompat;
+import androidx.core.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -44,44 +44,33 @@ public class CalipersView extends View {
 
     private GestureDetectorCompat gestureDetector;
 
+    public Caliper getTouchedCaliper() {
+        return touchedCaliper;
+    }
+
     private Caliper touchedCaliper;
+    private ArrayList<Caliper> calipers;
 
     public ArrayList<Caliper> getCalipers() {
         return calipers;
     }
-
     public void setCalipers(ArrayList<Caliper> calipers) {
         this.calipers = calipers;
     }
 
-    private ArrayList<Caliper> calipers;
-
-    public boolean isLocked() {
-        return locked;
-    }
-
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
-
-    boolean locked;
-
     public void setLockImage(boolean lockImage) {
         this.lockImage = lockImage;
     }
-
     private boolean lockImage;
 
     public void setMainActivity(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
-
     private MainActivity mainActivity;
 
     public Caliper.Component getPressedComponent() {
         return pressedComponent;
     }
-
     private Caliper.Component pressedComponent = Caliper.Component.None;
 
     public void setAllowColorChange(boolean allowColorChange) {
@@ -98,15 +87,20 @@ public class CalipersView extends View {
     public boolean isACaliperIsMarching() {
         return aCaliperIsMarching;
     }
-
     public void setACaliperIsMarching(boolean aCaliperIsMarching) {
         this.aCaliperIsMarching = aCaliperIsMarching;
     }
-
     private boolean aCaliperIsMarching = false;
 
+    public void setTweakingOrColoring(boolean tweakingOrColoring) {
+        this.tweakingOrColoring = tweakingOrColoring;
+    }
 
+    public boolean isTweakingOrColoring() {
+        return tweakingOrColoring;
+    }
 
+    private boolean tweakingOrColoring = false;
 
     public CalipersView(Context context) {
         super(context);
@@ -124,7 +118,7 @@ public class CalipersView extends View {
     }
 
     private void init(Context context) {
-        locked = false;
+        Context context1 = context;
         lockImage = false;
         calipers = new ArrayList<>();
         touchedCaliper = null;
@@ -154,6 +148,9 @@ public class CalipersView extends View {
                     return true;
                 }
             }
+            // Note returning false here allows the event to pass to the imageView below.
+            // However, not handling the event also triggers the onLongPress event in this
+            // GestureListener.
             return false;
         }
 
@@ -185,73 +182,86 @@ public class CalipersView extends View {
         @Override
         public void onLongPress(MotionEvent e) {
             PointF point = new PointF(e.getX(), e.getY());
+            if (mainActivity.getCurrentActionMode() == null && !tweakingOrColoring && caliperPressed(point) != null) {
+                startActionMode(mainActivity.calipersActionCallback);
+            }
             if (allowColorChange) {
                 changeColor(point);
-            }
-            else if (allowTweakPosition) {
+            } else if (allowTweakPosition) {
                 microMove(point);
             }
         }
     }
 
-        private void changeColor(PointF point) {
-            for (Caliper c : calipers) {
-                if (c.pointNearCaliper(point)) {
-                    final Caliper pressedCaliper = c;
-                    // better if unselected color is shown after color change
-                    c.setSelected(false);
-                    // https://github.com/QuadFlask/colorpicker
-                    ColorPickerDialogBuilder
-                            .with(getContext())
-                            .setTitle(getContext().getString(R.string.choose_color_label))
-                            .initialColor(pressedCaliper.getUnselectedColor())
-                            .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
-                            .density(12)
-                            .setPositiveButton(getContext().getString(R.string.ok_title), new ColorPickerClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int chosenColor, Integer[] allColors) {
-                                    if (!pressedCaliper.isSelected()) {
-                                        pressedCaliper.setColor(chosenColor);
-                                    }
-                                    pressedCaliper.setUnselectedColor(chosenColor);
-                                    invalidate();
-                                }
-                            })
-                            .setNegativeButton(getContext().getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .build()
-                            .show();
-                    break;
-                }
+    // Returns caliper if point near it, otherwise returns null
+    private Caliper caliperPressed(PointF point) {
+        for (Caliper c : calipers) {
+            if (c.pointNearCaliper(point)) {
+               return c;
             }
         }
+        return null;
+    }
+
+    private void changeColor(PointF point) {
+        for (Caliper c : calipers) {
+            if (c.pointNearCaliper(point)) {
+                final Caliper pressedCaliper = c;
+                // better if unselected color is shown after color change
+                c.setSelected(false);
+                // https://github.com/QuadFlask/colorpicker
+                ColorPickerDialogBuilder
+                        .with(getContext())
+                        .setTitle(getContext().getString(R.string.choose_color_label))
+                        .initialColor(pressedCaliper.getUnselectedColor())
+                        .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
+                        .density(12)
+                        .setPositiveButton(getContext().getString(R.string.ok_title), new ColorPickerClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int chosenColor, Integer[] allColors) {
+                                if (!pressedCaliper.isSelected()) {
+                                    pressedCaliper.setColor(chosenColor);
+                                }
+                                pressedCaliper.setUnselectedColor(chosenColor);
+                                invalidate();
+                            }
+                        })
+                        .setNegativeButton(getContext().getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .build()
+                        .show();
+                break;
+            }
+        }
+    }
 
     private void microMove(PointF point) {
         for (Caliper c : calipers) {
             if (c.pointNearBar1(point)) {
                 setupMicroMovements(c, Caliper.Component.Bar1);
                 break;
-            }
-            else if (c.pointNearBar2(point)) {
+            } else if (c.pointNearBar2(point)) {
                 setupMicroMovements(c, Caliper.Component.Bar2);
                 break;
-            }
-            else if (c.pointNearCrossBar(point)) {
+            } else if (c.pointNearCrossBar(point)) {
                 setupMicroMovements(c, Caliper.Component.Crossbar);
                 break;
             }
         }
     }
 
+
+
     private void setupMicroMovements(Caliper c, Caliper.Component component) {
-        locked = true;
-        selectCaliper(c);
-        unselectCalipersExcept(c);
+        unchooseAllCalipersAndComponents();
         pressedComponent = component;
+        c.setChosen(true);
+        c.setChosenComponent(component);
         mainActivity.selectMicroMovementMenu(c, component);
+        invalidate();
     }
 
     public void setPaint(int caliperColor, int highlightColor, int lineWidth) {
@@ -264,7 +274,6 @@ public class CalipersView extends View {
             c.setLineWidth(lineWidth);
         }
     }
-
 
 
     @Override
@@ -307,27 +316,25 @@ public class CalipersView extends View {
         for (int i = calipersCount() - 1; i >= 0; i--) {
             if (calipers.get(i).pointNearCaliper(p) && touchedCaliper == null) {
                 touchedCaliper = calipers.get(i);
-                touchedCaliper.setTouchedBar(Caliper.TouchedBar.NONE);
+                touchedCaliper.setTouchedBar(Caliper.Component.None);
                 if (touchedCaliper.pointNearCrossBar(p)) {
-                    touchedCaliper.setTouchedBar(Caliper.TouchedBar.CROSSBAR);
-                }
-                else if (touchedCaliper.pointNearBar1(p)) {
-                    touchedCaliper.setTouchedBar(Caliper.TouchedBar.BAR1);
-                }
-                else if (touchedCaliper.pointNearBar2(p)) {
-                    touchedCaliper.setTouchedBar(Caliper.TouchedBar.BAR2);
+                    touchedCaliper.setTouchedBar(Caliper.Component.Crossbar);
+                } else if (touchedCaliper.pointNearBar1(p)) {
+                    touchedCaliper.setTouchedBar(Caliper.Component.Bar1);
+                } else if (touchedCaliper.pointNearBar2(p)) {
+                    touchedCaliper.setTouchedBar(Caliper.Component.Bar2);
                 }
             }
         }
     }
 
-    public void selectCaliper(Caliper c) {
+    private void selectCaliper(Caliper c) {
         c.setColor(c.getSelectedColor());
         c.setSelected(true);
         invalidate();
     }
 
-    public void unselectCaliper(Caliper c) {
+    private void unselectCaliper(Caliper c) {
         c.setColor(c.getUnselectedColor());
         c.setSelected(false);
         invalidate();
@@ -360,6 +367,32 @@ public class CalipersView extends View {
             }
         }
         return c;
+    }
+
+    public Caliper chosenCaliper() {
+        for (Caliper c : calipers) {
+            if (c.isChosen()) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    private void unchooseAllCalipers() {
+        for (Caliper c : calipers) {
+            c.setChosen(false);
+        }
+    }
+
+    private void unchooseAllComponents() {
+        for (Caliper c : calipers) {
+            c.setChosenComponent(Caliper.Component.None);
+        }
+    }
+
+    public void unchooseAllCalipersAndComponents() {
+        unchooseAllCalipers();
+        unchooseAllComponents();
     }
 
     public void selectCaliperAndUnselectOthers(Caliper c) {
@@ -401,10 +434,7 @@ public class CalipersView extends View {
     // Single tap initially highlights (selects) caliper,
     // second tap unselects it.  Quick double tap is used
     // to delete caliper.  This is new behavior with v2.0+.
-    public void singleTap(PointF pointF) {
-        if (isLocked()) {
-            return;
-        }
+    private void singleTap(PointF pointF) {
         boolean caliperToggled = false;
         for (int i = calipersCount() - 1; i >= 0; i--) {
             if (calipers.get(i).pointNearCaliper(pointF) && !caliperToggled) {
@@ -414,8 +444,7 @@ public class CalipersView extends View {
                 } else {
                     selectCaliper(calipers.get(i));
                 }
-            }
-            else {
+            } else {
                 unselectCaliper(calipers.get(i));
             }
         }
@@ -423,10 +452,7 @@ public class CalipersView extends View {
 
     // Need a separate procedure for doubleTap, unlike in iOS,
     // since two fast taps won't count as two singleTaps.
-    public void doubleTap(PointF pointF) {
-        if (isLocked()) {
-            return;
-        }
+    private void doubleTap(PointF pointF) {
         for (int i = calipersCount() - 1; i >= 0; i--) {
             if (calipers.get(i).pointNearCaliper(pointF)) {
                 calipers.remove(i);
@@ -439,22 +465,21 @@ public class CalipersView extends View {
         }
     }
 
-    public void move(MotionEvent event, float distanceX, float distanceY) {
+    private void move(MotionEvent event, float distanceX, float distanceY) {
         if (touchedCaliper == null) {
             return;
         }
         if (touchedCaliper.getDirection() == Caliper.Direction.VERTICAL) {
             float tmp = distanceX;
+            //noinspection SuspiciousNameCombination
             distanceX = distanceY;
             distanceY = tmp;
         }
-        if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.CROSSBAR) {
+        if (touchedCaliper.getTouchedBar() == Caliper.Component.Crossbar) {
             touchedCaliper.moveCrossBar(distanceX, distanceY);
-        }
-        else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR1) {
+        } else if (touchedCaliper.getTouchedBar() == Caliper.Component.Bar1) {
             touchedCaliper.moveBar1(distanceX, distanceY, event);
-        }
-        else if (touchedCaliper.getTouchedBar() == Caliper.TouchedBar.BAR2) {
+        } else if (touchedCaliper.getTouchedBar() == Caliper.Component.Bar2) {
             touchedCaliper.moveBar2(distanceX, distanceY, event);
         }
         invalidate();

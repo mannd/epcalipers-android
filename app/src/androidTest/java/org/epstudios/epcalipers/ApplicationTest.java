@@ -1,26 +1,24 @@
 package org.epstudios.epcalipers;
 
-import android.app.Application;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.test.ApplicationTestCase;
 
-/**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
- */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
-    }
+import androidx.test.platform.app.InstrumentationRegistry;
 
-    public void test() throws Exception {
+import static org.junit.Assert.*;
+
+public class ApplicationTest {
+
+    @org.junit.Test
+    public void test() {
         final int expected = 1;
         final int reality = 1;
         assertEquals(expected, reality);
     }
 
+    @org.junit.Test
     public void testCanDisplayRate() {
-        Calibration cal = new Calibration(getContext());
+        Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
         cal.setCalibrated(true);
         cal.setUnits("msec");
         assertTrue(cal.canDisplayRate());
@@ -47,16 +45,18 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     }
 
+    @org.junit.Test
     public void testCurrentHorizontalCalFactor() {
-        Calibration cal = new Calibration(getContext());
+        Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
         cal.setOriginalZoom(1.0f);
         cal.setOriginalCalFactor(0.5f);
         cal.setCurrentZoom(1.0f);
-        assertEquals(cal.getCurrentCalFactor(), 0.5f);
+        assertEquals(cal.getCurrentCalFactor(), 0.5f, 0.001);
         cal.setCurrentZoom(2.0f);
-        assertEquals(cal.getCurrentCalFactor(), 0.25f);
+        assertEquals(cal.getCurrentCalFactor(), 0.25f, 0.001);
     }
 
+    @org.junit.Test
     public void testInitialCaliperPosition() {
         Caliper c = new Caliper();
         c.setInitialPosition(new Rect(0, 0, 600, 600));
@@ -70,6 +70,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(c.getCrossbarPosition(), 315.0f, 0.001);
     }
 
+    @org.junit.Test
     public void testBarCoord() {
         Caliper c = new Caliper();
         assertEquals(c.getBar1Position(), 0, 0.001);
@@ -81,8 +82,9 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(c.barCoord(p),50.0f, 0.001);
     }
 
+    @org.junit.Test
     public void testUnitsAreMM() {
-        Calibration cal = new Calibration(getContext());
+        Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
         cal.setCalibrated(true);
         cal.setDirection(Caliper.Direction.VERTICAL);
         cal.setUnits("mm");
@@ -103,6 +105,67 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertFalse(cal.unitsAreMM());
     }
 
+    @org.junit.Test
+    public void testUnitsAreSec() {
+        Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        cal.setUnits("sec");
+        assertTrue(cal.unitsAreSeconds());
+        cal.setUnits("seconds");
+        assertTrue(cal.unitsAreSeconds());
+        cal.setUnits("SEC");
+        assertTrue(cal.unitsAreSeconds());
+        cal.setUnits("s");
+        assertTrue(cal.unitsAreSeconds());
+        cal.setUnits("msec");
+        assertFalse(cal.unitsAreSeconds());
+        cal.setUnits("секунд");
+        assertTrue(cal.unitsAreSeconds());
+        cal.setUnits("сек");
+        assertTrue(cal.unitsAreSeconds());
+        cal.setUnits("с");
+        assertTrue(cal.unitsAreSeconds());
+        cal.setUnits("");
+        assertFalse(cal.unitsAreSeconds());
+        cal.setUnits("blah");
+        assertFalse(cal.unitsAreSeconds());
+        cal.setUnits("sec");
+        assertTrue(cal.unitsAreSeconds());
+    }
+
+    @org.junit.Test
+    public void testUnitsAreMsec() {
+        Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        cal.setUnits("msec");
+        assertTrue(cal.unitsAreMsec());
+        cal.setUnits("Msec");
+        assertTrue(cal.unitsAreMsec());
+        cal.setUnits("MSECs");
+        assertTrue(cal.unitsAreMsec());
+        cal.setUnits("ms");
+        assertTrue(cal.unitsAreMsec());
+        cal.setUnits("millisec");
+        assertTrue(cal.unitsAreMsec());
+        cal.setUnits("millimeters");
+        assertFalse(cal.unitsAreMsec());
+        cal.setUnits("мсек");
+        assertTrue(cal.unitsAreMsec());
+        cal.setUnits("мс");
+        assertTrue(cal.unitsAreMsec());
+        cal.setUnits("миллисекунду");
+        assertTrue(cal.unitsAreMsec());
+        cal.setUnits("");
+        assertFalse(cal.unitsAreMsec());
+        cal.setUnits("с");
+        assertFalse(cal.unitsAreMsec());
+        cal.setUnits("");
+        assertFalse(cal.unitsAreMsec());
+        cal.setUnits("blah");
+        assertFalse(cal.unitsAreMsec());
+        cal.setUnits("msec");
+        assertTrue(cal.unitsAreMsec());
+    }
+
+    @org.junit.Test
     public void testRadiansToDegrees() {
         double angle = 0;
         assert(AngleCaliper.radiansToDegrees(angle) == 0.0);
@@ -112,6 +175,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assert(AngleCaliper.radiansToDegrees(angle) == 180.0);
     }
 
+    @org.junit.Test
     public void testIsAngleCaliper() {
         Caliper caliper = new Caliper();
         assertTrue(caliper.requiresCalibration());
@@ -120,34 +184,15 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertFalse(angleCaliper.requiresCalibration());
         assertTrue(angleCaliper.isAngleCaliper());
     }
-//    func testQTc() {
-//        let qtcResult = QTcResult()
-//        var result = qtcResult.calculateFromQt(inSec: 0.4, rrInSec: 1.0, formula: .Bazett, convertToMsec: false, units: "sec")
-//        XCTAssertEqual(result, "Mean RR = 1 sec\nQT = 0.4 sec\nQTc = 0.4 sec (Bazett formula)")
-//        result = qtcResult.calculateFromQt(inSec: 0.4, rrInSec: 1.0, formula: .Hodges, convertToMsec: false, units: "sec")
-//        XCTAssertEqual(result, "Mean RR = 1 sec\nQT = 0.4 sec\nQTc = 0.4 sec (Hodges formula)")
-//        // test a real calculation using these formulas
-//        let qtcTable: [(formula: QTcFormulaPreference, value: Double, name: String)] = [(.Bazett, 0.3367, "Bazett"), (.Fridericia, 0.3159, "Fridericia"), (.Framingham, 0.327, "Framingham"), (.Hodges, 0.327, "Hodges")]
-//        for (formula, value, name) in qtcTable {
-//            result = qtcResult.calculateFromQt(inSec: 0.278, rrInSec: 0.6818, formula: formula, convertToMsec: false, units: "sec")
-//            XCTAssertEqual(result, "Mean RR = 0.6818 sec\nQT = 0.278 sec\nQTc = \(value) sec (\(name) formula)")
-//        }
-//
-//        let qtcTable2: [(formula: QTcFormulaPreference, value: Double, name: String)] = [(.Bazett, 456.3, "Bazett"), (.Fridericia, 411.2, "Fridericia"), (.Framingham, 405.5, "Framingham"), (.Hodges, 425, "Hodges")]
-//        for (formula, value, name) in qtcTable2 {
-//            result = qtcResult.calculateFromQt(inSec: 0.334, rrInSec: 0.5357, formula: formula, convertToMsec: true, units: "msec")
-//            XCTAssertEqual(result, String.localizedStringWithFormat("Mean RR = 535.7 msec\nQT = 334 msec\nQTc = %.4g msec (%@ formula)", value, name))
-//        }
-//    }
 
+    @org.junit.Test
     public void testQTc() {
-        QtcCalculator calc = new QtcCalculator(QtcCalculator.QtcFormula.qtcBzt, getContext());
+        QtcCalculator calc = new QtcCalculator(QtcCalculator.QtcFormula.qtcBzt, InstrumentationRegistry.getInstrumentation().getTargetContext());
         String result = calc.calculate(0.278, 0.6818, false, "sec");
         assertEquals(result, "Mean RR = 0.6818 sec\nQT = 0.278 sec\nQTc = 0.33668 sec (Bazett formula)");
-        QtcCalculator calc2 = new QtcCalculator(QtcCalculator.QtcFormula.qtcFrd, getContext());
+        QtcCalculator calc2 = new QtcCalculator(QtcCalculator.QtcFormula.qtcFrd, InstrumentationRegistry.getInstrumentation().getTargetContext());
         result = calc2.calculate(0.278, 0.6818, false, "sec");
         assertEquals(result, "Mean RR = 0.6818 sec\nQT = 0.278 sec\nQTc = 0.31586 sec (Fridericia formula)");
-        // TODO: add the other formulas here
         calc2.setFormula(QtcCalculator.QtcFormula.qtcHdg);
         result = calc2.calculate(0.278, 0.6818, false, "sec");
         assertEquals(result, "Mean RR = 0.6818 sec\nQT = 0.278 sec\nQTc = 0.327 sec (Hodges formula)");
@@ -156,4 +201,46 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         assertEquals(result, "Mean RR = 681.8 msec\nQT = 278 msec\nQTc = 327 msec (Framingham formula)");
     }
 
+    @org.junit.Test
+    public void testVersion() {
+	String testVersionName = "2.1.3";
+	int testVersionCode = 300;
+	Version version = new Version(null, null, testVersionName, testVersionCode);
+	assertEquals(version.getVersionName(), testVersionName);
+	assertEquals(version.getVersionCode(), testVersionCode);
+    }
+	
+	
+
+    @org.junit.Test
+    public void testMiscCaliperTests() {
+        Caliper c = new Caliper();
+        c.setBar1Position(100);
+        c.setBar2Position(50);
+        c.setCrossbarPosition(120);
+        assertEquals(c.getValueInPoints(), -50, 0.001);
+        assertTrue(c.pointNearBar1(new PointF(90, 130)));
+        assertTrue(c.pointNearBar2(new PointF(45, 180)));
+        assertTrue(c.pointNearCrossBar(new PointF(70, 130)));
+        PointF closePoint = new PointF(110, 110);
+        PointF farPoint = new PointF(130, 150);
+        assertTrue(c.pointNearCaliper(closePoint));
+        assertFalse(c.pointNearCaliper(farPoint));
+        c.setDirection(Caliper.Direction.VERTICAL);
+        assertTrue(c.pointNearCaliper(closePoint));
+        assertFalse(c.pointNearCaliper(farPoint));
+        PointF closePoint2 = new PointF(110, 75);
+        assertTrue(c.pointNearCaliper(closePoint2));
+        Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        c.setCalibration(cal);
+        assertEquals(c.intervalInSecs(200), 0.2, 0.001);
+        assertEquals(c.intervalInMsec(0.100), 100, 0.001);
+        cal.setUnits("msec");
+        assertEquals(c.intervalInMsec(100), 100, 0.001);
+        cal.setUnits("SEC");
+        assertEquals(c.intervalInSecs(0.314), 0.314, 0.001);
+        assertFalse(c.isTimeCaliper());
+        c.setDirection(Caliper.Direction.HORIZONTAL);
+        assertTrue(c.isTimeCaliper());
+    }
 }
