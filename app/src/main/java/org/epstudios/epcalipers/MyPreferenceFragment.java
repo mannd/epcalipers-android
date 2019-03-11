@@ -12,7 +12,6 @@ import android.util.SparseArray;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO: Why not store colors as Integers?
 public class MyPreferenceFragment extends PreferenceFragment implements
         OnSharedPreferenceChangeListener {
     private final int DEFAULT_LINE_WIDTH = 2;
