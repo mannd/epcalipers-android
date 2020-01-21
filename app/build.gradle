@@ -32,7 +32,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0-alpha01'
     implementation 'com.google.android.material:material:1.2.0-alpha03'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
-    implementation 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
+//    implementation 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
     implementation 'com.github.barteksc:android-pdf-viewer:3.2.0-beta.1'
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
     implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha01'

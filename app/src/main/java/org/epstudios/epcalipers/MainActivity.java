@@ -32,6 +32,7 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 
+import com.github.barteksc.pdfviewer.PDFView;
 import com.github.chrisbanes.photoview.OnMatrixChangedListener;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.navigation.NavigationView;
@@ -62,6 +63,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.epstudios.epcalipers.QtcCalculator.QtcFormula;
+
+import import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
+import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
+import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
+import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
+import com.github.barteksc.pdfviewer.util.FitPolicy;
+import com.shockwave.pdfium.PdfDocument;
+import com.shockwave.pdfium.PdfiumCore;
+
 import org.vudroid.core.DecodeServiceBase;
 import org.vudroid.pdfdroid.codec.PdfContext;
 import org.vudroid.pdfdroid.codec.PdfPage;
@@ -69,6 +80,7 @@ import org.vudroid.pdfdroid.codec.PdfPage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -838,6 +850,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int pageNumber;
     }
 
+    // FIXME: PDF access point
     @TargetApi(25)
     private static class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
         private final WeakReference<MainActivity> activityWeakReference;
@@ -943,7 +956,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public Bitmap getBitmap(File file) {
+        int pageNum = 0;
+        PdfiumCore pdfiumCore = new PdfiumCore(this);
+        try {
+            PdfDocument pdfDocument = pdfiumCore.newDocument(openFile(file));
+            pdfiumCore.openPage(pdfDocument, pageNum);
 
+            int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNum);
+            int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNum);
+
+
+            // ARGB_8888 - best quality, high memory usage, higher possibility of OutOfMemoryError
+            // RGB_565 - little worse quality, twice less memory usage
+            Bitmap bitmap = Bitmap.createBitmap(width , height ,
+                    Bitmap.Config.RGB_565);
+            pdfiumCore.renderPageBitmap(pdfDocument, bitmap, pageNum, 0, 0,
+                    width, height);
+            //if you need to render annotations and form fields, you can use
+            //the same method above adding 'true' as last param
+
+            pdfiumCore.closeDocument(pdfDocument); // important!
+            return bitmap;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    public static ParcelFileDescriptor openFile(File file) {
+        ParcelFileDescriptor descriptor;
+        try {
+            descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return descriptor;
+    }
+
+    // FIXME: PDF access point
     private static class AsyncLoadPDF extends AsyncTask<UriPage,
             Void, Bitmap> {
         private boolean isNewPdf;
@@ -965,66 +1016,67 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
 
-        @Override
-        protected Bitmap doInBackground(UriPage... params) {
-            DecodeServiceBase decodeService = new DecodeServiceBase(new PdfContext());
-            decodeService.setContentResolver(activityWeakReference.get().getContentResolver());
-            UriPage uriPage = params[0];
-            Uri pdfUri = uriPage.uri;
-            if (pdfUri == null) {
-                if (activityWeakReference.get().currentPdfUri == null) {
-                    // can't do anything if all is null
-                    return null;
-                }
-                // use currently opened PDF
-                pdfUri = activityWeakReference.get().currentPdfUri;
-                isNewPdf = false;
-            }
-            else {
-                // change Uri to a real file path
-                pdfUri = activityWeakReference.get().getTempUri(pdfUri);
-                // if getTempUri returns null then exception was thrown
-                if (pdfUri == null) {
-                    return null;
-                }
-                // close old currentPdfUri if possible
-                if (activityWeakReference.get().currentPdfUri != null) {
-                    File file = new File(activityWeakReference.get().currentPdfUri.getPath());
-                    if (file.exists()) {
-                        //noinspection ResultOfMethodCallIgnored
-                        file.delete();
-                    }
-                }
-                // retain PDF Uri for future page changes
-                activityWeakReference.get().currentPdfUri = pdfUri;
-                isNewPdf = true;
-            }
-            // Not clear if this code can throw out of memory exception --
-            // not well documented, so we'll be careful and catch any exception.
-            try {
-                decodeService.open(pdfUri);
-                activityWeakReference.get().numberOfPdfPages = decodeService.getPageCount();
-                activityWeakReference.get().currentPdfPageNumber = uriPage.pageNumber;
-                PdfPage page = (PdfPage) decodeService.getPage(activityWeakReference.get().currentPdfPageNumber);
 
-                int width = page.getWidth();
-                int height = page.getHeight();
-
-                Matrix matrix = new Matrix();
-                matrix.preTranslate(0, height);
-                matrix.preScale(1, -1);
-                matrix.postScale(3, 3);
-
-                Bitmap bitmap = page.render(new Rect(0, 0, width * 3, height * 3), matrix);
-                page.recycle();
-                decodeService.recycle();
-                return bitmap;
-            } catch (Exception e) {
-                // catch out of memory errors and just don't load rather than crash
-                exceptionMessage = e.getMessage();
-                return null;
-            }
-        }
+//        @Override
+//        protected Bitmap doInBackground(UriPage... params) {
+//            DecodeServiceBase decodeService = new DecodeServiceBase(new PdfContext());
+//            decodeService.setContentResolver(activityWeakReference.get().getContentResolver());
+//            UriPage uriPage = params[0];
+//            Uri pdfUri = uriPage.uri;
+//            if (pdfUri == null) {
+//                if (activityWeakReference.get().currentPdfUri == null) {
+//                    // can't do anything if all is null
+//                    return null;
+//                }
+//                // use currently opened PDF
+//                pdfUri = activityWeakReference.get().currentPdfUri;
+//                isNewPdf = false;
+//            }
+//            else {
+//                // change Uri to a real file path
+//                pdfUri = activityWeakReference.get().getTempUri(pdfUri);
+//                // if getTempUri returns null then exception was thrown
+//                if (pdfUri == null) {
+//                    return null;
+//                }
+//                // close old currentPdfUri if possible
+//                if (activityWeakReference.get().currentPdfUri != null) {
+//                    File file = new File(activityWeakReference.get().currentPdfUri.getPath());
+//                    if (file.exists()) {
+//                        //noinspection ResultOfMethodCallIgnored
+//                        file.delete();
+//                    }
+//                }
+//                // retain PDF Uri for future page changes
+//                activityWeakReference.get().currentPdfUri = pdfUri;
+//                isNewPdf = true;
+//            }
+//            // Not clear if this code can throw out of memory exception --
+//            // not well documented, so we'll be careful and catch any exception.
+//            try {
+//                decodeService.open(pdfUri);
+//                activityWeakReference.get().numberOfPdfPages = decodeService.getPageCount();
+//                activityWeakReference.get().currentPdfPageNumber = uriPage.pageNumber;
+//                PdfPage page = (PdfPage) decodeService.getPage(activityWeakReference.get().currentPdfPageNumber);
+//
+//                int width = page.getWidth();
+//                int height = page.getHeight();
+//
+//                Matrix matrix = new Matrix();
+//                matrix.preTranslate(0, height);
+//                matrix.preScale(1, -1);
+//                matrix.postScale(3, 3);
+//
+//                Bitmap bitmap = page.render(new Rect(0, 0, width * 3, height * 3), matrix);
+//                page.recycle();
+//                decodeService.recycle();
+//                return bitmap;
+//            } catch (Exception e) {
+//                // catch out of memory errors and just don't load rather than crash
+//                exceptionMessage = e.getMessage();
+//                return null;
+//            }
+//        }
 
         protected void onPostExecute(Bitmap bitmap) {
             MainActivity activity = activityWeakReference.get();
