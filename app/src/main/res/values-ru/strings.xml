@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">ЭФИ калипер</string>
     <string name="bpm">уд/мин</string>
-    <string name="about_text">Авторские права © 2015-2019 EP Studios, Inc.  Все права защищены.\n</string>
+    <string name="about_text">Авторские права © 2015-2020 EP Studios, Inc.  Все права защищены.\n</string>
     <string name="about_label">ЭФИ калипер</string>
     <string name="acknowledgments_ht">Благодарности</string>
     <string name="adding_deleting_calipers_ht">"Добавляйте и удаляйте калиперы "</string>
