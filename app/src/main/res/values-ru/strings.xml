@@ -139,4 +139,25 @@
     <string name="multipage_pdf_warning">Вам следует снова открыть PDF через приложение для просмотра всех страниц</string>
     <string name="negative_caliper_message">Выберите калипер с положительным значением, или измените значение этого калипера на положительное, а затем повторите калибровку.</string>
     <string name="negative_caliper_title">Отрицательное значение калипера</string>
+    <string name="auto_position_text_off">Текст фиксируется в позиции</string>
+    <string name="auto_position_text_on">Текст мобильный</string>
+    <string name="caliper_actions_title">Действия</string>
+    <string name="image_actions_title">Действия</string>
+    <string name="error">Ошибка</string>
+    <string name="file_load_error">Ошибка загрузки файла</string>
+    <string name="file_load_message">Ошибка загрузки файла</string>
+    <string name="finish_button_title">Конец</string>
+    <string name="opening_pdf_message">Открытие PDF</string>
+    <string name="page_number_hint">Номер страницы</string>
+    <string name="pdf_error_message">Не удалось открыть PDF</string>
+    <string name="round_msec_rate_off_summary">Нет округления интервалов и ставок</string>
+    <string name="round_msec_rate_on_summary">Интервалы и скорость округлены</string>
+    <string name="show_start_image_label">Показать образец ЭКГ при запуске?</string>
+    <string name="show_start_image_off_summary">Не показывать ЭКГ</string>
+    <string name="show_start_image_on_summary">Показать ЭКГ</string>
+    <string name="skip_button_title">Пропускать</string>
+    <string name="temp_image_file_warning">Не удалось сохранить временный файл изображения</string>
+    <string name="use_large_font_label">Использовать крупный текст шрифта?</string>
+    <string name="use_large_font_off_summary">Используйте шрифт нормального размера</string>
+    <string name="use_large_font_on_summary">Используйте большой шрифт</string>
 </resources>
