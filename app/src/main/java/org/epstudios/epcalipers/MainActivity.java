@@ -58,6 +58,7 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -390,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MenuItem cameraMenuItem = menuNav.findItem(R.id.nav_camera);
         // Disable camera button if no camera present
         cameraMenuItem.setEnabled(getPackageManager()
-                .hasSystemFeature(PackageManager.FEATURE_CAMERA));
+                .hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY));
         lockImageMenuItem = menuNav.findItem(R.id.nav_lock_image);
         // Make navigation (hamburger) menu do things.
         navigationView.setNavigationItemSelectedListener(
