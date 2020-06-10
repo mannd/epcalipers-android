@@ -256,4 +256,12 @@
     <string name="version_code" translatable="false">VersionCode</string>
     <string name="negative_caliper_title">Negatively Valued Caliper</string>
     <string name="negative_caliper_message">Select a caliper with a positive value, or change this caliper to a positive value, and then repeat calibration.</string>
+
+    <string name="msec_units">msec</string>
+    <string name="sec_units">sec</string>
+    <string name="mm_units">mm</string>
+    <string name="mv_units">mV</string>
+    <string name="choose_units_message">Choose units of measurement</string>
+
+
 </resources>

@@ -160,4 +160,9 @@
     <string name="use_large_font_label">Использовать крупный текст шрифта?</string>
     <string name="use_large_font_off_summary">Используйте шрифт нормального размера</string>
     <string name="use_large_font_on_summary">Используйте большой шрифт</string>
+    <string name="msec_units">мсек</string>
+    <string name="sec_units">сек</string>
+    <string name="mv_units">милливольт</string>
+    <string name="mm_units">мм</string>
+    <string name="choose_units_message">Выберите единицы измерения</string>
 </resources>

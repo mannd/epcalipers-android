@@ -92,6 +92,29 @@ public class Calibration {
 
     private boolean calibrated;
 
+    enum Units {
+        msec,
+        sec,
+        mm,
+        mV,
+        none
+    }
+
+    String getUnitsString(Units units) {
+        switch(units) {
+            case msec:
+                return context.getString(R.string.msec_units);
+            case sec:
+                return context.getString(R.string.sec_units);
+            case mm:
+                return context.getString(R.string.mm_units);
+            case mV:
+                return context.getString(R.string.mv_units);
+            default:
+                return "";
+        }
+    }
+
     public Calibration(Caliper.Direction direction, Context context) {
         this.direction = direction;
         this.context = context;
