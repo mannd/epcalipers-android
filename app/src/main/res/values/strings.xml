@@ -16,7 +16,7 @@
     <string name="calibrate_button_title">Calibrate</string>
     <string name="calibrate_dialog_title">Calibrate</string>
     <string name="calibration_dialog_hint">Enter calibration measurement.</string>
-    <string name="calibration_dialog_message">Enter measurement (e.g. %s):</string>
+    <string name="calibration_dialog_with_units_message">Enter measurement including units (e.g. %s):</string>
     <string name="cancel_button_title">Cancel</string>
     <string name="cancel_title">Cancel</string>
     <string name="center_above">Center above</string>
@@ -43,7 +43,7 @@
     <string name="done_button_title">Done</string>
     <string name="error">Error</string>
     <string name="example_amplitude_measurement">1 mV</string>
-    <string name="example_time_measurement">500 msec</string>
+    <string name="example_time_measurement">1000 msec</string>
     <string name="file_load_error">File load error</string>
     <string name="file_load_message">File could not be loaded</string>
     <string name="five_points">5 points</string>
@@ -195,6 +195,7 @@
     <string name="time_caliper_text_position_value" translatable="false">centerAbove</string>
     <string name="amplitude_caliper_text_position_value" translatable="false">right</string>
     <string name="qtc_formula_value" translatable="false">bazett</string>
+    <string name="use_custom_units_key" translatable="false">use_custom_units</string>
 
     <!--Save and restore instance state keys-->
     <string name="imageview_scale_key" translatable="false">scale</string>
@@ -262,6 +263,7 @@
     <string name="mm_units">mm</string>
     <string name="mv_units">mV</string>
     <string name="choose_units_message">Choose units of measurement</string>
+    <string name="calibration_without_units_message">Enter interval without units.</string>
 
 
 </resources>

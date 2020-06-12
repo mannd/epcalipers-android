@@ -41,6 +41,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -49,7 +50,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,8 +67,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -76,12 +74,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -100,10 +95,10 @@ import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    // TODO: regex below includes Cyrillic and must be updated with new alphabets
-    @SuppressWarnings("HardCodedStringLiteral")
-    private static final String calibrationRegex = "[.,0-9]+|[a-zA-ZА-яЁё]+";
-    private static final Pattern VALID_PATTERN = Pattern.compile(calibrationRegex);
+//    // TODO: regex below includes Cyrillic and must be updated with new alphabets
+//    @SuppressWarnings("HardCodedStringLiteral")
+//    private static final String calibrationRegex = "[.,0-9]+|[a-zA-ZА-яЁё]+";
+//    private static final Pattern VALID_PATTERN = Pattern.compile(calibrationRegex);
     private static final String LF = "\n";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
@@ -202,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int currentLineWidth;
     private String defaultTimeCalibration;
     private String defaultAmplitudeCalibration;
+    private Boolean defaultUseCustomUnits;
     private String dialogResult;
     private int shortAnimationDuration;
     private boolean noSavedInstance;
@@ -549,6 +545,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // show start image only has effect with restart
                 Objects.requireNonNull(sharedPreferences, "Shared preferences must not be null!");
                 if (key.equals(getString(R.string.show_start_image_key))) {
+                    return;
+                }
+                if (key.equals(getString(R.string.use_custom_units_key))) {
+                    defaultUseCustomUnits = sharedPreferences.getBoolean(key, false);
                     return;
                 }
                 if (key.equals(getString(R.string.time_calibration_key))) {
@@ -1033,6 +1033,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 R.string.time_calibration_key), getString(R.string.default_time_calibration_value));
         defaultAmplitudeCalibration = sharedPreferences.getString(
                 getString(R.string.amplitude_calibration_key), getString(R.string.default_amplitude_calibration_value));
+        defaultUseCustomUnits = sharedPreferences.getBoolean(getString(R.string.use_custom_units_key), false);
         useLargeFont = sharedPreferences.getBoolean(getString(R.string.use_large_font_key), false);
         String qtcFormulaName = sharedPreferences.getString(getString(R.string.qtc_formula_key),
                 getString(R.string.qtc_formula_value));
@@ -2485,7 +2486,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             calibrationIntervalMessage = customUnitsMessage;
         }
         else {
-            calibrationIntervalMessage = "Enter measurement only and choose units.";
+            calibrationIntervalMessage = getString(R.string.calibration_without_units_message);
         }
         return calibrationIntervalMessage;
     }
@@ -2500,7 +2501,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             noCaliperSelectedAlert();
             return;
         }
-        Caliper c = calipersView.activeCaliper();
+        final Caliper c = calipersView.activeCaliper();
         if (c == null) {
             return; // shouldn't happen, but if it does...
         }
@@ -2524,12 +2525,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else {
             example = getString(R.string.example_time_measurement);
         }
-        final String message = String.format(getString(R.string.calibration_dialog_message), example);
+        final String calibrateWithUnitsMessage = String.format(getString(R.string.calibration_dialog_with_units_message), example);
 
         // Units: mm mV V cm
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.set_calibration_dialog, null);
-        final Switch customUnitsSwitch = alertLayout.findViewById(R.id.customUnitsSwitch);
+        final CheckBox customUnitsCheckBox = alertLayout.findViewById(R.id.customUnitsCheckBox);
         final EditText calibrationIntervalEditText = alertLayout.findViewById(R.id.calibrationIntervalEditText);
         final TextView calibrationMessageTextView = alertLayout.findViewById(R.id.calibrationMessage);
         final TextView selectUnitsTextView = alertLayout.findViewById(R.id.selectUnitsTextView);
@@ -2539,48 +2540,83 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final RadioButton mmRadioButton = alertLayout.findViewById(R.id.mmRadioButton);
         final RadioButton mVRadioButton = alertLayout.findViewById(R.id.mVRadioButton);
 
+        customUnitsCheckBox.setChecked(defaultUseCustomUnits);
+        // TODO: implement updateDialog() and call whenever needed
+        // updateDialog();
+
         for (int i = 0; i < unitsRadioGroup.getChildCount(); i++) {
-            unitsRadioGroup.getChildAt(i).setEnabled(!customUnitsSwitch.isChecked());
+            unitsRadioGroup.getChildAt(i).setEnabled(!customUnitsCheckBox.isChecked());
         }
-        if (customUnitsSwitch.isChecked()) {
+        if (customUnitsCheckBox.isChecked()) {
             calibrationIntervalEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+            selectUnitsTextView.setEnabled(false);
         }
         else {
             calibrationIntervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
         }
-        String calibrationIntervalMessage = createCalibrationMessage(customUnitsSwitch.isChecked(), message);
+        String calibrationIntervalMessage = createCalibrationMessage(customUnitsCheckBox.isChecked(), calibrateWithUnitsMessage);
         calibrationMessageTextView.setText(calibrationIntervalMessage);
-        customUnitsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        if (c.isAmplitudeCaliper()) {
+            msecRadioButton.setEnabled(false);
+            secRadioButton.setEnabled(false);
+            mmRadioButton.setEnabled(true);
+            mVRadioButton.setEnabled(true);
+        }
+        else {
+            mmRadioButton.setEnabled(false);
+            mVRadioButton.setEnabled(false);
+            msecRadioButton.setEnabled(true);
+            secRadioButton.setEnabled(true);
+        }
+        String calibrationString;
+        if (horizontalCalibration.getCalibrationString().length() < 1) {
+            horizontalCalibration.setCalibrationString(defaultTimeCalibration);
+        }
+        if (verticalCalibration.getCalibrationString().length() < 1) {
+            verticalCalibration.setCalibrationString(defaultAmplitudeCalibration);
+        }
+        Caliper.Direction direction = c.getDirection();
+        if (direction == Caliper.Direction.HORIZONTAL) {
+            calibrationString = horizontalCalibration.getCalibrationString();
+        } else {
+            calibrationString = verticalCalibration.getCalibrationString();
+        }
+        calibrationIntervalEditText.setText(calibrationString);
+        calibrationIntervalEditText.setHint(R.string.calibration_dialog_hint);
+        customUnitsCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String calibrationIntervalMessage = createCalibrationMessage(customUnitsSwitch.isChecked(), message);
+                // TODO: Extract updateDialog()
+                // updateDialog();
+                String calibrationIntervalMessage = createCalibrationMessage(isChecked, calibrateWithUnitsMessage);
                 calibrationMessageTextView.setText(calibrationIntervalMessage);
+                selectUnitsTextView.setEnabled(!isChecked);
                 for (int i = 0; i < unitsRadioGroup.getChildCount(); i++) {
-                    unitsRadioGroup.getChildAt(i).setEnabled(!customUnitsSwitch.isChecked());
+                    unitsRadioGroup.getChildAt(i).setEnabled(!isChecked);
                 }
-                if (customUnitsSwitch.isChecked()) {
+                if (isChecked) {
                     calibrationIntervalEditText.setInputType(InputType.TYPE_CLASS_TEXT);
                 }
                 else {
                     calibrationIntervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
                 }
+                if (!isChecked) {
+                    if (c.isAmplitudeCaliper()) {
+                        msecRadioButton.setEnabled(false);
+                        secRadioButton.setEnabled(false);
+                        mmRadioButton.setEnabled(true);
+                        mVRadioButton.setEnabled(true);
+                    }
+                    else {
+                        mmRadioButton.setEnabled(false);
+                        mVRadioButton.setEnabled(false);
+                        msecRadioButton.setEnabled(true);
+                        secRadioButton.setEnabled(true);
+                    }
+                }
             }
         });
         selectUnitsTextView.setText(R.string.choose_units_message);
-        if (c.getDirection() == Caliper.Direction.VERTICAL) {
-            msecRadioButton.setEnabled(false);
-            secRadioButton.setEnabled(false);
-            // TODO these should be based on preferences
-            calibrationIntervalEditText.setText("10");
-            mmRadioButton.setChecked(true);
-        }
-        else {
-            mmRadioButton.setEnabled(false);
-            mVRadioButton.setEnabled(false);
-            // TODO these should be based on preferences
-            msecRadioButton.setChecked(true);
-            calibrationIntervalEditText.setText("1000");
-        }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Set Calibration");
         builder.setView(alertLayout);
@@ -2590,7 +2626,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onClick(DialogInterface dialog, int which) {
                 String calibrationIntervalString = calibrationIntervalEditText.getText().toString();
                 dialogResult = calibrationIntervalString;
-                if (customUnitsSwitch.isChecked()) {
+                if (customUnitsCheckBox.isChecked()) {
                     processCalibration(calibrationIntervalString, Calibration.Units.none);
                     return;
                 }
@@ -2683,7 +2719,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (dialogResult.length() < 1) {
             return;
         }
-        CalibrationResult calibrationResult = processCalibrationString(dialogResult);
+//        CalibrationResult calibrationResult = processCalibrationString(dialogResult);
+        CalibrationResult calibrationResult = CalibrationProcessor.processCalibrationString(dialogResult);
         if (!calibrationResult.success) {
             return;
         }
@@ -2714,47 +2751,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cal.setCalibrated(true);
         calipersView.invalidate();
         selectMainMenu();
-    }
-
-    // Guarantees outCalFactor is non-negative, non-zero.
-    // outUnits can be zero-length string.
-    private CalibrationResult processCalibrationString(String in) {
-        CalibrationResult calibrationResult = new CalibrationResult();
-        if (in.length() < 1) {
-            return calibrationResult;
-        }
-        List<String> chunks = parse(in);
-        if (chunks.size() < 1) {
-            return calibrationResult;
-        }
-        NumberFormat format = NumberFormat.getInstance();
-        try {
-            Number number = format.parse(chunks.get(0));
-            calibrationResult.value = number.floatValue();
-        } catch (ParseException ex) {
-            EPSLog.log("Exception = " + ex.toString());
-            return calibrationResult;
-        }
-        if (chunks.size() > 1) {
-            calibrationResult.units = chunks.get(1);
-        }
-        // all calibration values must be positive
-        calibrationResult.value = Math.abs(calibrationResult.value);
-        // check for other badness
-        if (calibrationResult.value <= 0.0f) {
-            return calibrationResult;
-        }
-        calibrationResult.success = true;
-        return calibrationResult;
-    }
-
-    private List<String> parse(String toParse) {
-        List<String> chunks = new LinkedList<>();
-        Matcher matcher = VALID_PATTERN.matcher(toParse);
-        while (matcher.find()) {
-            chunks.add( matcher.group() );
-        }
-        return chunks;
     }
 
     private void noCalipersAlert() {
@@ -2918,18 +2914,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void adjustCalibrationForScale(float scale) {
         horizontalCalibration.setCurrentZoom(scale);
         verticalCalibration.setCurrentZoom(scale);
-    }
-
-    private class CalibrationResult {
-        boolean success;
-        float value;
-        String units;
-
-        CalibrationResult() {
-            success = false;
-            value = 0.0f;
-            units = "";
-        }
     }
 
     private class MatrixChangeListener implements OnMatrixChangedListener {

@@ -2,7 +2,8 @@ package org.epstudios.epcalipers;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Copyright (C) 2019 EP Studios, Inc.
@@ -37,5 +38,26 @@ public class CaliperTest {
     public void isMarching() {
         Caliper c = new Caliper();
         assertFalse(c.isMarching());
+    }
+
+    @Test
+    public void testCalperType() {
+        Caliper c = new Caliper();
+        assert(c.getCaliperType() == Caliper.CaliperType.Time);
+        assertTrue(c.isTimeCaliper());
+        c.setDirection(Caliper.Direction.VERTICAL);
+        assert(c.getCaliperType() == Caliper.CaliperType.Amplitude);
+        assertTrue(c.isAmplitudeCaliper());
+        AngleCaliper ac = new AngleCaliper();
+        assert(ac.getCaliperType() == Caliper.CaliperType.Angle);
+        assertTrue(ac.isAngleCaliper());
+    }
+
+    @Test
+    public void testCalibrationParsing() {
+        // TODO: refactor out string functions like this.
+//        MainActivity activity = new MainActivity();
+//        MainActivity.CalibrationResult result = activity.processCalibrationString("");
+//        assert(result.success == false);
     }
 }

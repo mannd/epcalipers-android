@@ -66,6 +66,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultQtcFormulaKey;
     private String defaultTimeCaliperTextPositionKey;
     private String defaultAmplitudeCaliperTextPositionKey;
+    private String defaultCustomUnitsCheckBoxKey;
 
     private String defaultLineWidthName;
     private String defaultTimeCalibrationName;
@@ -73,18 +74,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultQtcFormula;
     private String defaultTimeCaliperTextPosition;
     private String defaultAmplitudeCaliperTextPosition;
-
-    // TODO add to preferences dialog
-    // New calibration dialog preferences
-    private String defaultNewCalibrationValueKey;
-    private String defaultNewCalibrationValue;
-    private String defaultNewCalibrationTimeUnitsKey;
-    private String defaultNewCalibrationTimeUnits;
-    private String defaultNewCalibrationAmplitudeUnitsKey;
-    private String defaultNewCalibrationAmplitudeUnits;
-    private String defaultUseNewCalibrationKey;
-    private Boolean defaultUseNewCalibration;
-
+    private String defaultCustomUnitsCheckBox;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {

@@ -1,17 +1,16 @@
 package org.epstudios.epcalipers;
 
-import android.app.Application;
-import android.content.pm.ApplicationInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import androidx.annotation.NonNull;
 import android.view.MotionEvent;
 
 import java.text.DecimalFormat;
+
+import androidx.annotation.NonNull;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -35,6 +34,12 @@ import java.text.DecimalFormat;
  * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Caliper {
+
+    public enum CaliperType {
+        Time,
+        Amplitude,
+        Angle
+    }
 
     public enum Component {
         Bar1,
@@ -132,6 +137,15 @@ public class Caliper {
         this.selected = selected;
     }
 
+    public CaliperType getCaliperType() {
+        if (direction == Direction.VERTICAL) {
+            return CaliperType.Amplitude;
+        }
+        if (isAngleCaliper()) {
+            return CaliperType.Angle;
+        }
+        return CaliperType.Time;
+    }
 
     private float bar1Position;
     private float bar2Position;
@@ -748,6 +762,10 @@ public class Caliper {
 
     public boolean isTimeCaliper() {
         return direction == Direction.HORIZONTAL && !isAngleCaliper();
+    }
+
+    public boolean isAmplitudeCaliper() {
+        return getCaliperType() == CaliperType.Amplitude;
     }
 
     public void moveCrossBar(float deltaX, float deltaY) {
