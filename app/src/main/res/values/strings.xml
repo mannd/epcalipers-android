@@ -15,8 +15,9 @@
     <string name="calculated_qtc_dialog_title">Calculated QTc</string>
     <string name="calibrate_button_title">Calibrate</string>
     <string name="calibrate_dialog_title">Calibrate</string>
-    <string name="calibration_dialog_hint">Enter calibration measurement.</string>
+    <string name="calibration_dialog_hint">e.g. %s</string>
     <string name="calibration_dialog_with_units_message">Enter measurement including units (e.g. %s):</string>
+    <string name="calibration_dialog_message">Enter measurement including units</string>
     <string name="cancel_button_title">Cancel</string>
     <string name="cancel_title">Cancel</string>
     <string name="center_above">Center above</string>
@@ -255,6 +256,7 @@
     <string name="version_number" translatable="false">VersionNumber</string>
     <string name="url_extra_key" translatable="false">URL</string>
     <string name="version_code" translatable="false">VersionCode</string>
+
     <string name="negative_caliper_title">Negatively Valued Caliper</string>
     <string name="negative_caliper_message">Select a caliper with a positive value, or change this caliper to a positive value, and then repeat calibration.</string>
 

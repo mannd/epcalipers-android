@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/calibrationMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:padding="5dp"
+        android:text="@string/calibration_dialog_message" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/calibrationIntervalTextInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="@string/calibration_dialog_hint"
+        app:endIconMode="clear_text">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/calibrationIntervalTextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+</LinearLayout>

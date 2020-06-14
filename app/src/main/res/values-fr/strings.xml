@@ -54,7 +54,6 @@
     <string name="no_calipers_alert_message">Ajouter un ou plus de compas avant de continuer</string>
     <string name="no_caliper_selected_alert_title">Compas pas choisi</string>
     <string name="no_caliper_selected_alert_message">Choisir un compas en le tapant une seule fois.  Le déplacer à un intervalle connu.  Toucher « définir » pour saisir l\'intervalle de l\'étalonnage</string>
-    <string name="calibration_dialog_with_units_message">Saisir la mesure avec des unités (p.e. %s):</string>
     <string name="example_amplitude_measurement">1 mV</string>
     <string name="calibrate_dialog_title">Étalonner</string>
     <string name="example_time_measurement">1000 msec</string>
@@ -83,7 +82,7 @@
     <string name="default_time_calibration_label">Étal. d\'temps par défaut</string>
     <string name="default_amplitude_calibration_label">Étal. d\'amplitude par défaut</string>
     <string name="default_qtc_formula_title">Formule de QTc</string>
-    <string name="calibration_dialog_hint">Saisir la mesure d\'étalonnage</string>
+    <string name="calibration_dialog_hint">p.e. %s</string>
     <string name="show_start_image_label">Exemple d\'ECG à début?</string>
     <string name="use_large_font_label">Utiliser les gros caractères?</string>
     <string name="use_large_font_off_summary">Utiliser les caractères normals</string>
@@ -191,4 +190,6 @@
     <string name="mm_units">mm</string>
     <string name="choose_units_message">Choisir les unités de mesure</string>
     <string name="calibration_without_units_message">Saisir l\'intervalle sans unités</string>
+    <string name="calibration_dialog_message">Saisir la mesure avec des unités</string>
+    <string name="calibration_dialog_with_units_message">Saisir la mesure avec des unités (p.e. %s)</string>
 </resources>

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.NonNull;
+
 /**
  * Copyright (C) 2020 EP Studios, Inc.
  * www.epstudiossoftware.com
@@ -34,6 +36,22 @@ public class CalibrationProcessor {
     private static final String calibrationRegex = "[.,0-9]+|[a-zA-ZА-яЁё]+";
     private static final Pattern VALID_PATTERN = Pattern.compile(calibrationRegex);
 
+    // Valid regexes for units.
+    @SuppressWarnings("HardCodedStringLiteral")
+    private static final String secRegex = "(?:^sec|^сек|^s$|^с$)";
+    @SuppressWarnings("HardCodedStringLiteral")
+    private static final String msecRegex = "(?:^msec|^millis|^мсек|^миллис|^ms$|^мс$)";
+    @SuppressWarnings("HardCodedStringLiteral")
+    private static final String mmRegex = "(?:^millim|^миллим|^mm$|^мм$)";
+    @SuppressWarnings("HardCodedStringLiteral")
+    private static final String mvRegex = "(?:^milliv|^mv$|^миллив|^мв$)";
+
+    final private static int flags = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
+    private static final Pattern secPattern = Pattern.compile(secRegex, flags);
+    private static final Pattern msecPattern = Pattern.compile(msecRegex, flags);
+    private static final Pattern mmPattern = Pattern.compile(mmRegex, flags);
+    private static final Pattern mvPattern = Pattern.compile(mvRegex, flags);
+
     static List<String> parse(String toParse) {
         List<String> chunks = new LinkedList<>();
         Matcher matcher = VALID_PATTERN.matcher(toParse);
@@ -43,9 +61,6 @@ public class CalibrationProcessor {
         return chunks;
     }
 
-    // TODO: refactor this out a a static method in another class.
-    // Guarantees outCalFactor is non-negative, non-zero.
-    // outUnits can be zero-length string.
     public static CalibrationResult processCalibrationString(String in) {
         CalibrationResult calibrationResult = new CalibrationResult();
         if (in.length() < 1) {
@@ -74,6 +89,70 @@ public class CalibrationProcessor {
         }
         calibrationResult.success = true;
         return calibrationResult;
+    }
+
+    public static class Validation {
+        public boolean noInput = false;
+        public boolean noNumber = false;
+        public boolean noUnits = false;
+        public boolean invalidNumber = false;
+        public boolean invalidUnits = false;
+
+        public boolean isValid() {
+            return !(noInput || noNumber || noUnits || invalidNumber || invalidUnits );
+        }
+    }
+
+    // TODO: may need enum here to indicate different outcomes;
+    @NonNull
+    public static Validation validate(String s) {
+        Validation validation = new Validation();
+        List<String> chunks = parse(s);
+        if (chunks.size() < 1) {
+             validation.noInput = true;
+             return validation;
+        }
+        // is it a number?
+        NumberFormat format = NumberFormat.getInstance();
+        try {
+            Number number = format.parse(chunks.get(0));
+            if (number.floatValue() <= 0.0) {
+                validation.invalidNumber = true;
+            }
+        } catch (ParseException ex) {
+            validation.noNumber = true;
+        }
+        if (chunks.size() == 1) {
+            validation.noUnits = true;
+        }
+        else { // chunk.siz() > 1 {
+            validation.invalidUnits = !validateUnits(chunks.get(1));
+        }
+        return validation;
+    }
+
+    private static boolean validateUnits(String s) {
+        return matchesSeconds(s) || matchesMsecs(s) || matchesMM(s) || matchesMV(s);
+    }
+
+    public static boolean matchesSeconds(String s) {
+        Matcher matcher = secPattern.matcher(s);
+        return matcher.lookingAt();
+    }
+
+    public static boolean matchesMsecs(String s) {
+        Matcher matcher = msecPattern.matcher(s);
+        return matcher.lookingAt();
+    }
+
+    public static boolean matchesMM(String s) {
+        Matcher matcher = mmPattern.matcher(s);
+        return matcher.lookingAt();
+    }
+
+    public static boolean matchesMV(String s) {
+        Matcher matcher = mvPattern.matcher(s);
+        return matcher.lookingAt();
     }
 
 }

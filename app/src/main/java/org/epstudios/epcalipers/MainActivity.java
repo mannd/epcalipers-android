@@ -41,21 +41,19 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.chrisbanes.photoview.OnMatrixChangedListener;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.epstudios.epcalipers.QtcCalculator.QtcFormula;
 
@@ -87,6 +85,7 @@ import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import static org.epstudios.epcalipers.CalibrationProcessor.processCalibrationString;
 import static org.epstudios.epcalipers.MyPreferenceFragment.ALL;
 import static org.epstudios.epcalipers.MyPreferenceFragment.BAZETT;
 import static org.epstudios.epcalipers.MyPreferenceFragment.FRAMINGHAM;
@@ -2518,56 +2517,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.show();
             return;
         }
+
+        // Create set calibration dialog.
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.simplified_calibration_dialog, null);
+        final TextInputLayout calibrationIntervalTextInputLayout = alertLayout.findViewById(R.id.calibrationIntervalTextInputLayout);
+        final TextInputEditText calibrationIntervalEditText = alertLayout.findViewById(R.id.calibrationIntervalTextInputEditText);
+
+        // Have hint depend on caliper type.
         String example;
-        if (c.getDirection() == Caliper.Direction.VERTICAL) {
+        if (c.isAmplitudeCaliper()) {
             example = getString(R.string.example_amplitude_measurement);
         }
-        else {
+        else { // time caliper
             example = getString(R.string.example_time_measurement);
         }
-        final String calibrateWithUnitsMessage = String.format(getString(R.string.calibration_dialog_with_units_message), example);
+        final String calibrationHint = String.format(getString(R.string.calibration_dialog_hint), example);
+        calibrationIntervalTextInputLayout.setHint(calibrationHint);
 
-        // Units: mm mV V cm
-        LayoutInflater inflater = getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.set_calibration_dialog, null);
-        final CheckBox customUnitsCheckBox = alertLayout.findViewById(R.id.customUnitsCheckBox);
-        final EditText calibrationIntervalEditText = alertLayout.findViewById(R.id.calibrationIntervalEditText);
-        final TextView calibrationMessageTextView = alertLayout.findViewById(R.id.calibrationMessage);
-        final TextView selectUnitsTextView = alertLayout.findViewById(R.id.selectUnitsTextView);
-        final RadioGroup unitsRadioGroup = alertLayout.findViewById(R.id.unitsRadioGroup);
-        final RadioButton msecRadioButton = alertLayout.findViewById(R.id.msecRadioButton);
-        final RadioButton secRadioButton = alertLayout.findViewById(R.id.secRadioButton);
-        final RadioButton mmRadioButton = alertLayout.findViewById(R.id.mmRadioButton);
-        final RadioButton mVRadioButton = alertLayout.findViewById(R.id.mVRadioButton);
-
-        customUnitsCheckBox.setChecked(defaultUseCustomUnits);
-        // TODO: implement updateDialog() and call whenever needed
-        // updateDialog();
-
-        for (int i = 0; i < unitsRadioGroup.getChildCount(); i++) {
-            unitsRadioGroup.getChildAt(i).setEnabled(!customUnitsCheckBox.isChecked());
-        }
-        if (customUnitsCheckBox.isChecked()) {
-            calibrationIntervalEditText.setInputType(InputType.TYPE_CLASS_TEXT);
-            selectUnitsTextView.setEnabled(false);
-        }
-        else {
-            calibrationIntervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-        }
-        String calibrationIntervalMessage = createCalibrationMessage(customUnitsCheckBox.isChecked(), calibrateWithUnitsMessage);
-        calibrationMessageTextView.setText(calibrationIntervalMessage);
-        if (c.isAmplitudeCaliper()) {
-            msecRadioButton.setEnabled(false);
-            secRadioButton.setEnabled(false);
-            mmRadioButton.setEnabled(true);
-            mVRadioButton.setEnabled(true);
-        }
-        else {
-            mmRadioButton.setEnabled(false);
-            mVRadioButton.setEnabled(false);
-            msecRadioButton.setEnabled(true);
-            secRadioButton.setEnabled(true);
-        }
+        // Use default calibration if no prior calibration.
         String calibrationString;
         if (horizontalCalibration.getCalibrationString().length() < 1) {
             horizontalCalibration.setCalibrationString(defaultTimeCalibration);
@@ -2575,83 +2543,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (verticalCalibration.getCalibrationString().length() < 1) {
             verticalCalibration.setCalibrationString(defaultAmplitudeCalibration);
         }
-        Caliper.Direction direction = c.getDirection();
-        if (direction == Caliper.Direction.HORIZONTAL) {
+        if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
             calibrationString = horizontalCalibration.getCalibrationString();
         } else {
             calibrationString = verticalCalibration.getCalibrationString();
         }
         calibrationIntervalEditText.setText(calibrationString);
-        calibrationIntervalEditText.setHint(R.string.calibration_dialog_hint);
-        customUnitsCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // TODO: Extract updateDialog()
-                // updateDialog();
-                String calibrationIntervalMessage = createCalibrationMessage(isChecked, calibrateWithUnitsMessage);
-                calibrationMessageTextView.setText(calibrationIntervalMessage);
-                selectUnitsTextView.setEnabled(!isChecked);
-                for (int i = 0; i < unitsRadioGroup.getChildCount(); i++) {
-                    unitsRadioGroup.getChildAt(i).setEnabled(!isChecked);
-                }
-                if (isChecked) {
-                    calibrationIntervalEditText.setInputType(InputType.TYPE_CLASS_TEXT);
-                }
-                else {
-                    calibrationIntervalEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                }
-                if (!isChecked) {
-                    if (c.isAmplitudeCaliper()) {
-                        msecRadioButton.setEnabled(false);
-                        secRadioButton.setEnabled(false);
-                        mmRadioButton.setEnabled(true);
-                        mVRadioButton.setEnabled(true);
-                    }
-                    else {
-                        mmRadioButton.setEnabled(false);
-                        mVRadioButton.setEnabled(false);
-                        msecRadioButton.setEnabled(true);
-                        secRadioButton.setEnabled(true);
-                    }
-                }
-            }
-        });
-        selectUnitsTextView.setText(R.string.choose_units_message);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Set Calibration");
+        builder.setTitle(getString(R.string.calibrate_dialog_title));
         builder.setView(alertLayout);
         builder.setCancelable(false);
         builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String calibrationIntervalString = calibrationIntervalEditText.getText().toString();
+                // TODO: test for valid number and type of units.
                 dialogResult = calibrationIntervalString;
-                if (customUnitsCheckBox.isChecked()) {
-                    processCalibration(calibrationIntervalString, Calibration.Units.none);
-                    return;
-                }
-                int units = unitsRadioGroup.getCheckedRadioButtonId();
-                Calibration.Units calibrationUnits = Calibration.Units.none;
-                switch(units) {
-                    case R.id.msecRadioButton:
-                        calibrationUnits = Calibration.Units.msec;
-                        dialogResult += " " + getString(R.string.msec_units);
-                        break;
-                    case R.id.secRadioButton:
-                        calibrationUnits = Calibration.Units.sec;
-                        dialogResult += " " + getString(R.string.sec_units);
-                        break;
-                    case R.id.mmRadioButton:
-                        calibrationUnits = Calibration.Units.mm;
-                        dialogResult += " " + getString(R.string.mm_units);
-                        break;
-                    case R.id.mVRadioButton:
-                        calibrationUnits = Calibration.Units.mV;
-                        dialogResult += " " + getString(R.string.mv_units);
-                        break;
-                }
-                // TODO modify below to get number from calibratinIntervalString and units from calibrationUnits.
-                processCalibration(calibrationIntervalString, calibrationUnits);
+                processCalibration(calibrationIntervalString);
             }
         });
         builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
@@ -2662,65 +2571,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         AlertDialog dialog = builder.create();
         dialog.show();
-
-
-
-
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(getString(R.string.calibrate_dialog_title));
-//        builder.setMessage(message);
-//
-//        final EditText input = new EditText(this);
-//        // not sure I need ALL of the below!
-//        input.setLines(1);
-//        input.setMaxLines(1);
-//        input.setSingleLine(true);
-//        input.setInputType(InputType.TYPE_CLASS_TEXT);
-//        input.setHint(getString(R.string.calibration_dialog_hint));
-//        input.setSelection(0);
-//        String calibrationString = "";
-//        if (horizontalCalibration.getCalibrationString().length() < 1) {
-//            horizontalCalibration.setCalibrationString(defaultTimeCalibration);
-//        }
-//        if (verticalCalibration.getCalibrationString().length() < 1) {
-//            verticalCalibration.setCalibrationString(defaultAmplitudeCalibration);
-//        }
-//        input.setText(calibrationString);
-//
-//        Caliper.Direction direction = c.getDirection();
-//        if (direction == Caliper.Direction.HORIZONTAL) {
-//            calibrationString = horizontalCalibration.getCalibrationString();
-//        } else {
-//            calibrationString = verticalCalibration.getCalibrationString();
-//        }
-//
-//        input.setText(calibrationString);
-//
-//        builder.setView(input);
-//
-//        builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialogResult = input.getText().toString();
-//                processCalibration();
-//            }
-//        });
-//        builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.cancel();
-//            }
-//        });
-//
-//        builder.show();
     }
 
-    private void processCalibration(String calibrationString, Calibration.Units units) {
+    private void processCalibration(String calibrationString) {
         if (dialogResult.length() < 1) {
             return;
         }
-//        CalibrationResult calibrationResult = processCalibrationString(dialogResult);
-        CalibrationResult calibrationResult = CalibrationProcessor.processCalibrationString(dialogResult);
+        CalibrationResult calibrationResult = processCalibrationString(dialogResult);
         if (!calibrationResult.success) {
             return;
         }

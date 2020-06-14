@@ -101,7 +101,7 @@
     <string name="single_tap_caliper_label">Нажмите чтобы выбрать</string>
     <string name="top">наверху</string>
     <string name="bottom">внизу</string>
-    <string name="calibration_dialog_hint">Введите измерение</string>
+    <string name="calibration_dialog_hint">например %s</string>
     <string name="default_amplitude_calibration_value">10 мм</string>
     <string name="default_amplitude_caliper_text_position_title">текст амплитудного калипера</string>
     <string name="default_time_caliper_text_position_title">текст временного калипера</string>
@@ -166,4 +166,5 @@
     <string name="mm_units">мм</string>
     <string name="choose_units_message">Выберите единицы измерения</string>
     <string name="calibration_without_units_message">Введите интервал без единиц</string>
+    <string name="calibration_dialog_message">Введите измерение, включая единицы</string>
 </resources>

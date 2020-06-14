@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -51,6 +53,8 @@ public class CalibrationTest {
         assertEquals("msec", chunks.get(0));
         assertEquals("sec", chunks.get(1));
         assertEquals("xxx", chunks.get(2));
+        chunks = CalibrationProcessor.parse("");
+        assertEquals(0, chunks.size());
     }
 
     @Test
@@ -86,5 +90,64 @@ public class CalibrationTest {
         assertEquals(result.success, false);
         assertEquals(result.value, 0, 0.0001);
         assertEquals(result.units, "");
+    }
+
+    @Test
+    public void validateCalibrationTest() {
+        CalibrationProcessor.Validation validation;
+        validation = CalibrationProcessor.validate("");
+        assertEquals(true, validation.noInput);
+        assertEquals(false, validation.isValid());
+        validation = CalibrationProcessor.validate("msec");
+        assertEquals(true, validation.noNumber);
+        assertEquals(true, validation.noUnits);
+        assertEquals(false, validation.isValid());
+        validation = CalibrationProcessor.validate("1000");
+        assertEquals(true, validation.noUnits);
+        assertEquals(false, validation.isValid());
+        validation = CalibrationProcessor.validate("0");
+        assertEquals(true, validation.invalidNumber);
+        assertEquals(true, validation.noUnits);
+        assertEquals(false, validation.isValid());
+        validation = CalibrationProcessor.validate("1000 sec");
+        assertEquals(true, validation.isValid());
+        validation = CalibrationProcessor.validate("1000 msec");
+        assertEquals(true, validation.isValid());
+        validation = CalibrationProcessor.validate("1 mV");
+        assertEquals(true, validation.isValid());
+        validation = CalibrationProcessor.validate("10 mm");
+        assertEquals(true, validation.isValid());
+    }
+
+    @Test
+    public void matcherTest() {
+        Calibration calibration = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        calibration.setUnits("");
+        // Empty strings never match...
+        assertEquals(false, CalibrationProcessor.matchesMM(""));
+        assertEquals(false, CalibrationProcessor.matchesMV(""));
+        assertEquals(false, CalibrationProcessor.matchesMsecs(""));
+        assertEquals(false, CalibrationProcessor.matchesSeconds(""));
+
+        // calibration unit checks check for empty string, probably unnecessarily.
+        assertEquals(false, calibration.unitsAreMM());
+        assertEquals(false, calibration.unitsAreSeconds());
+        assertEquals(false, calibration.unitsAreMsec());
+
+        calibration.setUnits("mm");
+        assertEquals(false, calibration.unitsAreMM());
+        // At present, unitsAreMM checks direction of caliper as well as units.
+        calibration.setDirection(Caliper.Direction.VERTICAL);
+        assertEquals(true, calibration.unitsAreMM());
+        // But msec and seconds don't check caliper direction...??
+        calibration.setUnits("msec");
+        assertEquals(true, calibration.unitsAreMsec());
+        calibration.setUnits("sec");
+        assertEquals(true, calibration.unitsAreSeconds());
+        calibration.setDirection(Caliper.Direction.HORIZONTAL);
+        calibration.setUnits("msec");
+        assertEquals(true, calibration.unitsAreMsec());
+        calibration.setUnits("sec");
+        assertEquals(true, calibration.unitsAreSeconds());
     }
 }

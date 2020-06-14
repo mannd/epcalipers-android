@@ -52,12 +52,4 @@ public class CaliperTest {
         assert(ac.getCaliperType() == Caliper.CaliperType.Angle);
         assertTrue(ac.isAngleCaliper());
     }
-
-    @Test
-    public void testCalibrationParsing() {
-        // TODO: refactor out string functions like this.
-//        MainActivity activity = new MainActivity();
-//        MainActivity.CalibrationResult result = activity.processCalibrationString("");
-//        assert(result.success == false);
-    }
 }

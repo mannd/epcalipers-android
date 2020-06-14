@@ -66,7 +66,6 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultQtcFormulaKey;
     private String defaultTimeCaliperTextPositionKey;
     private String defaultAmplitudeCaliperTextPositionKey;
-    private String defaultCustomUnitsCheckBoxKey;
 
     private String defaultLineWidthName;
     private String defaultTimeCalibrationName;
@@ -74,7 +73,6 @@ public class MyPreferenceFragment extends PreferenceFragment implements
     private String defaultQtcFormula;
     private String defaultTimeCaliperTextPosition;
     private String defaultAmplitudeCaliperTextPosition;
-    private String defaultCustomUnitsCheckBox;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
