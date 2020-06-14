@@ -139,10 +139,16 @@ public class CalibrationTest {
         // At present, unitsAreMM checks direction of caliper as well as units.
         calibration.setDirection(Caliper.Direction.VERTICAL);
         assertEquals(true, calibration.unitsAreMM());
+        calibration.setUnits("millimeters");
+        assertEquals(true, calibration.unitsAreMM());
         // But msec and seconds don't check caliper direction...??
         calibration.setUnits("msec");
         assertEquals(true, calibration.unitsAreMsec());
+        calibration.setUnits("millisecs");
+        assertEquals(true, calibration.unitsAreMsec());
         calibration.setUnits("sec");
+        assertEquals(true, calibration.unitsAreSeconds());
+        calibration.setUnits("Seconds");
         assertEquals(true, calibration.unitsAreSeconds());
         calibration.setDirection(Caliper.Direction.HORIZONTAL);
         calibration.setUnits("msec");
