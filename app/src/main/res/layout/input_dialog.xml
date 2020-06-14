@@ -6,25 +6,22 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/numberOfIntervalsMessage"
+        android:id="@+id/inputDialogMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:padding="5dp"
-        android:text="@string/number_of_intervals_dialog_message" />
+        android:padding="5dp" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/numberOfIntervalsTextInputLayout"
+        android:id="@+id/inputDialogTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:hint="@string/mean_rr_dialog_hint"
         app:endIconMode="clear_text">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/numberOfIntervalsTextInputEditText"
+            android:id="@+id/inputDialogEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number"
             android:layout_margin="20dp" />
     </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

@@ -978,20 +978,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         // get page number from dialog
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.input_dialog, null);
+        // No message TextView for this dialog; just title and hint.
+        final TextInputLayout numberOfIntervalsTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
+        final TextInputEditText numberOfIntervalsEditText = alertLayout.findViewById(R.id.inputDialogEditText);
+        numberOfIntervalsEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        numberOfIntervalsTextInputLayout.setHint(getString(R.string.page_number_hint));
+
+        String currentPageNumberString = Integer.toString(currentPdfPageNumber + 1);
+        numberOfIntervalsEditText.setText(currentPageNumberString);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.go_to_page_title);
-        final EditText input = new EditText(this);
-        input.setLines(1);
-        input.setMaxLines(1);
-        input.setSingleLine(true);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setHint(R.string.page_number_hint);
-        input.setSelection(0);
-        builder.setView(input);
+        builder.setCancelable(false);
+        builder.setView(alertLayout);
         builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialogResult = input.getText().toString();
+                dialogResult = numberOfIntervalsEditText.getText().toString();
                 int pageNumber;
                 try {
                     pageNumber = Integer.parseInt(dialogResult);
@@ -2190,6 +2195,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void meanRR() {
         if (!thereAreCalipers()) {
             noCalipersAlert();
+            // TODO: we don't consistently selectMainMenu() in this method.
             selectMainMenu();
             return;
         }
@@ -2198,7 +2204,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             calipersView.selectCaliperAndUnselectOthers(singleHorizontalCaliper);
         }
         if (calipersView.noCaliperIsSelected()) {
-            noCaliperSelectedAlert();
+            showNoCaliperSelectedAlert();
             return;
         }
         Caliper c = calipersView.activeCaliper();
@@ -2208,10 +2214,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         LayoutInflater inflater = getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.mean_rr_dialog, null);
-        final TextInputLayout numberOfIntervalsTextInputLayout = alertLayout.findViewById(R.id.numberOfIntervalsTextInputLayout);
-        final TextInputEditText numberOfIntervalsEditText = alertLayout.findViewById(R.id.numberOfIntervalsTextInputEditText);
+        View alertLayout = inflater.inflate(R.layout.input_dialog, null);
+        final TextView numberOfIntervalsMessage = alertLayout.findViewById(R.id.inputDialogMessage);
+        final TextInputLayout numberOfIntervalsTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
+        final TextInputEditText numberOfIntervalsEditText = alertLayout.findViewById(R.id.inputDialogEditText);
+        numberOfIntervalsMessage.setText(R.string.number_of_intervals_dialog_message);
         numberOfIntervalsEditText.setText(getString(R.string.default_number_rr_intervals));
+        numberOfIntervalsEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        numberOfIntervalsTextInputLayout.setHint(getString(R.string.mean_rr_dialog_hint));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.number_of_intervals_dialog_title));
@@ -2249,20 +2259,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             double meanRR = intervalResult / divisor;
             double meanRate = c.rateResult(meanRR);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.mean_rr_result_dialog_title));
             DecimalFormat decimalFormat = new DecimalFormat("@@@##");
-
-            builder.setMessage(String.format(getString(R.string.mean_rr_result_dialog_message),
+            String title = getString(R.string.mean_rr_result_dialog_title);
+            String message = String.format(getString(R.string.mean_rr_result_dialog_message),
                     decimalFormat.format(meanRR), c.getCalibration().getRawUnits(),
-                    decimalFormat.format(meanRate) ));
-            builder.setNegativeButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            builder.show();
+                    decimalFormat.format(meanRate));
+            Alerts.simpleAlert(this, title, message);
         }
     }
 
@@ -2446,8 +2448,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showNoTimeCaliperSelectedAlert() {
-        showSimpleAlert(R.string.no_time_caliper_selected_title,
-                R.string.no_time_caliper_selected_message);
+        Alerts.simpleAlert(this, R.string.no_time_caliper_selected_title, R.string.no_time_caliper_selected_message);
     }
 
     private boolean noTimeCaliperSelected() {
@@ -2463,9 +2464,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 !calipersView.activeCaliper().isAngleCaliper();
     }
 
-    private void noCaliperSelectedAlert() {
-        showSimpleAlert(R.string.no_caliper_selected_alert_title,
-                R.string.no_caliper_selected_alert_message);
+    private void showNoCaliperSelectedAlert() {
+        Alerts.simpleAlert(this, R.string.no_caliper_selected_alert_title, R.string.no_caliper_selected_alert_message);
     }
 
     private void setupCalibration() {
@@ -2496,7 +2496,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         if (calipersView.noCaliperIsSelected()) {
-            noCaliperSelectedAlert();
+            showNoCaliperSelectedAlert();
             return;
         }
         final Caliper c = calipersView.activeCaliper();
@@ -2504,24 +2504,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return; // shouldn't happen, but if it does...
         }
         if (!c.requiresCalibration()) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.angle_caliper_title);
-            builder.setMessage(R.string.angle_caliper_calibration_message);
-            builder.setNegativeButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            builder.show();
+            Alerts.simpleAlert(this, R.string.angle_caliper_title, R.string.angle_caliper_calibration_message);
             return;
         }
 
         // Create set calibration dialog.
         LayoutInflater inflater = getLayoutInflater();
-        View alertLayout = inflater.inflate(R.layout.simplified_calibration_dialog, null);
-        final TextInputLayout calibrationIntervalTextInputLayout = alertLayout.findViewById(R.id.calibrationIntervalTextInputLayout);
-        final TextInputEditText calibrationIntervalEditText = alertLayout.findViewById(R.id.calibrationIntervalTextInputEditText);
+        View alertLayout = inflater.inflate(R.layout.input_dialog, null);
+        final TextView calibrationMessage = alertLayout.findViewById(R.id.inputDialogMessage);
+        final TextInputLayout calibrationIntervalTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
+        final TextInputEditText calibrationIntervalEditText = alertLayout.findViewById(R.id.inputDialogEditText);
+        calibrationMessage.setText(R.string.calibration_dialog_message);
 
         // Have hint depend on caliper type.
         String example;
@@ -2548,6 +2541,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             calibrationString = verticalCalibration.getCalibrationString();
         }
         calibrationIntervalEditText.setText(calibrationString);
+        calibrationIntervalEditText.setInputType(InputType.TYPE_CLASS_TEXT);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.calibrate_dialog_title));
@@ -2585,8 +2579,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         if (c.getValueInPoints() <= 0) {
-            EPSLog.log("Negatively valued caliper");
-            showSimpleAlert(R.string.negative_caliper_title, R.string.negative_caliper_message);
+            Alerts.simpleAlert(this, R.string.negative_caliper_title, R.string.negative_caliper_message);
             return;
         }
         Calibration cal;
@@ -2610,21 +2603,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void noCalipersAlert() {
-        showSimpleAlert(R.string.no_calipers_alert_title,
-                R.string.no_calipers_alert_message);
-    }
-
-    private void showSimpleAlert(int title, int message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.setPositiveButton(getString(R.string.ok_title), null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        Alerts.simpleAlert(this, R.string.no_calipers_alert_title, R.string.no_caliper_selected_alert_message);
     }
 
     private void showFileErrorAlert() {
-        showSimpleAlert(R.string.file_load_error, R.string.file_load_message);
+        Alerts.simpleAlert(this, R.string.file_load_error, R.string.file_load_message);
     }
 
     private void clearCalibration() {
