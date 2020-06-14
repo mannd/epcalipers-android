@@ -5,13 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/inputDialogMessage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:padding="5dp" />
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/inputDialogTextInputLayout"
         android:layout_width="match_parent"

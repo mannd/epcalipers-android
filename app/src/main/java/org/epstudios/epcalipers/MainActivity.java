@@ -41,7 +41,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -2215,16 +2214,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.input_dialog, null);
-        final TextView numberOfIntervalsMessage = alertLayout.findViewById(R.id.inputDialogMessage);
         final TextInputLayout numberOfIntervalsTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
         final TextInputEditText numberOfIntervalsEditText = alertLayout.findViewById(R.id.inputDialogEditText);
-        numberOfIntervalsMessage.setText(R.string.number_of_intervals_dialog_message);
         numberOfIntervalsEditText.setText(getString(R.string.default_number_rr_intervals));
         numberOfIntervalsEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
         numberOfIntervalsTextInputLayout.setHint(getString(R.string.mean_rr_dialog_hint));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.number_of_intervals_dialog_title));
+        builder.setMessage(R.string.number_of_intervals_dialog_message);
         builder.setCancelable(false);
         builder.setView(alertLayout);
         builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
@@ -2289,20 +2287,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showNoTimeCaliperSelectedAlert();
         }
         else {
+            LayoutInflater inflater = getLayoutInflater();
+            final View alertLayout = inflater.inflate(R.layout.input_dialog, null);
+            final TextInputLayout numberOfIntervalsTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
+            final TextInputEditText numberOfIntervalsEditText = alertLayout.findViewById(R.id.inputDialogEditText);
+            numberOfIntervalsEditText.setText(getString(R.string.default_number_rr_intervals));
+            numberOfIntervalsEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+            numberOfIntervalsTextInputLayout.setHint(getString(R.string.mean_rr_dialog_hint));
+
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.number_of_intervals_dialog_title));
             builder.setMessage(getString(R.string.number_of_intervals_dialog_message));
-            final EditText input = new EditText(this);
-            // not sure I need ALL of the below!
-            input.setLines(1);
-            input.setMaxLines(1);
-            input.setSingleLine(true);
-            input.setInputType(InputType.TYPE_CLASS_NUMBER);
-            input.setHint(getString(R.string.mean_rr_dialog_hint));
-            input.setText(getString(R.string.default_number_qtc_rr_intervals));
-            input.setSelection(0);
-
-            builder.setView(input);
+            builder.setView(alertLayout);
+            builder.setCancelable(false);
             builder.setPositiveButton(getString(R.string.continue_title), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -2311,7 +2308,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         dialog.cancel();
                         return;
                     }
-                    dialogResult = input.getText().toString();
+                    dialogResult = numberOfIntervalsEditText.getText().toString();
                     int divisor;
                     try {
                         divisor = Integer.parseInt(dialogResult);
@@ -2511,10 +2508,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Create set calibration dialog.
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.input_dialog, null);
-        final TextView calibrationMessage = alertLayout.findViewById(R.id.inputDialogMessage);
         final TextInputLayout calibrationIntervalTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
         final TextInputEditText calibrationIntervalEditText = alertLayout.findViewById(R.id.inputDialogEditText);
-        calibrationMessage.setText(R.string.calibration_dialog_message);
 
         // Have hint depend on caliper type.
         String example;
@@ -2545,6 +2540,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.calibrate_dialog_title));
+        builder.setMessage(R.string.calibration_dialog_message);
         builder.setView(alertLayout);
         builder.setCancelable(false);
         builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
