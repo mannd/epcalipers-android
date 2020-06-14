@@ -2206,24 +2206,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showNoTimeCaliperSelectedAlert();
             return;
         }
+
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.mean_rr_dialog, null);
+        final TextInputLayout numberOfIntervalsTextInputLayout = alertLayout.findViewById(R.id.numberOfIntervalsTextInputLayout);
+        final TextInputEditText numberOfIntervalsEditText = alertLayout.findViewById(R.id.numberOfIntervalsTextInputEditText);
+        numberOfIntervalsEditText.setText(getString(R.string.default_number_rr_intervals));
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.number_of_intervals_dialog_title));
-        builder.setMessage(getString(R.string.number_of_intervals_dialog_message));
-        final EditText input = new EditText(this);
-        // not sure I need ALL of the below!
-        input.setLines(1);
-        input.setMaxLines(1);
-        input.setSingleLine(true);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setHint(getString(R.string.mean_rr_dialog_hint));
-        input.setText(getString(R.string.default_number_rr_intervals));
-        input.setSelection(0);
-
-        builder.setView(input);
+        builder.setCancelable(false);
+        builder.setView(alertLayout);
         builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialogResult = input.getText().toString();
+                dialogResult = numberOfIntervalsEditText.getText().toString();
                 processMeanRR();
             }
         });
@@ -2233,7 +2230,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dialog.cancel();
             }
         });
-
         builder.show();
     }
 
@@ -2260,9 +2256,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setMessage(String.format(getString(R.string.mean_rr_result_dialog_message),
                     decimalFormat.format(meanRR), c.getCalibration().getRawUnits(),
                     decimalFormat.format(meanRate) ));
-//            builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
-//                    c.getCalibration().getRawUnits() + "\nMean rate = " +
-//                    decimalFormat.format(meanRate) + " " + getString(R.string.bpm));
+            builder.setNegativeButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
             builder.show();
         }
     }

@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/calibrationMessage"
+        android:id="@+id/numberOfIntervalsMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:padding="5dp"
-        android:text="@string/calibration_dialog_message" />
+        android:text="@string/number_of_intervals_dialog_message" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/calibrationIntervalTextInputLayout"
+        android:id="@+id/numberOfIntervalsTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:hint="@string/calibration_dialog_hint"
+        android:hint="@string/mean_rr_dialog_hint"
         app:endIconMode="clear_text">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/calibrationIntervalTextInputEditText"
+            android:id="@+id/numberOfIntervalsTextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
+            android:inputType="number"
             android:layout_margin="20dp" />
     </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

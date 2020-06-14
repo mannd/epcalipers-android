@@ -155,4 +155,13 @@ public class CalibrationProcessor {
         return matcher.lookingAt();
     }
 
+    public static boolean unitsAreValidForCaliperDirection(String units, Caliper.Direction direction) {
+        // Don't check a angle caliper with this method...
+        if (direction == Caliper.Direction.HORIZONTAL) {
+            return matchesSeconds(units) || matchesMsecs(units);
+        }
+        else {  // only other direction is VERTICAL
+            return matchesMM(units) || matchesMV(units);
+        }
+    }
 }

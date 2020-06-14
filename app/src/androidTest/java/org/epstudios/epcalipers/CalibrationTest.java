@@ -156,4 +156,26 @@ public class CalibrationTest {
         calibration.setUnits("sec");
         assertEquals(true, calibration.unitsAreSeconds());
     }
+
+    @Test
+    public void validateUnitsTest() {
+        Caliper c = new Caliper();
+        assertEquals(Caliper.Direction.HORIZONTAL, c.getDirection());
+        String units = "msec";
+        assertEquals(true, CalibrationProcessor.unitsAreValidForCaliperDirection(units, c.getDirection()));
+        units = "SECs";
+        assertEquals(true, CalibrationProcessor.unitsAreValidForCaliperDirection(units, c.getDirection()));
+        units = "мсек";
+        assertEquals(true, CalibrationProcessor.unitsAreValidForCaliperDirection(units, c.getDirection()));
+        c.setDirection(Caliper.Direction.VERTICAL);
+        assertEquals(false, CalibrationProcessor.unitsAreValidForCaliperDirection(units, c.getDirection()));
+        units = "MM";
+        assertEquals(true, CalibrationProcessor.unitsAreValidForCaliperDirection(units, c.getDirection()));
+        units = "milliV";
+        assertEquals(true, CalibrationProcessor.unitsAreValidForCaliperDirection(units, c.getDirection()));
+        units = "mv";
+        assertEquals(true, CalibrationProcessor.unitsAreValidForCaliperDirection(units, c.getDirection()));
+        units = "mec";
+        assertEquals(false, CalibrationProcessor.unitsAreValidForCaliperDirection(units, c.getDirection()));
+    }
 }
