@@ -40,15 +40,7 @@ public class Alerts {
     }
 
     public static void simpleAlert(Context context, int title, int message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.setNegativeButton(R.string.ok_title, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
+        simpleAlert(context, context.getString(title), context.getString(message));
     }
+
 }

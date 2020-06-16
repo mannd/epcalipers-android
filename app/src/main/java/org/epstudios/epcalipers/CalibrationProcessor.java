@@ -101,11 +101,24 @@ public class CalibrationProcessor {
         public boolean isValid() {
             return !(noInput || noNumber || noUnits || invalidNumber || invalidUnits );
         }
+
+        @Override
+        public String toString() {
+            if (isValid()) {
+                return "Valid input";
+            }
+            String s = "";
+            s += noInput ? "noInput " : "";
+            s += noNumber ? "noNumber " : "";
+            s += noUnits ? "noUnits " : "";
+            s += invalidNumber ? "invalidNumber " : "";
+            s += invalidUnits ? "invalidUnits " : "";
+            return s;
+        }
     }
 
-    // TODO: may need enum here to indicate different outcomes;
     @NonNull
-    public static Validation validate(String s) {
+    public static Validation validate(String s, Caliper.Direction direction) {
         Validation validation = new Validation();
         List<String> chunks = parse(s);
         if (chunks.size() < 1) {
@@ -126,13 +139,18 @@ public class CalibrationProcessor {
             validation.noUnits = true;
         }
         else { // chunk.siz() > 1 {
-            validation.invalidUnits = !validateUnits(chunks.get(1));
+            validation.invalidUnits = !validateUnits(chunks.get(1), direction);
         }
         return validation;
     }
 
-    private static boolean validateUnits(String s) {
-        return matchesSeconds(s) || matchesMsecs(s) || matchesMM(s) || matchesMV(s);
+    private static boolean validateUnits(String s, Caliper.Direction direction) {
+        if (direction == Caliper.Direction.HORIZONTAL) {
+            return matchesMsecs(s) || matchesSeconds(s);
+        }
+        else { // vertical caliper
+            return matchesMM(s) || matchesMV(s);
+        }
     }
 
     public static boolean matchesSeconds(String s) {

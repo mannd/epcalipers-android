@@ -41,6 +41,8 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -93,10 +95,6 @@ import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-//    // TODO: regex below includes Cyrillic and must be updated with new alphabets
-//    @SuppressWarnings("HardCodedStringLiteral")
-//    private static final String calibrationRegex = "[.,0-9]+|[a-zA-ZА-яЁё]+";
-//    private static final Pattern VALID_PATTERN = Pattern.compile(calibrationRegex);
     private static final String LF = "\n";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
@@ -190,12 +188,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean roundMsecRate;
     private boolean autoPositionText;
     private boolean inQtc = false;
+    private boolean showValidationDialog;
     private int currentCaliperColor;
     private int currentHighlightColor;
     private int currentLineWidth;
     private String defaultTimeCalibration;
     private String defaultAmplitudeCalibration;
-    private Boolean defaultUseCustomUnits;
     private String dialogResult;
     private int shortAnimationDuration;
     private boolean noSavedInstance;
@@ -545,9 +543,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (key.equals(getString(R.string.show_start_image_key))) {
                     return;
                 }
-                if (key.equals(getString(R.string.use_custom_units_key))) {
-                    defaultUseCustomUnits = sharedPreferences.getBoolean(key, false);
-                    return;
+                if (key.equals(getString(R.string.show_validation_dialog_key))) {
+                    showValidationDialog = sharedPreferences.getBoolean(key, true);
                 }
                 if (key.equals(getString(R.string.time_calibration_key))) {
                     defaultTimeCalibration = sharedPreferences.getString(key,
@@ -833,7 +830,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int pageNumber;
     }
 
-    // FIXME: PDF access point
     private static class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
         private final WeakReference<MainActivity> activityWeakReference;
 
@@ -1027,6 +1023,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadSettings() {
+        EPSLog.log("loadSettings()");
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
         showStartImage = sharedPreferences.getBoolean(
@@ -1036,7 +1033,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 R.string.time_calibration_key), getString(R.string.default_time_calibration_value));
         defaultAmplitudeCalibration = sharedPreferences.getString(
                 getString(R.string.amplitude_calibration_key), getString(R.string.default_amplitude_calibration_value));
-        defaultUseCustomUnits = sharedPreferences.getBoolean(getString(R.string.use_custom_units_key), false);
         useLargeFont = sharedPreferences.getBoolean(getString(R.string.use_large_font_key), false);
         String qtcFormulaName = sharedPreferences.getString(getString(R.string.qtc_formula_key),
                 getString(R.string.qtc_formula_value));
@@ -1053,6 +1049,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 R.color.default_caliper_color);
         currentHighlightColor = sharedPreferences.getInt(getString(R.string.new_highlight_color_key),
                 R.color.default_highlight_color);
+        showValidationDialog = sharedPreferences.getBoolean(getString(R.string.show_validation_dialog_key),
+                true);
         try {
             String lineWidthString = sharedPreferences.getString(getString(R.string.line_width_key),
                     Integer.valueOf(DEFAULT_LINE_WIDTH).toString());
@@ -2543,13 +2541,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setMessage(R.string.calibration_dialog_message);
         builder.setView(alertLayout);
         builder.setCancelable(false);
-        builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.set_calibration_button_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String calibrationIntervalString = calibrationIntervalEditText.getText().toString();
-                // TODO: test for valid number and type of units.
-                dialogResult = calibrationIntervalString;
-                processCalibration(calibrationIntervalString);
+                showValidationDialog(calibrationIntervalString, c.getDirection());
+//                // TODO: test for valid number and type of units.
+//                CalibrationProcessor.Validation validation = CalibrationProcessor.validate(calibrationIntervalString, c.getDirection());
+//                EPSLog.log(validation.toString());
+//                dialogResult = calibrationIntervalString;
+//                processCalibration(calibrationIntervalString);
             }
         });
         builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
@@ -2558,11 +2559,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dialog.cancel();
             }
         });
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        builder.show();
     }
 
-    private void processCalibration(String calibrationString) {
+    private void showValidationDialog(String calibrationIntervalString, Caliper.Direction direction) {
+        CalibrationProcessor.Validation validation = CalibrationProcessor.validate(calibrationIntervalString, direction);
+        EPSLog.log(validation.toString());
+        dialogResult = calibrationIntervalString;
+        if (validation.isValid()) {
+            processCalibration();
+        }
+        else if (validation.noInput || validation.noNumber || validation.invalidNumber) {
+            Alerts.simpleAlert(this, getString(R.string.calibration_error_title), getString(R.string.calibration_error_message));
+        }
+        else if (showValidationDialog &&
+                (validation.noUnits
+                        || (validation.invalidUnits && direction == Caliper.Direction.HORIZONTAL))) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = getLayoutInflater();
+            View alertLayout = inflater.inflate(R.layout.validate_calibration, null);
+            final CheckBox doNotShowDialogCheckBox = alertLayout.findViewById(R.id.doNotShowValidationDialogCheckBox);
+            doNotShowDialogCheckBox.setChecked(!showValidationDialog);
+            final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            doNotShowDialogCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    showValidationDialog = !isChecked;
+                    editor.putBoolean(getString(R.string.show_validation_dialog_key), showValidationDialog);
+                    editor.apply();
+                }
+            });
+            builder.setTitle(R.string.calibration_warning_title);
+            String message = getString(R.string.calibration_warning_message);
+            builder.setMessage(message);
+            builder.setCancelable(false);
+            builder.setView(alertLayout);
+            builder.setNegativeButton(R.string.cancel_title, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.setPositiveButton(R.string.calibrate_anyway_title, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    processCalibration();
+                }
+            });
+            builder.show();
+        }
+        else {
+            processCalibration();
+        }
+    }
+
+    private void processCalibration() {
         if (dialogResult.length() < 1) {
             return;
         }

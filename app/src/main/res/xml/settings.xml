@@ -90,6 +90,11 @@
         android:summaryOff="@string/auto_position_text_off"
         android:summaryOn="@string/auto_position_text_on" />
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/show_validation_dialog_key"
+        android:title="Show warning dialogs" />
+
 </PreferenceScreen>
 
 

@@ -90,32 +90,54 @@ public class CalibrationTest {
         assertEquals(result.success, false);
         assertEquals(result.value, 0, 0.0001);
         assertEquals(result.units, "");
+        result = CalibrationProcessor.processCalibrationString("1 секунда");
+        assertEquals(result.success, true);
+        assertEquals(result.value, 1.0, 0.0001);
+        assertEquals(result.units, "секунда");
+        result = CalibrationProcessor.processCalibrationString("1000 мсек");
+        assertEquals(result.success, true);
+        assertEquals(result.value, 1000, 0.0001);
+        assertEquals(result.units, "мсек");
+        result = CalibrationProcessor.processCalibrationString("1 милливольт");
+        assertEquals(result.success, true);
+        assertEquals(result.value, 1, 0.0001);
+        assertEquals(result.units, "милливольт");
+        result = CalibrationProcessor.processCalibrationString("1 мв");
+        assertEquals(result.success, true);
+        assertEquals(result.value, 1, 0.0001);
+        assertEquals(result.units, "мв");
     }
 
     @Test
     public void validateCalibrationTest() {
         CalibrationProcessor.Validation validation;
-        validation = CalibrationProcessor.validate("");
+        Caliper.Direction d = Caliper.Direction.HORIZONTAL;
+        validation = CalibrationProcessor.validate("", d);
         assertEquals(true, validation.noInput);
         assertEquals(false, validation.isValid());
-        validation = CalibrationProcessor.validate("msec");
+        validation = CalibrationProcessor.validate("msec", d);
         assertEquals(true, validation.noNumber);
         assertEquals(true, validation.noUnits);
         assertEquals(false, validation.isValid());
-        validation = CalibrationProcessor.validate("1000");
+        validation = CalibrationProcessor.validate("1000", d);
         assertEquals(true, validation.noUnits);
         assertEquals(false, validation.isValid());
-        validation = CalibrationProcessor.validate("0");
+        validation = CalibrationProcessor.validate("0", d);
         assertEquals(true, validation.invalidNumber);
         assertEquals(true, validation.noUnits);
         assertEquals(false, validation.isValid());
-        validation = CalibrationProcessor.validate("1000 sec");
+        validation = CalibrationProcessor.validate("1000 sec", d);
         assertEquals(true, validation.isValid());
-        validation = CalibrationProcessor.validate("1000 msec");
+        validation = CalibrationProcessor.validate("1000 msec", d);
         assertEquals(true, validation.isValid());
-        validation = CalibrationProcessor.validate("1 mV");
+        validation = CalibrationProcessor.validate("1 mV", d);
+        assertEquals(false, validation.isValid());
+        validation = CalibrationProcessor.validate("10 mm", d);
+        assertEquals(false, validation.isValid());
+        d = Caliper.Direction.VERTICAL;
+        validation = CalibrationProcessor.validate("1 mV", d);
         assertEquals(true, validation.isValid());
-        validation = CalibrationProcessor.validate("10 mm");
+        validation = CalibrationProcessor.validate("10 mm", d);
         assertEquals(true, validation.isValid());
     }
 

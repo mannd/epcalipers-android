@@ -43,8 +43,8 @@
     <string name="default_time_caliper_text_position_title">Time caliper text</string>
     <string name="done_button_title">Done</string>
     <string name="error">Error</string>
-    <string name="example_amplitude_measurement">1 mV</string>
-    <string name="example_time_measurement">1000 msec</string>
+    <string name="example_amplitude_measurement">10 mm or 1 mV</string>
+    <string name="example_time_measurement">1000 msec or 1 sec</string>
     <string name="file_load_error">File load error</string>
     <string name="file_load_message">File could not be loaded</string>
     <string name="five_points">5 points</string>
@@ -197,6 +197,7 @@
     <string name="amplitude_caliper_text_position_value" translatable="false">right</string>
     <string name="qtc_formula_value" translatable="false">bazett</string>
     <string name="use_custom_units_key" translatable="false">use_custom_units</string>
+    <string name="show_validation_dialog_key" translatable="false">show_validation_dialog_key</string>
 
     <!--Save and restore instance state keys-->
     <string name="imageview_scale_key" translatable="false">scale</string>
@@ -266,6 +267,11 @@
     <string name="mv_units">mV</string>
     <string name="choose_units_message">Choose units of measurement</string>
     <string name="calibration_without_units_message">Enter interval without units.</string>
+    <string name="calibrate_anyway_title">Calibrate Anyway</string>
+    <string name="calibration_error_title">Calibration Error</string>
+    <string name="calibration_warning_title">Calibration Warning</string>
+    <string name="calibration_warning_message">Units are not compatible with making measurements like heart rate or QTc.  Use units like msec or sec.</string>
+    <string name="calibration_error_message">Not a valid calibration interval.</string>
 
 
 </resources>
