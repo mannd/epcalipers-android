@@ -167,4 +167,10 @@
     <string name="choose_units_message">Выберите единицы измерения</string>
     <string name="calibration_without_units_message">Введите интервал без единиц</string>
     <string name="calibration_dialog_message">Введите измерение, включая единицы</string>
+    <string name="don_t_show_this_dialog_again_message">Не показывать этот диалог снова.</string>
+    <string name="calibrate_anyway_title">Калибровать в любом случае</string>
+    <string name="calibration_error_title">Ошибка калибровки</string>
+    <string name="calibration_warning_title">Калибровка предупреждение</string>
+    <string name="calibration_warning_message">Единицы не совместимы с такими измерениями, как частота сердечных сокращений или QTc. Используйте такие единицы, как мс или сек.</string>
+    <string name="calibration_error_message">еверный интервал калибровки.</string>
 </resources>

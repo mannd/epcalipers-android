@@ -1309,10 +1309,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 c.setTextPosition(amplitudeCaliperTextPositionPreference);
             }
             if (c.isAngleCaliper()) {
-                assert c instanceof AngleCaliper;
-                ((AngleCaliper)c).setVerticalCalibration(verticalCalibration);
-                ((AngleCaliper)c).setBar1Angle(bar1Angle);
-                ((AngleCaliper)c).setBar2Angle(bar2Angle);
+                if (BuildConfig.DEBUG && !(c instanceof AngleCaliper)) {
+                    throw new AssertionError("Assertion failed");
+                }
+                ((AngleCaliper) c).setVerticalCalibration(verticalCalibration);
+                ((AngleCaliper) c).setBar1Angle(bar1Angle);
+                ((AngleCaliper) c).setBar2Angle(bar2Angle);
             }
 
 
