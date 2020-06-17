@@ -704,7 +704,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        //noinspection ConstantConditions
         if (force_first_run || version.isUpgrade() || version.isNewInstallation()) {
             startActivity(new Intent(this, Onboarder.class));
             version.saveVersion();
@@ -871,7 +870,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 // close old currentPdfUri if possible
                 if (activityWeakReference.get().currentPdfUri != null) {
-                    File file = new File(activityWeakReference.get().currentPdfUri.getPath());
+                    File file = new File(Objects.requireNonNull(activityWeakReference.get().currentPdfUri.getPath()));
                     if (file.exists()) {
                         //noinspection ResultOfMethodCallIgnored
                         file.delete();
@@ -882,7 +881,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 isNewPdf = true;
             }
             try {
-                File file = new File(pdfUri.getPath());
+                File file = new File(Objects.requireNonNull(pdfUri.getPath()));
                 ParcelFileDescriptor fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
                 PdfRenderer renderer = new PdfRenderer(fd);
                 activityWeakReference.get().numberOfPdfPages = renderer.getPageCount();
@@ -991,11 +990,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialogResult = numberOfIntervalsEditText.getText().toString();
                 int pageNumber;
                 try {
+                    dialogResult = Objects.requireNonNull(numberOfIntervalsEditText.getText()).toString();
                     pageNumber = Integer.parseInt(dialogResult);
-                } catch (NumberFormatException ex) {
+                } catch (NullPointerException | NumberFormatException ex) {
                     dialog.cancel();
                     return;
                 }
@@ -1310,6 +1309,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 c.setTextPosition(amplitudeCaliperTextPositionPreference);
             }
             if (c.isAngleCaliper()) {
+                assert c instanceof AngleCaliper;
                 ((AngleCaliper)c).setVerticalCalibration(verticalCalibration);
                 ((AngleCaliper)c).setBar1Angle(bar1Angle);
                 ((AngleCaliper)c).setBar2Angle(bar2Angle);
@@ -1640,6 +1640,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void selectMenu(ToolbarMenu menu) {
         switch (menu) {
             case Main:
+            case Move:
+            default:
                 selectMainMenu();
                 break;
             case AddCaliper:
@@ -1665,13 +1667,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case Tweak:
                 selectTweakMenu();
-                break;
-            case Move:
-                // This menu can't be called by selectMenu, so just...
-                selectMainMenu();
-                break;
-            default:
-                selectMainMenu();
                 break;
         }
     }
@@ -1877,7 +1872,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.add_caliper) {
             selectAddCaliperMenu();
             return true;
@@ -1970,20 +1964,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 showFileErrorAlert();
                 return;
             }
-            if (photoFile != null) {
-                Uri photoUri;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    photoUri = FileProvider.getUriForFile(MainActivity.this,
-                            BuildConfig.APPLICATION_ID + ".provider",
-                            photoFile);
-                }
-                else {
-                    photoUri = Uri.fromFile(photoFile);
-                }
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        photoUri);
-                startActivityForResult(takePictureIntent, RESULT_CAPTURE_IMAGE);
+            Uri photoUri;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                photoUri = FileProvider.getUriForFile(MainActivity.this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        photoFile);
             }
+            else {
+                photoUri = Uri.fromFile(photoFile);
+            }
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                    photoUri);
+            startActivityForResult(takePictureIntent, RESULT_CAPTURE_IMAGE);
         }
         // camera icon inactivate with if no camera present, so no warning here
 
@@ -2226,8 +2218,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialogResult = numberOfIntervalsEditText.getText().toString();
-                processMeanRR();
+                try {
+                    dialogResult = Objects.requireNonNull(numberOfIntervalsEditText.getText()).toString();
+                    processMeanRR();
+                } catch (NullPointerException ex) {
+                    dialog.cancel();
+                }
             }
         });
         builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
@@ -2289,7 +2285,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             final View alertLayout = inflater.inflate(R.layout.input_dialog, null);
             final TextInputLayout numberOfIntervalsTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
             final TextInputEditText numberOfIntervalsEditText = alertLayout.findViewById(R.id.inputDialogEditText);
-            numberOfIntervalsEditText.setText(getString(R.string.default_number_rr_intervals));
+            numberOfIntervalsEditText.setText(getString(R.string.default_number_qtc_rr_intervals));
             numberOfIntervalsEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
             numberOfIntervalsTextInputLayout.setHint(getString(R.string.mean_rr_dialog_hint));
 
@@ -2306,7 +2302,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         dialog.cancel();
                         return;
                     }
-                    dialogResult = numberOfIntervalsEditText.getText().toString();
+                    try {
+                        dialogResult = Objects.requireNonNull(numberOfIntervalsEditText.getText()).toString();
+                    } catch (NullPointerException ex) {
+                        dialog.cancel();
+                    }
                     int divisor;
                     try {
                         divisor = Integer.parseInt(dialogResult);
@@ -2544,13 +2544,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setPositiveButton(getString(R.string.set_calibration_button_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String calibrationIntervalString = calibrationIntervalEditText.getText().toString();
-                showValidationDialog(calibrationIntervalString, c.getDirection());
-//                // TODO: test for valid number and type of units.
-//                CalibrationProcessor.Validation validation = CalibrationProcessor.validate(calibrationIntervalString, c.getDirection());
-//                EPSLog.log(validation.toString());
-//                dialogResult = calibrationIntervalString;
-//                processCalibration(calibrationIntervalString);
+                try {
+                    String calibrationIntervalString = Objects.requireNonNull(calibrationIntervalEditText.getText()).toString();
+                    showValidationDialog(calibrationIntervalString, c.getDirection());
+                } catch (NullPointerException ex) {
+                    dialog.cancel();
+                }
             }
         });
         builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {

@@ -8,5 +8,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:text="Don't show this dialog again." />
+        android:text="@string/don_t_show_this_dialog_again_message" />
 </LinearLayout>

@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Typeface;
-import androidx.core.view.GestureDetectorCompat;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -18,6 +17,8 @@ import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import java.util.ArrayList;
+
+import androidx.core.view.GestureDetectorCompat;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -118,7 +119,6 @@ public class CalipersView extends View {
     }
 
     private void init(Context context) {
-        Context context1 = context;
         lockImage = false;
         calipers = new ArrayList<>();
         touchedCaliper = null;
@@ -351,6 +351,7 @@ public class CalipersView extends View {
         for (int i = calipers.size() - 1; i >= 0; i--) {
             if (calipers.get(i).isSelected()) {
                 noneSelected = false;
+                break;
             }
         }
         return noneSelected;

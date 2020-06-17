@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,8 +74,8 @@ public class CalibrationProcessor {
         NumberFormat format = NumberFormat.getInstance();
         try {
             Number number = format.parse(chunks.get(0));
-            calibrationResult.value = number.floatValue();
-        } catch (ParseException ex) {
+            calibrationResult.value = Objects.requireNonNull(number).floatValue();
+        } catch (NullPointerException | ParseException ex) {
             EPSLog.log("Exception = " + ex.toString());
             return calibrationResult;
         }
@@ -102,6 +103,7 @@ public class CalibrationProcessor {
             return !(noInput || noNumber || noUnits || invalidNumber || invalidUnits );
         }
 
+        @NonNull
         @Override
         public String toString() {
             if (isValid()) {
@@ -129,10 +131,10 @@ public class CalibrationProcessor {
         NumberFormat format = NumberFormat.getInstance();
         try {
             Number number = format.parse(chunks.get(0));
-            if (number.floatValue() <= 0.0) {
+            if (Objects.requireNonNull(number).floatValue() <= 0.0) {
                 validation.invalidNumber = true;
             }
-        } catch (ParseException ex) {
+        } catch (NullPointerException | ParseException ex) {
             validation.noNumber = true;
         }
         if (chunks.size() == 1) {

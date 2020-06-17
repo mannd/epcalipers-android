@@ -639,11 +639,11 @@ public class Caliper {
     }
 
     private float leftOrTopMostBarPosition() {
-        return bar1Position <= bar2Position ? bar1Position : bar2Position;
+        return Math.min(bar1Position, bar2Position);
     }
 
     private float rightOrBottomMostBarPosition() {
-        return bar1Position > bar2Position ? bar1Position : bar2Position;
+        return Math.max(bar1Position, bar2Position);
     }
 
     private Boolean textIsCentered() {
