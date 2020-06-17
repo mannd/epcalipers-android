@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">ЭФИ калипер</string>
     <string name="bpm">уд/мин</string>
-    <string name="about_text">Авторские права © 2015-2020 EP Studios, Inc.  Все права защищены.\n</string>
+    <string name="about_text">Авторские права © 2015–2020 EP Studios, Inc.  Все права защищены.\n</string>
     <string name="about_label">ЭФИ калипер</string>
     <string name="acknowledgments_ht">Благодарности</string>
     <string name="adding_deleting_calipers_ht">"Добавляйте и удаляйте калиперы "</string>
@@ -31,7 +31,7 @@
     <string name="drawer_take_photo">Сделать фото</string>
     <string name="add_tooltip">Добавить калипер</string>
     <string name="all_formulas">Все</string>
-    <string name="calibration_dialog_message">Введите измерение (например %s)</string>
+    <string name="calibration_dialog_with_units_message">Введите измерение, включая единицы (например %s)</string>
     <string name="default_time_calibration_label">Калибровка времени по умолчанию</string>
     <string name="default_amplitude_calibration_label">Калибровка амплитуды по умолчанию</string>
     <string name="go_to_page">Перейти к странице</string>
@@ -101,7 +101,7 @@
     <string name="single_tap_caliper_label">Нажмите чтобы выбрать</string>
     <string name="top">наверху</string>
     <string name="bottom">внизу</string>
-    <string name="calibration_dialog_hint">Введите измерение</string>
+    <string name="calibration_dialog_hint">например %s</string>
     <string name="default_amplitude_calibration_value">10 мм</string>
     <string name="default_amplitude_caliper_text_position_title">текст амплитудного калипера</string>
     <string name="default_time_caliper_text_position_title">текст временного калипера</string>
@@ -109,8 +109,8 @@
     <string name="double_tap_caliper_label">Двойное нажатие чтобы удалить</string>
     <string name="default_qtc_formula_title">Формула QTc</string>
     <string name="default_auto_position_text_label">авто-позиционирование текста</string>
-    <string name="example_amplitude_measurement">1 милливольт</string>
-    <string name="example_time_measurement">500 мсек</string>
+    <string name="example_amplitude_measurement">1 милливольт или 1 мв</string>
+    <string name="example_time_measurement">1000 мсек или 1 секунда</string>
     <string name="formula_detail">(формула %s)</string>
     <string name="framingham_formula">Фрамингема</string>
     <string name="fridericia_formula">Фредерика</string>
@@ -160,4 +160,18 @@
     <string name="use_large_font_label">Использовать крупный текст шрифта?</string>
     <string name="use_large_font_off_summary">Используйте шрифт нормального размера</string>
     <string name="use_large_font_on_summary">Используйте большой шрифт</string>
+    <string name="msec_units">мсек</string>
+    <string name="sec_units">сек</string>
+    <string name="mv_units">милливольт</string>
+    <string name="mm_units">мм</string>
+    <string name="choose_units_message">Выберите единицы измерения</string>
+    <string name="calibration_without_units_message">Введите интервал без единиц</string>
+    <string name="calibration_dialog_message">Введите измерение, включая единицы</string>
+    <string name="don_t_show_this_dialog_again_message">Не показывать этот диалог снова.</string>
+    <string name="calibrate_anyway_title">Калибровать в любом случае</string>
+    <string name="calibration_error_title">Ошибка калибровки</string>
+    <string name="calibration_warning_title">Калибровка предупреждение</string>
+    <string name="calibration_warning_message">Единицы не совместимы с такими измерениями, как частота сердечных сокращений или QTc. Используйте такие единицы, как мс или сек.</string>
+    <string name="calibration_error_message">еверный интервал калибровки.</string>
+    <string name="calibration_no_units_message">Калибровка не имеет единиц измерения</string>
 </resources>

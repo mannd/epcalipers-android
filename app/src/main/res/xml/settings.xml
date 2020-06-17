@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--suppress DeprecatedClassUsageInspection -->
+<!-- using androidx.preference.PreferenceScreen crashes app when in landscape mode.  Don't use -->
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
@@ -89,6 +91,11 @@
         android:title="@string/default_auto_position_text_label"
         android:summaryOff="@string/auto_position_text_off"
         android:summaryOn="@string/auto_position_text_on" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/show_validation_dialog_key"
+        android:title="Show warning dialogs" />
 
 </PreferenceScreen>
 

@@ -183,7 +183,6 @@ public class MyPreferenceFragment extends PreferenceFragment implements
             }
             return lineWidthNames.get(value);
         } catch (NumberFormatException ex) {
-            //noinspection SuspiciousMethodCalls
             return getString(R.string.error);
         }
     }

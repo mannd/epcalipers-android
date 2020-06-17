@@ -30,9 +30,10 @@ This file is part of EP Coding.
 package org.epstudios.epcalipers;
 
 import android.os.Bundle;
+import android.view.MenuItem;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.view.MenuItem;
 
 public class Prefs extends AppCompatActivity {
 	@Override
@@ -56,10 +57,8 @@ public class Prefs extends AppCompatActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
 		// Respond to the action bar's Up/Home button
-		case android.R.id.home:
-			// NavUtils.navigateUpFromSameTask(this);
+		if (item.getItemId() == android.R.id.home) {// NavUtils.navigateUpFromSameTask(this);
 			finish();
 			return true;
 		}

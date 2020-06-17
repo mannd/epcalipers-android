@@ -2,7 +2,6 @@ package org.epstudios.epcalipers;
 
 import android.content.Context;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -27,20 +26,10 @@ import java.util.regex.Pattern;
  * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Calibration {
-    @SuppressWarnings("HardCodedStringLiteral")
-    private static final String secRegex = "(?:^sec|^сек|^s$|^с$)";
-    @SuppressWarnings("HardCodedStringLiteral")
-    private static final String msecRegex = "(?:^msec|^millis|^мсек|^миллис|^ms$|^мс$)";
-    @SuppressWarnings("HardCodedStringLiteral")
-    private static final String mmRegex = "(?:^millim|^миллим|^mm$|^мм$)";
-
     private Caliper.Direction direction;
     private String units;
     private String calibrationString;
     private final Context context;
-    private final Pattern secPattern;
-    private final Pattern msecPattern;
-    private final Pattern mmPattern;
 
     public Caliper.Direction getDirection() {
         return direction;
@@ -96,9 +85,6 @@ public class Calibration {
         this.direction = direction;
         this.context = context;
         final int flags = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
-        this.secPattern = Pattern.compile(secRegex, flags);
-        this.msecPattern = Pattern.compile(msecRegex, flags);
-        this.mmPattern = Pattern.compile(mmRegex, flags);
         reset();
     }
 
@@ -156,24 +142,6 @@ public class Calibration {
         return unitsAreMsec() || unitsAreSeconds();
     }
 
-    private boolean matchesSeconds(String s) {
-        Matcher matcher = secPattern.matcher(s);
-        return matcher.lookingAt();
-    }
-
-    public boolean unitsAreSeconds() {
-        return units.length() > 0 && matchesSeconds(units);
-    }
-
-    private boolean matchesMsecs(String s) {
-        Matcher matcher = msecPattern.matcher(s);
-        return matcher.lookingAt();
-    }
-
-    public boolean unitsAreMsec() {
-        return units.length() > 0 && matchesMsecs(units);
-    }
-
     public float getCurrentCalFactor() {
         return (originalZoom * originalCalFactor) / currentZoom;
     }
@@ -190,12 +158,16 @@ public class Calibration {
         this.originalCalFactor = originalCalFactor;
     }
 
-    private boolean matchesMM(String s) {
-        Matcher matcher = mmPattern.matcher(s);
-        return matcher.lookingAt();
+    public boolean unitsAreMM() {
+        return (direction == Caliper.Direction.VERTICAL) && CalibrationProcessor.matchesMM(units);
     }
 
-    public boolean unitsAreMM() {
-        return !(units.length() < 1 || direction != Caliper.Direction.VERTICAL) && matchesMM(units);
+    public boolean unitsAreSeconds() {
+        return CalibrationProcessor.matchesSeconds(units);
     }
+
+    public boolean unitsAreMsec() {
+        return CalibrationProcessor.matchesMsecs(units);
+    }
+
 }

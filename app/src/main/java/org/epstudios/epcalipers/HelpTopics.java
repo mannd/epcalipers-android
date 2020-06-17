@@ -2,15 +2,15 @@ package org.epstudios.epcalipers;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
-import android.view.MenuItem;
-import android.view.View;
 
 /**
  * Copyright (C) 2019 EP Studios, Inc.
@@ -80,12 +80,10 @@ public class HelpTopics extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                // NavUtils.navigateUpFromSameTask(this);
-                finish();
-                return true;
+        // Respond to the action bar's Up/Home button
+        if (item.getItemId() == android.R.id.home) {// NavUtils.navigateUpFromSameTask(this);
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

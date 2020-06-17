@@ -2,11 +2,11 @@ package org.epstudios.epcalipers;
 
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.view.MenuItem;
 import android.webkit.WebView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -68,12 +68,10 @@ public class Help extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                // NavUtils.navigateUpFromSameTask(this);
-                finish();
-                return true;
+        // Respond to the action bar's Up/Home button
+        if (item.getItemId() == android.R.id.home) {// NavUtils.navigateUpFromSameTask(this);
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
