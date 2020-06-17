@@ -198,4 +198,5 @@
     <string name="calibration_warning_message">Les unités ne sont pas compatibles avec des mesures telles que la fréquence cardiaque ou le QTc. Utiliser des unités comme msec ou sec.</string>
     <string name="calibration_error_message">Intervalle d\'étalonnage non valide.</string>
     <string name="don_t_show_this_dialog_again_message">Ne plus afficher cette boîte de dialogue.</string>
+    <string name="calibration_no_units_message">L\'étalonnage n\'a pas d\'unités</string>
 </resources>

@@ -2591,7 +2591,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
             builder.setTitle(R.string.calibration_warning_title);
-            String message = getString(R.string.calibration_warning_message);
+            String message = validation.noUnits ? getString(R.string.calibration_no_units_message)
+                    : getString(R.string.calibration_warning_message);
             builder.setMessage(message);
             builder.setCancelable(false);
             builder.setView(alertLayout);
