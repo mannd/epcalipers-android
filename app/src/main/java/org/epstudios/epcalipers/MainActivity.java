@@ -4,7 +4,6 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,22 +29,11 @@ import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-
-import com.github.chrisbanes.photoview.OnMatrixChangedListener;
-import com.github.chrisbanes.photoview.PhotoView;
-import com.google.android.material.navigation.NavigationView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.InputType;
 import android.util.Pair;
 import android.view.ActionMode;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,28 +41,31 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.github.chrisbanes.photoview.OnMatrixChangedListener;
+import com.github.chrisbanes.photoview.PhotoView;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.epstudios.epcalipers.QtcCalculator.QtcFormula;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -82,13 +73,20 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import static org.epstudios.epcalipers.CalibrationProcessor.processCalibrationString;
 import static org.epstudios.epcalipers.MyPreferenceFragment.ALL;
 import static org.epstudios.epcalipers.MyPreferenceFragment.BAZETT;
 import static org.epstudios.epcalipers.MyPreferenceFragment.FRAMINGHAM;
@@ -97,10 +95,6 @@ import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    // TODO: regex below includes Cyrillic and must be updated with new alphabets
-    @SuppressWarnings("HardCodedStringLiteral")
-    private static final String calibrationRegex = "[.,0-9]+|[a-zA-ZА-яЁё]+";
-    private static final Pattern VALID_PATTERN = Pattern.compile(calibrationRegex);
     private static final String LF = "\n";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
@@ -194,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean roundMsecRate;
     private boolean autoPositionText;
     private boolean inQtc = false;
+    private boolean showValidationDialog;
     private int currentCaliperColor;
     private int currentHighlightColor;
     private int currentLineWidth;
@@ -548,6 +543,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (key.equals(getString(R.string.show_start_image_key))) {
                     return;
                 }
+                if (key.equals(getString(R.string.show_validation_dialog_key))) {
+                    showValidationDialog = sharedPreferences.getBoolean(key, true);
+                }
                 if (key.equals(getString(R.string.time_calibration_key))) {
                     defaultTimeCalibration = sharedPreferences.getString(key,
                             getString(R.string.default_time_calibration_value));
@@ -832,7 +830,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int pageNumber;
     }
 
-    // FIXME: PDF access point
     private static class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
         private final WeakReference<MainActivity> activityWeakReference;
 
@@ -976,20 +973,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         // get page number from dialog
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.input_dialog, null);
+        // No message TextView for this dialog; just title and hint.
+        final TextInputLayout numberOfIntervalsTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
+        final TextInputEditText numberOfIntervalsEditText = alertLayout.findViewById(R.id.inputDialogEditText);
+        numberOfIntervalsEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        numberOfIntervalsTextInputLayout.setHint(getString(R.string.page_number_hint));
+
+        String currentPageNumberString = Integer.toString(currentPdfPageNumber + 1);
+        numberOfIntervalsEditText.setText(currentPageNumberString);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.go_to_page_title);
-        final EditText input = new EditText(this);
-        input.setLines(1);
-        input.setMaxLines(1);
-        input.setSingleLine(true);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setHint(R.string.page_number_hint);
-        input.setSelection(0);
-        builder.setView(input);
+        builder.setCancelable(false);
+        builder.setView(alertLayout);
         builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialogResult = input.getText().toString();
+                dialogResult = numberOfIntervalsEditText.getText().toString();
                 int pageNumber;
                 try {
                     pageNumber = Integer.parseInt(dialogResult);
@@ -1021,6 +1023,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void loadSettings() {
+        EPSLog.log("loadSettings()");
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
         showStartImage = sharedPreferences.getBoolean(
@@ -1046,6 +1049,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 R.color.default_caliper_color);
         currentHighlightColor = sharedPreferences.getInt(getString(R.string.new_highlight_color_key),
                 R.color.default_highlight_color);
+        showValidationDialog = sharedPreferences.getBoolean(getString(R.string.show_validation_dialog_key),
+                true);
         try {
             String lineWidthString = sharedPreferences.getString(getString(R.string.line_width_key),
                     Integer.valueOf(DEFAULT_LINE_WIDTH).toString());
@@ -1215,7 +1220,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         EPSLog.log("onRestoreInstanceState");
         imageIsLocked = savedInstanceState.getBoolean(getString(R.string.image_locked_key));
@@ -1742,11 +1747,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void returnFromAddCaliperMenu() {
         if (toolbarMenuDeque.peekLast() == ToolbarMenu.AddCaliper) {
             toolbarMenuDeque.removeLast();
-            gotoPreviousMenu();
         }
-        else {
-            gotoPreviousMenu();
-        }
+        gotoPreviousMenu();
     }
 
     private void selectRotateImageMenu() {
@@ -2190,6 +2192,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void meanRR() {
         if (!thereAreCalipers()) {
             noCalipersAlert();
+            // TODO: we don't consistently selectMainMenu() in this method.
             selectMainMenu();
             return;
         }
@@ -2198,7 +2201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             calipersView.selectCaliperAndUnselectOthers(singleHorizontalCaliper);
         }
         if (calipersView.noCaliperIsSelected()) {
-            noCaliperSelectedAlert();
+            showNoCaliperSelectedAlert();
             return;
         }
         Caliper c = calipersView.activeCaliper();
@@ -2206,24 +2209,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showNoTimeCaliperSelectedAlert();
             return;
         }
+
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.input_dialog, null);
+        final TextInputLayout numberOfIntervalsTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
+        final TextInputEditText numberOfIntervalsEditText = alertLayout.findViewById(R.id.inputDialogEditText);
+        numberOfIntervalsEditText.setText(getString(R.string.default_number_rr_intervals));
+        numberOfIntervalsEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        numberOfIntervalsTextInputLayout.setHint(getString(R.string.mean_rr_dialog_hint));
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.number_of_intervals_dialog_title));
-        builder.setMessage(getString(R.string.number_of_intervals_dialog_message));
-        final EditText input = new EditText(this);
-        // not sure I need ALL of the below!
-        input.setLines(1);
-        input.setMaxLines(1);
-        input.setSingleLine(true);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setHint(getString(R.string.mean_rr_dialog_hint));
-        input.setText(getString(R.string.default_number_rr_intervals));
-        input.setSelection(0);
-
-        builder.setView(input);
+        builder.setMessage(R.string.number_of_intervals_dialog_message);
+        builder.setCancelable(false);
+        builder.setView(alertLayout);
         builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialogResult = input.getText().toString();
+                dialogResult = numberOfIntervalsEditText.getText().toString();
                 processMeanRR();
             }
         });
@@ -2233,7 +2236,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dialog.cancel();
             }
         });
-
         builder.show();
     }
 
@@ -2253,17 +2255,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             double meanRR = intervalResult / divisor;
             double meanRate = c.rateResult(meanRR);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.mean_rr_result_dialog_title));
             DecimalFormat decimalFormat = new DecimalFormat("@@@##");
-
-            builder.setMessage(String.format(getString(R.string.mean_rr_result_dialog_message),
+            String title = getString(R.string.mean_rr_result_dialog_title);
+            String message = String.format(getString(R.string.mean_rr_result_dialog_message),
                     decimalFormat.format(meanRR), c.getCalibration().getRawUnits(),
-                    decimalFormat.format(meanRate) ));
-//            builder.setMessage("Mean interval = " + decimalFormat.format(meanRR) + " " +
-//                    c.getCalibration().getRawUnits() + "\nMean rate = " +
-//                    decimalFormat.format(meanRate) + " " + getString(R.string.bpm));
-            builder.show();
+                    decimalFormat.format(meanRate));
+            Alerts.simpleAlert(this, title, message);
         }
     }
 
@@ -2288,20 +2285,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showNoTimeCaliperSelectedAlert();
         }
         else {
+            LayoutInflater inflater = getLayoutInflater();
+            final View alertLayout = inflater.inflate(R.layout.input_dialog, null);
+            final TextInputLayout numberOfIntervalsTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
+            final TextInputEditText numberOfIntervalsEditText = alertLayout.findViewById(R.id.inputDialogEditText);
+            numberOfIntervalsEditText.setText(getString(R.string.default_number_rr_intervals));
+            numberOfIntervalsEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+            numberOfIntervalsTextInputLayout.setHint(getString(R.string.mean_rr_dialog_hint));
+
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.number_of_intervals_dialog_title));
             builder.setMessage(getString(R.string.number_of_intervals_dialog_message));
-            final EditText input = new EditText(this);
-            // not sure I need ALL of the below!
-            input.setLines(1);
-            input.setMaxLines(1);
-            input.setSingleLine(true);
-            input.setInputType(InputType.TYPE_CLASS_NUMBER);
-            input.setHint(getString(R.string.mean_rr_dialog_hint));
-            input.setText(getString(R.string.default_number_qtc_rr_intervals));
-            input.setSelection(0);
-
-            builder.setView(input);
+            builder.setView(alertLayout);
+            builder.setCancelable(false);
             builder.setPositiveButton(getString(R.string.continue_title), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -2310,7 +2306,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         dialog.cancel();
                         return;
                     }
-                    dialogResult = input.getText().toString();
+                    dialogResult = numberOfIntervalsEditText.getText().toString();
                     int divisor;
                     try {
                         divisor = Integer.parseInt(dialogResult);
@@ -2447,8 +2443,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showNoTimeCaliperSelectedAlert() {
-        showSimpleAlert(R.string.no_time_caliper_selected_title,
-                R.string.no_time_caliper_selected_message);
+        Alerts.simpleAlert(this, R.string.no_time_caliper_selected_title, R.string.no_time_caliper_selected_message);
     }
 
     private boolean noTimeCaliperSelected() {
@@ -2464,9 +2459,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 !calipersView.activeCaliper().isAngleCaliper();
     }
 
-    private void noCaliperSelectedAlert() {
-        showSimpleAlert(R.string.no_caliper_selected_alert_title,
-                R.string.no_caliper_selected_alert_message);
+    private void showNoCaliperSelectedAlert() {
+        Alerts.simpleAlert(this, R.string.no_caliper_selected_alert_title, R.string.no_caliper_selected_alert_message);
     }
 
     private void setupCalibration() {
@@ -2479,6 +2473,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private String createCalibrationMessage(Boolean useCustomUnits, String customUnitsMessage) {
+        String calibrationIntervalMessage;
+        if (useCustomUnits) {
+            calibrationIntervalMessage = customUnitsMessage;
+        }
+        else {
+            calibrationIntervalMessage = getString(R.string.calibration_without_units_message);
+        }
+        return calibrationIntervalMessage;
+    }
+
     private void setCalibration() {
         if (!thereAreCalipers()) {
             noCalipersAlert();
@@ -2486,71 +2491,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         if (calipersView.noCaliperIsSelected()) {
-            noCaliperSelectedAlert();
+            showNoCaliperSelectedAlert();
             return;
         }
-        Caliper c = calipersView.activeCaliper();
+        final Caliper c = calipersView.activeCaliper();
         if (c == null) {
             return; // shouldn't happen, but if it does...
         }
         if (!c.requiresCalibration()) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.angle_caliper_title);
-            builder.setMessage(R.string.angle_caliper_calibration_message);
-            builder.setNegativeButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            builder.show();
+            Alerts.simpleAlert(this, R.string.angle_caliper_title, R.string.angle_caliper_calibration_message);
             return;
         }
+
+        // Create set calibration dialog.
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.input_dialog, null);
+        final TextInputLayout calibrationIntervalTextInputLayout = alertLayout.findViewById(R.id.inputDialogTextInputLayout);
+        final TextInputEditText calibrationIntervalEditText = alertLayout.findViewById(R.id.inputDialogEditText);
+
+        // Have hint depend on caliper type.
         String example;
-        if (c.getDirection() == Caliper.Direction.VERTICAL) {
+        if (c.isAmplitudeCaliper()) {
             example = getString(R.string.example_amplitude_measurement);
         }
-        else {
+        else { // time caliper
             example = getString(R.string.example_time_measurement);
         }
-        String message = String.format(getString(R.string.calibration_dialog_message), example);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.calibrate_dialog_title));
-        builder.setMessage(message);
+        final String calibrationHint = String.format(getString(R.string.calibration_dialog_hint), example);
+        calibrationIntervalTextInputLayout.setHint(calibrationHint);
 
-        final EditText input = new EditText(this);
-        // not sure I need ALL of the below!
-        input.setLines(1);
-        input.setMaxLines(1);
-        input.setSingleLine(true);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        input.setHint(getString(R.string.calibration_dialog_hint));
-        input.setSelection(0);
-        String calibrationString = "";
+        // Use default calibration if no prior calibration.
+        String calibrationString;
         if (horizontalCalibration.getCalibrationString().length() < 1) {
             horizontalCalibration.setCalibrationString(defaultTimeCalibration);
         }
         if (verticalCalibration.getCalibrationString().length() < 1) {
             verticalCalibration.setCalibrationString(defaultAmplitudeCalibration);
         }
-        input.setText(calibrationString);
-
-        Caliper.Direction direction = c.getDirection();
-        if (direction == Caliper.Direction.HORIZONTAL) {
+        if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
             calibrationString = horizontalCalibration.getCalibrationString();
         } else {
             calibrationString = verticalCalibration.getCalibrationString();
         }
+        calibrationIntervalEditText.setText(calibrationString);
+        calibrationIntervalEditText.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        input.setText(calibrationString);
-
-        builder.setView(input);
-
-        builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.calibrate_dialog_title));
+        builder.setMessage(R.string.calibration_dialog_message);
+        builder.setView(alertLayout);
+        builder.setCancelable(false);
+        builder.setPositiveButton(getString(R.string.set_calibration_button_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialogResult = input.getText().toString();
-                processCalibration();
+                String calibrationIntervalString = calibrationIntervalEditText.getText().toString();
+                showValidationDialog(calibrationIntervalString, c.getDirection());
+//                // TODO: test for valid number and type of units.
+//                CalibrationProcessor.Validation validation = CalibrationProcessor.validate(calibrationIntervalString, c.getDirection());
+//                EPSLog.log(validation.toString());
+//                dialogResult = calibrationIntervalString;
+//                processCalibration(calibrationIntervalString);
             }
         });
         builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
@@ -2559,8 +2559,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dialog.cancel();
             }
         });
-
         builder.show();
+    }
+
+    private void showValidationDialog(String calibrationIntervalString, Caliper.Direction direction) {
+        CalibrationProcessor.Validation validation = CalibrationProcessor.validate(calibrationIntervalString, direction);
+        EPSLog.log(validation.toString());
+        dialogResult = calibrationIntervalString;
+        if (validation.isValid()) {
+            processCalibration();
+        }
+        else if (validation.noInput || validation.noNumber || validation.invalidNumber) {
+            Alerts.simpleAlert(this, getString(R.string.calibration_error_title), getString(R.string.calibration_error_message));
+        }
+        else if (showValidationDialog &&
+                (validation.noUnits
+                        || (validation.invalidUnits && direction == Caliper.Direction.HORIZONTAL))) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = getLayoutInflater();
+            View alertLayout = inflater.inflate(R.layout.validate_calibration, null);
+            final CheckBox doNotShowDialogCheckBox = alertLayout.findViewById(R.id.doNotShowValidationDialogCheckBox);
+            doNotShowDialogCheckBox.setChecked(!showValidationDialog);
+            final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+            doNotShowDialogCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    showValidationDialog = !isChecked;
+                    editor.putBoolean(getString(R.string.show_validation_dialog_key), showValidationDialog);
+                    editor.apply();
+                }
+            });
+            builder.setTitle(R.string.calibration_warning_title);
+            String message = getString(R.string.calibration_warning_message);
+            builder.setMessage(message);
+            builder.setCancelable(false);
+            builder.setView(alertLayout);
+            builder.setNegativeButton(R.string.cancel_title, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.setPositiveButton(R.string.calibrate_anyway_title, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    processCalibration();
+                }
+            });
+            builder.show();
+        }
+        else {
+            processCalibration();
+        }
     }
 
     private void processCalibration() {
@@ -2576,8 +2626,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         if (c.getValueInPoints() <= 0) {
-            EPSLog.log("Negatively valued caliper");
-            showSimpleAlert(R.string.negative_caliper_title, R.string.negative_caliper_message);
+            Alerts.simpleAlert(this, R.string.negative_caliper_title, R.string.negative_caliper_message);
             return;
         }
         Calibration cal;
@@ -2600,63 +2649,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         selectMainMenu();
     }
 
-    // Guarantees outCalFactor is non-negative, non-zero.
-    // outUnits can be zero-length string.
-    private CalibrationResult processCalibrationString(String in) {
-        CalibrationResult calibrationResult = new CalibrationResult();
-        if (in.length() < 1) {
-            return calibrationResult;
-        }
-        List<String> chunks = parse(in);
-        if (chunks.size() < 1) {
-            return calibrationResult;
-        }
-        NumberFormat format = NumberFormat.getInstance();
-        try {
-            Number number = format.parse(chunks.get(0));
-            calibrationResult.value = number.floatValue();
-        } catch (ParseException ex) {
-            EPSLog.log("Exception = " + ex.toString());
-            return calibrationResult;
-        }
-        if (chunks.size() > 1) {
-            calibrationResult.units = chunks.get(1);
-        }
-        // all calibration values must be positive
-        calibrationResult.value = Math.abs(calibrationResult.value);
-        // check for other badness
-        if (calibrationResult.value <= 0.0f) {
-            return calibrationResult;
-        }
-        calibrationResult.success = true;
-        return calibrationResult;
-    }
-
-    private List<String> parse(String toParse) {
-        List<String> chunks = new LinkedList<>();
-        Matcher matcher = VALID_PATTERN.matcher(toParse);
-        while (matcher.find()) {
-            chunks.add( matcher.group() );
-        }
-        return chunks;
-    }
-
     private void noCalipersAlert() {
-        showSimpleAlert(R.string.no_calipers_alert_title,
-                R.string.no_calipers_alert_message);
-    }
-
-    private void showSimpleAlert(int title, int message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.setPositiveButton(getString(R.string.ok_title), null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        Alerts.simpleAlert(this, R.string.no_calipers_alert_title, R.string.no_caliper_selected_alert_message);
     }
 
     private void showFileErrorAlert() {
-        showSimpleAlert(R.string.file_load_error, R.string.file_load_message);
+        Alerts.simpleAlert(this, R.string.file_load_error, R.string.file_load_message);
     }
 
     private void clearCalibration() {
@@ -2802,18 +2800,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void adjustCalibrationForScale(float scale) {
         horizontalCalibration.setCurrentZoom(scale);
         verticalCalibration.setCurrentZoom(scale);
-    }
-
-    private class CalibrationResult {
-        boolean success;
-        float value;
-        String units;
-
-        CalibrationResult() {
-            success = false;
-            value = 0.0f;
-            units = "";
-        }
     }
 
     private class MatrixChangeListener implements OnMatrixChangedListener {
