@@ -2072,7 +2072,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Create an image file name
         String timeStamp = getTimeStamp();
         String imageFileName = "JPEG_" + timeStamp + "_"; //NON-NLS
+//        File storageDir = getExternalFilesDir(null);
         File storageDir = Environment.getExternalStorageDirectory();
+        EPSLog.log("storage directory = " + storageDir);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -2151,6 +2153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         resetPdf();
     }
 
+    // Original code fails in Android 29.  See https://medium.com/@sriramaripirala/android-10-open-failed-eacces-permission-denied-da8b630a89df
     private Bitmap getScaledBitmap(String picturePath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;

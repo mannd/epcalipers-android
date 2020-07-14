@@ -109,7 +109,7 @@
     <string name="double_tap_caliper_label">Двойное нажатие чтобы удалить</string>
     <string name="default_qtc_formula_title">Формула QTc</string>
     <string name="default_auto_position_text_label">авто-позиционирование текста</string>
-    <string name="example_amplitude_measurement">1 милливольт или 1 мв</string>
+    <string name="example_amplitude_measurement">10 миллиметр или 1 мв</string>
     <string name="example_time_measurement">1000 мсек или 1 секунда</string>
     <string name="formula_detail">(формула %s)</string>
     <string name="framingham_formula">Фрамингема</string>
