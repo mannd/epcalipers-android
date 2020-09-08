@@ -1672,7 +1672,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
-    
+
     private void selectMainMenu() {
         EPSLog.log("selectMainMenu called");
         if (mainMenu == null) {
@@ -1939,6 +1939,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivityForResult(intent, RESULT_LOAD_IMAGE);
     }
 
+    /* TODO: CAUTION: Image and file functions are only working at this point because
+    we have set the requestLegacyExternalStorage to true in the AndroidMandifest.  
+    Android 10 and 11 have "scoped storage," 
+    see https://developer.android.com/training/data-storage/use-cases for more details.  
+    If we change the target SDK to Android 30, the requestLegacyExternalStorage 
+    attribute will be ignored, and camera and image loading won't work.  
+    Fixes are outlined in the link above. 
+     */
     private void takePhoto() {
         // check permissions
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -2772,7 +2780,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void addAmplitudeCaliper() {
             addCaliperWithDirection(Caliper.Direction.VERTICAL);
     }
-    
+
     private void addAngleCaliper() {
         AngleCaliper c = new AngleCaliper();
         Rect rect = new Rect(0, 0, calipersView.getWidth(),
@@ -2816,5 +2824,3 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 }
-
-

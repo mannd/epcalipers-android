@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!--        requestLegacyExternalStorage necessary for Android 10 with target SDK = 29, will be ignored if target SDK = 30.-->
     <application
         android:requestLegacyExternalStorage="true"
         android:allowBackup="false"
