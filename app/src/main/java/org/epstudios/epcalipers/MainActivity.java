@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Pair;
@@ -78,6 +77,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -85,6 +85,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.preference.PreferenceManager;
 
 import static org.epstudios.epcalipers.CalibrationProcessor.processCalibrationString;
 import static org.epstudios.epcalipers.MyPreferenceFragment.ALL;
@@ -187,7 +188,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean showStartImage;
     private boolean roundMsecRate;
     private boolean autoPositionText;
-    private boolean inQtc = false;
     private boolean showValidationDialog;
     private int currentCaliperColor;
     private int currentHighlightColor;
@@ -361,6 +361,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return dp * density;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -650,7 +651,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String versionName = "";
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            versionCode = packageInfo.versionCode;
+            versionCode = (int)packageInfo.getLongVersionCode();
             versionName = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -824,7 +825,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private class UriPage {
+    private static class UriPage {
         Uri uri;
         int pageNumber;
     }
@@ -1308,10 +1309,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 c.setCalibration(verticalCalibration);
                 c.setTextPosition(amplitudeCaliperTextPositionPreference);
             }
-            if (c.isAngleCaliper()) {
-                if (BuildConfig.DEBUG && !(c instanceof AngleCaliper)) {
-                    throw new AssertionError("Assertion failed");
-                }
+            if (c instanceof AngleCaliper) {
                 ((AngleCaliper) c).setVerticalCalibration(verticalCalibration);
                 ((AngleCaliper) c).setBar1Angle(bar1Angle);
                 ((AngleCaliper) c).setBar2Angle(bar2Angle);
@@ -1698,7 +1696,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        calipersView.setLocked(false);
         calipersView.setAllowTweakPosition(false);
         calipersView.setAllowColorChange(false);
-        inQtc = false;
     }
 
     private void selectPDFMenu() {
@@ -1777,7 +1774,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         pushToolbarMenuStack(ToolbarMenu.QTc2);
         selectMenu(qtcStep2Menu);
-        inQtc = true;
     }
 
     private void selectColorMenu() {
@@ -1940,7 +1936,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /* TODO: CAUTION: Image and file functions are only working at this point because
-    we have set the requestLegacyExternalStorage to true in the AndroidMandifest.  
+    we have set the requestLegacyExternalStorage to true in the AndroidManifest.
     Android 10 and 11 have "scoped storage," 
     see https://developer.android.com/training/data-storage/use-cases for more details.  
     If we change the target SDK to Android 30, the requestLegacyExternalStorage 
@@ -1993,7 +1989,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_CAMERA: {
                 // If request is cancelled, the result arrays are empty.

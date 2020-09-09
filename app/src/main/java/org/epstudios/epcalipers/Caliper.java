@@ -173,17 +173,11 @@ public class Caliper {
 
     private TextPosition textPosition;
 
-    public Boolean getAutoPositionText() {
-        return autoPositionText;
-    }
-
     public void setAutoPositionText(Boolean autoPositionText) {
         this.autoPositionText = autoPositionText;
     }
 
     private Boolean autoPositionText;
-
-    private Boolean useAltLabelPosition = true;
 
     public int getUnselectedColor() {
         return unselectedColor;
@@ -250,6 +244,7 @@ public class Caliper {
     private boolean marching;
 
 
+    @SuppressWarnings("SameParameterValue")
     private Caliper(Direction direction, float bar1Position, float bar2Position,
                     float crossBarPosition, float fontSize) {
         this.direction = direction;
@@ -293,17 +288,9 @@ public class Caliper {
         marchingPaint.setColor(color);
     }
 
-    public int getColor() {
-        return paint.getColor();
-    }
-
     public void setLineWidth(float lineWidth) {
         paint.setStrokeWidth(lineWidth);
         setMarchingPaintStrokeWidth(paint);
-    }
-
-    public float getLineWidth() {
-        return paint.getStrokeWidth();
     }
 
     public void setInitialPosition(Rect rect) {
@@ -636,18 +623,6 @@ public class Caliper {
         Rect bounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), bounds);
         return bounds;
-    }
-
-    private float leftOrTopMostBarPosition() {
-        return Math.min(bar1Position, bar2Position);
-    }
-
-    private float rightOrBottomMostBarPosition() {
-        return Math.max(bar1Position, bar2Position);
-    }
-
-    private Boolean textIsCentered() {
-        return textPosition == TextPosition.CenterAbove || textPosition == TextPosition.CenterBelow;
     }
 
     public float barCoord(PointF p) {

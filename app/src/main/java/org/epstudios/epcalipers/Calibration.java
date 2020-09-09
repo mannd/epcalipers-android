@@ -2,8 +2,6 @@ package org.epstudios.epcalipers;
 
 import android.content.Context;
 
-import java.util.regex.Pattern;
-
 /**
  * Copyright (C) 2015 EP Studios, Inc.
  * www.epstudiossoftware.com
@@ -84,7 +82,6 @@ public class Calibration {
     public Calibration(Caliper.Direction direction, Context context) {
         this.direction = direction;
         this.context = context;
-        final int flags = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         reset();
     }
 

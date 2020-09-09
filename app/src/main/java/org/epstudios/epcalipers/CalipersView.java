@@ -55,9 +55,6 @@ public class CalipersView extends View {
     public ArrayList<Caliper> getCalipers() {
         return calipers;
     }
-    public void setCalipers(ArrayList<Caliper> calipers) {
-        this.calipers = calipers;
-    }
 
     public void setLockImage(boolean lockImage) {
         this.lockImage = lockImage;

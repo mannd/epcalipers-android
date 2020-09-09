@@ -31,7 +31,6 @@
     <string name="drawer_take_photo">Сделать фото</string>
     <string name="add_tooltip">Добавить калипер</string>
     <string name="all_formulas">Все</string>
-    <string name="calibration_dialog_with_units_message">Введите измерение, включая единицы (например %s)</string>
     <string name="default_time_calibration_label">Калибровка времени по умолчанию</string>
     <string name="default_amplitude_calibration_label">Калибровка амплитуды по умолчанию</string>
     <string name="go_to_page">Перейти к странице</string>
@@ -134,7 +133,6 @@
     <string name="number_of_intervals_dialog_message">Сколько интервалов измерить в этом калипере?</string>
     <string name="no_time_caliper_selected_message">Для измерения одного или более RR интервалов выберите время калипера</string>
     <string name="no_calipers_alert_title">Нет калиперов для использования</string>
-    <string name="no_calipers_alert_message">Для продолжения введите один или несколько калиперов</string>
     <string name="no_caliper_selected_alert_message">Выберите калипер одним косанием. Переместите калипер к известному интервалу. Нажмите «Настройки», чтобы ввести калибровочное измерение.</string>
     <string name="multipage_pdf_warning">Вам следует снова открыть PDF через приложение для просмотра всех страниц</string>
     <string name="negative_caliper_message">Выберите калипер с положительным значением, или измените значение этого калипера на положительное, а затем повторите калибровку.</string>
@@ -160,11 +158,6 @@
     <string name="use_large_font_label">Использовать крупный текст шрифта?</string>
     <string name="use_large_font_off_summary">Используйте шрифт нормального размера</string>
     <string name="use_large_font_on_summary">Используйте большой шрифт</string>
-    <string name="msec_units">мсек</string>
-    <string name="sec_units">сек</string>
-    <string name="mv_units">милливольт</string>
-    <string name="mm_units">мм</string>
-    <string name="choose_units_message">Выберите единицы измерения</string>
     <string name="calibration_without_units_message">Введите интервал без единиц</string>
     <string name="calibration_dialog_message">Введите измерение, включая единицы</string>
     <string name="don_t_show_this_dialog_again_message">Не показывать этот диалог снова.</string>
