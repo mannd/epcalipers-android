@@ -2194,8 +2194,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void meanRR() {
         if (!thereAreCalipers()) {
             noCalipersAlert();
-            // TODO: we don't consistently selectMainMenu() in this method.
-            selectMainMenu();
             return;
         }
         Caliper singleHorizontalCaliper = getLoneTimeCaliper();
