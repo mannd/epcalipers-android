@@ -22,7 +22,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -45,7 +45,7 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
     implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha05'
-    implementation 'com.github.kizitonwose.colorpreference:core:1.1.0'
+    implementation 'com.github.kizitonwose.colorpreference:support:1.1.0'
     implementation 'com.cuneytayyildiz:onboarder:1.0.3'
     implementation 'androidx.preference:preference:1.1.1'
     // Required for local unit tests (JUnit 4 framework)
