@@ -394,8 +394,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        menuItem.setChecked(true);
-
+//                        menuItem.setChecked(true);
                         int id = menuItem.getItemId();
                         switch(id) {
                             case R.id.nav_camera:
