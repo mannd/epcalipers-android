@@ -1,5 +1,6 @@
 package org.epstudios.epcalipers;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -7,6 +8,8 @@ import android.webkit.WebView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewFeature;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -54,6 +57,13 @@ public class Help extends AppCompatActivity {
         // See https://stackoverflow.com/questions/3039555/android-webview-anchor-link-jump-link-not-working
         Handler handler = new Handler();
         final String finalUrl = url;
+        // See https://stackoverflow.com/questions/57449900/letting-webview-on-android-work-with-prefers-color-scheme-dark
+        int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+            if(WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                WebSettingsCompat.setForceDark(webView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
+            }
+        }
         // Variables inside closure must be final.
         handler.postDelayed(new Runnable() {
             public void run() {
