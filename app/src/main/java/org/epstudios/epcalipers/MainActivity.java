@@ -18,7 +18,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -673,7 +672,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 if (noSavedInstance) {
                     addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
-                    scaleImageForImageView();
                 }
                 // else adjust the caliper positions, now that calipersView is created
                 else {
@@ -1067,47 +1065,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onResume() {
         super.onResume();
         EPSLog.log("onResume");
-    }
-
-    private void scaleImageForImageView() {
-        Drawable image = imageView.getDrawable();
-        if (image == null) {
-            return;
-        }
-        float imageWidth = image.getIntrinsicWidth();
-        float imageHeight = image.getIntrinsicHeight();
-        float actionBarHeight = actionBar.getHeight();
-        float toolbarHeight = menuToolbar.getHeight();
-        float statusBarHeight = getStatusBarHeight();
-        Pair<Integer, Integer> screenDimensions = getScreenDimensions();
-        float screenWidth = (float) screenDimensions.first;
-        float screenHeight = (float) screenDimensions.second;
-        float verticalSpace = statusBarHeight + actionBarHeight + toolbarHeight;
-
-        float portraitWidth = Math.min(screenHeight, screenWidth);
-//        float landscapeWidth = Math.max(screenHeight, screenWidth);
-//        float portraitHeight = Math.max(screenHeight, screenWidth) - verticalSpace;
-        float landscapeHeight = Math.min(screenHeight, screenWidth) - verticalSpace;
-        float ratio;
-        if (imageWidth > imageHeight) {
-            ratio = portraitWidth / imageWidth;
-        }
-        else {
-            ratio = landscapeHeight / imageHeight;
-        }
-        Bitmap bitmap = ((BitmapDrawable)image).getBitmap();
-        if (bitmap == null) {
-            return;
-        }
-        int bitmapWidth = bitmap.getWidth();
-        int bitmapHeight = bitmap.getHeight();
-        Matrix matrix = new Matrix();
-        matrix.postScale(ratio, ratio);
-        Bitmap scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmapWidth,
-                bitmapHeight, matrix, true);
-        BitmapDrawable result = new BitmapDrawable(getResources(), scaledBitmap);
-
-        imageView.setImageDrawable(result);
     }
 
     private Pair<Integer, Integer> getScreenDimensions () {
@@ -2149,7 +2106,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void updateImageView(Bitmap bitmap) {
         imageView.setImageBitmap(bitmap);
-        scaleImageForImageView();
         imageView.setVisibility(View.VISIBLE);
         clearCalibration();
         // updateImageView not used for PDFs, so
