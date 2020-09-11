@@ -649,7 +649,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String versionName = "";
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            versionCode = (int)packageInfo.getLongVersionCode();
+            // versionCode deprecated in Android Pie.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                versionCode = (int)packageInfo.getLongVersionCode();
+            } else {
+                versionCode = packageInfo.versionCode;
+            }
             versionName = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
