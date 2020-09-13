@@ -75,7 +75,7 @@ public class AngleCaliper extends Caliper {
         // crossBarPosition is the y coordinate.
         setBar1Position(100.0f);
         setBar2Position(100.0f);
-        setCrossbarPosition(100.0f);
+        setCrossBarPosition(100.0f);
         setVerticalCalibration(null);
         degreeDecimalFormat = new DecimalFormat("#.#");
 
@@ -91,7 +91,7 @@ public class AngleCaliper extends Caliper {
     public void setInitialPosition(Rect rect) {
         setBar1Position(rect.width() / 3f + differential);
         setBar2Position(getBar1Position());
-        setCrossbarPosition(rect.height() / 3f + differential * 1.5f);
+        setCrossBarPosition(rect.height() / 3f + differential * 1.5f);
         differential += 20.0f;
         if (differential > 100.0f) {
             differential = 0.0f;
@@ -104,20 +104,20 @@ public class AngleCaliper extends Caliper {
         float length = Math.max(canvas.getHeight(), canvas.getHeight() * 2);
 
         float delta = 20.0f;
-        setCrossbarPosition(Math.min(getCrossbarPosition(), canvas.getHeight() - delta));
-        setCrossbarPosition(Math.max(getCrossbarPosition(), delta));
+        setCrossBarPosition(Math.min(getCrossBarPosition(), canvas.getHeight() - delta));
+        setCrossBarPosition(Math.max(getCrossBarPosition(), delta));
         setBar1Position(Math.min(getBar1Position(), canvas.getWidth() - delta));
         setBar1Position(Math.max(getBar1Position(), delta));
         setBar2Position(getBar1Position());
 
-        endPointBar1 = endPointForPosition(new PointF(getBar1Position(), getCrossbarPosition()),
+        endPointBar1 = endPointForPosition(new PointF(getBar1Position(), getCrossBarPosition()),
                 bar1Angle, length);
-        canvas.drawLine(getBar1Position(), getCrossbarPosition(), endPointBar1.x, endPointBar1.y,
+        canvas.drawLine(getBar1Position(), getCrossBarPosition(), endPointBar1.x, endPointBar1.y,
                 getPaint());
 
-        endPointBar2 = endPointForPosition(new PointF(getBar2Position(), getCrossbarPosition()),
+        endPointBar2 = endPointForPosition(new PointF(getBar2Position(), getCrossBarPosition()),
                 bar2Angle, length);
-        canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
+        canvas.drawLine(getBar2Position(), getCrossBarPosition(), endPointBar2.x, endPointBar2.y,
                 getPaint());
         // Force the angle measurement to always be center above.
         caliperText(canvas, TextPosition.CenterAbove, false);
@@ -144,17 +144,17 @@ public class AngleCaliper extends Caliper {
         getPaint().setColor(chosenComponentColor);
         switch (getChosenComponent()) {
             case Bar1:
-                    canvas.drawLine(getBar1Position(), getCrossbarPosition(), endPointBar1.x, endPointBar1.y,
+                    canvas.drawLine(getBar1Position(), getCrossBarPosition(), endPointBar1.x, endPointBar1.y,
                             getPaint());
                 break;
             case Bar2:
-                    canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
+                    canvas.drawLine(getBar2Position(), getCrossBarPosition(), endPointBar2.x, endPointBar2.y,
                             getPaint());
                 break;
             case Crossbar:
-                canvas.drawLine(getBar1Position(), getCrossbarPosition(), endPointBar1.x, endPointBar1.y,
+                canvas.drawLine(getBar1Position(), getCrossBarPosition(), endPointBar1.x, endPointBar1.y,
                         getPaint());
-                canvas.drawLine(getBar2Position(), getCrossbarPosition(), endPointBar2.x, endPointBar2.y,
+                canvas.drawLine(getBar2Position(), getCrossBarPosition(), endPointBar2.x, endPointBar2.y,
                         getPaint());
 
                 break;
@@ -183,14 +183,14 @@ public class AngleCaliper extends Caliper {
     }
 
     private PointF getBasePoint1ForHeight(double height) {
-        double pointY = getCrossbarPosition() + height;
+        double pointY = getCrossBarPosition() + height;
         double pointX = height * (Math.sin(bar1Angle - Math.PI / 2) / Math.sin(Math.PI - bar1Angle));
         pointX = getBar1Position() - pointX;
         return new PointF((float)pointX, (float)pointY);
     }
 
     private PointF getBasePoint2ForHeight(double height) {
-        double pointY = getCrossbarPosition() + height;
+        double pointY = getCrossBarPosition() + height;
         double pointX = height * (Math.sin(Math.PI / 2 - bar2Angle) / Math.sin(bar2Angle));
         pointX += getBar1Position();
         return new PointF((float)pointX, (float)pointY);
@@ -228,7 +228,7 @@ public class AngleCaliper extends Caliper {
 
     private double relativeTheta(PointF p) {
         float x = p.x - getBar1Position();
-        float y = p.y - getCrossbarPosition();
+        float y = p.y - getCrossBarPosition();
         return Math.atan2(y,x);
     }
 
@@ -245,7 +245,7 @@ public class AngleCaliper extends Caliper {
     public boolean pointNearCrossBar(PointF p) {
         float delta = 40.0f;
         return (p.x > getBar1Position() - delta && p.x < getBar1Position() + delta &&
-                p.y > getCrossbarPosition() - delta && p.y < getCrossbarPosition() + delta);
+                p.y > getCrossBarPosition() - delta && p.y < getCrossBarPosition() + delta);
     }
 
     public boolean pointNearCaliper(PointF p) {

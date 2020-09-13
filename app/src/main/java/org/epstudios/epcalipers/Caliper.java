@@ -1,18 +1,4 @@
-package org.epstudios.epcalipers;
-
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PointF;
-import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.view.MotionEvent;
-
-import java.text.DecimalFormat;
-
-import androidx.annotation.NonNull;
-
-/**
+/*
  * Copyright (C) 2015 EP Studios, Inc.
  * www.epstudiossoftware.com
  * <p/>
@@ -33,6 +19,21 @@ import androidx.annotation.NonNull;
  * You should have received a copy of the GNU General Public License
  * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+package org.epstudios.epcalipers;
+
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.view.MotionEvent;
+
+import java.text.DecimalFormat;
+
+import androidx.annotation.NonNull;
+
 public class Caliper {
 
     public enum CaliperType {
@@ -114,10 +115,10 @@ public class Caliper {
     public void setBar2Position(float bar2Position) {
         this.bar2Position = bar2Position;
     }
-    public float getCrossbarPosition() {
+    public float getCrossBarPosition() {
         return crossBarPosition;
     }
-    public void setCrossbarPosition(float crossBarPosition) {
+    public void setCrossBarPosition(float crossBarPosition) {
         this.crossBarPosition = crossBarPosition;
     }
 
@@ -295,14 +296,14 @@ public class Caliper {
 
     public void setInitialPosition(Rect rect) {
         if (direction == Direction.HORIZONTAL) {
-            bar1Position = (rect.width()/3f) + differential;
-            bar2Position = (2 * rect.width()/3f) + differential;
-            crossBarPosition = (rect.height()/2f) + differential;
+            setBar1Position((rect.width()/3f) + differential);
+            setBar2Position((2 * rect.width()/3f) + differential);
+            setCrossBarPosition((rect.height()/2f) + differential);
         }
         else {
-            bar1Position = (rect.height()/3f) + differential;
-            bar2Position = ((2 * rect.height())/3f) + differential;
-            crossBarPosition = (rect.width()/2f) + differential;
+            setBar1Position((rect.height()/3f) + differential);
+            setBar2Position(((2 * rect.height())/3f) + differential);
+            setCrossBarPosition((rect.width()/2f) + differential);
         }
         differential += 15;
         if (differential > 80) {
@@ -312,22 +313,22 @@ public class Caliper {
 
     public void draw(Canvas canvas) {
         if (direction == Direction.HORIZONTAL) {
-            crossBarPosition = Math.min(crossBarPosition, canvas.getHeight() - DELTA);
-            crossBarPosition = Math.max(crossBarPosition, DELTA);
-            bar1Position = Math.min(bar1Position, canvas.getWidth() - DELTA);
-            bar2Position = Math.max(bar2Position, DELTA);
-            canvas.drawLine(bar1Position, 0, bar1Position, canvas.getHeight(), paint);
-            canvas.drawLine(bar2Position, 0, bar2Position, canvas.getHeight(), paint);
-            canvas.drawLine(bar2Position, crossBarPosition, bar1Position, crossBarPosition, paint);
+            setCrossBarPosition(Math.min(getCrossBarPosition(), canvas.getHeight() - DELTA));
+            setCrossBarPosition(Math.max(getCrossBarPosition(), DELTA));
+            setBar1Position(Math.min(getBar1Position(), canvas.getWidth() - DELTA));
+            setBar2Position(Math.max(getBar2Position(), DELTA));
+            canvas.drawLine(getBar1Position(), 0, getBar1Position(), canvas.getHeight(), paint);
+            canvas.drawLine(getBar2Position(), 0, getBar2Position(), canvas.getHeight(), paint);
+            canvas.drawLine(getBar2Position(), getCrossBarPosition(), getBar1Position(), getCrossBarPosition(), paint);
         }
         else {  // draw vertical caliper
-            crossBarPosition = Math.min(crossBarPosition, canvas.getWidth() - DELTA);
-            crossBarPosition = Math.max(crossBarPosition, DELTA);
-            bar1Position = Math.min(bar1Position, canvas.getHeight() - DELTA);
-            bar2Position = Math.max(bar2Position, DELTA);
-            canvas.drawLine(0, bar1Position, canvas.getWidth(), bar1Position, paint);
-            canvas.drawLine(0, bar2Position, canvas.getWidth(), bar2Position, paint);
-            canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
+            setCrossBarPosition(Math.min(getCrossBarPosition(), canvas.getWidth() - DELTA));
+            setCrossBarPosition(Math.max(getCrossBarPosition(), DELTA));
+            setBar1Position(Math.min(getBar1Position(), canvas.getHeight() - DELTA));
+            setBar2Position(Math.max(getBar2Position(), DELTA));
+            canvas.drawLine(0, getBar1Position(), canvas.getWidth(), getBar1Position(), paint);
+            canvas.drawLine(0, getBar2Position(), canvas.getWidth(), getBar2Position(), paint);
+            canvas.drawLine(getCrossBarPosition(), getBar2Position(), getCrossBarPosition(), getBar1Position(), paint);
         }
         if (marching && direction == Direction.HORIZONTAL) {
             drawMarchingCalipers(canvas);
@@ -338,13 +339,13 @@ public class Caliper {
     }
 
     private void drawMarchingCalipers(Canvas canvas) {
-        float difference = Math.abs(bar1Position - bar2Position);
+        float difference = Math.abs(getBar1Position() - getBar2Position());
         float MIN_DISTANCE_FOR_MARCH = 20.0f;
         if (difference < MIN_DISTANCE_FOR_MARCH) {
             return;
         }
-        float greaterBar = Math.max(bar1Position, bar2Position);
-        float lesserBar = Math.min(bar1Position, bar2Position);
+        float greaterBar = Math.max(getBar1Position(), getBar2Position());
+        float lesserBar = Math.min(getBar1Position(), getBar2Position());
         int MAX_MARCHING_CALIPERS = 20;
         float[] biggerBars = new float[MAX_MARCHING_CALIPERS];
         float[] smallerBars = new float[MAX_MARCHING_CALIPERS];
@@ -387,8 +388,8 @@ public class Caliper {
     void caliperText(Canvas canvas, TextPosition textPosition, Boolean optimizeTextPosition) {
         String text = measurement();
         Rect bounds = getTextBounds(text);
-        PointF textPositionPoint = caliperTextPosition(Math.min(bar1Position, bar2Position),
-                Math.max(bar1Position, bar2Position), crossBarPosition, bounds,
+        PointF textPositionPoint = caliperTextPosition(Math.min(getBar1Position(), getBar2Position()),
+                Math.max(getBar1Position(), getBar2Position()), getCrossBarPosition(), bounds,
                 canvas, textPosition, optimizeTextPosition);
         // Note x and y for draw text depend of the alignment property of paint
         canvas.drawText(text, textPositionPoint.x, textPositionPoint.y, paint);
@@ -404,26 +405,26 @@ public class Caliper {
         switch (chosenComponent) {
             case Bar1:
                 if (direction == Direction.HORIZONTAL) {
-                    canvas.drawLine(bar1Position, 0, bar1Position, canvas.getHeight(), paint);
+                    canvas.drawLine(getBar1Position(), 0, getBar1Position(), canvas.getHeight(), paint);
                 }
                 else {
-                    canvas.drawLine(0, bar1Position, canvas.getWidth(), bar1Position, paint);
+                    canvas.drawLine(0, getBar1Position(), canvas.getWidth(), getBar1Position(), paint);
                 }
                 break;
             case Bar2:
                 if (direction == Direction.HORIZONTAL) {
-                    canvas.drawLine(bar2Position, 0, bar2Position, canvas.getHeight(), paint);
+                    canvas.drawLine(getBar2Position(), 0, getBar2Position(), canvas.getHeight(), paint);
                 }
                 else {
-                    canvas.drawLine(0, bar2Position, canvas.getWidth(), bar2Position, paint);
+                    canvas.drawLine(0, getBar2Position(), canvas.getWidth(), getBar2Position(), paint);
                 }
                 break;
             case Crossbar:
                 if (direction == Direction.HORIZONTAL) {
-                    canvas.drawLine(bar2Position, crossBarPosition, bar1Position, crossBarPosition, paint);
+                    canvas.drawLine(getBar2Position(), getCrossBarPosition(), getBar1Position(), getCrossBarPosition(), paint);
                 }
                 else {
-                    canvas.drawLine(crossBarPosition, bar2Position, crossBarPosition, bar1Position, paint);
+                    canvas.drawLine(getCrossBarPosition(), getBar2Position(), getCrossBarPosition(), getBar1Position(), paint);
                 }
                 break;
             case None:
@@ -654,7 +655,7 @@ public class Caliper {
     }
 
     private float points() {
-        return bar2Position - bar1Position;
+        return getBar2Position() - getBar1Position();
     }
 
     public float getValueInPoints() {
@@ -696,11 +697,11 @@ public class Caliper {
     }
 
     public boolean pointNearBar1(PointF p) {
-        return pointNearBar(p, bar1Position);
+        return pointNearBar(p, getBar1Position());
     }
 
     public boolean pointNearBar2(PointF p) {
-        return pointNearBar(p, bar2Position);
+        return pointNearBar(p, getBar2Position());
     }
 
 
@@ -708,23 +709,23 @@ public class Caliper {
         boolean nearBar;
         float delta = DELTA + 8.0f;  // cross bar delta a little bigger
         if (direction == Direction.HORIZONTAL) {
-            nearBar = (p.x > Math.min(bar1Position, bar2Position)
-                    && p.x < Math.max(bar2Position, bar1Position)
-                    && p.y > crossBarPosition - delta
-                    && p.y < crossBarPosition + delta);
+            nearBar = (p.x > Math.min(getBar1Position(), getBar2Position())
+                    && p.x < Math.max(getBar2Position(), getBar1Position())
+                    && p.y > getCrossBarPosition() - delta
+                    && p.y < getCrossBarPosition() + delta);
         } else {
-            nearBar = (p.y > Math.min(bar1Position, bar2Position)
-                    && p.y < Math.max(bar2Position, bar1Position)
-                    && p.x > crossBarPosition - delta
-                    && p.x < crossBarPosition + delta);
+            nearBar = (p.y > Math.min(getBar1Position(), getBar2Position())
+                    && p.y < Math.max(getBar2Position(), getBar1Position())
+                    && p.x > getCrossBarPosition() - delta
+                    && p.x < getCrossBarPosition() + delta);
         }
         return nearBar;
     }
 
     public boolean pointNearCaliper(PointF p) {
         return pointNearCrossBar(p)
-                || pointNearBar(p, bar1Position)
-                || pointNearBar(p, bar2Position);
+                || pointNearBar(p, getBar1Position())
+                || pointNearBar(p, getBar2Position());
     }
 
     public boolean requiresCalibration() {
@@ -744,26 +745,26 @@ public class Caliper {
     }
 
     public void moveCrossBar(float deltaX, float deltaY) {
-        bar1Position += deltaX;
-        bar2Position += deltaX;
-        crossBarPosition += deltaY;
+        setBar1Position(getBar1Position()+ deltaX);
+        setBar2Position(getBar2Position() + deltaX);
+        setCrossBarPosition(getCrossBarPosition() + deltaY);
     }
 
     public void moveBar1(float delta, float deltaY, MotionEvent event) {
-        bar1Position += delta;
+        setBar1Position(getBar1Position() + delta);
     }
 
     public void moveBar2(float delta, float deltaY, MotionEvent event) {
-        bar2Position += delta;
+        setBar2Position(getBar2Position() + delta);
     }
 
     public void moveBar(float delta, Component component, MovementDirection direction) {
         switch (component) {
             case Bar1:
-                bar1Position += delta;
+                setBar1Position(getBar1Position() + delta);
                 break;
             case Bar2:
-                bar2Position += delta;
+                setBar2Position(getBar2Position() + delta);
                 break;
             case Crossbar:
                 moveCrossbarDirectionally(delta, direction);
@@ -793,11 +794,11 @@ public class Caliper {
             direction = swapDirection(direction);
         }
         if (direction == MovementDirection.Up || direction == MovementDirection.Down) {
-            crossBarPosition += delta;
+            setCrossBarPosition(getCrossBarPosition() + delta);
         }
         else {
-            bar1Position += delta;
-            bar2Position += delta;
+            setBar1Position(getBar1Position() + delta);
+            setBar2Position(getBar2Position() + delta);
         }
     }
 

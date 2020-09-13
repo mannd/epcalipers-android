@@ -696,7 +696,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 : calipersView.getWidth();
                         c.setBar1Position(untransformCoordinate(c.getBar1Position(), maxX));
                         c.setBar2Position(untransformCoordinate(c.getBar2Position(), maxX));
-                        c.setCrossbarPosition(untransformCoordinate(c.getCrossbarPosition(), maxY));
+                        c.setCrossBarPosition(untransformCoordinate(c.getCrossBarPosition(), maxY));
                     }
                     calipersView.invalidate();
                     Log.d(TAG, "second display rect = " + imageView.getDisplayRect());
@@ -1172,7 +1172,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             outState.putFloat(i + getString(R.string.caliper_bar2_position_key),
                     transformCoordinate(c.getBar2Position(), maxX));
             outState.putFloat(i + getString(R.string.caliper_crossbar_position_key),
-                    transformCoordinate(c.getCrossbarPosition(), maxY));
+                    transformCoordinate(c.getCrossBarPosition(), maxY));
             outState.putBoolean(i + getString(R.string.caliper_selected_key), c.isSelected());
             outState.putBoolean(i + getString(R.string.is_angle_caliper_key), c.isAngleCaliper());
             outState.putInt(i + getString(R.string.unselected_color_restore_key), c.getUnselectedColor());
@@ -1262,7 +1262,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             c.setyOffset(getResources().getDimension(R.dimen.caliper_text_offset));
             c.setBar1Position(bar1Position);
             c.setBar2Position(bar2Position);
-            c.setCrossbarPosition(crossbarPosition);
+            c.setCrossBarPosition(crossbarPosition);
             c.setSelected(selected);
             c.setUnselectedColor(unselectedColor);
             c.setSelectedColor(currentHighlightColor);

@@ -62,12 +62,12 @@ public class ApplicationTest {
         c.setInitialPosition(new Rect(0, 0, 600, 600));
         assertEquals(c.getBar1Position(), 200.0, 0.001);
         assertEquals(c.getBar2Position(), 400.0, 0.001);
-        assertEquals(c.getCrossbarPosition(), 300.0, 0.001);
+        assertEquals(c.getCrossBarPosition(), 300.0, 0.001);
         c.setInitialPosition(new Rect(0, 0, 600, 600));
         c.setDirection(Caliper.Direction.VERTICAL);
         assertEquals(c.getBar1Position(), 215.0f, 0.001);
         assertEquals(c.getBar2Position(), 415.0f, 0.001);
-        assertEquals(c.getCrossbarPosition(), 315.0f, 0.001);
+        assertEquals(c.getCrossBarPosition(), 315.0f, 0.001);
     }
 
     @org.junit.Test
@@ -75,7 +75,7 @@ public class ApplicationTest {
         Caliper c = new Caliper();
         assertEquals(c.getBar1Position(), 0, 0.001);
         assertEquals(c.getBar2Position(), 0, 0.001);
-        assertEquals(c.getCrossbarPosition(), 100.0, 0.001);
+        assertEquals(c.getCrossBarPosition(), 100.0, 0.001);
         PointF p = new PointF(100, 50);
         assertEquals(c.barCoord(p), 100.0f, 0.001);
         c.setDirection(Caliper.Direction.VERTICAL);
@@ -217,7 +217,7 @@ public class ApplicationTest {
         Caliper c = new Caliper();
         c.setBar1Position(100);
         c.setBar2Position(50);
-        c.setCrossbarPosition(120);
+        c.setCrossBarPosition(120);
         assertEquals(c.getValueInPoints(), -50, 0.001);
         assertTrue(c.pointNearBar1(new PointF(90, 130)));
         assertTrue(c.pointNearBar2(new PointF(45, 180)));
