@@ -28,6 +28,7 @@ import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.util.Log;
 import android.util.Pair;
 import android.view.ActionMode;
 import android.view.Display;
@@ -49,6 +50,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.chrisbanes.photoview.OnMatrixChangedListener;
+import com.github.chrisbanes.photoview.OnScaleChangedListener;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -95,6 +97,7 @@ import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "EPS";
     private static final String LF = "\n";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
@@ -175,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PhotoView imageView;
     private CalipersView calipersView;
     private Toolbar menuToolbar;
+    @SuppressWarnings("FieldCanBeLocal")
     private Toolbar actionBar;
     private NavigationView navigationView;
     // Side menu items
@@ -204,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int currentPdfPageNumber;
     private boolean useLargeFont;
     private boolean imageIsLocked = false;
+    private boolean stickyCalipers = true;
 
     private float smallFontSize;
     private float largeFontSize;
@@ -294,7 +299,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             MenuItem marchingMenuItem = menu.findItem(R.id.menu_march);
-            marchingMenuItem.setVisible(calipersView.getTouchedCaliper().isTimeCaliper());
+            if (calipersView.getTouchedCaliper() != null) {
+                marchingMenuItem.setVisible(calipersView.getTouchedCaliper().isTimeCaliper());
+            } else {
+                marchingMenuItem.setVisible(false);
+            }
             return true;
         }
 
@@ -369,7 +378,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
-
 
         noSavedInstance = (savedInstanceState == null);
 
@@ -468,10 +476,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         float max_zoom = 10.0f;
         imageView.setMaximumScale(max_zoom);
         imageView.setMinimumScale(0.3f);
-        // We need to use MatrixChangeListener and not ScaleChangeListener
-        // since the former only fires when scale has completely changed and
-        // the latter fires while the scale is changing, so is inaccurate.
+        Log.d(TAG, "original display rect = " + imageView.getDisplayRect());
         imageView.setOnMatrixChangeListener(new MatrixChangeListener());
+//        imageView.setOnScaleChangeListener(new ScaleChangeListener());
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -495,7 +502,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 handleImage();
             }
         }
-
 
         calipersView = findViewById(R.id.caliperView);
         calipersView.setMainActivity(this);
@@ -668,6 +674,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @SuppressWarnings("deprecation")
             @Override
             public void onGlobalLayout() {
+                Log.d(TAG, "onGlobalLayout");
                 int androidVersion = Build.VERSION.SDK_INT;
                 if (androidVersion >= Build.VERSION_CODES.JELLY_BEAN) {
                     layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -692,6 +699,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         c.setCrossbarPosition(untransformCoordinate(c.getCrossbarPosition(), maxY));
                     }
                     calipersView.invalidate();
+                    Log.d(TAG, "second display rect = " + imageView.getDisplayRect());
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         public void run() {
@@ -706,6 +714,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 imageView.setRotationBy(totalRotation);
             }
         });
+
+//        calipersView.setMinimumWidth(imageView.getMinimumWidth());
 
         if (force_first_run || version.isUpgrade() || version.isNewInstallation()) {
             startActivity(new Intent(this, Onboarder.class));
@@ -2765,17 +2775,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.invalidate();
     }
 
+
     private void adjustCalibrationForScale(float scale) {
         horizontalCalibration.setCurrentZoom(scale);
         verticalCalibration.setCurrentZoom(scale);
+        if (stickyCalipers) {
+            Log.d("EPS", "raw scale = " + scale);
+            Log.d("EPS", "matrix = " + imageView.getImageMatrix());
+            Log.d("EPS", "display rect = " + imageView.getDisplayRect());
+            calipersView.adjustPositions(scale, imageView.getDisplayRect());
+        }
     }
 
     private class MatrixChangeListener implements OnMatrixChangedListener {
         @Override
         public void onMatrixChanged(RectF rect) {
             matrixChangedAction();
-
         }
     }
 
+    private class ScaleChangeListener implements OnScaleChangedListener {
+        @Override
+        public void onScaleChange(float scaleFactor, float focusX, float focusY) {
+            matrixChangedAction();
+        }
+    }
 }

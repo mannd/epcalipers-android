@@ -27,6 +27,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -102,6 +103,7 @@ public class CalipersView extends View {
 
     private float scale;
     private PointF offset;
+    private boolean stickyCalipers = false;
 
     public void setScale(float scale) {
         this.scale = scale;
@@ -111,6 +113,9 @@ public class CalipersView extends View {
         this.offset = offset;
     }
 
+    public void setStickyCalipers(boolean value) {
+       stickyCalipers = value;
+    }
 
     public CalipersView(Context context) {
         super(context);
@@ -541,4 +546,14 @@ public class CalipersView extends View {
         return noTimeCalipers;
     }
 
+
+    public void adjustPositions(float scale, RectF rect) {
+        for (Caliper c : calipers) {
+            c.setBar1Position(rect.left + 250 * scale);
+            c.setBar2Position(rect.right - 250 * scale);
+            EPSLog.log("rect scale = " + scale);
+            EPSLog.log("rect.left = " + rect.left);
+            EPSLog.log("bar1Position = " + c.getBar1Position());
+        }
+    }
 }
