@@ -104,22 +104,29 @@ public class Caliper {
     private boolean chosen;  // Caliper is chosen for tweaking
 
     public float getBar1Position() {
-        return bar1Position;
+        return Position.translateToScaledPositionX(bar1Position,
+                calibration.getDisplayRect().left, calibration.getCurrentZoom());
     }
     public void setBar1Position(float bar1Position) {
-        this.bar1Position = bar1Position;
+        this.bar1Position = Position.translateToAbsolutePositionX(bar1Position,
+                calibration.getDisplayRect().left, calibration.getCurrentZoom());
     }
     public float getBar2Position() {
-        return bar2Position;
+        return Position.translateToScaledPositionX(bar2Position,
+                calibration.getDisplayRect().left, calibration.getCurrentZoom());
     }
     public void setBar2Position(float bar2Position) {
-        this.bar2Position = bar2Position;
+        this.bar2Position = Position.translateToAbsolutePositionX(bar2Position,
+                calibration.getDisplayRect().left, calibration.getCurrentZoom());
     }
     public float getCrossBarPosition() {
-        return crossBarPosition;
+        return Position.translateToScaledPositionX(crossBarPosition,
+                calibration.getDisplayRect().top, calibration.getCurrentZoom());
     }
+
     public void setCrossBarPosition(float crossBarPosition) {
-        this.crossBarPosition = crossBarPosition;
+        this.crossBarPosition = Position.translateToAbsolutePositionX(crossBarPosition,
+                calibration.getDisplayRect().top, calibration.getCurrentZoom());
     }
 
     public Direction getDirection() {

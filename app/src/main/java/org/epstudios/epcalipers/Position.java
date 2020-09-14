@@ -26,13 +26,13 @@ public class Position {
             float scaledPositionX,
             float offsetX,
             float scale) {
-        return (scaledPositionX + offsetX) / scale;
+        return (scaledPositionX - offsetX) / scale;
     }
 
     public static final float translateToScaledPositionX(
             float absolutePositionX,
             float offsetX,
             float scale) {
-        return scale * absolutePositionX - offsetX;
+        return scale * absolutePositionX + offsetX;
     }
 }

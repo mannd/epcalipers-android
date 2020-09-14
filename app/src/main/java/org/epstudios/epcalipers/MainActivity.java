@@ -2779,12 +2779,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void adjustCalibrationForScale(float scale) {
         horizontalCalibration.setCurrentZoom(scale);
         verticalCalibration.setCurrentZoom(scale);
-        if (stickyCalipers) {
-            Log.d("EPS", "raw scale = " + scale);
-            Log.d("EPS", "matrix = " + imageView.getImageMatrix());
-            Log.d("EPS", "display rect = " + imageView.getDisplayRect());
-            calipersView.adjustPositions(scale, imageView.getDisplayRect());
-        }
+        horizontalCalibration.setDisplayRect(imageView.getDisplayRect());
+        verticalCalibration.setDisplayRect(imageView.getDisplayRect());
+        calipersView.invalidate();
+//        if (stickyCalipers) {
+//            Log.d("EPS", "raw scale = " + scale);
+//            Log.d("EPS", "matrix = " + imageView.getImageMatrix());
+//            Log.d("EPS", "display rect = " + imageView.getDisplayRect());
+//            calipersView.adjustPositions(scale, imageView.getDisplayRect());
+//        }
     }
 
     private class MatrixChangeListener implements OnMatrixChangedListener {

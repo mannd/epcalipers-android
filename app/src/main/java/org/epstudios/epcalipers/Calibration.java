@@ -1,6 +1,7 @@
 package org.epstudios.epcalipers;
 
 import android.content.Context;
+import android.graphics.RectF;
 
 /**
  * Copyright (C) 2015 EP Studios, Inc.
@@ -78,6 +79,16 @@ public class Calibration {
     }
 
     private boolean calibrated;
+
+    private RectF displayRect;
+
+    public RectF getDisplayRect() {
+        return displayRect;
+    }
+
+    public void setDisplayRect(RectF displayRect) {
+        this.displayRect = displayRect;
+    }
 
     public Calibration(Caliper.Direction direction, Context context) {
         this.direction = direction;
