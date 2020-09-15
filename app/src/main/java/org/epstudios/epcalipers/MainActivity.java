@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.InputType;
@@ -685,28 +686,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (noSavedInstance) {
                     addCaliperWithDirection(Caliper.Direction.HORIZONTAL);
                 }
-                // else adjust the caliper positions, now that calipersView is created
+                // else rotate view after brief delay
                 else {
-//                    for (Caliper c : calipersView.getCalipers()) {
-//                        float maxX = c.getDirection() == Caliper.Direction.HORIZONTAL
-//                                ? calipersView.getWidth()
-//                                : calipersView.getHeight();
-//                        float maxY = c.getDirection() == Caliper.Direction.HORIZONTAL
-//                                ? calipersView.getHeight()
-//                                : calipersView.getWidth();
-//                        c.setBar1Position(untransformCoordinate(c.getBar1Position(), maxX));
-//                        c.setBar2Position(untransformCoordinate(c.getBar2Position(), maxX));
-//                        c.setCrossBarPosition(untransformCoordinate(c.getCrossBarPosition(), maxY));
-//                    }
-//                    calipersView.invalidate();
-//                    Log.d(TAG, "second display rect = " + imageView.getDisplayRect());
-//                    Handler handler = new Handler();
-//                    handler.postDelayed(new Runnable() {
-//                        public void run() {
-//                            rotateImageView();
-//                        }
-//                    }, 1000);
-//
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            rotateImageView();
+                        }
+                    }, 50);
+
                 }
             }
 
@@ -714,8 +702,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 imageView.setRotationBy(totalRotation);
             }
         });
-
-//        calipersView.setMinimumWidth(imageView.getMinimumWidth());
 
         if (force_first_run || version.isUpgrade() || version.isNewInstallation()) {
             startActivity(new Intent(this, Onboarder.class));
@@ -1118,10 +1104,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean(getString(R.string.image_locked_key), imageIsLocked);
         outState.putBoolean(getString(R.string.multipage_pdf_key), numberOfPdfPages > 0);
         outState.putBoolean(getString(R.string.a_caliper_is_marching_key), calipersView.isACaliperIsMarching());
-//        outState.putFloat(getString(R.string.offset_left_key), imageView.getDisplayRect().left);
-//        outState.putFloat(getString(R.string.offset_top_key), imageView.getDisplayRect().top);
-//        outState.putFloat(getString(R.string.offset_right_key), imageView.getDisplayRect().right);
-//        outState.putFloat(getString(R.string.offset_bottom_key), imageView.getDisplayRect().bottom);
 
         // To avoid FAILED BINDER TRANSACTION issue (which is ignored up until Android 24,
         // save to temp file instead of storing bitmap in bundle.
@@ -1165,20 +1147,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             outState.putString(i + getString(R.string.caliper_direction_key),
                     c.getDirection() == Caliper.Direction.HORIZONTAL ?
                             getString(R.string.horizontal_direction) : getString(R.string.vertical_direction));
-            // maxX normalizes bar and crossbar positions regardless of caliper direction,
-            // i.e. X is direction for bars and Y is direction for crossbars.
-//            float maxX = c.getDirection() == Caliper.Direction.HORIZONTAL
-//                    ? calipersView.getWidth()
-//                    : calipersView.getHeight();
-//            float maxY = c.getDirection() == Caliper.Direction.HORIZONTAL
-//                    ? calipersView.getHeight()
-//                    : calipersView.getWidth();
-//            outState.putFloat(i + getString(R.string.caliper_bar1_position_key),
-//                    transformCoordinate(c.getBar1Position(), maxX));
-//            outState.putFloat(i + getString(R.string.caliper_bar2_position_key),
-//                    transformCoordinate(c.getBar2Position(), maxX));
-//            outState.putFloat(i + getString(R.string.caliper_crossbar_position_key),
-//                    transformCoordinate(c.getCrossBarPosition(), maxY));
             outState.putFloat(i + getString(R.string.caliper_bar1_position_key),
                     c.getAbsoluteBar1Position());
             outState.putFloat(i + getString(R.string.caliper_bar2_position_key),
@@ -1204,10 +1172,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
         EPSLog.log("onRestoreInstanceState");
-        EPSLog.log("imageView.scale = " + imageView.getScale());
-        EPSLog.log("imageView.displayRect = " + imageView.getDisplayRect());
+        super.onRestoreInstanceState(savedInstanceState);
+
         imageIsLocked = savedInstanceState.getBoolean(getString(R.string.image_locked_key));
         lockImage(imageIsLocked);
         calipersView.setACaliperIsMarching(savedInstanceState.getBoolean(getString(R.string.a_caliper_is_marching_key)));
@@ -1224,13 +1191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         float scale = Math.max(savedInstanceState.getFloat(getString(R.string.imageview_scale_key)), imageView.getMinimumScale());
         scale = Math.min(scale, imageView.getMaximumScale());
-        EPSLog.log("calculated scale = " + scale);
         imageView.setScale(scale, true);
-
-        float offsetLeft = savedInstanceState.getFloat(getString(R.string.offset_left_key), 0);
-        float offsetTop = savedInstanceState.getFloat(getString(R.string.offset_top_key), 0);
-        float offsetRight = savedInstanceState.getFloat(getString(R.string.offset_right_key), 0);
-        float offsetBottom = savedInstanceState.getFloat(getString(R.string.offset_bottom_key), 0);
 
         // Calibration
         horizontalCalibration.setUnits(savedInstanceState.getString(getString(R.string.hcal_units_key)));
@@ -1240,8 +1201,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         horizontalCalibration.setCurrentZoom(savedInstanceState.getFloat(getString(R.string.hcal_current_zoom_key)));
         horizontalCalibration.setCalibrated(savedInstanceState.getBoolean(getString(R.string.hcal_is_calibrated_key)));
         horizontalCalibration.setOriginalCalFactor(savedInstanceState.getFloat(getString(R.string.hcal_original_cal_factor_key)));
-
-        EPSLog.log("currentZoom = " + horizontalCalibration.getCurrentZoom());
 
         horizontalCalibration.setOffset(new PointF(imageView.getDisplayRect().left, imageView.getDisplayRect().top));
 
@@ -1253,11 +1212,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         verticalCalibration.setCalibrated(savedInstanceState.getBoolean(getString(R.string.vcal_is_calibrated_key)));
         verticalCalibration.setOriginalCalFactor(savedInstanceState.getFloat(getString(R.string.vcal_original_cal_factor_key)));
 
-        verticalCalibration.setOffset(new PointF(imageView.getDisplayRect().left, imageView.getDisplayRect().top));
-
-        horizontalCalibration.setCurrentZoom(scale);
-        verticalCalibration.setCurrentZoom(scale);
-        horizontalCalibration.setOffset(new PointF(imageView.getDisplayRect().left, imageView.getDisplayRect().top));
         verticalCalibration.setOffset(new PointF(imageView.getDisplayRect().left, imageView.getDisplayRect().top));
 
         // restore calipers
@@ -1316,10 +1270,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             c.setRoundMsecRate(roundMsecRate);
             c.setAutoPositionText(autoPositionText);
             c.setMarching(isMarching);
-
-
             calipersView.getCalipers().add(c);
-
         }
         // To avoid weird situations, rather than restore active menu,
         // go back to Main Menu with rotation.  This avoids problems
