@@ -27,7 +27,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -95,27 +94,7 @@ public class CalipersView extends View {
         this.tweakingOrColoring = tweakingOrColoring;
     }
 
-    public boolean isTweakingOrColoring() {
-        return tweakingOrColoring;
-    }
-
     private boolean tweakingOrColoring = false;
-
-    private float scale;
-    private PointF offset;
-    private boolean stickyCalipers = false;
-
-    public void setScale(float scale) {
-        this.scale = scale;
-    }
-
-    public void setOffset(PointF offset) {
-        this.offset = offset;
-    }
-
-    public void setStickyCalipers(boolean value) {
-       stickyCalipers = value;
-    }
 
     public CalipersView(Context context) {
         super(context);
@@ -278,18 +257,6 @@ public class CalipersView extends View {
         invalidate();
     }
 
-    public void setPaint(int caliperColor, int highlightColor, int lineWidth) {
-        if (calipersCount() <= 0) {
-            return;
-        }
-        for (Caliper c : calipers) {
-            c.setUnselectedColor(caliperColor);
-            c.setSelectedColor(highlightColor);
-            c.setLineWidth(lineWidth);
-        }
-    }
-
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -426,24 +393,8 @@ public class CalipersView extends View {
         }
     }
 
-    public void unselectAllCalipers() {
-        for (Caliper c : calipers) {
-            c.setSelected(false);
-        }
-        invalidate();
-    }
-
     public int calipersCount() {
         return calipers.size();
-    }
-
-
-    public void addCaliper(Caliper c) {
-        calipers.add(c);
-    }
-
-    public void removeCaliper(Caliper c) {
-        calipers.remove(c);
     }
 
     // Single tap initially highlights (selects) caliper,
@@ -544,16 +495,5 @@ public class CalipersView extends View {
             }
         }
         return noTimeCalipers;
-    }
-
-
-    public void adjustPositions(float scale, RectF rect) {
-        for (Caliper c : calipers) {
-            c.setBar1Position(rect.left + 250 * scale);
-            c.setBar2Position(rect.right - 250 * scale);
-            EPSLog.log("rect scale = " + scale);
-            EPSLog.log("rect.left = " + rect.left);
-            EPSLog.log("bar1Position = " + c.getBar1Position());
-        }
     }
 }

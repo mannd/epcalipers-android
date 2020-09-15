@@ -71,8 +71,6 @@ public class Caliper {
         Bottom
     }
 
-    private boolean sticky = false;
-
     private static int differential = 0;
     private static final float DELTA = 30.0f;
 

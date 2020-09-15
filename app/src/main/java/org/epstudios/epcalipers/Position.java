@@ -22,14 +22,14 @@ package org.epstudios.epcalipers;
  * along with epcalipers-android.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class Position {
-    public static final float translateToAbsolutePositionX(
+    public static float translateToAbsolutePositionX(
             float scaledPositionX,
             float offsetX,
             float scale) {
         return (scaledPositionX - offsetX) / scale;
     }
 
-    public static final float translateToScaledPositionX(
+    public static float translateToScaledPositionX(
             float absolutePositionX,
             float offsetX,
             float scale) {

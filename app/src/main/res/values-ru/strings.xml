@@ -158,7 +158,6 @@
     <string name="use_large_font_label">Использовать крупный текст шрифта?</string>
     <string name="use_large_font_off_summary">Используйте шрифт нормального размера</string>
     <string name="use_large_font_on_summary">Используйте большой шрифт</string>
-    <string name="calibration_without_units_message">Введите интервал без единиц</string>
     <string name="calibration_dialog_message">Введите измерение, включая единицы</string>
     <string name="don_t_show_this_dialog_again_message">Не показывать этот диалог снова.</string>
     <string name="calibrate_anyway_title">Калибровать в любом случае</string>

@@ -14,7 +14,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -30,16 +29,13 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
-import android.util.Pair;
 import android.view.ActionMode;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -51,7 +47,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.chrisbanes.photoview.OnMatrixChangedListener;
-import com.github.chrisbanes.photoview.OnScaleChangedListener;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -209,7 +204,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int currentPdfPageNumber;
     private boolean useLargeFont;
     private boolean imageIsLocked = false;
-    private boolean stickyCalipers = true;
 
     private float smallFontSize;
     private float largeFontSize;
@@ -1068,22 +1062,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         EPSLog.log("onResume");
     }
 
-    private Pair<Integer, Integer> getScreenDimensions () {
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int height = size.y;
-        int width = size.x;
-        return new Pair<>(width, height);
-    }
-
-    private float getStatusBarHeight() {
-        Rect rect = new Rect();
-        Window window = getWindow();
-        window.getDecorView().getWindowVisibleDisplayFrame(rect);
-        return rect.top;
-    }
-
     private void proceedToStoreBitmap() {
         Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
         // for efficiency, don't bother writing the bitmap to a file if it hasn't changed
@@ -1303,15 +1281,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             String path = getCacheDir() + getString(R.string.temp_bitmap_file_name);
             return BitmapFactory.decodeFile(path);
-    }
-
-    // return coordinate position ratio will be between 0 and 1.0
-    private float transformCoordinate(float coord, float maxDim) {
-        return coord / maxDim;
-    }
-
-    private float untransformCoordinate(float ratio, float maxDim) {
-        return ratio * maxDim;
     }
 
     @Override
@@ -2413,12 +2382,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 calipersView.activeCaliper().isAngleCaliper();
     }
 
-    private boolean noAngleCaliperSelected() {
-        return !thereAreCalipers() ||
-                calipersView.noCaliperIsSelected() ||
-                !calipersView.activeCaliper().isAngleCaliper();
-    }
-
     private void showNoCaliperSelectedAlert() {
         Alerts.simpleAlert(this, R.string.no_caliper_selected_alert_title, R.string.no_caliper_selected_alert_message);
     }
@@ -2431,17 +2394,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             selectCalibrationMenu();
             calipersView.selectCaliperIfNoneSelected();
         }
-    }
-
-    private String createCalibrationMessage(Boolean useCustomUnits, String customUnitsMessage) {
-        String calibrationIntervalMessage;
-        if (useCustomUnits) {
-            calibrationIntervalMessage = customUnitsMessage;
-        }
-        else {
-            calibrationIntervalMessage = getString(R.string.calibration_without_units_message);
-        }
-        return calibrationIntervalMessage;
     }
 
     private void setCalibration() {
@@ -2665,6 +2617,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // will be used when Brugadometer button/calculator is implemented
+    @SuppressWarnings("unused")
     private Caliper getLoneAngleCaliper() {
         Caliper c = null;
         int n = 0;
@@ -2769,13 +2722,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private class MatrixChangeListener implements OnMatrixChangedListener {
         @Override
         public void onMatrixChanged(RectF rect) {
-            matrixChangedAction();
-        }
-    }
-
-    private class ScaleChangeListener implements OnScaleChangedListener {
-        @Override
-        public void onScaleChange(float scaleFactor, float focusX, float focusY) {
             matrixChangedAction();
         }
     }

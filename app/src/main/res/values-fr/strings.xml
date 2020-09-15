@@ -183,7 +183,6 @@
     <string name="quick_start_ht">Commencement rapide</string>
     <string name="negative_caliper_message">Choisir un compas de valeur positive et étalonner encore.</string>
     <string name="negative_caliper_title">Compas à valeur négative</string>
-    <string name="calibration_without_units_message">Saisir l\'intervalle sans unités</string>
     <string name="calibration_dialog_message">Saisir la mesure avec des unités</string>
     <string name="calibrate_anyway_title">Étalonner quand même</string>
     <string name="calibration_error_title">Erreur d\'étalonnage</string>
