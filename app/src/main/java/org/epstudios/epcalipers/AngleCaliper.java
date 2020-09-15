@@ -73,9 +73,9 @@ public class AngleCaliper extends Caliper {
         bar2Angle = Math.PI * 0.25;
         // bar1Position and bar2Position are equal and are the x coordinates of the vertex of the angle.
         // crossBarPosition is the y coordinate.
-        setBar1Position(100.0f);
-        setBar2Position(100.0f);
-        setCrossBarPosition(100.0f);
+//        setBar1Position(100.0f);
+//        setBar2Position(100.0f);
+//        setCrossBarPosition(100.0f);
         setVerticalCalibration(null);
         degreeDecimalFormat = new DecimalFormat("#.#");
 

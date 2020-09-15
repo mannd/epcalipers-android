@@ -71,6 +71,8 @@ public class Caliper {
         Bottom
     }
 
+    private boolean sticky = false;
+
     private static int differential = 0;
     private static final float DELTA = 30.0f;
 
@@ -104,29 +106,65 @@ public class Caliper {
     private boolean chosen;  // Caliper is chosen for tweaking
 
     public float getBar1Position() {
-        return Position.translateToScaledPositionX(bar1Position,
-                calibration.getDisplayRect().left, calibration.getCurrentZoom());
+        return Position.translateToScaledPositionX(
+                bar1Position,
+                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().left : calibration.getDisplayRect().top,
+                calibration.getCurrentZoom());
     }
     public void setBar1Position(float bar1Position) {
-        this.bar1Position = Position.translateToAbsolutePositionX(bar1Position,
-                calibration.getDisplayRect().left, calibration.getCurrentZoom());
+        this.bar1Position = Position.translateToAbsolutePositionX(
+                bar1Position,
+                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().left : calibration.getDisplayRect().top,
+                calibration.getCurrentZoom());
     }
     public float getBar2Position() {
-        return Position.translateToScaledPositionX(bar2Position,
-                calibration.getDisplayRect().left, calibration.getCurrentZoom());
+        return Position.translateToScaledPositionX(
+                bar2Position,
+                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().left : calibration.getDisplayRect().top,
+                calibration.getCurrentZoom());
     }
     public void setBar2Position(float bar2Position) {
-        this.bar2Position = Position.translateToAbsolutePositionX(bar2Position,
-                calibration.getDisplayRect().left, calibration.getCurrentZoom());
+        this.bar2Position = Position.translateToAbsolutePositionX(
+                bar2Position,
+                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().left : calibration.getDisplayRect().top,
+                calibration.getCurrentZoom());
     }
     public float getCrossBarPosition() {
-        return Position.translateToScaledPositionX(crossBarPosition,
-                calibration.getDisplayRect().top, calibration.getCurrentZoom());
+        return Position.translateToScaledPositionX(
+                crossBarPosition,
+                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().top : calibration.getDisplayRect().left,
+                calibration.getCurrentZoom());
     }
 
     public void setCrossBarPosition(float crossBarPosition) {
-        this.crossBarPosition = Position.translateToAbsolutePositionX(crossBarPosition,
-                calibration.getDisplayRect().top, calibration.getCurrentZoom());
+        this.crossBarPosition = Position.translateToAbsolutePositionX(
+                crossBarPosition,
+                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().top : calibration.getDisplayRect().left,
+                calibration.getCurrentZoom());
+    }
+
+    public float getAbsoluteBar1Position() {
+        return bar1Position;
+    }
+
+    public float getAbsoluteBar2Position() {
+        return bar2Position;
+    }
+
+    public float getAbsoluteCrossBarPosition() {
+        return crossBarPosition;
+    }
+
+    public void setAbsoluteBar1Position(float bar1Position) {
+        this.bar1Position = bar1Position;
+    }
+
+    public void setAbsoluteBar2Position(float bar2Position) {
+        this.bar2Position = bar2Position;
+    }
+
+    public void setAbsoluteCrossBarPosition(float crossBarPosition) {
+        this.crossBarPosition = crossBarPosition;
     }
 
     public Direction getDirection() {

@@ -266,6 +266,8 @@
     <string name="calibration_warning_message">Units are not compatible with making measurements like heart rate or QTc.  Use units like msec or sec.</string>
     <string name="calibration_error_message">Not a valid calibration interval.</string>
     <string name="don_t_show_this_dialog_again_message">Don\'t show this dialog again.</string>
+    <string name="hcal_display_rect_key">hcal_display_rect_key</string>
+    <string name="vcal_display_rect_key">vcal_display_rect_key</string>
 
 
 </resources>
