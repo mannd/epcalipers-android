@@ -268,6 +268,10 @@
     <string name="don_t_show_this_dialog_again_message">Don\'t show this dialog again.</string>
     <string name="hcal_display_rect_key">hcal_display_rect_key</string>
     <string name="vcal_display_rect_key">vcal_display_rect_key</string>
+    <string name="offset_left_key">offsetLeft</string>
+    <string name="offset_top_key">offsetTop</string>
+    <string name="offset_right_key">offsetRight</string>
+    <string name="offset_bottom_key">offsetBottom</string>
 
 
 </resources>

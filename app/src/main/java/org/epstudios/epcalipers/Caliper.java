@@ -108,38 +108,38 @@ public class Caliper {
     public float getBar1Position() {
         return Position.translateToScaledPositionX(
                 bar1Position,
-                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().left : calibration.getDisplayRect().top,
+                direction == Direction.HORIZONTAL ? calibration.getOffset().x : calibration.getOffset().y,
                 calibration.getCurrentZoom());
     }
     public void setBar1Position(float bar1Position) {
         this.bar1Position = Position.translateToAbsolutePositionX(
                 bar1Position,
-                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().left : calibration.getDisplayRect().top,
+                direction == Direction.HORIZONTAL ? calibration.getOffset().x : calibration.getOffset().y,
                 calibration.getCurrentZoom());
     }
     public float getBar2Position() {
         return Position.translateToScaledPositionX(
                 bar2Position,
-                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().left : calibration.getDisplayRect().top,
+                direction == Direction.HORIZONTAL ? calibration.getOffset().x : calibration.getOffset().y,
                 calibration.getCurrentZoom());
     }
     public void setBar2Position(float bar2Position) {
         this.bar2Position = Position.translateToAbsolutePositionX(
                 bar2Position,
-                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().left : calibration.getDisplayRect().top,
+                direction == Direction.HORIZONTAL ? calibration.getOffset().x : calibration.getOffset().y,
                 calibration.getCurrentZoom());
     }
     public float getCrossBarPosition() {
         return Position.translateToScaledPositionX(
                 crossBarPosition,
-                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().top : calibration.getDisplayRect().left,
+                direction == Direction.HORIZONTAL ? calibration.getOffset().y : calibration.getOffset().x,
                 calibration.getCurrentZoom());
     }
 
     public void setCrossBarPosition(float crossBarPosition) {
         this.crossBarPosition = Position.translateToAbsolutePositionX(
                 crossBarPosition,
-                direction == Direction.HORIZONTAL ? calibration.getDisplayRect().top : calibration.getDisplayRect().left,
+                direction == Direction.HORIZONTAL ? calibration.getOffset().y : calibration.getOffset().x,
                 calibration.getCurrentZoom());
     }
 
