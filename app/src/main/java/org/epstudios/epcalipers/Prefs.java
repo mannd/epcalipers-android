@@ -49,7 +49,7 @@ public class Prefs extends AppCompatActivity {
 
 
         // Display the fragment as the main content.
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame,
                         new MyPreferenceFragment()).commit();
 

@@ -51,7 +51,6 @@
     <string name="no_time_caliper_selected_title">Compas de temps pas choisi</string>
     <string name="no_time_caliper_selected_message">Choisir un compas pour mesurer un (ou plus) intervalle RR.</string>
     <string name="no_calipers_alert_title">Pas de compas à utiliser</string>
-    <string name="no_calipers_alert_message">Ajouter un ou plus de compas avant de continuer</string>
     <string name="no_caliper_selected_alert_title">Compas pas choisi</string>
     <string name="no_caliper_selected_alert_message">Choisir un compas en le tapant une seule fois.  Le déplacer à un intervalle connu.  Toucher « définir » pour saisir l\'intervalle de l\'étalonnage</string>
     <string name="example_amplitude_measurement">10 mm ou 1 mV</string>
@@ -184,14 +183,7 @@
     <string name="quick_start_ht">Commencement rapide</string>
     <string name="negative_caliper_message">Choisir un compas de valeur positive et étalonner encore.</string>
     <string name="negative_caliper_title">Compas à valeur négative</string>
-    <string name="msec_units">msec</string>
-    <string name="sec_units">sec</string>
-    <string name="mv_units">mV</string>
-    <string name="mm_units">mm</string>
-    <string name="choose_units_message">Choisir les unités de mesure</string>
-    <string name="calibration_without_units_message">Saisir l\'intervalle sans unités</string>
     <string name="calibration_dialog_message">Saisir la mesure avec des unités</string>
-    <string name="calibration_dialog_with_units_message">Saisir la mesure avec des unités (p.e. %s)</string>
     <string name="calibrate_anyway_title">Étalonner quand même</string>
     <string name="calibration_error_title">Erreur d\'étalonnage</string>
     <string name="calibration_warning_title">Avertissement d\'étalonnage</string>

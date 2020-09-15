@@ -50,7 +50,7 @@ public class HelpTopics extends AppCompatActivity {
 
         final String[] helpTopics = getResources().getStringArray(R.array.help_topics);
         final String[] helpAnchors = getResources().getStringArray(R.array.help_anchors);
-        RecyclerView.Adapter adapter = new HelpTopicAdapter(helpTopics);
+        RecyclerView.Adapter<HelpTopicAdapter.TopicViewHolder> adapter = new HelpTopicAdapter(helpTopics);
         recyclerView.setAdapter(adapter);
 
         recyclerView.addOnItemTouchListener(new HelpRecyclerTouchListener(getApplicationContext(),
