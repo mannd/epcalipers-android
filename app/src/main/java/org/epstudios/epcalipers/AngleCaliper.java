@@ -73,9 +73,6 @@ public class AngleCaliper extends Caliper {
         bar2Angle = Math.PI * 0.25;
         // bar1Position and bar2Position are equal and are the x coordinates of the vertex of the angle.
         // crossBarPosition is the y coordinate.
-//        setBar1Position(100.0f);
-//        setBar2Position(100.0f);
-//        setCrossBarPosition(100.0f);
         setVerticalCalibration(null);
         degreeDecimalFormat = new DecimalFormat("#.#");
 
@@ -100,16 +97,7 @@ public class AngleCaliper extends Caliper {
 
     @Override
     public void draw(Canvas canvas) {
-        //        CGFloat length = MAX(rect.size.height, rect.size.height) * 2;
         float length = Math.max(canvas.getHeight(), canvas.getHeight() * 2);
-
-        float delta = 20.0f;
-        setCrossBarPosition(Math.min(getCrossBarPosition(), canvas.getHeight() - delta));
-        setCrossBarPosition(Math.max(getCrossBarPosition(), delta));
-        setBar1Position(Math.min(getBar1Position(), canvas.getWidth() - delta));
-        setBar1Position(Math.max(getBar1Position(), delta));
-        setBar2Position(getBar1Position());
-
         endPointBar1 = endPointForPosition(new PointF(getBar1Position(), getCrossBarPosition()),
                 bar1Angle, length);
         canvas.drawLine(getBar1Position(), getCrossBarPosition(), endPointBar1.x, endPointBar1.y,
