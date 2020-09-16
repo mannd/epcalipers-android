@@ -12,8 +12,8 @@ android {
         // Warning, if you change targetSdkVersion to 30, app will break without changes.
         // See TODO in MainActivity regarding scoped storage in Android 10 and 11.
         targetSdkVersion 29
-        versionCode 35
-        versionName "3.3"
+        versionCode 36
+        versionName "3.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
