@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--suppress DeprecatedClassUsageInspection -->
 <!-- using androidx.preference.PreferenceScreen crashes app when in landscape mode.  Don't use -->
-<PreferenceScreen
+<androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
-
 
     <CheckBoxPreference
         android:defaultValue="true"
@@ -31,13 +30,13 @@
         android:maxLines="1"
         android:singleLine="true" />
 
-    <com.kizitonwose.colorpreference.ColorPreference
+    <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
         android:defaultValue="@color/default_caliper_color"
         android:key="@string/new_caliper_color_key"
         app:colorChoices="@array/color_choices"
         android:title="@string/default_caliper_color_label" />
 
-    <com.kizitonwose.colorpreference.ColorPreference
+    <com.kizitonwose.colorpreferencecompat.ColorPreferenceCompat
         android:defaultValue="@color/default_highlight_color"
         android:key="@string/new_highlight_color_key"
         app:colorChoices="@array/color_choices"
@@ -97,7 +96,7 @@
         android:key="@string/show_validation_dialog_key"
         android:title="Show warning dialogs" />
 
-</PreferenceScreen>
+</androidx.preference.PreferenceScreen>
 
 
 

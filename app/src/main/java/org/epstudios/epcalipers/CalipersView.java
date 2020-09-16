@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2015 EP Studios, Inc.
+ * www.epstudiossoftware.com
+ * <p/>
+ * Created by mannd on 4/17/15.
+ * <p/>
+ * This file is part of EP Calipers.
+ * <p/>
+ * EP Calipers is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p/>
+ * EP Calipers is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU General Public License
+ * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.epstudios.epcalipers;
 
 import android.content.Context;
@@ -20,27 +41,6 @@ import java.util.ArrayList;
 
 import androidx.core.view.GestureDetectorCompat;
 
-/**
- * Copyright (C) 2015 EP Studios, Inc.
- * www.epstudiossoftware.com
- * <p/>
- * Created by mannd on 4/17/15.
- * <p/>
- * This file is part of EP Calipers.
- * <p/>
- * EP Calipers is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p/>
- * EP Calipers is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p/>
- * You should have received a copy of the GNU General Public License
- * along with EP Calipers.  If not, see <http://www.gnu.org/licenses/>.
- */
 public class CalipersView extends View {
 
     private GestureDetectorCompat gestureDetector;
@@ -54,9 +54,6 @@ public class CalipersView extends View {
 
     public ArrayList<Caliper> getCalipers() {
         return calipers;
-    }
-    public void setCalipers(ArrayList<Caliper> calipers) {
-        this.calipers = calipers;
     }
 
     public void setLockImage(boolean lockImage) {
@@ -95,10 +92,6 @@ public class CalipersView extends View {
 
     public void setTweakingOrColoring(boolean tweakingOrColoring) {
         this.tweakingOrColoring = tweakingOrColoring;
-    }
-
-    public boolean isTweakingOrColoring() {
-        return tweakingOrColoring;
     }
 
     private boolean tweakingOrColoring = false;
@@ -264,18 +257,6 @@ public class CalipersView extends View {
         invalidate();
     }
 
-    public void setPaint(int caliperColor, int highlightColor, int lineWidth) {
-        if (calipersCount() <= 0) {
-            return;
-        }
-        for (Caliper c : calipers) {
-            c.setUnselectedColor(caliperColor);
-            c.setSelectedColor(highlightColor);
-            c.setLineWidth(lineWidth);
-        }
-    }
-
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -412,24 +393,8 @@ public class CalipersView extends View {
         }
     }
 
-    public void unselectAllCalipers() {
-        for (Caliper c : calipers) {
-            c.setSelected(false);
-        }
-        invalidate();
-    }
-
     public int calipersCount() {
         return calipers.size();
-    }
-
-
-    public void addCaliper(Caliper c) {
-        calipers.add(c);
-    }
-
-    public void removeCaliper(Caliper c) {
-        calipers.remove(c);
     }
 
     // Single tap initially highlights (selects) caliper,
@@ -531,5 +496,4 @@ public class CalipersView extends View {
         }
         return noTimeCalipers;
     }
-
 }

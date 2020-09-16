@@ -5,14 +5,16 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.util.SparseArray;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-public class MyPreferenceFragment extends PreferenceFragment implements
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+
+public class MyPreferenceFragment extends PreferenceFragmentCompat implements
         OnSharedPreferenceChangeListener {
     private final int DEFAULT_LINE_WIDTH = 2;
 
@@ -81,7 +83,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         lineWidthNames = createLineWidthMap();
         formulaNames = createFormulaNamesMap();
         textPositionNames = createTextPositionNamesMap();
-        defaultTimeCalibrationKey = activity.getString(R.string.time_calibration_key);
+        defaultTimeCalibrationKey = Objects.requireNonNull(activity).getString(R.string.time_calibration_key);
         defaultAmplitudeCalibrationKey = activity.getString(R.string.amplitude_calibration_key);
         defaultLineWidthKey = activity.getString(R.string.line_width_key);
         defaultQtcFormulaKey = activity.getString(R.string.qtc_formula_key);
@@ -94,15 +96,15 @@ public class MyPreferenceFragment extends PreferenceFragment implements
         defaultTimeCaliperTextPosition = activity.getString(R.string.time_caliper_text_position_value);
         defaultAmplitudeCaliperTextPosition = activity.getString(R.string.amplitude_caliper_text_position_value);
 
-        addPreferencesFromResource(R.xml.settings);
+
 
         Preference defaultTimeCalibrationPreference = findPreference(defaultTimeCalibrationKey);
-        defaultTimeCalibrationPreference.setSummary(getPreferenceScreen()
+        Objects.requireNonNull(defaultTimeCalibrationPreference).setSummary(getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultTimeCalibrationKey, defaultTimeCalibrationName));
 
         Preference defaultAmplitudeCalibrationPreference = findPreference(defaultAmplitudeCalibrationKey);
-        defaultAmplitudeCalibrationPreference.setSummary(getPreferenceScreen()
+        Objects.requireNonNull(defaultAmplitudeCalibrationPreference).setSummary(getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultAmplitudeCalibrationKey, defaultAmplitudeCalibrationName));
 
@@ -120,57 +122,63 @@ public class MyPreferenceFragment extends PreferenceFragment implements
             // just leave lineWidth as DEFAULT_LINE_WIDTH
         }
         String defaultLineWidthName = lineWidthNames.get(lineWidth);
-        defaultLineWidthPreference.setSummary(defaultLineWidthName);
+        Objects.requireNonNull(defaultLineWidthPreference).setSummary(defaultLineWidthName);
 
         Preference defaultQtcFormulaPreference = findPreference(defaultQtcFormulaKey);
         String defaultQtcFormulaValue = getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultQtcFormulaKey, defaultQtcFormula);
         String defaultQtcFormulaName = formulaNames.get(defaultQtcFormulaValue);
-        defaultQtcFormulaPreference.setSummary(defaultQtcFormulaName);
+        Objects.requireNonNull(defaultQtcFormulaPreference).setSummary(defaultQtcFormulaName);
 
         Preference defaultTimeCaliperTextPositionPreference = findPreference(defaultTimeCaliperTextPositionKey);
         String defaultTimeCaliperTextPositionValue = getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultTimeCaliperTextPositionKey, defaultTimeCaliperTextPosition);
         String defaultTimeCaliperTextPositionName = textPositionNames.get(defaultTimeCaliperTextPositionValue);
-        defaultTimeCaliperTextPositionPreference.setSummary(defaultTimeCaliperTextPositionName);
+        Objects.requireNonNull(defaultTimeCaliperTextPositionPreference).setSummary(defaultTimeCaliperTextPositionName);
 
         Preference defaultAmplitudeCaliperTextPositionPreference = findPreference(defaultAmplitudeCaliperTextPositionKey);
         String defaultAmplitudeCaliperTextPositionValue = getPreferenceScreen()
                 .getSharedPreferences()
                 .getString(defaultAmplitudeCaliperTextPositionKey, defaultAmplitudeCaliperTextPosition);
         String defaultAmplitudeCaliperTextPositionName = textPositionNames.get(defaultAmplitudeCaliperTextPositionValue);
-        defaultAmplitudeCaliperTextPositionPreference.setSummary(defaultAmplitudeCaliperTextPositionName);
+        Objects.requireNonNull(defaultAmplitudeCaliperTextPositionPreference).setSummary(defaultAmplitudeCaliperTextPositionName);
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.settings, rootKey);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                           String key) {
+        EPSLog.log("onSharedPreferenceChanged in MyPreferenceFragment");
         Preference pref = findPreference(key);
         if (key.equals(defaultTimeCalibrationKey)) {
-            pref.setSummary(sharedPreferences.getString(key, defaultTimeCalibrationName));
+            Objects.requireNonNull(pref).setSummary(sharedPreferences.getString(key, defaultTimeCalibrationName));
         }
         else if (key.equals(defaultAmplitudeCalibrationKey)) {
-            pref.setSummary(sharedPreferences.getString(key, defaultAmplitudeCalibrationName));
+            Objects.requireNonNull(pref).setSummary(sharedPreferences.getString(key, defaultAmplitudeCalibrationName));
         }
         else if (key.equals(defaultLineWidthKey)) {
-            pref.setSummary(getNameFromKey(sharedPreferences, key, defaultLineWidthName));
+            Objects.requireNonNull(pref).setSummary(getNameFromKey(sharedPreferences, key, defaultLineWidthName));
         }
         else if (key.equals(defaultQtcFormulaKey)) {
             String formulaName = sharedPreferences.getString(key, defaultQtcFormula);
             formulaName = formulaNames.get(formulaName);
-            pref.setSummary(formulaName);
+            Objects.requireNonNull(pref).setSummary(formulaName);
         }
         else if (key.equals(defaultTimeCaliperTextPositionKey)) {
             String textPositionName = sharedPreferences.getString(key, defaultTimeCaliperTextPosition);
             textPositionName = textPositionNames.get(textPositionName);
-            pref.setSummary(textPositionName);
+            Objects.requireNonNull(pref).setSummary(textPositionName);
         }
         else if (key.equals(defaultAmplitudeCaliperTextPositionKey)) {
             String textPositionName = sharedPreferences.getString(key, defaultAmplitudeCaliperTextPosition);
             textPositionName = textPositionNames.get(textPositionName);
-            pref.setSummary(textPositionName);
+            Objects.requireNonNull(pref).setSummary(textPositionName);
         }
     }
 
