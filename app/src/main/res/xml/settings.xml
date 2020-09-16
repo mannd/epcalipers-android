@@ -5,7 +5,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
 
-
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="@string/show_start_image_key"

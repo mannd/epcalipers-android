@@ -154,6 +154,7 @@ public class MyPreferenceFragment extends PreferenceFragmentCompat implements
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
                                           String key) {
+        EPSLog.log("onSharedPreferenceChanged in MyPreferenceFragment");
         Preference pref = findPreference(key);
         if (key.equals(defaultTimeCalibrationKey)) {
             Objects.requireNonNull(pref).setSummary(sharedPreferences.getString(key, defaultTimeCalibrationName));

@@ -19,7 +19,7 @@
     <!--        requestLegacyExternalStorage necessary for Android 10 with target SDK = 29, will be ignored if target SDK = 30.-->
     <application
         android:requestLegacyExternalStorage="true"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"

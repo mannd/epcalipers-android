@@ -439,8 +439,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         numberOfPdfPages = 0;
         currentPdfPageNumber = 0;
         useLargeFont = false;
-        currentCaliperColor = R.color.default_caliper_color;
-        currentHighlightColor = R.color.default_highlight_color;
+        currentCaliperColor = ContextCompat.getColor(this, R.color.default_caliper_color);
+        currentHighlightColor = ContextCompat.getColor(this, R.color.default_highlight_color);
         currentLineWidth = DEFAULT_LINE_WIDTH;
 
         // QTc formulas
@@ -471,9 +471,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         float max_zoom = 10.0f;
         imageView.setMaximumScale(max_zoom);
         imageView.setMinimumScale(0.3f);
-        Log.d(TAG, "original display rect = " + imageView.getDisplayRect());
         imageView.setOnMatrixChangeListener(new MatrixChangeListener());
-//        imageView.setOnScaleChangeListener(new ScaleChangeListener());
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -539,6 +537,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 // show start image only has effect with restart
+                EPSLog.log("onSharedPreferenceChangeListener");
                 Objects.requireNonNull(sharedPreferences, "Shared preferences must not be null!");
                 if (key.equals(getString(R.string.show_start_image_key))) {
                     return;
@@ -566,12 +565,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 if (key.equals(getString(R.string.new_caliper_color_key))) {
                     currentCaliperColor = sharedPreferences.getInt(key,
-                            R.color.default_caliper_color);
+                            ContextCompat.getColor(getApplicationContext(), R.color.default_caliper_color));
                     return;
                 }
                 if (key.equals(getString(R.string.new_highlight_color_key))) {
                     currentHighlightColor = sharedPreferences.getInt(key,
-                            R.color.default_highlight_color);
+                            ContextCompat.getColor(getApplicationContext(), R.color.default_highlight_color));
                     for (Caliper c : calipersView.getCalipers()) {
                         c.setSelectedColor(currentHighlightColor);
                         if (c.isSelected()) {
@@ -1037,10 +1036,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String amplitudeCaliperTextPositionName = sharedPreferences.getString(getString(R.string.amplitude_caliper_text_position_key),
                 getString(R.string.amplitude_caliper_text_position_value));
         amplitudeCaliperTextPositionPreference = textPositionMap.get(amplitudeCaliperTextPositionName);
+        // Must use ContextCompat.getColor for default, otherwise colors are wrong.
         currentCaliperColor = sharedPreferences.getInt(getString(R.string.new_caliper_color_key),
-                R.color.default_caliper_color);
+                ContextCompat.getColor(this, R.color.default_caliper_color));
         currentHighlightColor = sharedPreferences.getInt(getString(R.string.new_highlight_color_key),
-                R.color.default_highlight_color);
+                ContextCompat.getColor(this, R.color.default_highlight_color));
         showValidationDialog = sharedPreferences.getBoolean(getString(R.string.show_validation_dialog_key),
                 true);
         try {
@@ -2638,6 +2638,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void addCaliperWithDirection(Caliper.Direction direction) {
+        EPSLog.log("addCaliperWithDirection");
         addCaliperWithDirectionAtRect(direction, new Rect(0, 0, calipersView.getWidth(),
                 calipersView.getHeight()));
         calipersView.invalidate();
@@ -2651,6 +2652,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void addCaliperWithDirectionAtRect(Caliper.Direction direction,
                                                Rect rect) {
+        EPSLog.log("currentCaliperColor = " + currentCaliperColor);
         Caliper c = new Caliper();
         c.setUnselectedColor(currentCaliperColor);
         c.setSelectedColor(currentHighlightColor);
