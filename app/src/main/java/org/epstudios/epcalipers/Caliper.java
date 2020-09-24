@@ -356,11 +356,15 @@ public class Caliper {
 
     public void draw(Canvas canvas) {
         if (direction == Direction.HORIZONTAL) {
+            setCrossBarPosition(Math.min(getCrossBarPosition(), canvas.getHeight() - DELTA));
+            setCrossBarPosition(Math.max(getCrossBarPosition(), DELTA));
             canvas.drawLine(getBar1Position(), 0, getBar1Position(), canvas.getHeight(), paint);
             canvas.drawLine(getBar2Position(), 0, getBar2Position(), canvas.getHeight(), paint);
             canvas.drawLine(getBar2Position(), getCrossBarPosition(), getBar1Position(), getCrossBarPosition(), paint);
         }
         else {  // draw vertical caliper
+            setCrossBarPosition(Math.min(getCrossBarPosition(), canvas.getWidth() - DELTA));
+            setCrossBarPosition(Math.max(getCrossBarPosition(), DELTA));
             canvas.drawLine(0, getBar1Position(), canvas.getWidth(), getBar1Position(), paint);
             canvas.drawLine(0, getBar2Position(), canvas.getWidth(), getBar2Position(), paint);
             canvas.drawLine(getCrossBarPosition(), getBar2Position(), getCrossBarPosition(), getBar1Position(), paint);
