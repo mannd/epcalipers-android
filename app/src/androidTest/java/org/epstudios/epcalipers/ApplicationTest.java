@@ -5,7 +5,9 @@ import android.graphics.Rect;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ApplicationTest {
 
@@ -58,7 +60,10 @@ public class ApplicationTest {
 
     @org.junit.Test
     public void testInitialCaliperPosition() {
+        Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        cal.setOffset(new PointF(0, 0));
         Caliper c = new Caliper();
+        c.setCalibration(cal);
         c.setInitialPosition(new Rect(0, 0, 600, 600));
         assertEquals(c.getBar1Position(), 200.0, 0.001);
         assertEquals(c.getBar2Position(), 400.0, 0.001);
@@ -70,9 +75,14 @@ public class ApplicationTest {
         assertEquals(c.getCrossBarPosition(), 315.0f, 0.001);
     }
 
+
+
     @org.junit.Test
     public void testBarCoord() {
+        Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        cal.setOffset(new PointF(0, 0));
         Caliper c = new Caliper();
+        c.setCalibration(cal);
         assertEquals(c.getBar1Position(), 0, 0.001);
         assertEquals(c.getBar2Position(), 0, 0.001);
         assertEquals(c.getCrossBarPosition(), 100.0, 0.001);
@@ -214,7 +224,10 @@ public class ApplicationTest {
 
     @org.junit.Test
     public void testMiscCaliperTests() {
+        Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        cal.setOffset(new PointF(0, 0));
         Caliper c = new Caliper();
+        c.setCalibration(cal);
         c.setBar1Position(100);
         c.setBar2Position(50);
         c.setCrossBarPosition(120);
@@ -231,7 +244,6 @@ public class ApplicationTest {
         assertFalse(c.pointNearCaliper(farPoint));
         PointF closePoint2 = new PointF(110, 75);
         assertTrue(c.pointNearCaliper(closePoint2));
-        Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
         c.setCalibration(cal);
         assertEquals(c.intervalInSecs(200), 0.2, 0.001);
         assertEquals(c.intervalInMsec(0.100), 100, 0.001);
