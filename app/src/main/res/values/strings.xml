@@ -1,6 +1,6 @@
 <resources>
     <string name="about_label">EP Calipers</string>
-    <string name="about_text">Copyright \u00a9 2015–2020 EP Studios, Inc.  All rights reserved.\n</string>
+    <string name="about_text">Copyright \u00a9 2015–2021 EP Studios, Inc.  All rights reserved.\n</string>
     <string name="all_formulas">All</string>
     <string name="angle_caliper_button_title">Angle</string>
     <string name="angle_caliper_calibration_message">Angle calipers don\'t require calibration. Only time or amplitude calipers need to be calibrated. \n\nIf you want to use an angle caliper as a Brugadometer, you must first calibrate time and amplitude calipers.</string>
