@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="about_label">EP Calipers</string>
     <string name="about_text">Copyright \u00a9 2015–2021 EP Studios, Inc.  All rights reserved.\n</string>
     <string name="all_formulas">All</string>
@@ -217,7 +217,7 @@
     <string name="vcal_is_calibrated_key" translatable="false">vcalCalibrated</string>
     <string name="vcal_original_cal_factor_key" translatable="false">vcalOriginalCalFactor</string>
     <string name="caliper_direction_key" translatable="false">CaliperDirection</string>
-    <string name="caliper_bar1_position_key" translatable="false">CaliperBar1Position</string>
+    <string name="caliper_bar1_position_key" translatable="false" tools:ignore="Typos">CaliperBar1Position</string>
     <string name="caliper_bar2_position_key" translatable="false">CaliperBar2Position</string>
     <string name="caliper_crossbar_position_key" translatable="false">CaliperCrossbarPosition</string>
     <string name="caliper_selected_key" translatable="false">CaliperSelected</string>
@@ -225,7 +225,7 @@
     <string name="unselected_color_restore_key" translatable="false">UnselectedColor</string>
     <string name="marching_caliper_restore_key" translatable="false">MarchingCaliper</string>
     <string name="calipers_count_key" translatable="false">CalipersCount</string>
-    <string name="angle_b1_key" translatable="false">angleB1</string>
+    <string name="angle_b1_key" translatable="false" tools:ignore="Typos">angleB1</string>
     <string name="angle_b2_key" translatable="false">angleB2</string>
 
     <!--Other non-translatable keys, strings-->

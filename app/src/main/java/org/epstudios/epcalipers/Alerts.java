@@ -2,7 +2,6 @@ package org.epstudios.epcalipers;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 
 /**
  * Copyright (C) 2020 EP Studios, Inc.
@@ -30,12 +29,7 @@ public class Alerts {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setMessage(message);
-        builder.setNegativeButton(R.string.ok_title, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton(R.string.ok_title, (dialog, which) -> dialog.cancel());
         builder.show();
     }
 

@@ -65,9 +65,7 @@ public class Help extends AppCompatActivity {
             }
         }
         // Variables inside closure must be final.
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                webView.loadUrl(finalUrl);} }, 400);
+        handler.postDelayed(() -> webView.loadUrl(finalUrl), 400);
 
         Toolbar actionBar = findViewById(R.id.action_bar);
         setSupportActionBar(actionBar);

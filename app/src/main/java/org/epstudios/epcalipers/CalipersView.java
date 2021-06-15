@@ -22,7 +22,6 @@
 package org.epstudios.epcalipers;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -34,7 +33,6 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import java.lang.ref.WeakReference;
@@ -63,7 +61,7 @@ public class CalipersView extends View {
     private boolean lockImage;
 
     public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = new WeakReference<MainActivity>(mainActivity);
+        this.mainActivity = new WeakReference<>(mainActivity);
     }
     private WeakReference<MainActivity> mainActivity;
 
@@ -119,11 +117,9 @@ public class CalipersView extends View {
         MyGestureListener listener = new MyGestureListener();
         gestureDetector = new GestureDetectorCompat(context, listener);
         gestureDetector.setIsLongpressEnabled(true);
-        View.OnTouchListener gestureListener = new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                v.performClick();
-                return gestureDetector.onTouchEvent(event);
-            }
+        View.OnTouchListener gestureListener = (v, event) -> {
+            v.performClick();
+            return gestureDetector.onTouchEvent(event);
         };
 
         setOnTouchListener(gestureListener);
@@ -212,20 +208,14 @@ public class CalipersView extends View {
                         .initialColor(pressedCaliper.getUnselectedColor())
                         .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
                         .density(12)
-                        .setPositiveButton(getContext().getString(R.string.ok_title), new ColorPickerClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int chosenColor, Integer[] allColors) {
-                                if (!pressedCaliper.isSelected()) {
-                                    pressedCaliper.setColor(chosenColor);
-                                }
-                                pressedCaliper.setUnselectedColor(chosenColor);
-                                invalidate();
+                        .setPositiveButton(getContext().getString(R.string.ok_title), (dialog, chosenColor, allColors) -> {
+                            if (!pressedCaliper.isSelected()) {
+                                pressedCaliper.setColor(chosenColor);
                             }
+                            pressedCaliper.setUnselectedColor(chosenColor);
+                            invalidate();
                         })
-                        .setNegativeButton(getContext().getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
+                        .setNegativeButton(getContext().getString(R.string.cancel_title), (dialog, which) -> {
                         })
                         .build()
                         .show();

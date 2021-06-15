@@ -103,8 +103,9 @@ public class Calibration {
     public void reset() {
         units = context.getString(R.string.points);
         displayRate = false;
-        originalZoom = 1.0f;
-        currentZoom = 1.0f;
+        // We no longer change zoom when resetting calibration, now that calipers remain fixed in place.
+//        originalZoom = 1.0f;
+//        currentZoom = 1.0f;
         calibrated = false;
         calibrationString = "";
     }
