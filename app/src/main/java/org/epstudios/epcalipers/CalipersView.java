@@ -37,6 +37,7 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import androidx.core.view.GestureDetectorCompat;
@@ -62,9 +63,9 @@ public class CalipersView extends View {
     private boolean lockImage;
 
     public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+        this.mainActivity = new WeakReference<MainActivity>(mainActivity);
     }
-    private MainActivity mainActivity;
+    private WeakReference<MainActivity> mainActivity;
 
     public Caliper.Component getPressedComponent() {
         return pressedComponent;
@@ -175,8 +176,10 @@ public class CalipersView extends View {
         @Override
         public void onLongPress(MotionEvent e) {
             PointF point = new PointF(e.getX(), e.getY());
-            if (mainActivity.getCurrentActionMode() == null && !tweakingOrColoring && caliperPressed(point) != null) {
-                startActionMode(mainActivity.calipersActionCallback);
+            if (mainActivity != null) {
+                if (mainActivity.get().getCurrentActionMode() == null && !tweakingOrColoring && caliperPressed(point) != null) {
+                    startActionMode(mainActivity.get().calipersActionCallback);
+                }
             }
             if (allowColorChange) {
                 changeColor(point);
@@ -253,7 +256,9 @@ public class CalipersView extends View {
         pressedComponent = component;
         c.setChosen(true);
         c.setChosenComponent(component);
-        mainActivity.selectMicroMovementMenu(c, component);
+        if (mainActivity != null) {
+            mainActivity.get().selectMicroMovementMenu(c, component);
+        }
         invalidate();
     }
 

@@ -1067,6 +1067,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // for efficiency, don't bother writing the bitmap to a file if it hasn't changed
         if (imageBitmap != null && !imageBitmap.sameAs(previousBitmap)) {
             storeBitmapToTempFile(imageBitmap);
+            EPSLog.log("storingBitmap");
         }
     }
 
