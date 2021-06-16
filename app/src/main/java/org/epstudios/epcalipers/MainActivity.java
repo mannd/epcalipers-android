@@ -5,7 +5,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -38,7 +37,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -262,17 +260,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.menu_rotate:
-                    selectRotateImageMenu();
-                    mode.finish();
-                    return true;
-                case R.id.menu_pdf:
-                    selectPDFMenu();
-                    mode.finish();
-                    return true;
-                default:
-                    return false;
+            final int itemId = item.getItemId();
+            if (itemId == R.id.menu_rotate) {
+                selectRotateImageMenu();
+                mode.finish();
+                return true;
+            } else if (itemId == R.id.menu_pdf) {
+                selectPDFMenu();
+                mode.finish();
+                return true;
+            } else {
+                return false;
             }
         }
 
@@ -304,23 +302,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.menu_color:
-                    selectColorMenu();
-                    calipersView.setTweakingOrColoring(true);
-                    mode.finish();
-                    return true;
-                case R.id.menu_tweak:
-                    selectTweakMenu();
-                    calipersView.setTweakingOrColoring(true);
-                    mode.finish();
-                    return true;
-                case R.id.menu_march:
-                    toggleMarchingCalipers();
-                    mode.finish();
-                    return true;
-                default:
-                    return false;
+            final int itemId = item.getItemId();
+            if (itemId == R.id.menu_color) {
+                selectColorMenu();
+                calipersView.setTweakingOrColoring(true);
+                mode.finish();
+                return true;
+            } else if (itemId == R.id.menu_tweak) {
+                selectTweakMenu();
+                calipersView.setTweakingOrColoring(true);
+                mode.finish();
+                return true;
+            } else if (itemId == R.id.menu_march) {
+                toggleMarchingCalipers();
+                mode.finish();
+                return true;
+            } else {
+                return false;
             }
         }
 
@@ -393,43 +391,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lockImageMenuItem = menuNav.findItem(R.id.nav_lock_image);
         // Make navigation (hamburger) menu do things.
         navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-//                        menuItem.setChecked(true);
-                        int id = menuItem.getItemId();
-                        switch(id) {
-                            case R.id.nav_camera:
-                                takePhoto();
-                                // Reset to main menu with new image
-                                selectMainMenu();
-                                break;
-                            case R.id.nav_image:
-                                selectImageFromGallery();
-                                // Reset to main menu with new image
-                                selectMainMenu();
-                                break;
-                            case R.id.nav_lock_image:
-                                lockImage();
-                                break;
-                            case R.id.nav_sample_ecg:
-                                loadSampleEcg();
-                                // Reset to main menu with new image
-                                selectMainMenu();
-                                break;
-                            case R.id.nav_about:
-                                about();
-                                break;
-                            case R.id.nav_help:
-                                showHelp();
-                                break;
-                            case R.id.nav_preferences:
-                                changeSettings();
-                                break;
-                        }
-                        drawerLayout.closeDrawers();
-                        return true;
+                menuItem -> {
+                    int id = menuItem.getItemId();
+                    if (id == R.id.nav_camera) {
+                        takePhoto();
+                        // Reset to main menu with any new image
+                        selectMainMenu();
+                    } else if (id == R.id.nav_image) {
+                        selectImageFromGallery();
+                        selectMainMenu();
+                    } else if (id == R.id.nav_lock_image) {
+                        lockImage();
+                    } else if (id == R.id.nav_sample_ecg) {
+                        loadSampleEcg();
+                        selectMainMenu();
+                    } else if (id == R.id.nav_about) {
+                        about();
+                    } else if (id == R.id.nav_help) {
+                        showHelp();
+                    } else if (id == R.id.nav_preferences) {
+                        changeSettings();
                     }
+                    drawerLayout.closeDrawers();
+                    return true;
                 }
         );
 
@@ -472,15 +456,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageView.setMaximumScale(max_zoom);
         imageView.setMinimumScale(0.3f);
         imageView.setOnMatrixChangeListener(new MatrixChangeListener());
-        imageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (currentActionMode != null) { // || calipersView.isTweakingOrColoring()) {
-                    return false;
-                }
-                startActionMode(imageCallBack);
-                return true;
+        imageView.setOnLongClickListener(v -> {
+            if (currentActionMode != null) { // || calipersView.isTweakingOrColoring()) {
+                return false;
             }
+            startActionMode(imageCallBack);
+            return true;
         });
 
         if (noSavedInstance && Intent.ACTION_SEND.equals(action) && type != null) {
@@ -533,112 +514,109 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             externalImageLoad = false;
         }
 
-        onSharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                // show start image only has effect with restart
-                EPSLog.log("onSharedPreferenceChangeListener");
-                Objects.requireNonNull(sharedPreferences, "Shared preferences must not be null!");
-                if (key.equals(getString(R.string.show_start_image_key))) {
-                    return;
-                }
-                if (key.equals(getString(R.string.show_validation_dialog_key))) {
-                    showValidationDialog = sharedPreferences.getBoolean(key, true);
-                }
-                if (key.equals(getString(R.string.time_calibration_key))) {
-                    defaultTimeCalibration = sharedPreferences.getString(key,
-                            getString(R.string.default_time_calibration_value));
-                    horizontalCalibration.setCalibrationString(defaultTimeCalibration);
-                    return; // no need to invalidate calipersView.
-                }
-                if (key.equals(getString(R.string.amplitude_calibration_key))) {
-                    defaultAmplitudeCalibration = sharedPreferences.getString(key,
-                            getString(R.string.default_amplitude_calibration_value));
-                    verticalCalibration.setCalibrationString(defaultAmplitudeCalibration);
-                    return; // no need to invalidate calipersView.
-                }
-                if (key.equals(getString(R.string.qtc_formula_key))) {
-                    String qtcFormulaName = sharedPreferences.getString(key,
-                            getString(R.string.qtc_formula_value));
-                    qtcFormulaPreference = qtcFormulaMap.get(qtcFormulaName);
-                    return;  // no need to invalidate calipersView
-                }
-                if (key.equals(getString(R.string.new_caliper_color_key))) {
-                    currentCaliperColor = sharedPreferences.getInt(key,
-                            ContextCompat.getColor(getApplicationContext(), R.color.default_caliper_color));
-                    return;
-                }
-                if (key.equals(getString(R.string.new_highlight_color_key))) {
-                    currentHighlightColor = sharedPreferences.getInt(key,
-                            ContextCompat.getColor(getApplicationContext(), R.color.default_highlight_color));
-                    for (Caliper c : calipersView.getCalipers()) {
-                        c.setSelectedColor(currentHighlightColor);
-                        if (c.isSelected()) {
-                            c.setColor(currentHighlightColor);
-                        }
-                    }
-                    return;
-                }
-                if (key.equals(getString(R.string.line_width_key))) {
-                    try {
-                        String lineWidthString = sharedPreferences.getString(key,
-                                getString(R.string.default_line_width));
-                        int lineWidth = DEFAULT_LINE_WIDTH;
-                        if (lineWidthString != null) {
-                            lineWidth = Integer.parseInt(lineWidthString);
-                        }
-                        currentLineWidth = lineWidth;
-                        for (Caliper c : calipersView.getCalipers()) {
-                            setLineWidth(c, lineWidth);
-                        }
-                    } catch (NumberFormatException ex) {
-                        currentLineWidth = DEFAULT_LINE_WIDTH;
-                        for (Caliper c : calipersView.getCalipers()) {
-                            setLineWidth(c, currentLineWidth);
-                        }
-                    }
-                    return;
-                }
-                if (key.equals(getString(R.string.use_large_font_key))) {
-                    useLargeFont = sharedPreferences.getBoolean(key, false);
-                    for (Caliper c : calipersView.getCalipers()) {
-                        c.setFontSize(useLargeFont ? largeFontSize : smallFontSize);
-                    }
-                }
-                if (key.equals(getString(R.string.round_msec_rate_key))) {
-                    roundMsecRate = sharedPreferences.getBoolean(key, true);
-                    for (Caliper c : calipersView.getCalipers()) {
-                        c.setRoundMsecRate(roundMsecRate);
-                    }
-                }
-                if (key.equals(getString(R.string.auto_position_text_key))) {
-                    autoPositionText = sharedPreferences.getBoolean(key, true);
-                    for (Caliper c : calipersView.getCalipers()) {
-                        c.setAutoPositionText(autoPositionText);
-                    }
-                }
-                if (key.equals(getString(R.string.time_caliper_text_position_key))) {
-                    String timeCaliperTextPositionName = sharedPreferences.getString(key,
-                            getString(R.string.time_caliper_text_position_value));
-                    timeCaliperTextPositionPreference = textPositionMap.get(timeCaliperTextPositionName);
-                    for (Caliper c : calipersView.getCalipers()) {
-                        if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
-                            c.setTextPosition(timeCaliperTextPositionPreference);
-                        }
-                    }
-                }
-                if (key.equals(getString(R.string.amplitude_caliper_text_position_key))) {
-                    String amplitudeCaliperTextPositionName = sharedPreferences.getString(key,
-                            getString(R.string.amplitude_caliper_text_position_value));
-                    amplitudeCaliperTextPositionPreference = textPositionMap.get(amplitudeCaliperTextPositionName);
-                    for (Caliper c : calipersView.getCalipers()) {
-                        if (c.getDirection() == Caliper.Direction.VERTICAL) {
-                            c.setTextPosition(amplitudeCaliperTextPositionPreference);
-                        }
-                    }
-                }
-                calipersView.invalidate();
+        onSharedPreferenceChangeListener = (sharedPreferences, key) -> {
+            // show start image only has effect with restart
+            EPSLog.log("onSharedPreferenceChangeListener");
+            Objects.requireNonNull(sharedPreferences, "Shared preferences must not be null!");
+            if (key.equals(getString(R.string.show_start_image_key))) {
+                return;
             }
+            if (key.equals(getString(R.string.show_validation_dialog_key))) {
+                showValidationDialog = sharedPreferences.getBoolean(key, true);
+            }
+            if (key.equals(getString(R.string.time_calibration_key))) {
+                defaultTimeCalibration = sharedPreferences.getString(key,
+                        getString(R.string.default_time_calibration_value));
+                horizontalCalibration.setCalibrationString(defaultTimeCalibration);
+                return; // no need to invalidate calipersView.
+            }
+            if (key.equals(getString(R.string.amplitude_calibration_key))) {
+                defaultAmplitudeCalibration = sharedPreferences.getString(key,
+                        getString(R.string.default_amplitude_calibration_value));
+                verticalCalibration.setCalibrationString(defaultAmplitudeCalibration);
+                return; // no need to invalidate calipersView.
+            }
+            if (key.equals(getString(R.string.qtc_formula_key))) {
+                String qtcFormulaName = sharedPreferences.getString(key,
+                        getString(R.string.qtc_formula_value));
+                qtcFormulaPreference = qtcFormulaMap.get(qtcFormulaName);
+                return;  // no need to invalidate calipersView
+            }
+            if (key.equals(getString(R.string.new_caliper_color_key))) {
+                currentCaliperColor = sharedPreferences.getInt(key,
+                        ContextCompat.getColor(getApplicationContext(), R.color.default_caliper_color));
+                return;
+            }
+            if (key.equals(getString(R.string.new_highlight_color_key))) {
+                currentHighlightColor = sharedPreferences.getInt(key,
+                        ContextCompat.getColor(getApplicationContext(), R.color.default_highlight_color));
+                for (Caliper c : calipersView.getCalipers()) {
+                    c.setSelectedColor(currentHighlightColor);
+                    if (c.isSelected()) {
+                        c.setColor(currentHighlightColor);
+                    }
+                }
+                return;
+            }
+            if (key.equals(getString(R.string.line_width_key))) {
+                try {
+                    String lineWidthString = sharedPreferences.getString(key,
+                            getString(R.string.default_line_width));
+                    int lineWidth = DEFAULT_LINE_WIDTH;
+                    if (lineWidthString != null) {
+                        lineWidth = Integer.parseInt(lineWidthString);
+                    }
+                    currentLineWidth = lineWidth;
+                    for (Caliper c : calipersView.getCalipers()) {
+                        setLineWidth(c, lineWidth);
+                    }
+                } catch (NumberFormatException ex) {
+                    currentLineWidth = DEFAULT_LINE_WIDTH;
+                    for (Caliper c : calipersView.getCalipers()) {
+                        setLineWidth(c, currentLineWidth);
+                    }
+                }
+                return;
+            }
+            if (key.equals(getString(R.string.use_large_font_key))) {
+                useLargeFont = sharedPreferences.getBoolean(key, false);
+                for (Caliper c : calipersView.getCalipers()) {
+                    c.setFontSize(useLargeFont ? largeFontSize : smallFontSize);
+                }
+            }
+            if (key.equals(getString(R.string.round_msec_rate_key))) {
+                roundMsecRate = sharedPreferences.getBoolean(key, true);
+                for (Caliper c : calipersView.getCalipers()) {
+                    c.setRoundMsecRate(roundMsecRate);
+                }
+            }
+            if (key.equals(getString(R.string.auto_position_text_key))) {
+                autoPositionText = sharedPreferences.getBoolean(key, true);
+                for (Caliper c : calipersView.getCalipers()) {
+                    c.setAutoPositionText(autoPositionText);
+                }
+            }
+            if (key.equals(getString(R.string.time_caliper_text_position_key))) {
+                String timeCaliperTextPositionName = sharedPreferences.getString(key,
+                        getString(R.string.time_caliper_text_position_value));
+                timeCaliperTextPositionPreference = textPositionMap.get(timeCaliperTextPositionName);
+                for (Caliper c : calipersView.getCalipers()) {
+                    if (c.getDirection() == Caliper.Direction.HORIZONTAL) {
+                        c.setTextPosition(timeCaliperTextPositionPreference);
+                    }
+                }
+            }
+            if (key.equals(getString(R.string.amplitude_caliper_text_position_key))) {
+                String amplitudeCaliperTextPositionName = sharedPreferences.getString(key,
+                        getString(R.string.amplitude_caliper_text_position_value));
+                amplitudeCaliperTextPositionPreference = textPositionMap.get(amplitudeCaliperTextPositionName);
+                for (Caliper c : calipersView.getCalipers()) {
+                    if (c.getDirection() == Caliper.Direction.VERTICAL) {
+                        c.setTextPosition(amplitudeCaliperTextPositionPreference);
+                    }
+                }
+            }
+            calipersView.invalidate();
         };
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -682,11 +660,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // else rotate view after brief delay
                 else {
                     Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        public void run() {
-                            rotateImageView();
-                        }
-                    }, 50);
+                    handler.postDelayed(this::rotateImageView, 50);
 
                 }
             }
@@ -979,37 +953,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setTitle(R.string.go_to_page_title);
         builder.setCancelable(false);
         builder.setView(alertLayout);
-        builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                int pageNumber;
-                try {
-                    dialogResult = Objects.requireNonNull(numberOfIntervalsEditText.getText()).toString();
-                    pageNumber = Integer.parseInt(dialogResult);
-                } catch (NullPointerException | NumberFormatException ex) {
-                    dialog.cancel();
-                    return;
-                }
-                if (pageNumber > numberOfPdfPages) {
-                    pageNumber = numberOfPdfPages;
-                }
-                if (pageNumber < 1) {
-                    pageNumber = 1;
-                }
-                currentPdfPageNumber = pageNumber - 1;
-                enablePageButtons(true);
-                UriPage uriPage = new UriPage();
-                uriPage.uri = null;
-                uriPage.pageNumber = currentPdfPageNumber;
-                loadPDFAsynchronously(uriPage);
-            }
-        });
-        builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+        builder.setPositiveButton(getString(R.string.ok_title), (dialog, which) -> {
+            int pageNumber;
+            try {
+                dialogResult = Objects.requireNonNull(numberOfIntervalsEditText.getText()).toString();
+                pageNumber = Integer.parseInt(dialogResult);
+            } catch (NullPointerException | NumberFormatException ex) {
                 dialog.cancel();
+                return;
             }
+            if (pageNumber > numberOfPdfPages) {
+                pageNumber = numberOfPdfPages;
+            }
+            if (pageNumber < 1) {
+                pageNumber = 1;
+            }
+            currentPdfPageNumber = pageNumber - 1;
+            enablePageButtons(true);
+            UriPage uriPage = new UriPage();
+            uriPage.uri = null;
+            uriPage.pageNumber = currentPdfPageNumber;
+            loadPDFAsynchronously(uriPage);
         });
+        builder.setNegativeButton(getString(R.string.cancel_title), (dialog, which) -> dialog.cancel());
         builder.show();
     }
 
@@ -1067,6 +1033,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // for efficiency, don't bother writing the bitmap to a file if it hasn't changed
         if (imageBitmap != null && !imageBitmap.sameAs(previousBitmap)) {
             storeBitmapToTempFile(imageBitmap);
+            EPSLog.log("storingBitmap");
         }
     }
 
@@ -2144,23 +2111,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setMessage(R.string.number_of_intervals_dialog_message);
         builder.setCancelable(false);
         builder.setView(alertLayout);
-        builder.setPositiveButton(getString(R.string.ok_title), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    dialogResult = Objects.requireNonNull(numberOfIntervalsEditText.getText()).toString();
-                    processMeanRR();
-                } catch (NullPointerException ex) {
-                    dialog.cancel();
-                }
-            }
-        });
-        builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+        builder.setPositiveButton(getString(R.string.ok_title), (dialog, which) -> {
+            try {
+                dialogResult = Objects.requireNonNull(numberOfIntervalsEditText.getText()).toString();
+                processMeanRR();
+            } catch (NullPointerException ex) {
                 dialog.cancel();
             }
         });
+        builder.setNegativeButton(getString(R.string.cancel_title), (dialog, which) -> dialog.cancel());
         builder.show();
     }
 
@@ -2223,38 +2182,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setMessage(getString(R.string.number_of_intervals_dialog_message));
             builder.setView(alertLayout);
             builder.setCancelable(false);
-            builder.setPositiveButton(getString(R.string.continue_title), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Caliper c = calipersView.activeCaliper();
-                    if (c == null) {
-                        dialog.cancel();
-                        return;
-                    }
-                    try {
-                        dialogResult = Objects.requireNonNull(numberOfIntervalsEditText.getText()).toString();
-                    } catch (NullPointerException ex) {
-                        dialog.cancel();
-                    }
-                    int divisor;
-                    try {
-                        divisor = Integer.parseInt(dialogResult);
-                    } catch (Exception ex) {
-                        dialog.cancel();
-                        return;
-                    }
-                    double intervalResult = Math.abs(c.intervalResult());
-                    double meanRR = intervalResult / divisor;
-                    rrIntervalForQTc = c.intervalInSecs(meanRR);
-                    selectQTcStep2Menu();
+            builder.setPositiveButton(getString(R.string.continue_title), (dialog, which) -> {
+                Caliper c = calipersView.activeCaliper();
+                if (c == null) {
+                    dialog.cancel();
+                    return;
                 }
-            });
-            builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                try {
+                    dialogResult = Objects.requireNonNull(numberOfIntervalsEditText.getText()).toString();
+                } catch (NullPointerException ex) {
                     dialog.cancel();
                 }
+                int divisor;
+                try {
+                    divisor = Integer.parseInt(dialogResult);
+                } catch (Exception ex) {
+                    dialog.cancel();
+                    return;
+                }
+                double intervalResult = Math.abs(c.intervalResult());
+                double meanRR = intervalResult / divisor;
+                rrIntervalForQTc = c.intervalInSecs(meanRR);
+                selectQTcStep2Menu();
             });
+            builder.setNegativeButton(getString(R.string.cancel_title), (dialog, which) -> dialog.cancel());
 
             builder.show();
         }
@@ -2279,18 +2230,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.calculated_qtc_dialog_title));
                 builder.setMessage(result);
-                builder.setNegativeButton(getString(R.string.repeat_qt_button_title), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        selectQTcStep2Menu();
-                    }
-                });
-                builder.setPositiveButton(getString(R.string.done_button_title), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        selectMainMenu();
-                    }
-                });
+                builder.setNegativeButton(getString(R.string.repeat_qt_button_title), (dialog, which) -> selectQTcStep2Menu());
+                builder.setPositiveButton(getString(R.string.done_button_title), (dialog, which) -> selectMainMenu());
                 builder.show();
             }
         }
@@ -2453,23 +2394,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setMessage(R.string.calibration_dialog_message);
         builder.setView(alertLayout);
         builder.setCancelable(false);
-        builder.setPositiveButton(getString(R.string.set_calibration_button_title), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    String calibrationIntervalString = Objects.requireNonNull(calibrationIntervalEditText.getText()).toString();
-                    showValidationDialog(calibrationIntervalString, c.getDirection());
-                } catch (NullPointerException ex) {
-                    dialog.cancel();
-                }
-            }
-        });
-        builder.setNegativeButton(getString(R.string.cancel_title), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+        builder.setPositiveButton(getString(R.string.set_calibration_button_title), (dialog, which) -> {
+            try {
+                String calibrationIntervalString = Objects.requireNonNull(calibrationIntervalEditText.getText()).toString();
+                showValidationDialog(calibrationIntervalString, c.getDirection());
+            } catch (NullPointerException ex) {
                 dialog.cancel();
             }
         });
+        builder.setNegativeButton(getString(R.string.cancel_title), (dialog, which) -> dialog.cancel());
         builder.show();
     }
 
@@ -2492,13 +2425,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             final CheckBox doNotShowDialogCheckBox = alertLayout.findViewById(R.id.doNotShowValidationDialogCheckBox);
             doNotShowDialogCheckBox.setChecked(!showValidationDialog);
             final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-            doNotShowDialogCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    showValidationDialog = !isChecked;
-                    editor.putBoolean(getString(R.string.show_validation_dialog_key), showValidationDialog);
-                    editor.apply();
-                }
+            doNotShowDialogCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                showValidationDialog = !isChecked;
+                editor.putBoolean(getString(R.string.show_validation_dialog_key), showValidationDialog);
+                editor.apply();
             });
             builder.setTitle(R.string.calibration_warning_title);
             String message = validation.noUnits ? getString(R.string.calibration_no_units_message)
@@ -2506,18 +2436,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setMessage(message);
             builder.setCancelable(false);
             builder.setView(alertLayout);
-            builder.setNegativeButton(R.string.cancel_title, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            builder.setPositiveButton(R.string.calibrate_anyway_title, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    processCalibration();
-                }
-            });
+            builder.setNegativeButton(R.string.cancel_title, (dialog, which) -> dialog.cancel());
+            builder.setPositiveButton(R.string.calibrate_anyway_title, (dialog, which) -> processCalibration());
             builder.show();
         }
         else {
