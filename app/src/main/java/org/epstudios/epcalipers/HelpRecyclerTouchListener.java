@@ -1,11 +1,12 @@
 package org.epstudios.epcalipers;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Copyright (C) 2019 EP Studios, Inc.
@@ -69,6 +70,7 @@ class HelpRecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
     }
 
+    @SuppressWarnings({"unused", "EmptyMethod"})
     public interface ClickListener {
         void onClick(View view, int position);
 

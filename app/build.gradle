@@ -3,7 +3,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion '30.0.2'
 
     defaultConfig {
@@ -11,7 +11,7 @@ android {
         minSdkVersion 21
         // Warning, if you change targetSdkVersion to 30, app will break without changes.
         // See TODO in MainActivity regarding scoped storage in Android 10 and 11.
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 39
         versionName "3.5.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

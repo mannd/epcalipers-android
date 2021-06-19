@@ -55,6 +55,7 @@ public class HelpTopics extends AppCompatActivity {
 
         recyclerView.addOnItemTouchListener(new HelpRecyclerTouchListener(getApplicationContext(),
                 recyclerView, new HelpRecyclerTouchListener.ClickListener() {
+            @SuppressWarnings("unused")
             @Override
             public void onClick(View view, int position) {
                 if (helpAnchors[position].equals("acknowledgments-id")) {
@@ -67,6 +68,7 @@ public class HelpTopics extends AppCompatActivity {
                 }
             }
 
+            @SuppressWarnings("unused")
             @Override
             public void onLongClick(View view, int position) { }
         }));
