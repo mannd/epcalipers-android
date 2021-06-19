@@ -22,7 +22,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
@@ -1966,8 +1965,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Create an image file name
         String timeStamp = getTimeStamp();
         String imageFileName = "JPEG_" + timeStamp + "_"; //NON-NLS
+
 //        File storageDir = getExternalFilesDir(null);
-        File storageDir = Environment.getExternalStorageDirectory();
+        File storageDir = getExternalFilesDir(null);
+//        File storageDir = Environment.getExternalStorageDirectory();
         EPSLog.log("storage directory = " + storageDir);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
@@ -2029,6 +2030,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
             updateImageViewWithPath(currentPhotoPath);
+            // Clean up by deleting file that no longer is needed from storage.
+            File f = new File(currentPhotoPath);
+            if (f.exists()) {
+                f.delete();
+            }
         }
     }
 
