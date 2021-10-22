@@ -1887,6 +1887,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     EPSLog.log("Camera permission granted");
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
+                    // FIXME: need to restart app to reset this, when permission regranted through settings app.
                     enableCameraMenuItem(true);
                     proceedToTakePhoto();
                 } else {
@@ -1903,8 +1904,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     proceedToSelectImageFromGallery();
                 } else {
                     EPSLog.log("Write external storage permission denied");
-                    // We won't disable the select image button, but will just keep asking about
-                    // this every time the button is pressed.
                 }
                 break;
             }
@@ -1955,6 +1954,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Menu menuNav = navigationView.getMenu();
         MenuItem cameraMenuItem = menuNav.findItem(R.id.nav_camera);
         cameraMenuItem.setEnabled(enable);
+    }
+
+    private void enableImageMenuItem(boolean enable) {
+        Menu menuNav = navigationView.getMenu();
+        MenuItem imageMenuItem = menuNav.findItem(R.id.nav_image);
+        imageMenuItem.setEnabled(enable);
     }
 
     private boolean deviceHasCamera(Intent takePictureIntent) {
@@ -2009,32 +2014,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        EPSLog.log("onActivityResult()");
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            if (selectedImage == null) {
-                return;
-            }
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            if (cursor == null) {
-                return;
-            }
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
+        try {
+            if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+                Uri selectedImage = data.getData();
+                if (selectedImage == null) {
+                    return;
+                }
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                Cursor cursor = getContentResolver().query(selectedImage,
+                        filePathColumn, null, null, null);
+                if (cursor == null) {
+                    return;
+                }
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                cursor.close();
 
-            updateImageViewWithPath(picturePath);
-        }
-        if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
-            updateImageViewWithPath(currentPhotoPath);
-            // Clean up by deleting file that no longer is needed from storage.
-            File f = new File(currentPhotoPath);
-            if (f.exists()) {
-                f.delete();
+                updateImageViewWithPath(picturePath);
             }
+            if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
+                updateImageViewWithPath(currentPhotoPath);
+                // Clean up by deleting file that no longer is needed from storage.
+                File f = new File(currentPhotoPath);
+                if (f.exists()) {
+                    f.delete();
+                }
+            }
+        } catch (Exception e) {
+            EPSLog.log("******unknown exception*******");
         }
     }
 
