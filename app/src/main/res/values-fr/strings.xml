@@ -191,4 +191,5 @@
     <string name="calibration_error_message">Intervalle d\'étalonnage non valide.</string>
     <string name="don_t_show_this_dialog_again_message">Ne plus afficher cette boîte de dialogue.</string>
     <string name="calibration_no_units_message">L\'étalonnage n\'a pas d\'unités</string>
+    <string name="need_to_set_permissions">Besoin de définir des autorisations.</string>
 </resources>
