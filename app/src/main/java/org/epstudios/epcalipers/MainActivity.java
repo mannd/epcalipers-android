@@ -1809,10 +1809,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+            // Buttons are unresponsive if permission not granted.
+            showPermissionsRequestToast();
+            EPSLog.log("Permission needed to select images.");
         }
         else {
             proceedToSelectImageFromGallery();
         }
+    }
+
+    private void showPermissionsRequestToast() {
+        Toast toast = Toast.makeText(this, R.string.need_to_set_permissions, Toast.LENGTH_SHORT );
+        toast.show();
     }
 
     @SuppressLint("IntentReset")
@@ -1823,14 +1831,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivityForResult(intent, RESULT_LOAD_IMAGE);
     }
 
-    /* TODO: CAUTION: Image and file functions are only working at this point because
-    we have set the requestLegacyExternalStorage to true in the AndroidManifest.
-    Android 10 and 11 have "scoped storage," 
-    see https://developer.android.com/training/data-storage/use-cases for more details.  
-    If we change the target SDK to Android 30, the requestLegacyExternalStorage 
-    attribute will be ignored, and camera and image loading won't work.  
-    Fixes are outlined in the link above. 
-     */
     private void takePhoto() {
         // check permissions
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -1841,7 +1841,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST_CAMERA);
-
+            // Buttons are unresponsive if permission not granted.
+            showPermissionsRequestToast();
+            EPSLog.log("Permission needed to take photos.");
         }
         else {
             proceedToTakePhoto();
@@ -1887,11 +1889,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     EPSLog.log("Camera permission granted");
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    enableCameraMenuItem(true);
                     proceedToTakePhoto();
                 } else {
                     EPSLog.log("Camera permission denied");
-                    enableCameraMenuItem(false);
                 }
                 break;
             }
@@ -1903,8 +1903,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     proceedToSelectImageFromGallery();
                 } else {
                     EPSLog.log("Write external storage permission denied");
-                    // We won't disable the select image button, but will just keep asking about
-                    // this every time the button is pressed.
                 }
                 break;
             }
@@ -1951,10 +1949,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    // No longer used.
     private void enableCameraMenuItem(boolean enable) {
         Menu menuNav = navigationView.getMenu();
         MenuItem cameraMenuItem = menuNav.findItem(R.id.nav_camera);
         cameraMenuItem.setEnabled(enable);
+    }
+
+    // No longer used.
+    private void enableImageMenuItem(boolean enable) {
+        Menu menuNav = navigationView.getMenu();
+        MenuItem imageMenuItem = menuNav.findItem(R.id.nav_image);
+        imageMenuItem.setEnabled(enable);
     }
 
     private boolean deviceHasCamera(Intent takePictureIntent) {
@@ -2009,32 +2015,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        EPSLog.log("onActivityResult()");
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            if (selectedImage == null) {
-                return;
-            }
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            if (cursor == null) {
-                return;
-            }
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
+        try {
+            if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+                Uri selectedImage = data.getData();
+                if (selectedImage == null) {
+                    return;
+                }
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                Cursor cursor = getContentResolver().query(selectedImage,
+                        filePathColumn, null, null, null);
+                if (cursor == null) {
+                    return;
+                }
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                cursor.close();
 
-            updateImageViewWithPath(picturePath);
-        }
-        if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
-            updateImageViewWithPath(currentPhotoPath);
-            // Clean up by deleting file that no longer is needed from storage.
-            File f = new File(currentPhotoPath);
-            if (f.exists()) {
-                f.delete();
+                updateImageViewWithPath(picturePath);
             }
+            if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
+                updateImageViewWithPath(currentPhotoPath);
+                // Clean up by deleting file that no longer is needed from storage.
+                File f = new File(currentPhotoPath);
+                if (f.exists()) {
+                    //noinspection ResultOfMethodCallIgnored
+                    f.delete();
+                }
+            }
+        } catch (Exception e) {
+            EPSLog.log("onActivityResult() threw exception.");
         }
     }
 
