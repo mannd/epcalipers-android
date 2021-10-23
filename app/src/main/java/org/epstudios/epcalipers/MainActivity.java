@@ -856,7 +856,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int width = page.getWidth();
                 int height = page.getHeight();
 
-                Bitmap bitmap = Bitmap.createBitmap(width * 3, height * 3, Bitmap.Config.ARGB_4444);
+                Bitmap bitmap = Bitmap.createBitmap(width * 3, height * 3, Bitmap.Config.ARGB_8888);
 
                 Matrix matrix = new Matrix();
                 matrix.postScale(3, 3);
@@ -1829,6 +1829,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         startActivityForResult(intent, RESULT_LOAD_IMAGE);
+
     }
 
     private void takePhoto() {
@@ -2013,6 +2014,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        this.sendBroadcast(mediaScanIntent);
 //    }
 
+    // TODO: deprecated, also source of crashes.
+    //  See https://stackoverflow.com/questions/62671106/onactivityresult-method-is-deprecated-what-is-the-alternative
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         EPSLog.log("onActivityResult()");
@@ -2023,6 +2026,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (selectedImage == null) {
                     return;
                 }
+//                String[] filePathColumn = {MediaStore.Images.Media._ID};
                 String[] filePathColumn = {MediaStore.Images.Media.DATA};
                 Cursor cursor = getContentResolver().query(selectedImage,
                         filePathColumn, null, null, null);
