@@ -70,6 +70,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -222,6 +225,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private final Deque<ToolbarMenu> toolbarMenuDeque = new ArrayDeque<>();
 
+    File photoFile;
+
     private enum ToolbarMenu {
         Main,
         AddCaliper,
@@ -360,6 +365,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         float density = getResources().getDisplayMetrics().density;
         return dp * density;
     }
+
+    ActivityResultLauncher<Uri> getPhotoContent = registerForActivityResult(
+            new ActivityResultContracts.TakePicture(),
+            new ActivityResultCallback<Boolean>() {
+                @Override
+                public void onActivityResult(Boolean result) {
+                    EPSLog.log("launching camera");
+                    Uri photoUri = Uri.fromFile(photoFile);
+                    imageView.setImageURI(photoUri);
+                }
+            });
+
+
+    ActivityResultLauncher<String> getContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri result) {
+                    EPSLog.log("launching activity");
+                    Uri selectedImage = result;
+                    if (selectedImage == null) {
+                        return;
+                    }
+                    imageView.setImageURI(selectedImage);
+//                    updateImageViewWithPath(selectedImage.getPath());
+                }
+            });
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
@@ -1804,18 +1837,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // See: http://stackoverflow.com/questions/32431723/read-external-storage-permission-for-android
     // and https://developer.android.com/training/permissions/requesting.html
     private void selectImageFromGallery() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-            // Buttons are unresponsive if permission not granted.
-            showPermissionsRequestToast();
-            EPSLog.log("Permission needed to select images.");
-        }
-        else {
-            proceedToSelectImageFromGallery();
-        }
+        getContent.launch("image/*");
+
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+//            // Buttons are unresponsive if permission not granted.
+//            showPermissionsRequestToast();
+//            EPSLog.log("Permission needed to select images.");
+//        }
+//        else {
+//            proceedToSelectImageFromGallery();
+//        }
     }
 
     private void showPermissionsRequestToast() {
@@ -1835,7 +1870,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void takePhoto() {
         // check permissions
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED  ||
+                != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
 
@@ -1845,9 +1880,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Buttons are unresponsive if permission not granted.
             showPermissionsRequestToast();
             EPSLog.log("Permission needed to take photos.");
-        }
-        else {
-            proceedToTakePhoto();
+        } else {
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                showFileErrorAlert();
+                return;
+            }
+            Uri photoUri;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                photoUri = FileProvider.getUriForFile(MainActivity.this,
+                        BuildConfig.APPLICATION_ID + ".provider",
+                        photoFile);
+            } else {
+                photoUri = Uri.fromFile(photoFile);
+            }
+            getPhotoContent.launch(photoUri);
         }
     }
 
