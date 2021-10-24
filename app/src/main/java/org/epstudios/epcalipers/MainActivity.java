@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -100,12 +99,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int DEFAULT_LINE_WIDTH = 2;
 
     // new permissions for Android >= 6.0
+    // TODO: Unused permissions at the moment.
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 101;
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_IMAGE = 102;
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_PDF = 103;
     private static final int MY_PERMISSIONS_REQUEST_STORE_BITMAP = 104;
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE = 105;
+
+    private final Deque<ToolbarMenu> toolbarMenuDeque = new ArrayDeque<>();
+
+    // TODO: Make sure the 1st part of this conditional never changes.  force_first_run
+    // MUST be false for a release.  The 2nd part of the condition can be set true to
+    // test onboarding with each startup.
+    private final boolean force_first_run = !BuildConfig.DEBUG ? false : false;
+
+    private File photoFile; // Used as tmp file to hold results of taking a photo.
 
     // Store version information
     private Version version;
@@ -156,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button microUpButton;
     private Button microDownButton;
     private Button microDoneButton;
+
     // Toolbar menus
     private HorizontalScrollView mainMenu;
     private HorizontalScrollView pdfMenu;
@@ -167,9 +177,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private HorizontalScrollView colorMenu;
     private HorizontalScrollView tweakMenu;
     private HorizontalScrollView microMovementMenu;
+
     // Calibration
     private Calibration horizontalCalibration;
     private Calibration verticalCalibration;
+
     // Views
     private PhotoView imageView;
     private CalipersView calipersView;
@@ -177,12 +189,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @SuppressWarnings("FieldCanBeLocal")
     private Toolbar actionBar;
     private NavigationView navigationView;
+
     // Side menu items
     private MenuItem lockImageMenuItem;
+
+    // Other variables
+    // TODO: no longer used?
     private String currentPhotoPath;
     private FrameLayout layout;
     private DrawerLayout drawerLayout;
-
     private double rrIntervalForQTc;
     private boolean showStartImage;
     private boolean roundMsecRate;
@@ -202,50 +217,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Uri currentPdfUri;
     private int numberOfPdfPages;
     private int currentPdfPageNumber;
+
     private boolean useLargeFont;
     private boolean imageIsLocked = false;
-
     private float smallFontSize;
     private float largeFontSize;
-
     private Bitmap previousBitmap = null;
-
     private List<Button> upDownButtons;
     private List<Button> rightLeftButtons;
-
     private Map<String, QtcFormula> qtcFormulaMap;
     private QtcFormula qtcFormulaPreference = QtcFormula.qtcBzt;
-
     private HashMap<String, Caliper.TextPosition> textPositionMap;
-
     // These are equal to the defaults in MyPreferenceFragment mapped to strings "CenterAbove"
     // and "Right".
     private Caliper.TextPosition timeCaliperTextPositionPreference = Caliper.TextPosition.CenterAbove;
     private Caliper.TextPosition amplitudeCaliperTextPositionPreference = Caliper.TextPosition.Right;
 
-    private final Deque<ToolbarMenu> toolbarMenuDeque = new ArrayDeque<>();
 
-    File photoFile;
 
-    private enum ToolbarMenu {
-        Main,
-        AddCaliper,
-        Calibration,
-        QTc1,
-        QTc2,
-        Rotate,
-        PDF,
-        Color,
-        Tweak,
-        Move
-    }
+    // New way to get take photo and get media images.
+    ActivityResultLauncher<Uri> getPhotoContent = registerForActivityResult(
+            new ActivityResultContracts.TakePicture(),
+            new ActivityResultCallback<Boolean>() {
+                @Override
+                public void onActivityResult(Boolean result) {
+                    Uri photoUri = Uri.fromFile(photoFile);
+                    updateImageView(photoUri);
+                }
+            });
+    ActivityResultLauncher<String> getImageContent = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri result) {
+                    if (result == null) {
+                        return;
+                    }
+                    updateImageView(result);
+                }
+            });
 
-    public ActionMode getCurrentActionMode() {
-        return currentActionMode;
-    }
-
+    // Set up the long press menus.
     private ActionMode currentActionMode;
-
     private final ActionMode.Callback imageCallBack = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -283,7 +296,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             currentActionMode = null;
         }
     };
-
     public final ActionMode.Callback calipersActionCallback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -332,32 +344,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    // TODO: Make sure the 1st part of this conditional never changes.  force_first_run
-    // MUST be false for a release.  The 2nd part of the condition can be set true to
-    // test onboarding with each startup.
-    private final boolean force_first_run = !BuildConfig.DEBUG ? false : false;
-
-    private static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
+    public ActionMode getCurrentActionMode() {
+        return currentActionMode;
     }
 
     // Convert dp to pixels utility
@@ -365,34 +353,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         float density = getResources().getDisplayMetrics().density;
         return dp * density;
     }
-
-    ActivityResultLauncher<Uri> getPhotoContent = registerForActivityResult(
-            new ActivityResultContracts.TakePicture(),
-            new ActivityResultCallback<Boolean>() {
-                @Override
-                public void onActivityResult(Boolean result) {
-                    EPSLog.log("launching camera");
-                    Uri photoUri = Uri.fromFile(photoFile);
-                    imageView.setImageURI(photoUri);
-                }
-            });
-
-
-    ActivityResultLauncher<String> getContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
-            new ActivityResultCallback<Uri>() {
-                @Override
-                public void onActivityResult(Uri result) {
-                    EPSLog.log("launching activity");
-                    Uri selectedImage = result;
-                    if (selectedImage == null) {
-                        return;
-                    }
-                    imageView.setImageURI(selectedImage);
-//                    updateImageViewWithPath(selectedImage.getPath());
-                }
-            });
-
-
 
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
@@ -408,7 +368,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         smallFontSize = getResources().getDimension(R.dimen.small_font_size);
         largeFontSize = getResources().getDimension(R.dimen.large_font_size);
-        EPSLog.log("Small font size = " + smallFontSize + " large font size = " + largeFontSize);
 
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -427,7 +386,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     int id = menuItem.getItemId();
                     if (id == R.id.nav_camera) {
                         takePhoto();
-                        // Reset to main menu with any new image
                         selectMainMenu();
                     } else if (id == R.id.nav_image) {
                         selectImageFromGallery();
@@ -822,114 +780,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private static class UriPage {
-        Uri uri;
-        int pageNumber;
-    }
-
-    private static class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
-        private final WeakReference<MainActivity> activityWeakReference;
-
-        private boolean isNewPdf;
-        private String exceptionMessage = "";
-
-        NougatAsyncLoadPDF(MainActivity context) {
-            activityWeakReference = new WeakReference<>(context);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-            Toast toast = Toast.makeText(activityWeakReference.get(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
-            toast.show();
-
-        }
-
-        @Override
-        protected Bitmap doInBackground(UriPage... params) {
-            UriPage uriPage = params[0];
-            Uri pdfUri = uriPage.uri;
-            if (pdfUri == null) {
-                if (activityWeakReference.get().currentPdfUri == null) {
-                    // can't do anything if all is null
-                    return null;
-                }
-                // use currently opened PDF
-                pdfUri = activityWeakReference.get().currentPdfUri;
-                isNewPdf = false;
-            }
-            else {
-                // change Uri to a real file path
-                pdfUri = activityWeakReference.get().getTempUri(pdfUri);
-                // if getTempUri returns null then exception was thrown
-                if (pdfUri == null) {
-                    return null;
-                }
-                // close old currentPdfUri if possible
-                if (activityWeakReference.get().currentPdfUri != null) {
-                    File file = new File(Objects.requireNonNull(activityWeakReference.get().currentPdfUri.getPath()));
-                    if (file.exists()) {
-                        //noinspection ResultOfMethodCallIgnored
-                        file.delete();
-                    }
-                }
-                // retain PDF Uri for future page changes
-                activityWeakReference.get().currentPdfUri = pdfUri;
-                isNewPdf = true;
-            }
-            try {
-                File file = new File(Objects.requireNonNull(pdfUri.getPath()));
-                ParcelFileDescriptor fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
-                PdfRenderer renderer = new PdfRenderer(fd);
-                activityWeakReference.get().numberOfPdfPages = renderer.getPageCount();
-                activityWeakReference.get().currentPdfPageNumber = uriPage.pageNumber;
-                PdfRenderer.Page page = renderer.openPage(activityWeakReference.get().currentPdfPageNumber);
-
-                int width = page.getWidth();
-                int height = page.getHeight();
-
-                Bitmap bitmap = Bitmap.createBitmap(width * 3, height * 3, Bitmap.Config.ARGB_8888);
-
-                Matrix matrix = new Matrix();
-                matrix.postScale(3, 3);
-
-                page.render(bitmap, null, matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-                page.close();
-                renderer.close();
-                fd.close();
-                return bitmap;
-            } catch (java.io.IOException e) {
-                // catch out of memory errors and just don't load rather than crash
-                exceptionMessage = e.getMessage();
-                return null;
-            }
-        }
-
-        protected void onPostExecute(Bitmap bitmap) {
-            MainActivity activity = activityWeakReference.get();
-            if (activity == null || activity.isFinishing()) {
-                return;
-            }
-            if (bitmap != null) {
-                // Set pdf bitmap directly, scaling screws it up
-                activityWeakReference.get().imageView.setImageBitmap(bitmap);
-                // must set visibility as imageview will be hidden if started with sample ecg hidden
-                activityWeakReference.get().imageView.setVisibility(View.VISIBLE);
-                activityWeakReference.get().imageView.setScale(activityWeakReference.get().imageView.getMinimumScale());
-                if (isNewPdf) {
-                    activityWeakReference.get().clearCalibration();
-                }
-            }
-            else {
-                Toast toast = Toast.makeText(activityWeakReference.get(), activityWeakReference.get().getString(R.string.pdf_error_message) +
-                        LF + exceptionMessage, Toast.LENGTH_SHORT);
-                toast.show();
-            }
-            activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
-        }
-    }
-
     private void resetPdf() {
         currentPdfUri = null;
         numberOfPdfPages = 0;
@@ -1069,7 +919,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -1088,18 +937,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
 
         // also check permissions first
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_STORE_BITMAP);
-
-        }
-        else {
+//        if (ContextCompat.checkSelfPermission(this,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                        MY_PERMISSIONS_REQUEST_STORE_BITMAP);
+//
+//        }
+//        else {
             proceedToStoreBitmap();
-        }
+//        }
 
         // Calibration
         // must use getRawUnits here, otherwise original calibration units are lost
@@ -1723,8 +1572,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.setAllowTweakPosition(true);
     }
 
-
-
     //public because used by CalipersView
     public void selectMicroMovementMenu(Caliper c, Caliper.Component component) {
         if (microMovementMenu == null) {
@@ -1837,7 +1684,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // See: http://stackoverflow.com/questions/32431723/read-external-storage-permission-for-android
     // and https://developer.android.com/training/permissions/requesting.html
     private void selectImageFromGallery() {
-        getContent.launch("image/*");
+        getImageContent.launch("image/*");
 
 //        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 //                != PackageManager.PERMISSION_GRANTED) {
@@ -1853,34 +1700,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        }
     }
 
-    private void showPermissionsRequestToast() {
-        Toast toast = Toast.makeText(this, R.string.need_to_set_permissions, Toast.LENGTH_SHORT );
-        toast.show();
-    }
-
-    @SuppressLint("IntentReset")
-    private void proceedToSelectImageFromGallery() {
-        @SuppressLint("IntentReset") Intent intent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(intent, RESULT_LOAD_IMAGE);
-
-    }
-
     private void takePhoto() {
-        // check permissions
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_CAMERA);
-            // Buttons are unresponsive if permission not granted.
-            showPermissionsRequestToast();
-            EPSLog.log("Permission needed to take photos.");
-        } else {
+//        // check permissions
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+//                != PackageManager.PERMISSION_GRANTED ||
+//                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                        != PackageManager.PERMISSION_GRANTED) {
+//
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    MY_PERMISSIONS_REQUEST_CAMERA);
+//            // Buttons are unresponsive if permission not granted.
+//            showPermissionsRequestToast();
+//            EPSLog.log("Permission needed to take photos.");
+//        } else {
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
@@ -1896,106 +1729,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 photoUri = Uri.fromFile(photoFile);
             }
             getPhotoContent.launch(photoUri);
-        }
-    }
-
-    private void proceedToTakePhoto() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (deviceHasCamera(takePictureIntent)) {
-            File photoFile;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                showFileErrorAlert();
-                return;
-            }
-            Uri photoUri;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                photoUri = FileProvider.getUriForFile(MainActivity.this,
-                        BuildConfig.APPLICATION_ID + ".provider",
-                        photoFile);
-            }
-            else {
-                photoUri = Uri.fromFile(photoFile);
-            }
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                    photoUri);
-            startActivityForResult(takePictureIntent, RESULT_CAPTURE_IMAGE);
-        }
-        // camera icon inactivate with if no camera present, so no warning here
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_CAMERA: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    EPSLog.log("Camera permission granted");
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                    proceedToTakePhoto();
-                } else {
-                    EPSLog.log("Camera permission denied");
-                }
-                break;
-            }
-            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    EPSLog.log("Write External storage permission granted");
-                    proceedToSelectImageFromGallery();
-                } else {
-                    EPSLog.log("Write external storage permission denied");
-                }
-                break;
-            }
-            case MY_PERMISSIONS_REQUEST_STARTUP_IMAGE: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    EPSLog.log("Write External storage permission granted");
-                    proceedToHandleImage();
-                } else {
-                    EPSLog.log("Write external storage permission denied");
-                }
-                break;
-            }
-            case MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    EPSLog.log("Write External storage permission granted");
-                    proceedToHandleSentImage();
-                } else {
-                    EPSLog.log("Write external storage permission denied");
-                }
-                break;
-            }
-            case MY_PERMISSIONS_REQUEST_STARTUP_PDF: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    EPSLog.log("Write External storage permission granted");
-                    proceedToHandlePDF();
-                } else {
-                    EPSLog.log("Write external storage permission denied");
-                }
-                break;
-            }
-            case MY_PERMISSIONS_REQUEST_STORE_BITMAP: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    EPSLog.log("Write External storage permission granted");
-                    proceedToStoreBitmap();
-                } else {
-                    EPSLog.log("Write external storage permission denied");
-                }
-                break;
-            }
-        }
+//        }
     }
 
     // No longer used.
@@ -2012,9 +1746,117 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageMenuItem.setEnabled(enable);
     }
 
+//    @SuppressLint("IntentReset")
+//    private void proceedToSelectImageFromGallery() {
+//        @SuppressLint("IntentReset") Intent intent = new Intent(Intent.ACTION_PICK,
+//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        intent.setType("image/*");
+//        startActivityForResult(intent, RESULT_LOAD_IMAGE);
+//
+//    }
+
     private boolean deviceHasCamera(Intent takePictureIntent) {
         return takePictureIntent.resolveActivity(getPackageManager()) != null;
     }
+
+//    private void proceedToTakePhoto() {
+//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        if (deviceHasCamera(takePictureIntent)) {
+//            File photoFile;
+//            try {
+//                photoFile = createImageFile();
+//            } catch (IOException ex) {
+//                showFileErrorAlert();
+//                return;
+//            }
+//            Uri photoUri;
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                photoUri = FileProvider.getUriForFile(MainActivity.this,
+//                        BuildConfig.APPLICATION_ID + ".provider",
+//                        photoFile);
+//            }
+//            else {
+//                photoUri = Uri.fromFile(photoFile);
+//            }
+//            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+//                    photoUri);
+//            startActivityForResult(takePictureIntent, RESULT_CAPTURE_IMAGE);
+//        }
+//        // camera icon inactivate with if no camera present, so no warning here
+//
+//    }
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode,
+//                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        switch (requestCode) {
+//            case MY_PERMISSIONS_REQUEST_CAMERA: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    EPSLog.log("Camera permission granted");
+//                    // permission was granted, yay! Do the
+//                    // contacts-related task you need to do.
+//                    proceedToTakePhoto();
+//                } else {
+//                    EPSLog.log("Camera permission denied");
+//                }
+//                break;
+//            }
+//            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    EPSLog.log("Write External storage permission granted");
+//                    proceedToSelectImageFromGallery();
+//                } else {
+//                    EPSLog.log("Write external storage permission denied");
+//                }
+//                break;
+//            }
+//            case MY_PERMISSIONS_REQUEST_STARTUP_IMAGE: {
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    EPSLog.log("Write External storage permission granted");
+//                    proceedToHandleImage();
+//                } else {
+//                    EPSLog.log("Write external storage permission denied");
+//                }
+//                break;
+//            }
+//            case MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE: {
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    EPSLog.log("Write External storage permission granted");
+//                    proceedToHandleSentImage();
+//                } else {
+//                    EPSLog.log("Write external storage permission denied");
+//                }
+//                break;
+//            }
+//            case MY_PERMISSIONS_REQUEST_STARTUP_PDF: {
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    EPSLog.log("Write External storage permission granted");
+//                    proceedToHandlePDF();
+//                } else {
+//                    EPSLog.log("Write external storage permission denied");
+//                }
+//                break;
+//            }
+//            case MY_PERMISSIONS_REQUEST_STORE_BITMAP: {
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    EPSLog.log("Write External storage permission granted");
+//                    proceedToStoreBitmap();
+//                } else {
+//                    EPSLog.log("Write external storage permission denied");
+//                }
+//                break;
+//            }
+//        }
+//    }
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -2053,55 +1895,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
-    // possibly implement save photo to gallery
-//    private void galleryAddPic() {
-//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//        File f = new File(currentPhotoPath);
-//        Uri contentUri = Uri.fromFile(f);
-//        mediaScanIntent.setData(contentUri);
-//        this.sendBroadcast(mediaScanIntent);
-//    }
-
-    // TODO: deprecated, also source of crashes.
-    //  See https://stackoverflow.com/questions/62671106/onactivityresult-method-is-deprecated-what-is-the-alternative
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        EPSLog.log("onActivityResult()");
-        super.onActivityResult(requestCode, resultCode, data);
-        try {
-            if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-                Uri selectedImage = data.getData();
-                if (selectedImage == null) {
-                    return;
-                }
-//                String[] filePathColumn = {MediaStore.Images.Media._ID};
-                String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                Cursor cursor = getContentResolver().query(selectedImage,
-                        filePathColumn, null, null, null);
-                if (cursor == null) {
-                    return;
-                }
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String picturePath = cursor.getString(columnIndex);
-                cursor.close();
-
-                updateImageViewWithPath(picturePath);
-            }
-            if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
-                updateImageViewWithPath(currentPhotoPath);
-                // Clean up by deleting file that no longer is needed from storage.
-                File f = new File(currentPhotoPath);
-                if (f.exists()) {
-                    //noinspection ResultOfMethodCallIgnored
-                    f.delete();
-                }
-            }
-        } catch (Exception e) {
-            EPSLog.log("onActivityResult() threw exception.");
-        }
-    }
-
     private void updateImageViewWithPath(String path) {
         Bitmap bitmap = getScaledBitmap(path);
         updateImageView(bitmap);
@@ -2116,6 +1909,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         resetPdf();
     }
 
+    // FIXME: not doing any of the processing done in getScaledBitmap(path)
+    private void updateImageView(Uri uri) {
+        imageView.setImageURI(uri);
+        imageView.setVisibility(View.VISIBLE);
+        clearCalibration();
+        // updateImageView not used for PDFs, so
+        // reset all the PDF variables
+        resetPdf();
+    }
+
+    // possibly implement save photo to gallery
+//    private void galleryAddPic() {
+//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//        File f = new File(currentPhotoPath);
+//        Uri contentUri = Uri.fromFile(f);
+//        mediaScanIntent.setData(contentUri);
+//        this.sendBroadcast(mediaScanIntent);
+//    }
+
+    // TODO: deprecated, also source of crashes.
+    //  See https://stackoverflow.com/questions/62671106/onactivityresult-method-is-deprecated-what-is-the-alternative
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        EPSLog.log("onActivityResult()");
+//        super.onActivityResult(requestCode, resultCode, data);
+//        try {
+//            if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+//                Uri selectedImage = data.getData();
+//                if (selectedImage == null) {
+//                    return;
+//                }
+//                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+//                Cursor cursor = getContentResolver().query(selectedImage,
+//                        filePathColumn, null, null, null);
+//                if (cursor == null) {
+//                    return;
+//                }
+//                cursor.moveToFirst();
+//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//                String picturePath = cursor.getString(columnIndex);
+//                cursor.close();
+//
+//                updateImageViewWithPath(picturePath);
+//            }
+//            if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
+//                updateImageViewWithPath(currentPhotoPath);
+//                // Clean up by deleting file that no longer is needed from storage.
+//                File f = new File(currentPhotoPath);
+//                if (f.exists()) {
+//                    //noinspection ResultOfMethodCallIgnored
+//                    f.delete();
+//                }
+//            }
+//        } catch (Exception e) {
+//            EPSLog.log("onActivityResult() threw exception.");
+//        }
+//    }
+
     // Original code fails in Android 29.  See https://medium.com/@sriramaripirala/android-10-open-failed-eacces-permission-denied-da8b630a89df
     private Bitmap getScaledBitmap(String picturePath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -2126,6 +1977,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         options.inSampleSize = calculateInSampleSize(options, targetWidth, targetHeight);
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeFile(picturePath, options);
+    }
+
+    private static int calculateInSampleSize(
+            BitmapFactory.Options options,
+            int reqWidth,
+            int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
     private void rotateImage(float degrees) {
@@ -2591,7 +2467,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return calipersView.getCalipers().size() > 0;
     }
 
-
     private Caliper getLoneTimeCaliper() {
         Caliper c = null;
         int n = 0;
@@ -2702,13 +2577,133 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         calipersView.invalidate();
     }
 
-
     private void adjustCalibrationForScale(float scale) {
         horizontalCalibration.setCurrentZoom(scale);
         verticalCalibration.setCurrentZoom(scale);
         horizontalCalibration.setOffset(new PointF(imageView.getDisplayRect().left, imageView.getDisplayRect().top));
         verticalCalibration.setOffset(new PointF(imageView.getDisplayRect().left, imageView.getDisplayRect().top));
         calipersView.invalidate();
+    }
+
+    private enum ToolbarMenu {
+        Main,
+        AddCaliper,
+        Calibration,
+        QTc1,
+        QTc2,
+        Rotate,
+        PDF,
+        Color,
+        Tweak,
+        Move
+    }
+
+    private static class UriPage {
+        Uri uri;
+        int pageNumber;
+    }
+
+    private static class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
+        private final WeakReference<MainActivity> activityWeakReference;
+
+        private boolean isNewPdf;
+        private String exceptionMessage = "";
+
+        NougatAsyncLoadPDF(MainActivity context) {
+            activityWeakReference = new WeakReference<>(context);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+            Toast toast = Toast.makeText(activityWeakReference.get(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
+            toast.show();
+
+        }
+
+        @Override
+        protected Bitmap doInBackground(UriPage... params) {
+            UriPage uriPage = params[0];
+            Uri pdfUri = uriPage.uri;
+            if (pdfUri == null) {
+                if (activityWeakReference.get().currentPdfUri == null) {
+                    // can't do anything if all is null
+                    return null;
+                }
+                // use currently opened PDF
+                pdfUri = activityWeakReference.get().currentPdfUri;
+                isNewPdf = false;
+            }
+            else {
+                // change Uri to a real file path
+                pdfUri = activityWeakReference.get().getTempUri(pdfUri);
+                // if getTempUri returns null then exception was thrown
+                if (pdfUri == null) {
+                    return null;
+                }
+                // close old currentPdfUri if possible
+                if (activityWeakReference.get().currentPdfUri != null) {
+                    File file = new File(Objects.requireNonNull(activityWeakReference.get().currentPdfUri.getPath()));
+                    if (file.exists()) {
+                        //noinspection ResultOfMethodCallIgnored
+                        file.delete();
+                    }
+                }
+                // retain PDF Uri for future page changes
+                activityWeakReference.get().currentPdfUri = pdfUri;
+                isNewPdf = true;
+            }
+            try {
+                File file = new File(Objects.requireNonNull(pdfUri.getPath()));
+                ParcelFileDescriptor fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
+                PdfRenderer renderer = new PdfRenderer(fd);
+                activityWeakReference.get().numberOfPdfPages = renderer.getPageCount();
+                activityWeakReference.get().currentPdfPageNumber = uriPage.pageNumber;
+                PdfRenderer.Page page = renderer.openPage(activityWeakReference.get().currentPdfPageNumber);
+
+                int width = page.getWidth();
+                int height = page.getHeight();
+
+                Bitmap bitmap = Bitmap.createBitmap(width * 3, height * 3, Bitmap.Config.ARGB_8888);
+
+                Matrix matrix = new Matrix();
+                matrix.postScale(3, 3);
+
+                page.render(bitmap, null, matrix, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+                page.close();
+                renderer.close();
+                fd.close();
+                return bitmap;
+            } catch (java.io.IOException e) {
+                // catch out of memory errors and just don't load rather than crash
+                exceptionMessage = e.getMessage();
+                return null;
+            }
+        }
+
+        protected void onPostExecute(Bitmap bitmap) {
+            MainActivity activity = activityWeakReference.get();
+            if (activity == null || activity.isFinishing()) {
+                return;
+            }
+            if (bitmap != null) {
+                // Set pdf bitmap directly, scaling screws it up
+                activityWeakReference.get().imageView.setImageBitmap(bitmap);
+                // must set visibility as imageview will be hidden if started with sample ecg hidden
+                activityWeakReference.get().imageView.setVisibility(View.VISIBLE);
+                activityWeakReference.get().imageView.setScale(activityWeakReference.get().imageView.getMinimumScale());
+                if (isNewPdf) {
+                    activityWeakReference.get().clearCalibration();
+                }
+            }
+            else {
+                Toast toast = Toast.makeText(activityWeakReference.get(), activityWeakReference.get().getString(R.string.pdf_error_message) +
+                        LF + exceptionMessage, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+            activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        }
     }
 
     private class MatrixChangeListener implements OnMatrixChangedListener {
