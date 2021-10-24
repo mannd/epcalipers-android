@@ -69,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -256,6 +257,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     updateImageView(result);
                 }
             });
+    ActivityResultLauncher<Intent> imageResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    Intent intent = result.getData();
+                    try {
+                        if (intent != null) {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(
+                                    getContentResolver(), intent.getData()
+                            );
+
+                            updateImageView(bitmap);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+    );
 
     // Set up the long press menus.
     private ActionMode currentActionMode;
@@ -1684,7 +1705,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // See: http://stackoverflow.com/questions/32431723/read-external-storage-permission-for-android
     // and https://developer.android.com/training/permissions/requesting.html
     private void selectImageFromGallery() {
-        getImageContent.launch("image/*");
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        imageResultLauncher.launch(intent);
 
 //        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 //                != PackageManager.PERMISSION_GRANTED) {
