@@ -70,7 +70,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -241,53 +240,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     // New way to get take photo and get media images.
-    ActivityResultLauncher<Uri> getPhotoContent = registerForActivityResult(
+    final ActivityResultLauncher<Uri> getPhotoContent = registerForActivityResult(
             new ActivityResultContracts.TakePicture(),
             new ActivityResultCallback<Boolean>() {
                 @Override
                 public void onActivityResult(Boolean result) {
-                    Uri photoUri = Uri.fromFile(photoFile);
-                    updateImageView(photoUri);
+                    if (result) {
+                        Uri photoUri = Uri.fromFile(photoFile);
+                        if (photoUri == null) {
+                            return;
+                        }
+                        updateImageView(photoUri);
+                    }
                 }
             });
-    ActivityResultLauncher<String> getImageContent = registerForActivityResult(
+    final ActivityResultLauncher<String> getImageContent = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
-            new ActivityResultCallback<Uri>() {
-                @Override
-                public void onActivityResult(Uri imageUri) {
-                    if (imageUri == null) {
-                        return;
+            imageUri -> {
+                if (imageUri == null) {
+                    return;
+                }
+                Bitmap bitmap;
+                try {
+                    if (Build.VERSION.SDK_INT < 28) {
+                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                    } else {
+                        ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), imageUri);
+                        bitmap = ImageDecoder.decodeBitmap(source);
                     }
-                    Bitmap bitmap = null;
-                    try {
-                        if (Build.VERSION.SDK_INT < 28) {
-                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                        } else {
-                            ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), imageUri);
-                            bitmap = ImageDecoder.decodeBitmap(source);
-                        }
-                        updateImageView(bitmap);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    updateImageView(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             });
     ActivityResultLauncher<Intent> imageResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    Intent intent = result.getData();
-                    try {
-                        if (intent != null) {
-                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                                    getContentResolver(), intent.getData()
-                            );
-                            updateImageView(bitmap);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            result -> {
+                Intent intent = result.getData();
+                try {
+                    if (intent != null) {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(
+                                getContentResolver(), intent.getData()
+                        );
+                        updateImageView(bitmap);
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
     );
@@ -1721,28 +1719,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateImageView(image);
     }
 
-    // Note: for target SDK over 22, must add specific code to check for permissions,
-    // as Android > 6 has dynamic granting of permissions.  Leave target SDK to avoid this.
-    // See: http://stackoverflow.com/questions/32431723/read-external-storage-permission-for-android
-    // and https://developer.android.com/training/permissions/requesting.html
     private void selectImageFromGallery() {
         getImageContent.launch("image/*");
-//        Intent intent = new Intent(Intent.ACTION_PICK);
-//        intent.setType("image/*");
-//        imageResultLauncher.launch(intent);
-
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                    MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-//            // Buttons are unresponsive if permission not granted.
-//            showPermissionsRequestToast();
-//            EPSLog.log("Permission needed to select images.");
-//        }
-//        else {
-//            proceedToSelectImageFromGallery();
-//        }
     }
 
     private void takePhoto() {
@@ -1790,15 +1768,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MenuItem imageMenuItem = menuNav.findItem(R.id.nav_image);
         imageMenuItem.setEnabled(enable);
     }
-
-//    @SuppressLint("IntentReset")
-//    private void proceedToSelectImageFromGallery() {
-//        @SuppressLint("IntentReset") Intent intent = new Intent(Intent.ACTION_PICK,
-//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        intent.setType("image/*");
-//        startActivityForResult(intent, RESULT_LOAD_IMAGE);
-//
-//    }
 
     private boolean deviceHasCamera(Intent takePictureIntent) {
         return takePictureIntent.resolveActivity(getPackageManager()) != null;
@@ -1971,45 +1940,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        Uri contentUri = Uri.fromFile(f);
 //        mediaScanIntent.setData(contentUri);
 //        this.sendBroadcast(mediaScanIntent);
-//    }
-
-    // TODO: deprecated, also source of crashes.
-    //  See https://stackoverflow.com/questions/62671106/onactivityresult-method-is-deprecated-what-is-the-alternative
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        EPSLog.log("onActivityResult()");
-//        super.onActivityResult(requestCode, resultCode, data);
-//        try {
-//            if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-//                Uri selectedImage = data.getData();
-//                if (selectedImage == null) {
-//                    return;
-//                }
-//                String[] filePathColumn = {MediaStore.Images.Media.DATA};
-//                Cursor cursor = getContentResolver().query(selectedImage,
-//                        filePathColumn, null, null, null);
-//                if (cursor == null) {
-//                    return;
-//                }
-//                cursor.moveToFirst();
-//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//                String picturePath = cursor.getString(columnIndex);
-//                cursor.close();
-//
-//                updateImageViewWithPath(picturePath);
-//            }
-//            if (requestCode == RESULT_CAPTURE_IMAGE && resultCode == RESULT_OK) {
-//                updateImageViewWithPath(currentPhotoPath);
-//                // Clean up by deleting file that no longer is needed from storage.
-//                File f = new File(currentPhotoPath);
-//                if (f.exists()) {
-//                    //noinspection ResultOfMethodCallIgnored
-//                    f.delete();
-//                }
-//            }
-//        } catch (Exception e) {
-//            EPSLog.log("onActivityResult() threw exception.");
-//        }
 //    }
 
     // Original code fails in Android 29.  See https://medium.com/@sriramaripirala/android-10-open-failed-eacces-permission-denied-da8b630a89df
