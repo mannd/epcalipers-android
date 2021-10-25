@@ -11,6 +11,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -82,6 +83,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import static org.epstudios.epcalipers.CalibrationProcessor.processCalibrationString;
@@ -191,6 +193,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Toolbar actionBar;
     private NavigationView navigationView;
 
+    private ImageViewModel imageViewModel;
+
     // Side menu items
     private MenuItem lockImageMenuItem;
 
@@ -250,11 +254,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             new ActivityResultContracts.GetContent(),
             new ActivityResultCallback<Uri>() {
                 @Override
-                public void onActivityResult(Uri result) {
-                    if (result == null) {
+                public void onActivityResult(Uri imageUri) {
+                    if (imageUri == null) {
                         return;
                     }
-                    updateImageView(result);
+                    Bitmap bitmap = null;
+                    try {
+                        if (Build.VERSION.SDK_INT < 28) {
+                            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                        } else {
+                            ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), imageUri);
+                            bitmap = ImageDecoder.decodeBitmap(source);
+                        }
+                        updateImageView(bitmap);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
     ActivityResultLauncher<Intent> imageResultLauncher = registerForActivityResult(
@@ -268,7 +283,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Bitmap bitmap = MediaStore.Images.Media.getBitmap(
                                     getContentResolver(), intent.getData()
                             );
-
                             updateImageView(bitmap);
                         }
                     } catch (IOException e) {
@@ -456,6 +470,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textPositionMap.put("bottom", Caliper.TextPosition.Bottom);
 
         loadSettings();
+
+        // Initialize view model to hold bitmap during app lifecycle
+        imageViewModel = new ViewModelProvider(this).get(ImageViewModel.class);
 
         imageView = findViewById(R.id.imageView);
         imageView.setEnabled(true);
@@ -952,6 +969,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean(getString(R.string.multipage_pdf_key), numberOfPdfPages > 0);
         outState.putBoolean(getString(R.string.a_caliper_is_marching_key), calipersView.isACaliperIsMarching());
 
+        Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        imageViewModel.setBitmap(imageBitmap);
+
         // To avoid FAILED BINDER TRANSACTION issue (which is ignored up until Android 24,
         // save to temp file instead of storing bitmap in bundle.
         // See http://stackoverflow.com/questions/36007540/failed-binder-transaction-in-android
@@ -968,7 +988,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //
 //        }
 //        else {
-            proceedToStoreBitmap();
+//            proceedToStoreBitmap();
 //        }
 
         // Calibration
@@ -1030,7 +1050,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Bitmap now passed via temporary file
         //Bitmap image = savedInstanceState.getParcelable("Image");
-        Bitmap image = getBitmapFromTempFile();
+        Bitmap image = imageViewModel.getBitmap();
+//        Bitmap image = getBitmapFromTempFile();
         imageView.setImageBitmap(image);
         previousBitmap = image;
 
@@ -1705,9 +1726,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // See: http://stackoverflow.com/questions/32431723/read-external-storage-permission-for-android
     // and https://developer.android.com/training/permissions/requesting.html
     private void selectImageFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        imageResultLauncher.launch(intent);
+        getImageContent.launch("image/*");
+//        Intent intent = new Intent(Intent.ACTION_PICK);
+//        intent.setType("image/*");
+//        imageResultLauncher.launch(intent);
 
 //        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 //                != PackageManager.PERMISSION_GRANTED) {
@@ -1994,6 +2016,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Bitmap getScaledBitmap(String picturePath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
+        // FIXME: file is decoded twice in this method.  Probable bug.
         BitmapFactory.decodeFile(picturePath, options);
         int targetWidth = imageView.getWidth();
         int targetHeight = imageView.getHeight();
