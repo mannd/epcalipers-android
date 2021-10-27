@@ -2579,6 +2579,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int pageNumber;
     }
 
+    // FIXME: source of crash
     private static class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
         private final WeakReference<MainActivity> activityWeakReference;
 
