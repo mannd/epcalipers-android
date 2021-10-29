@@ -1,6 +1,5 @@
 package org.epstudios.epcalipers;
 
-import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
@@ -17,6 +16,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -26,7 +26,6 @@ import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.InputType;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -74,10 +73,8 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
@@ -92,16 +89,24 @@ import static org.epstudios.epcalipers.MyPreferenceFragment.FRAMINGHAM;
 import static org.epstudios.epcalipers.MyPreferenceFragment.FRIDERICIA;
 import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
 
+// Note EP Calipers is legacy software.  Ideally all variables that aren't UI related
+// would be moved to a view model class, but instead we rely still rely on onSaveInstanceState()
+// to save and reload these variables directly to this Activity.  Thus the imageView
+// bitmap is held in the MainViewModel class to deal with device rotation, while
+// the imageView URI is held in the app bundle to deal with the app going into the
+// background.
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
-    private static final String TAG = "EPS";
-    private static final String LF = "\n";
+    // TODO: Remove unused constants
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_CAPTURE_IMAGE = 2;
+
     private static final int DEFAULT_LINE_WIDTH = 2;
 
-    // new permissions for Android >= 6.0
-    // TODO: Unused permissions at the moment.
+    // Image scaling limits
+    private static final float MAX_SCALE = 10.0f;
+    private static final float MIN_SCALE = 0.3f;
+
+    // TODO: Remove unused permissions
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 101;
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_IMAGE = 102;
@@ -109,14 +114,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int MY_PERMISSIONS_REQUEST_STORE_BITMAP = 104;
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE = 105;
 
-    private final Deque<ToolbarMenu> toolbarMenuDeque = new ArrayDeque<>();
-
     // TODO: Make sure the 1st part of this conditional never changes.  force_first_run
     // MUST be false for a release.  The 2nd part of the condition can be set true to
     // test onboarding with each startup.
     private final boolean force_first_run = !BuildConfig.DEBUG ? false : false;
-
-    private File photoFile; // Used as tmp file to hold results of taking a photo.
 
     // Store version information
     private Version version;
@@ -169,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button microDoneButton;
 
     // Toolbar menus
+    private final Deque<ToolbarMenu> toolbarMenuDeque = new ArrayDeque<>();
     private HorizontalScrollView mainMenu;
     private HorizontalScrollView pdfMenu;
     private HorizontalScrollView addCaliperMenu;
@@ -192,13 +194,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Toolbar actionBar;
     private NavigationView navigationView;
 
-    private ImageViewModel imageViewModel;
+    // Contains big objects that must persist with rotation, e.g. the imageView Bitmap.
+    private MainViewModel mainViewModel;
 
     // Side menu items
     private MenuItem lockImageMenuItem;
 
     // Other variables
-    // TODO: no longer used?
     private String currentPhotoPath;
     private FrameLayout layout;
     private DrawerLayout drawerLayout;
@@ -221,12 +223,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Uri currentPdfUri;
     private int numberOfPdfPages;
     private int currentPdfPageNumber;
+    private File photoFile; // Used as tmp file to hold results of taking a photo.
+    private Uri imageUri; // The URI of the image held in imageView.
 
     private boolean useLargeFont;
-    private boolean imageIsLocked = false;
+    private boolean imageIsLocked;
     private float smallFontSize;
     private float largeFontSize;
+
+    // TODO: To be removed.
     private Bitmap previousBitmap = null;
+
     private List<Button> upDownButtons;
     private List<Button> rightLeftButtons;
     private Map<String, QtcFormula> qtcFormulaMap;
@@ -236,8 +243,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // and "Right".
     private Caliper.TextPosition timeCaliperTextPositionPreference = Caliper.TextPosition.CenterAbove;
     private Caliper.TextPosition amplitudeCaliperTextPositionPreference = Caliper.TextPosition.Right;
-
-
 
     // New way to get take photo and get media images.
     final ActivityResultLauncher<Uri> getPhotoContent = registerForActivityResult(
@@ -261,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
                 Bitmap bitmap;
+                this.imageUri = imageUri;
                 try {
                     if (Build.VERSION.SDK_INT < 28) {
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
@@ -273,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     e.printStackTrace();
                 }
             });
-    ActivityResultLauncher<Intent> imageResultLauncher = registerForActivityResult(
+    final ActivityResultLauncher<Intent> imageResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 Intent intent = result.getData();
@@ -381,30 +387,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return currentActionMode;
     }
 
-    // Convert dp to pixels utility
-    private float dpToPixel(float dp) {
-        float density = getResources().getDisplayMetrics().density;
-        return dp * density;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EPSLog.log("onCreate");
 
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        String type = intent.getType();
-
+        // App started from scratch
         noSavedInstance = (savedInstanceState == null);
-
-        smallFontSize = getResources().getDimension(R.dimen.small_font_size);
-        largeFontSize = getResources().getDimension(R.dimen.large_font_size);
+        EPSLog.log("noSavedInstance = " + noSavedInstance);
 
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
 
+        // Set up calipers view
+        calipersView = findViewById(R.id.caliperView);
+        calipersView.setMainActivity(this);
+
+        // Set up side menu
         navigationView = findViewById(R.id.nav_view);
         drawerLayout = findViewById(R.id.activity_main_id);
         Menu menuNav = navigationView.getMenu();
@@ -440,15 +439,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
         );
 
-
-        externalImageLoad = false;
-        currentPdfUri = null;
-        numberOfPdfPages = 0;
-        currentPdfPageNumber = 0;
-        useLargeFont = false;
+        // Initialize variables
+        smallFontSize = getResources().getDimension(R.dimen.small_font_size);
+        largeFontSize = getResources().getDimension(R.dimen.large_font_size);
         currentCaliperColor = ContextCompat.getColor(this, R.color.default_caliper_color);
         currentHighlightColor = ContextCompat.getColor(this, R.color.default_highlight_color);
         currentLineWidth = DEFAULT_LINE_WIDTH;
+        shortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
 
         // QTc formulas
         qtcFormulaMap = new HashMap<>();
@@ -467,10 +465,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textPositionMap.put("top", Caliper.TextPosition.Top);
         textPositionMap.put("bottom", Caliper.TextPosition.Bottom);
 
-        loadSettings();
+        loadPreferences();
 
         // Initialize view model to hold bitmap during app lifecycle
-        imageViewModel = new ViewModelProvider(this).get(ImageViewModel.class);
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        Drawable viewModelDrawable = mainViewModel.getDrawable();
+        EPSLog.log("mainViewModel.getDrawable() = " + viewModelDrawable);
+        if (savedInstanceState != null) {
+            Uri savedInstanceStateImageUri = savedInstanceState.getParcelable(getString(R.string.image_uri_key));
+            EPSLog.log("savedInstanceStateImageUri = " + savedInstanceStateImageUri);
+        } else {
+            EPSLog.log("savedInstanceState is null");
+        }
 
         imageView = findViewById(R.id.imageView);
         imageView.setEnabled(true);
@@ -478,9 +484,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             imageView.setVisibility(View.INVISIBLE);
         }
         imageView.setScaleType(ImageView.ScaleType.CENTER);
-        float max_zoom = 10.0f;
-        imageView.setMaximumScale(max_zoom);
-        imageView.setMinimumScale(0.3f);
+        imageView.setMaximumScale(MAX_SCALE);
+        imageView.setMinimumScale(MIN_SCALE);
         imageView.setOnMatrixChangeListener(new MatrixChangeListener());
         imageView.setOnLongClickListener(v -> {
             if (currentActionMode != null) { // || calipersView.isTweakingOrColoring()) {
@@ -490,6 +495,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return true;
         });
 
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
         if (noSavedInstance && Intent.ACTION_SEND.equals(action) && type != null) {
             if (type.startsWith(getString(R.string.image_type))) {
                 handleSentImage();
@@ -503,12 +511,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        calipersView = findViewById(R.id.caliperView);
-        calipersView.setMainActivity(this);
-
-
-        shortAnimationDuration = getResources().getInteger(
-                android.R.integer.config_shortAnimTime);
 
         // Set up action bar up top.  Note that icon on left for hamburger menu.
         actionBar = findViewById(R.id.action_bar);
@@ -527,10 +529,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         horizontalCalibration = new Calibration(Caliper.Direction.HORIZONTAL, this);
         verticalCalibration = new Calibration(Caliper.Direction.VERTICAL, this);
-
-        rrIntervalForQTc = 0.0;
-
-        totalRotation = 0.0f;
 
         selectMainMenu();
 
@@ -672,7 +670,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @SuppressWarnings("deprecation")
             @Override
             public void onGlobalLayout() {
-                Log.d(TAG, "onGlobalLayout");
+                EPSLog.log("onGlobalLayout");
                 int androidVersion = Build.VERSION.SDK_INT;
                 if (androidVersion >= Build.VERSION_CODES.JELLY_BEAN) {
                     layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -707,34 +705,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void handleImage() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_STARTUP_IMAGE);
-        }
-        else {
+//        if (ContextCompat.checkSelfPermission(this,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    MY_PERMISSIONS_REQUEST_STARTUP_IMAGE);
+//        }
+//        else {
             proceedToHandleImage();
-        }
+//        }
     }
 
     private void handleSentImage() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE);
-        }
-        else {
+//        if (ContextCompat.checkSelfPermission(this,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE);
+//        }
+//        else {
             proceedToHandleSentImage();
-        }
+//        }
     }
 
     private void proceedToHandleImage() {
         try {
-            Uri imageUri = getIntent().getData();
+            imageUri = getIntent().getData();
             if (imageUri != null) {
                 externalImageLoad = true;
                 externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
@@ -760,16 +758,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // from http://stackoverflow.com/questions/10698360/how-to-convert-a-pdf-page-to-an-image-in-android
     private void handlePDF() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_STARTUP_PDF);
-        }
-        else {
+        // FIXME: these permissions no longer needed???
+//        if (ContextCompat.checkSelfPermission(this,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    MY_PERMISSIONS_REQUEST_STARTUP_PDF);
+//        }
+//        else {
             proceedToHandlePDF();
-        }
+//        }
     }
 
     private void proceedToHandlePDF() {
@@ -897,8 +896,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.show();
     }
 
-    private void loadSettings() {
-        EPSLog.log("loadSettings()");
+    private void loadPreferences() {
+        EPSLog.log("loadPreferences()");
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(this);
         showStartImage = sharedPreferences.getBoolean(
@@ -955,6 +954,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private Bitmap getImageViewBitmap() {
+        Drawable drawable = imageView.getDrawable();
+        BitmapDrawable bitmapDrawable = (BitmapDrawable)drawable;
+        Bitmap bitmap = bitmapDrawable.getBitmap();
+        return bitmap;
+    }
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -967,27 +973,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean(getString(R.string.multipage_pdf_key), numberOfPdfPages > 0);
         outState.putBoolean(getString(R.string.a_caliper_is_marching_key), calipersView.isACaliperIsMarching());
 
-        Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-        imageViewModel.setBitmap(imageBitmap);
+        // FIXME: new handling of imageView bitmap is experimental.
+        // Need to set this bitmap whenever imageView is updated.
+//        Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+//        mainViewModel.setBitmap(imageBitmap);
 
-        // To avoid FAILED BINDER TRANSACTION issue (which is ignored up until Android 24,
-        // save to temp file instead of storing bitmap in bundle.
-        // See http://stackoverflow.com/questions/36007540/failed-binder-transaction-in-android
-        //outState.putParcelable("Image", ((BitmapDrawable) imageView.getDrawable()).getBitmap());
-
-        // also check permissions first
-//        if (ContextCompat.checkSelfPermission(this,
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//
-//                ActivityCompat.requestPermissions(this,
-//                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                        MY_PERMISSIONS_REQUEST_STORE_BITMAP);
-//
-//        }
-//        else {
-//            proceedToStoreBitmap();
-//        }
+        Drawable drawable = imageView.getDrawable();
+        mainViewModel.setDrawable(drawable);
+        outState.putParcelable(getString(R.string.image_uri_key), imageUri);
+        outState.putParcelable("currentPdfUri", currentPdfUri);
 
         // Calibration
         // must use getRawUnits here, otherwise original calibration units are lost
@@ -1046,12 +1040,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         boolean isMultipagePdf = savedInstanceState.getBoolean(getString(R.string.multipage_pdf_key));
 
+        // FIXME: experimenting with image URI/bitmap handling here...
         // Bitmap now passed via temporary file
         //Bitmap image = savedInstanceState.getParcelable("Image");
-        Bitmap image = imageViewModel.getBitmap();
+//        Bitmap image = imageViewModel.getBitmap();
 //        Bitmap image = getBitmapFromTempFile();
-        imageView.setImageBitmap(image);
-        previousBitmap = image;
+//        imageView.setImageBitmap(image);
+//        previousBitmap = image;
+        // TODO: This also works.  Ideally should have bitmap in ViewModel, and recreate Uri when view comes back from background.
+        // See: https://proandroiddev.com/customizing-the-new-viewmodel-cf28b8a7c5fc
+//        imageUri = savedInstanceState.getParcelable(getString(R.string.image_uri_key));
+//        imageView.setImageURI(imageUri);
+//        currentPdfUri = savedInstanceState.getParcelable("currentPdfUri");
+        Drawable drawable = mainViewModel.getDrawable();
+        imageView.setImageDrawable(drawable);
 
         totalRotation = savedInstanceState.getFloat(getString(R.string.total_rotation_key));
 
@@ -2486,6 +2488,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         returnFromAddCaliperMenu();
     }
 
+    private float dpToPixel(float dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return dp * density;
+    }
+
     private void setLineWidth(Caliper c, float width) {
         float pixels = dpToPixel(width);
         c.setLineWidth(pixels);
@@ -2675,8 +2682,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
             else {
-                Toast toast = Toast.makeText(activityWeakReference.get(), activityWeakReference.get().getString(R.string.pdf_error_message) +
-                        LF + exceptionMessage, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(activityWeakReference.get(),
+                        activityWeakReference.get().getString(R.string.pdf_error_message) +
+                        "\n" + exceptionMessage, Toast.LENGTH_SHORT);
                 toast.show();
             }
             activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.GONE);

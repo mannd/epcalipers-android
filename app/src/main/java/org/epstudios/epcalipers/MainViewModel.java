@@ -1,6 +1,7 @@
 package org.epstudios.epcalipers;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 
 import androidx.lifecycle.ViewModel;
 
@@ -25,7 +26,8 @@ import androidx.lifecycle.ViewModel;
  * You should have received a copy of the GNU General Public License
  * along with epcalipers-android.  If not, see <http://www.gnu.org/licenses/>.
  */
-public class ImageViewModel extends ViewModel {
+
+public class MainViewModel extends ViewModel {
     public Bitmap getBitmap() {
         return bitmap;
     }
@@ -35,4 +37,14 @@ public class ImageViewModel extends ViewModel {
     }
 
     private Bitmap bitmap = null;
+
+    public Drawable getDrawable() {
+        return drawable;
+    }
+
+    public void setDrawable(Drawable drawable) {
+        this.drawable = drawable;
+    }
+
+    private Drawable drawable = null;
 }
