@@ -1,5 +1,6 @@
 package org.epstudios.epcalipers;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
@@ -75,6 +76,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
@@ -107,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final float MIN_SCALE = 0.3f;
 
     // TODO: Remove unused permissions
+    // FIXME: Need to get camera permission.
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 101;
     private static final int MY_PERMISSIONS_REQUEST_STARTUP_IMAGE = 102;
@@ -123,8 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Version version;
 
     // OnSharedPreferenceListener must be a strong reference
-    // as otherwise it is a weak reference and will be garbage collected, thus
-    // making it stop working.
+    // because if it is a weak reference it will be garbage collected and stop working.
     // See http://stackoverflow.com/questions/2542938/sharedpreferences-onsharedpreferencechangelistener-not-being-called-consistently
     @SuppressWarnings("FieldCanBeLocal")
     private SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
@@ -168,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button microUpButton;
     private Button microDownButton;
     private Button microDoneButton;
+    private List<Button> upDownButtons;
+    private List<Button> rightLeftButtons;
 
     // Toolbar menus
     private final Deque<ToolbarMenu> toolbarMenuDeque = new ArrayDeque<>();
@@ -190,9 +194,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PhotoView imageView;
     private CalipersView calipersView;
     private Toolbar menuToolbar;
+    private NavigationView navigationView;
     @SuppressWarnings("FieldCanBeLocal")
     private Toolbar actionBar;
-    private NavigationView navigationView;
 
     // Contains big objects that must persist with rotation, e.g. the imageView Bitmap.
     private MainViewModel mainViewModel;
@@ -201,7 +205,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MenuItem lockImageMenuItem;
 
     // Other variables
-    private String currentPhotoPath;
     private FrameLayout layout;
     private DrawerLayout drawerLayout;
     private double rrIntervalForQTc;
@@ -224,7 +227,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int numberOfPdfPages;
     private int currentPdfPageNumber;
     private File photoFile; // Used as tmp file to hold results of taking a photo.
-    private Uri imageUri; // The URI of the image held in imageView.
+    private Uri currentImageUri; // The URI of the image held in imageView.
+    private String currentPhotoPath;
 
     private boolean useLargeFont;
     private boolean imageIsLocked;
@@ -234,8 +238,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // TODO: To be removed.
     private Bitmap previousBitmap = null;
 
-    private List<Button> upDownButtons;
-    private List<Button> rightLeftButtons;
     private Map<String, QtcFormula> qtcFormulaMap;
     private QtcFormula qtcFormulaPreference = QtcFormula.qtcBzt;
     private HashMap<String, Caliper.TextPosition> textPositionMap;
@@ -266,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
                 Bitmap bitmap;
-                this.imageUri = imageUri;
+                currentImageUri = imageUri;
                 try {
                     if (Build.VERSION.SDK_INT < 28) {
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
@@ -394,7 +396,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // App started from scratch
         noSavedInstance = (savedInstanceState == null);
-        EPSLog.log("noSavedInstance = " + noSavedInstance);
 
         setContentView(R.layout.activity_main);
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
@@ -412,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cameraMenuItem.setEnabled(getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY));
         lockImageMenuItem = menuNav.findItem(R.id.nav_lock_image);
-        // Make navigation (hamburger) menu do things.
+        // Set up actions for navigation (hamburger) menu.
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> {
                     int id = menuItem.getItemId();
@@ -467,16 +468,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         loadPreferences();
 
-        // Initialize view model to hold bitmap during app lifecycle
-        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        Drawable viewModelDrawable = mainViewModel.getDrawable();
-        EPSLog.log("mainViewModel.getDrawable() = " + viewModelDrawable);
-        if (savedInstanceState != null) {
-            Uri savedInstanceStateImageUri = savedInstanceState.getParcelable(getString(R.string.image_uri_key));
-            EPSLog.log("savedInstanceStateImageUri = " + savedInstanceStateImageUri);
-        } else {
-            EPSLog.log("savedInstanceState is null");
-        }
 
         imageView = findViewById(R.id.imageView);
         imageView.setEnabled(true);
@@ -511,6 +502,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
+//        // Initialize view model to hold bitmap during app lifecycle
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+//        Drawable viewModelDrawable = mainViewModel.getDrawable();
+//        EPSLog.log("mainViewModel.getDrawable() = " + viewModelDrawable);
+//       if (savedInstanceState != null) {
+//           if (viewModelDrawable != null) {
+//               imageView.setImageDrawable(viewModelDrawable);
+//           }
+//       }
+//       }//        String image_key = getString(R.string.image_uri_key);
+//        EPSLog.log("****" + image_key);
+////        Uri savedInstanceStateImageUri = (Uri)savedInstanceState.getParcelable(getString(R.string.image_uri_key));
+////        if (savedInstanceState != null) {
+//            if (viewModelDrawable != null) {
+//                imageView.setImageDrawable(viewModelDrawable);
+//            }
+////            else if (savedInstanceStateImageUri != null ){
+////                imageView.setImageURI(savedInstanceStateImageUri);
+////            }
+////        } else {
+//            // Start up from scratch
+//            EPSLog.log("savedInstanceState is null");
+////        }
 
         // Set up action bar up top.  Note that icon on left for hamburger menu.
         actionBar = findViewById(R.id.action_bar);
@@ -732,10 +746,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void proceedToHandleImage() {
         try {
-            imageUri = getIntent().getData();
-            if (imageUri != null) {
+            currentImageUri = getIntent().getData();
+            if (currentImageUri != null) {
                 externalImageLoad = true;
-                externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), currentImageUri);
             }
         }
         catch (java.io.IOException e) {
@@ -980,8 +994,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Drawable drawable = imageView.getDrawable();
         mainViewModel.setDrawable(drawable);
-        outState.putParcelable(getString(R.string.image_uri_key), imageUri);
-        outState.putParcelable("currentPdfUri", currentPdfUri);
+        outState.putParcelable(getString(R.string.image_uri_key), currentImageUri);
+        outState.putParcelable(getString(R.string.current_pdf_uri), currentPdfUri);
+        outState.putInt(getString(R.string.number_pdf_pages), numberOfPdfPages);
+        outState.putInt(getString(R.string.current_pdf_page), currentPdfPageNumber);
 
         // Calibration
         // must use getRawUnits here, otherwise original calibration units are lost
@@ -1033,27 +1049,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         EPSLog.log("onRestoreInstanceState");
         super.onRestoreInstanceState(savedInstanceState);
+        // See: https://proandroiddev.com/customizing-the-new-viewmodel-cf28b8a7c5fc
+        Uri imageUri = savedInstanceState.getParcelable(getString(R.string.image_uri_key));
+        // Todo: need to make sure drawables and Uris all saved when they need to be.
+        // Also, if external image loaded, don't want to overwrite it with old image.
+        Drawable drawable = mainViewModel.getDrawable();
+        if (drawable != null) {
+            imageView.setImageDrawable(drawable);
+        } else if (imageUri != null) {
+            imageView.setImageURI(imageUri);
+        } else {
+            return; // else return?? don't restore anything if no image?
+        }
+        currentPdfUri = savedInstanceState.getParcelable(getString(R.string.current_pdf_uri));
+        numberOfPdfPages = savedInstanceState.getInt(getString(R.string.number_pdf_pages));
+        currentPdfPageNumber = savedInstanceState.getInt(getString(R.string.current_pdf_page));
 
         imageIsLocked = savedInstanceState.getBoolean(getString(R.string.image_locked_key));
         lockImage(imageIsLocked);
         calipersView.setACaliperIsMarching(savedInstanceState.getBoolean(getString(R.string.a_caliper_is_marching_key)));
 
-        boolean isMultipagePdf = savedInstanceState.getBoolean(getString(R.string.multipage_pdf_key));
-
-        // FIXME: experimenting with image URI/bitmap handling here...
-        // Bitmap now passed via temporary file
-        //Bitmap image = savedInstanceState.getParcelable("Image");
-//        Bitmap image = imageViewModel.getBitmap();
-//        Bitmap image = getBitmapFromTempFile();
-//        imageView.setImageBitmap(image);
-//        previousBitmap = image;
-        // TODO: This also works.  Ideally should have bitmap in ViewModel, and recreate Uri when view comes back from background.
-        // See: https://proandroiddev.com/customizing-the-new-viewmodel-cf28b8a7c5fc
-//        imageUri = savedInstanceState.getParcelable(getString(R.string.image_uri_key));
-//        imageView.setImageURI(imageUri);
-//        currentPdfUri = savedInstanceState.getParcelable("currentPdfUri");
-        Drawable drawable = mainViewModel.getDrawable();
-        imageView.setImageDrawable(drawable);
+        // TODO: eperimentally eliminated
+//        boolean isMultipagePdf = savedInstanceState.getBoolean(getString(R.string.multipage_pdf_key));
 
         totalRotation = savedInstanceState.getFloat(getString(R.string.total_rotation_key));
 
@@ -1144,11 +1161,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // go back to Main Menu with rotation.  This avoids problems
         // with rotation while in QTc, tweaking, etc.
         selectMainMenu();
-        if (isMultipagePdf) {
-            Toast toast = Toast.makeText(this, R.string.multipage_pdf_warning,
-                    Toast.LENGTH_LONG);
-            toast.show();
-        }
+//        if (isMultipagePdf) {
+//            Toast toast = Toast.makeText(this, R.string.multipage_pdf_warning,
+//                    Toast.LENGTH_LONG);
+//            toast.show();
+//        }
     }
 
     private void storeBitmapToTempFile(Bitmap bitmap) {
@@ -1725,20 +1742,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getImageContent.launch("image/*");
     }
 
+    // FIXME: Use this to get bitmap from Uri??  From: https://pednekarshashank33.medium.com/android-10s-scoped-storage-image-picker-gallery-camera-d3dcca427bbf
+    // and is in Kotlin
+//    @Throws(IOException::class)
+//    private fun getBitmapFromUri(uri: Uri): Bitmap {
+//        val parcelFileDescriptor: ParcelFileDescriptor = contentResolver.openFileDescriptor(uri, "r")
+//        val fileDescriptor: FileDescriptor = parcelFileDescriptor.fileDescriptor
+//        val image: Bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor)
+//        parcelFileDescriptor.close()
+//        return image
+//    }
+
+    // FIXME: We do need permission to take photos.
     private void takePhoto() {
-//        // check permissions
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-//                != PackageManager.PERMISSION_GRANTED ||
-//                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                        != PackageManager.PERMISSION_GRANTED) {
-//
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                    MY_PERMISSIONS_REQUEST_CAMERA);
-//            // Buttons are unresponsive if permission not granted.
+        // check permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    MY_PERMISSIONS_REQUEST_CAMERA);
+            // Buttons are unresponsive if permission not granted.
 //            showPermissionsRequestToast();
-//            EPSLog.log("Permission needed to take photos.");
-//        } else {
+            EPSLog.log("Permission needed to take photos.");
+        } else {
+            // FIXME: Do on background thread?
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
@@ -1754,7 +1781,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 photoUri = Uri.fromFile(photoFile);
             }
             getPhotoContent.launch(photoUri);
-//        }
+            // TODO: Delete the photoUri.  Or do we need to keep it so the Uri can be restored if
+            // the activity is sent to background or killed by operating system?.
+        }
     }
 
     // No longer used.
@@ -1802,24 +1831,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //
 //    }
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode,
-//                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        switch (requestCode) {
-//            case MY_PERMISSIONS_REQUEST_CAMERA: {
-//                // If request is cancelled, the result arrays are empty.
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    EPSLog.log("Camera permission granted");
-//                    // permission was granted, yay! Do the
-//                    // contacts-related task you need to do.
-//                    proceedToTakePhoto();
-//                } else {
-//                    EPSLog.log("Camera permission denied");
-//                }
-//                break;
-//            }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    EPSLog.log("Camera permission granted");
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    takePhoto();
+                } else {
+                    EPSLog.log("Camera permission denied");
+                }
+                break;
+            }
 //            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
 //                // If request is cancelled, the result arrays are empty.
 //                if (grantResults.length > 0
@@ -1871,8 +1900,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                }
 //                break;
 //            }
-//        }
-//    }
+        }
+    }
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -1911,6 +1940,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
+    // TODO: see https://developer.android.com/training/camera/photobasics
     private void updateImageViewWithPath(String path) {
         Bitmap bitmap = getScaledBitmap(path);
         updateImageView(bitmap);
@@ -1944,6 +1974,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        this.sendBroadcast(mediaScanIntent);
 //    }
 
+    // FIXME: See https://developer.android.com/training/camera/photobasics for explanation of why this is good to avoid running out of memory.
     // Original code fails in Android 29.  See https://medium.com/@sriramaripirala/android-10-open-failed-eacces-permission-denied-da8b630a89df
     private Bitmap getScaledBitmap(String picturePath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
