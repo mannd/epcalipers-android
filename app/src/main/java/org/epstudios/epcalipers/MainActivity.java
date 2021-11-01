@@ -108,14 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final float MAX_SCALE = 10.0f;
     private static final float MIN_SCALE = 0.3f;
 
-    // TODO: Remove unused permissions
-    // FIXME: Need to get camera permission.
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
-    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 101;
-    private static final int MY_PERMISSIONS_REQUEST_STARTUP_IMAGE = 102;
-    private static final int MY_PERMISSIONS_REQUEST_STARTUP_PDF = 103;
-    private static final int MY_PERMISSIONS_REQUEST_STORE_BITMAP = 104;
-    private static final int MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE = 105;
 
     // TODO: Make sure the 1st part of this conditional never changes.  force_first_run
     // MUST be false for a release.  The 2nd part of the condition can be set true to
@@ -228,15 +221,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int currentPdfPageNumber;
     private File photoFile; // Used as tmp file to hold results of taking a photo.
     private Uri currentImageUri; // The URI of the image held in imageView.
-    private String currentPhotoPath;
 
     private boolean useLargeFont;
     private boolean imageIsLocked;
     private float smallFontSize;
     private float largeFontSize;
-
-    // TODO: To be removed.
-    private Bitmap previousBitmap = null;
 
     private Map<String, QtcFormula> qtcFormulaMap;
     private QtcFormula qtcFormulaPreference = QtcFormula.qtcBzt;
@@ -258,6 +247,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             return;
                         }
                         updateImageView(photoUri);
+                        // rotates image
+//                        updateImageViewWithPath(photoUri.getPath());
                     }
                 }
             });
@@ -959,20 +950,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         EPSLog.log("onResume");
     }
 
-    private void proceedToStoreBitmap() {
-        Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-        // for efficiency, don't bother writing the bitmap to a file if it hasn't changed
-        if (imageBitmap != null && !imageBitmap.sameAs(previousBitmap)) {
-            storeBitmapToTempFile(imageBitmap);
-            EPSLog.log("storingBitmap");
-        }
-    }
-
     private Bitmap getImageViewBitmap() {
         Drawable drawable = imageView.getDrawable();
         BitmapDrawable bitmapDrawable = (BitmapDrawable)drawable;
-        Bitmap bitmap = bitmapDrawable.getBitmap();
-        return bitmap;
+        return bitmapDrawable.getBitmap();
     }
 
     @Override
@@ -986,11 +967,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean(getString(R.string.image_locked_key), imageIsLocked);
         outState.putBoolean(getString(R.string.multipage_pdf_key), numberOfPdfPages > 0);
         outState.putBoolean(getString(R.string.a_caliper_is_marching_key), calipersView.isACaliperIsMarching());
-
-        // FIXME: new handling of imageView bitmap is experimental.
-        // Need to set this bitmap whenever imageView is updated.
-//        Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-//        mainViewModel.setBitmap(imageBitmap);
 
         Drawable drawable = imageView.getDrawable();
         mainViewModel.setDrawable(drawable);
@@ -1068,9 +1044,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageIsLocked = savedInstanceState.getBoolean(getString(R.string.image_locked_key));
         lockImage(imageIsLocked);
         calipersView.setACaliperIsMarching(savedInstanceState.getBoolean(getString(R.string.a_caliper_is_marching_key)));
-
-        // TODO: eperimentally eliminated
-//        boolean isMultipagePdf = savedInstanceState.getBoolean(getString(R.string.multipage_pdf_key));
 
         totalRotation = savedInstanceState.getFloat(getString(R.string.total_rotation_key));
 
@@ -1161,11 +1134,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // go back to Main Menu with rotation.  This avoids problems
         // with rotation while in QTc, tweaking, etc.
         selectMainMenu();
-//        if (isMultipagePdf) {
-//            Toast toast = Toast.makeText(this, R.string.multipage_pdf_warning,
-//                    Toast.LENGTH_LONG);
-//            toast.show();
-//        }
     }
 
     private void storeBitmapToTempFile(Bitmap bitmap) {
@@ -1804,102 +1772,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return takePictureIntent.resolveActivity(getPackageManager()) != null;
     }
 
-//    private void proceedToTakePhoto() {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        if (deviceHasCamera(takePictureIntent)) {
-//            File photoFile;
-//            try {
-//                photoFile = createImageFile();
-//            } catch (IOException ex) {
-//                showFileErrorAlert();
-//                return;
-//            }
-//            Uri photoUri;
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                photoUri = FileProvider.getUriForFile(MainActivity.this,
-//                        BuildConfig.APPLICATION_ID + ".provider",
-//                        photoFile);
-//            }
-//            else {
-//                photoUri = Uri.fromFile(photoFile);
-//            }
-//            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-//                    photoUri);
-//            startActivityForResult(takePictureIntent, RESULT_CAPTURE_IMAGE);
-//        }
-//        // camera icon inactivate with if no camera present, so no warning here
-//
-//    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_CAMERA: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    EPSLog.log("Camera permission granted");
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                    takePhoto();
-                } else {
-                    EPSLog.log("Camera permission denied");
-                }
-                break;
+        if (requestCode == MY_PERMISSIONS_REQUEST_CAMERA) {// If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                EPSLog.log("Camera permission granted");
+                // permission was granted, yay! Do the
+                // contacts-related task you need to do.
+                takePhoto();
+            } else {
+                EPSLog.log("Camera permission denied");
             }
-//            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
-//                // If request is cancelled, the result arrays are empty.
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    EPSLog.log("Write External storage permission granted");
-//                    proceedToSelectImageFromGallery();
-//                } else {
-//                    EPSLog.log("Write external storage permission denied");
-//                }
-//                break;
-//            }
-//            case MY_PERMISSIONS_REQUEST_STARTUP_IMAGE: {
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    EPSLog.log("Write External storage permission granted");
-//                    proceedToHandleImage();
-//                } else {
-//                    EPSLog.log("Write external storage permission denied");
-//                }
-//                break;
-//            }
-//            case MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE: {
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    EPSLog.log("Write External storage permission granted");
-//                    proceedToHandleSentImage();
-//                } else {
-//                    EPSLog.log("Write external storage permission denied");
-//                }
-//                break;
-//            }
-//            case MY_PERMISSIONS_REQUEST_STARTUP_PDF: {
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    EPSLog.log("Write External storage permission granted");
-//                    proceedToHandlePDF();
-//                } else {
-//                    EPSLog.log("Write external storage permission denied");
-//                }
-//                break;
-//            }
-//            case MY_PERMISSIONS_REQUEST_STORE_BITMAP: {
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    EPSLog.log("Write External storage permission granted");
-//                    proceedToStoreBitmap();
-//                } else {
-//                    EPSLog.log("Write external storage permission denied");
-//                }
-//                break;
-//            }
         }
     }
 
@@ -1918,7 +1804,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 storageDir      /* directory */
         );
 
-        currentPhotoPath = image.getAbsolutePath();
+        String currentPhotoPath = image.getAbsolutePath();
        // galleryAddPic();
         return image;
     }
@@ -1964,15 +1850,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // reset all the PDF variables
         resetPdf();
     }
-
-    // possibly implement save photo to gallery
-//    private void galleryAddPic() {
-//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-//        File f = new File(currentPhotoPath);
-//        Uri contentUri = Uri.fromFile(f);
-//        mediaScanIntent.setData(contentUri);
-//        this.sendBroadcast(mediaScanIntent);
-//    }
 
     // FIXME: See https://developer.android.com/training/camera/photobasics for explanation of why this is good to avoid running out of memory.
     // Original code fails in Android 29.  See https://medium.com/@sriramaripirala/android-10-open-failed-eacces-permission-denied-da8b630a89df

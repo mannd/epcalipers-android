@@ -26,7 +26,6 @@ import android.util.Log;
 
 // Make logging consistent, do it with this class.
 class EPSLog {
-   @SuppressWarnings("HardCodedStringLiteral")
    private static final String TAG = "EPS";
 
    public static void log(String s) {

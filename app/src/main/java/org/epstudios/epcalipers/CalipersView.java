@@ -118,7 +118,7 @@ public class CalipersView extends View {
         gestureDetector = new GestureDetectorCompat(context, listener);
         gestureDetector.setIsLongpressEnabled(true);
         View.OnTouchListener gestureListener = (v, event) -> {
-//            v.performClick();
+            v.performClick();
             return gestureDetector.onTouchEvent(event);
         };
 
