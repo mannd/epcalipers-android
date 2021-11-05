@@ -2494,6 +2494,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int pageNumber;
     }
 
+
     // FIXME: source of crash
     private static class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
         private final WeakReference<MainActivity> activityWeakReference;
@@ -2508,6 +2509,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            if (activityWeakReference == null) {
+                return;
+            }
             activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
             Toast toast = Toast.makeText(activityWeakReference.get(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
             toast.show();
@@ -2516,7 +2520,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected Bitmap doInBackground(UriPage... params) {
-            UriPage uriPage = params[0];
+            return getPdfBitmap(params[0]);
+        }
+
+        private Bitmap getPdfBitmap(UriPage param) {
+            if (activityWeakReference == null) {
+                return null;
+            }
+            UriPage uriPage = param;
             Uri pdfUri = uriPage.uri;
             if (pdfUri == null) {
                 if (activityWeakReference.get().currentPdfUri == null) {
@@ -2567,7 +2578,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 renderer.close();
                 fd.close();
                 return bitmap;
-            } catch (java.io.IOException e) {
+            } catch (IOException e) {
                 // catch out of memory errors and just don't load rather than crash
                 exceptionMessage = e.getMessage();
                 return null;
@@ -2584,7 +2595,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 activityWeakReference.get().imageView.setImageBitmap(bitmap);
                 // must set visibility as imageview will be hidden if started with sample ecg hidden
                 activityWeakReference.get().imageView.setVisibility(View.VISIBLE);
-                activityWeakReference.get().imageView.setScale(activityWeakReference.get().imageView.getMinimumScale());
+                // Don't set scale to minimum, is annoying with each page change.  Keep scale the same.
+                //activityWeakReference.get().imageView.setScale(activityWeakReference.get().imageView.getMinimumScale());
                 if (isNewPdf) {
                     activityWeakReference.get().clearCalibration();
                 }
