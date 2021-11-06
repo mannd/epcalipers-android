@@ -45,6 +45,8 @@ dependencies {
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'com.github.kizitonwose.colorpreference:support:1.1.0'
+    // Don't update onboarder.  2.x version uses Kotlin.
+    //noinspection GradleDependency
     implementation 'com.cuneytayyildiz:onboarder:1.0.3'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.activity:activity:1.4.0'

@@ -98,10 +98,6 @@ import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
 // the imageView URI is held in the app bundle to deal with the app going into the
 // background.
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    // TODO: Remove unused constants
-    private static final int RESULT_LOAD_IMAGE = 1;
-    private static final int RESULT_CAPTURE_IMAGE = 2;
-
     private static final int DEFAULT_LINE_WIDTH = 2;
 
     // Image scaling limits
@@ -219,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Uri currentPdfUri;
     private int numberOfPdfPages;
     private int currentPdfPageNumber;
-    private File photoFile; // Used as tmp file to hold results of taking a photo.
+    private Uri photoUri; // Keep a copy of the the camera's photo file URI
     private Uri currentImageUri; // The URI of the image held in imageView.
 
     private boolean useLargeFont;
@@ -242,13 +238,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onActivityResult(Boolean result) {
                     if (result) {
-                        Uri photoUri = Uri.fromFile(photoFile);
                         if (photoUri == null) {
                             return;
                         }
+                        // Not image is rotated to native orientation of camera.  So it may be
+                        // rotated 90 degrees when shown in the app.
                         updateImageView(photoUri);
-                        // rotates image
-//                        updateImageViewWithPath(photoUri.getPath());
                     }
                 }
             });
@@ -272,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     e.printStackTrace();
                 }
             });
+    @Deprecated
     final ActivityResultLauncher<Intent> imageResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -710,29 +706,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void handleImage() {
-//        if (ContextCompat.checkSelfPermission(this,
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                    MY_PERMISSIONS_REQUEST_STARTUP_IMAGE);
-//        }
-//        else {
             proceedToHandleImage();
-//        }
     }
 
     private void handleSentImage() {
-//        if (ContextCompat.checkSelfPermission(this,
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                    MY_PERMISSIONS_REQUEST_STARTUP_SENT_IMAGE);
-//        }
-//        else {
             proceedToHandleSentImage();
-//        }
     }
 
     private void proceedToHandleImage() {
@@ -763,17 +741,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // from http://stackoverflow.com/questions/10698360/how-to-convert-a-pdf-page-to-an-image-in-android
     private void handlePDF() {
-        // FIXME: these permissions no longer needed???
-//        if (ContextCompat.checkSelfPermission(this,
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                    MY_PERMISSIONS_REQUEST_STARTUP_PDF);
-//        }
-//        else {
             proceedToHandlePDF();
-//        }
     }
 
     private void proceedToHandlePDF() {
@@ -950,6 +918,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         EPSLog.log("onResume");
     }
 
+    @Deprecated
     private Bitmap getImageViewBitmap() {
         Drawable drawable = imageView.getDrawable();
         BitmapDrawable bitmapDrawable = (BitmapDrawable)drawable;
@@ -1027,15 +996,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onRestoreInstanceState(savedInstanceState);
         // See: https://proandroiddev.com/customizing-the-new-viewmodel-cf28b8a7c5fc
         Uri imageUri = savedInstanceState.getParcelable(getString(R.string.image_uri_key));
-        // Todo: need to make sure drawables and Uris all saved when they need to be.
-        // Also, if external image loaded, don't want to overwrite it with old image.
         Drawable drawable = mainViewModel.getDrawable();
         if (drawable != null) {
             imageView.setImageDrawable(drawable);
         } else if (imageUri != null) {
             imageView.setImageURI(imageUri);
         } else {
-            return; // else return?? don't restore anything if no image?
+            return; // Don't restore anything if no saved image.
         }
         currentPdfUri = savedInstanceState.getParcelable(getString(R.string.current_pdf_uri));
         numberOfPdfPages = savedInstanceState.getInt(getString(R.string.number_pdf_pages));
@@ -1136,6 +1103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         selectMainMenu();
     }
 
+    @Deprecated
     private void storeBitmapToTempFile(Bitmap bitmap) {
         try {
             File file = new File(getCacheDir() + getString(R.string.temp_bitmap_file_name));
@@ -1152,6 +1120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Deprecated
     private Bitmap getBitmapFromTempFile() {
 
             String path = getCacheDir() + getString(R.string.temp_bitmap_file_name);
@@ -1651,7 +1620,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
         EPSLog.log("onCreateOptionsMenu");
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -1710,18 +1679,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getImageContent.launch("image/*");
     }
 
-    // FIXME: Use this to get bitmap from Uri??  From: https://pednekarshashank33.medium.com/android-10s-scoped-storage-image-picker-gallery-camera-d3dcca427bbf
-    // and is in Kotlin
-//    @Throws(IOException::class)
-//    private fun getBitmapFromUri(uri: Uri): Bitmap {
-//        val parcelFileDescriptor: ParcelFileDescriptor = contentResolver.openFileDescriptor(uri, "r")
-//        val fileDescriptor: FileDescriptor = parcelFileDescriptor.fileDescriptor
-//        val image: Bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-//        parcelFileDescriptor.close()
-//        return image
-//    }
-
-    // FIXME: We do need permission to take photos.
     private void takePhoto() {
         // check permissions
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -1730,17 +1687,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     new String[]{Manifest.permission.CAMERA},
                     MY_PERMISSIONS_REQUEST_CAMERA);
             // Buttons are unresponsive if permission not granted.
-//            showPermissionsRequestToast();
+            Toast toast = Toast.makeText(this, R.string.need_camera_permission, Toast.LENGTH_LONG);
+            toast.show();
             EPSLog.log("Permission needed to take photos.");
         } else {
-            // FIXME: Do on background thread?
+            // FIXME: Consider move to a background thread.
+            File photoFile;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 showFileErrorAlert();
                 return;
             }
-            Uri photoUri;
+//            Uri photoUri;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 photoUri = FileProvider.getUriForFile(MainActivity.this,
                         BuildConfig.APPLICATION_ID + ".provider",
@@ -1749,12 +1708,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 photoUri = Uri.fromFile(photoFile);
             }
             getPhotoContent.launch(photoUri);
-            // TODO: Delete the photoUri.  Or do we need to keep it so the Uri can be restored if
-            // the activity is sent to background or killed by operating system?.
         }
     }
 
     // No longer used.
+    @Deprecated
     private void enableCameraMenuItem(boolean enable) {
         Menu menuNav = navigationView.getMenu();
         MenuItem cameraMenuItem = menuNav.findItem(R.id.nav_camera);
@@ -1762,12 +1720,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // No longer used.
+    @Deprecated
     private void enableImageMenuItem(boolean enable) {
         Menu menuNav = navigationView.getMenu();
         MenuItem imageMenuItem = menuNav.findItem(R.id.nav_image);
         imageMenuItem.setEnabled(enable);
     }
 
+    @Deprecated
     private boolean deviceHasCamera(Intent takePictureIntent) {
         return takePictureIntent.resolveActivity(getPackageManager()) != null;
     }
@@ -1793,20 +1753,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Create an image file name
         String timeStamp = getTimeStamp();
         String imageFileName = "JPEG_" + timeStamp + "_"; //NON-NLS
-
-//        File storageDir = getExternalFilesDir(null);
         File storageDir = getExternalFilesDir(null);
-//        File storageDir = Environment.getExternalStorageDirectory();
-        EPSLog.log("storage directory = " + storageDir);
-        File image = File.createTempFile(
+        return File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-
-        String currentPhotoPath = image.getAbsolutePath();
-       // galleryAddPic();
-        return image;
     }
 
     private File createTmpPdfFile() throws IOException {
@@ -1826,7 +1778,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
-    // TODO: see https://developer.android.com/training/camera/photobasics
+    // This seems to be overkill. See https://developer.android.com/training/camera/photobasics
+    @SuppressWarnings("deprecation")
+    @Deprecated
     private void updateImageViewWithPath(String path) {
         Bitmap bitmap = getScaledBitmap(path);
         updateImageView(bitmap);
@@ -1841,7 +1795,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         resetPdf();
     }
 
-    // FIXME: not doing any of the processing done in getScaledBitmap(path)
     private void updateImageView(Uri uri) {
         imageView.setImageURI(uri);
         imageView.setVisibility(View.VISIBLE);
@@ -1851,12 +1804,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         resetPdf();
     }
 
-    // FIXME: See https://developer.android.com/training/camera/photobasics for explanation of why this is good to avoid running out of memory.
-    // Original code fails in Android 29.  See https://medium.com/@sriramaripirala/android-10-open-failed-eacces-permission-denied-da8b630a89df
+    // This below is overkill, see links below.
+    // See https://developer.android.com/training/camera/photobasics for explanation of why this is good to avoid running out of memory.
+    // See https://medium.com/@sriramaripirala/android-10-open-failed-eacces-permission-denied-da8b630a89df
+    @SuppressWarnings("deprecation")
+    @Deprecated
     private Bitmap getScaledBitmap(String picturePath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        // FIXME: file is decoded twice in this method.  Probable bug.
         BitmapFactory.decodeFile(picturePath, options);
         int targetWidth = imageView.getWidth();
         int targetHeight = imageView.getHeight();
@@ -1865,6 +1820,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return BitmapFactory.decodeFile(picturePath, options);
     }
 
+    @Deprecated
     private static int calculateInSampleSize(
             BitmapFactory.Options options,
             int reqWidth,
@@ -2495,13 +2451,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    // FIXME: source of crash
+    // Some crashes from this, but added some additional null checking, so
+    // keep an idea on this.  AsyncTask is deprecated, but replacing this is nontrivial.
+    // Leave until forced to change it.
     private static class NougatAsyncLoadPDF extends AsyncTask<UriPage, Void, Bitmap> {
         private final WeakReference<MainActivity> activityWeakReference;
 
         private boolean isNewPdf;
         private String exceptionMessage = "";
 
+        // Deprecated, see class comment.
         NougatAsyncLoadPDF(MainActivity context) {
             activityWeakReference = new WeakReference<>(context);
         }
@@ -2523,11 +2482,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return getPdfBitmap(params[0]);
         }
 
-        private Bitmap getPdfBitmap(UriPage param) {
+        private Bitmap getPdfBitmap(UriPage uriPage) {
             if (activityWeakReference == null) {
                 return null;
             }
-            UriPage uriPage = param;
             Uri pdfUri = uriPage.uri;
             if (pdfUri == null) {
                 if (activityWeakReference.get().currentPdfUri == null) {

@@ -1,6 +1,5 @@
 package org.epstudios.epcalipers;
 
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import androidx.lifecycle.ViewModel;
@@ -28,16 +27,6 @@ import androidx.lifecycle.ViewModel;
  */
 
 public class MainViewModel extends ViewModel {
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
-
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
-
-    private Bitmap bitmap = null;
-
     public Drawable getDrawable() {
         return drawable;
     }

@@ -264,6 +264,7 @@
     <string name="calibration_warning_message">Units are not compatible with making measurements like heart rate or QTc.  Use units like msec or sec.</string>
     <string name="calibration_error_message">Not a valid calibration interval.</string>
     <string name="don_t_show_this_dialog_again_message">Don\'t show this dialog again.</string>
+    <string name="need_camera_permission">Need permission to use the camera."</string>
     <string name="image_uri_key" translatable="false">ïmageUri</string>
     <string name="current_pdf_uri" translatable="false">currentPdfUri</string>
     <string name="number_pdf_pages" translatable="false">numberPDFPages</string>
