@@ -123,8 +123,6 @@ public class CalipersView extends View {
         };
 
         setOnTouchListener(gestureListener);
-
-
     }
 
     private class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
