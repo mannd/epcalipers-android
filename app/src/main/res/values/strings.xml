@@ -66,7 +66,6 @@
     <string name="measure_button_label">Measure</string>
     <string name="micro_tweak_image_left_button_title">0.1°L</string>
     <string name="micro_tweak_image_right_button_title">0.1°R</string>
-    <string name="multipage_pdf_warning">Multipage PDF will need to be reloaded to view other pages.</string>
     <string name="no_caliper_selected_alert_message">Select a caliper by single-tapping it. Move the caliper to a known interval. Touch Set to enter the calibration measurement.</string>
     <string name="no_caliper_selected_alert_title">No Caliper Selected</string>
     <string name="no_calipers_alert_title">No Calipers To Use</string>
@@ -265,5 +264,9 @@
     <string name="calibration_warning_message">Units are not compatible with making measurements like heart rate or QTc.  Use units like msec or sec.</string>
     <string name="calibration_error_message">Not a valid calibration interval.</string>
     <string name="don_t_show_this_dialog_again_message">Don\'t show this dialog again.</string>
-    <string name="need_to_set_permissions">Need to set permissions.</string>
+    <string name="need_camera_permission">Need permission to use the camera."</string>
+    <string name="image_uri_key" translatable="false">ïmageUri</string>
+    <string name="current_pdf_uri" translatable="false">currentPdfUri</string>
+    <string name="number_pdf_pages" translatable="false">numberPDFPages</string>
+    <string name="current_pdf_page" translatable="false">currentPDFPage</string>
 </resources>

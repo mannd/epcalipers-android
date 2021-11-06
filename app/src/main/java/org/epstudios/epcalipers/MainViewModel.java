@@ -1,12 +1,14 @@
 package org.epstudios.epcalipers;
 
-import android.util.Log;
+import android.graphics.drawable.Drawable;
+
+import androidx.lifecycle.ViewModel;
 
 /**
- * Copyright (C) 2019 EP Studios, Inc.
+ * Copyright (C) 2021 EP Studios, Inc.
  * www.epstudiossoftware.com
  * <p>
- * Created by mannd on 2/24/19.
+ * Created by mannd on 10/24/21.
  * <p>
  * This file is part of epcalipers-android.
  * <p>
@@ -24,11 +26,14 @@ import android.util.Log;
  * along with epcalipers-android.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Make logging consistent, do it with this class.
-class EPSLog {
-   private static final String TAG = "EPS";
+public class MainViewModel extends ViewModel {
+    public Drawable getDrawable() {
+        return drawable;
+    }
 
-   public static void log(String s) {
-      Log.d(TAG, s);
-   }
+    public void setDrawable(Drawable drawable) {
+        this.drawable = drawable;
+    }
+
+    private Drawable drawable = null;
 }
