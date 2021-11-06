@@ -10,8 +10,8 @@ android {
         applicationId "org.epstudios.epcalipers"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 41
-        versionName "3.5.2"
+        versionCode 42
+        versionName "3.6.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
