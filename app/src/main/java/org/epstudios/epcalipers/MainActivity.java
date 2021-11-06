@@ -299,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             MenuItem pdfMenuItem = menu.findItem(R.id.menu_pdf);
-            pdfMenuItem.setVisible(currentPdfUri != null && numberOfPdfPages > 0);
+            pdfMenuItem.setVisible(currentPdfUri != null && numberOfPdfPages > 1);
             return true;
         }
 
@@ -1468,7 +1468,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (pdfMenu == null) {
             createPDFMenu();
         }
-        boolean enable = (numberOfPdfPages  > 0);
+        boolean enable = (numberOfPdfPages  > 1);
         enablePageButtons(enable);
         selectMenu(pdfMenu);
     }
@@ -1686,9 +1686,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA},
                     MY_PERMISSIONS_REQUEST_CAMERA);
-            // Buttons are unresponsive if permission not granted.
-            Toast toast = Toast.makeText(this, R.string.need_camera_permission, Toast.LENGTH_LONG);
-            toast.show();
+            // Buttons are unresponsive if permission not granted, but OS makes it pretty clear
+            // what you are getting into if you deny camera permission.
             EPSLog.log("Permission needed to take photos.");
         } else {
             // FIXME: Consider move to a background thread.
@@ -2472,9 +2471,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             }
             activityWeakReference.get().findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-            Toast toast = Toast.makeText(activityWeakReference.get(), R.string.opening_pdf_message, Toast.LENGTH_SHORT);
-            toast.show();
-
         }
 
         @Override
