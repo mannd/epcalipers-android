@@ -16,12 +16,12 @@
         android:name="android.hardware.camera.autofocus"
         android:required="false"/>
 
-<!--    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
-<!--    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>-->
+    <!--    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <!--        requestLegacyExternalStorage necessary for Android 10 with target SDK = 29, will be ignored if target SDK = 30.-->
-    <!--        android:requestLegacyExternalStorage="true"-->
+    android:requestLegacyExternalStorage="true"
     <application
 
         android:allowBackup="true"
