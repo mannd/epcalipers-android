@@ -724,6 +724,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         catch (java.io.IOException e) {
             showFileErrorAlert();
         }
+        // Attempt to handle security exception without crashing app...
+        catch (java.lang.SecurityException e) {
+            showFileErrorAlert();
+        }
     }
 
     private void proceedToHandleSentImage() {
