@@ -1556,10 +1556,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void selectTweakMenu() {
-        if (!thereAreCalipers()) {
-            noCalipersAlert();
-            return;
-        }
         if (tweakMenu == null) {
             createTweakMenu();
         }
@@ -2030,7 +2026,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void microMoveBar(Caliper c, Caliper.Component component, float distance, Caliper.MovementDirection direction) {
-        if (component == Caliper.Component.None) {
+        if (c == null || component == Caliper.Component.None) {
             return;
         }
         c.moveBar(distance, component, direction);
