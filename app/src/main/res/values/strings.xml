@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="about_label">EP Calipers</string>
     <string name="about_text">Copyright \u00a9 2015–2022 EP Studios, Inc.  All rights reserved.\n</string>
