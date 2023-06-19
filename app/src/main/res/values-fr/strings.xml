@@ -67,7 +67,7 @@
     <string name="repeat_qt_button_title">Répéter QT</string>
     <string name="tweak_label">Régler</string>
     <string name="color_label">Couleur</string>
-    <string name="about_text">Copyright © 2015 – 2022 EP Studios, Inc.  Tous droits réservés.\n</string>
+    <string name="about_text">Copyright © 2015 – 2023 EP Studios, Inc.  Tous droits réservés.\n</string>
     <string name="app_version">Version %1s</string>
     <string name="continue_title">Continuer</string>
     <string name="calculated_qtc_dialog_title">QTc calculé</string>
