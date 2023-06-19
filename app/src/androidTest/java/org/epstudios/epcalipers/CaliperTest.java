@@ -1,7 +1,12 @@
 package org.epstudios.epcalipers;
 
+import android.graphics.PointF;
+
 import org.junit.Test;
 
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -51,5 +56,32 @@ public class CaliperTest {
         AngleCaliper ac = new AngleCaliper();
         assert(ac.getCaliperType() == Caliper.CaliperType.Angle);
         assertTrue(ac.isAngleCaliper());
+    }
+
+    @Test
+    public void testNonNegativeBPM() {
+        Caliper c = new Caliper();
+        Calibration calibration = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        calibration.setOffset(new PointF(100.0f, 0));
+        calibration.setOriginalCalFactor(1.f);
+        calibration.setCalibrationString("1000 msec");
+        calibration.setOriginalZoom(1.0f);
+        calibration.setCurrentZoom(1.0f);
+        calibration.setUnits("msec");
+        calibration.setCalibrated(true);
+        c.setCalibration(calibration);
+        c.setRoundMsecRate(true);
+        c.setBar1Position(1000.0f);
+        c.setBar2Position(2000.0f);
+        assertEquals("1000 msec", c.measurement());
+        calibration.setDisplayRate(true);
+        assertEquals("60 bpm", c.measurement());
+        // make sure negative calipers don't show negative BPM
+        c.setBar1Position(2000.0f);
+        c.setBar2Position(1000.0f);
+        calibration.setDisplayRate(false);
+        assertEquals("-1000 msec", c.measurement());
+        calibration.setDisplayRate(true);
+        assertEquals("60 bpm", c.measurement());
     }
 }

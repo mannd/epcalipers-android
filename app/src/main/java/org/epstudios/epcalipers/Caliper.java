@@ -710,7 +710,8 @@ public class Caliper {
                 interval = 60.0 / interval;
             }
         }
-        return interval;
+        // rates can no longer be negative
+        return Math.abs(interval);
     }
 
     public double intervalInSecs(double interval) {
