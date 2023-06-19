@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="org.epstudios.epcalipers">
+          xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.CAMERA"/>
     <queries>
@@ -21,9 +20,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <!--        requestLegacyExternalStorage necessary for Android 10 with target SDK = 29, will be ignored if target SDK = 30.-->
-    android:requestLegacyExternalStorage="true"
+<!--    android:requestLegacyExternalStorage="true"-->
     <application
-
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"

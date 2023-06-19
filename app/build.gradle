@@ -3,15 +3,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion '30.0.2'
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "org.epstudios.epcalipers"
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 43
-        versionName "3.6.1"
+        targetSdkVersion 33
+        versionCode 44
+        versionName "3.6.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -24,6 +23,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'org.epstudios.epcalipers'
 }
 
 repositories {
@@ -38,21 +38,32 @@ allprojects {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.webkit:webkit:1.4.0'
-    implementation 'androidx.appcompat:appcompat:1.4.0-rc01'
+    implementation 'androidx.webkit:webkit:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0-alpha02'
     implementation 'com.google.android.material:material:1.5.0-alpha05'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
     implementation 'com.github.kizitonwose.colorpreference:support:1.1.0'
     // Don't update onboarder.  2.x version uses Kotlin.
     //noinspection GradleDependency
     implementation 'com.cuneytayyildiz:onboarder:1.0.3'
-    implementation 'androidx.preference:preference:1.1.1'
-    implementation 'androidx.activity:activity:1.4.0'
+    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'androidx.activity:activity:1.7.0'
     // Required for local unit tests (JUnit 4 framework)
     testImplementation 'junit:junit:4.13.2'
     // Required for instrumented tests
-    androidTestImplementation 'androidx.annotation:annotation:1.2.0'
-    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.annotation:annotation:1.3.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+}
+
+dependencies {
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
+            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+        }
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
+            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+        }
+    }
 }

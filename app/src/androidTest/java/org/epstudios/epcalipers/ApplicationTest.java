@@ -62,6 +62,7 @@ public class ApplicationTest {
     public void testInitialCaliperPosition() {
         Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
         cal.setOffset(new PointF(0, 0));
+        cal.setCurrentZoom(1.0f);
         Caliper c = new Caliper();
         c.setCalibration(cal);
         c.setInitialPosition(new Rect(0, 0, 600, 600));
@@ -81,6 +82,7 @@ public class ApplicationTest {
     public void testBarCoord() {
         Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
         cal.setOffset(new PointF(0, 0));
+        cal.setCurrentZoom(1.0f);
         Caliper c = new Caliper();
         c.setCalibration(cal);
         assertEquals(c.getBar1Position(), 0, 0.001);
@@ -226,6 +228,7 @@ public class ApplicationTest {
     public void testMiscCaliperTests() {
         Calibration cal = new Calibration(InstrumentationRegistry.getInstrumentation().getTargetContext());
         cal.setOffset(new PointF(0, 0));
+        cal.setCurrentZoom(1.0f);
         Caliper c = new Caliper();
         c.setCalibration(cal);
         c.setBar1Position(100);
