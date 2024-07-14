@@ -3,14 +3,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "org.epstudios.epcalipers"
         minSdkVersion 21
-        targetSdkVersion 33
-        versionCode 44
-        versionName "3.6.2"
+        targetSdkVersion 34
+        versionCode 45
+        versionName "3.7.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
