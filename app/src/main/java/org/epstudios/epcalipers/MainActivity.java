@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int shortAnimationDuration;
     private boolean noSavedInstance;
     private float totalRotation;
-    private boolean externalImageLoad;
+    private boolean isExternalImageLoaded;
     private Bitmap externalImageBitmap;
     private Uri currentPdfUri;
     private int numberOfPdfPages;
@@ -536,9 +536,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         selectMainMenu();
 
         // entry point to load external pics/PDFs
-        if (externalImageLoad) {
+        if (isExternalImageLoaded) {
             updateImageView(externalImageBitmap);
-            externalImageLoad = false;
+            isExternalImageLoaded = false;
         }
 
         onSharedPreferenceChangeListener = (sharedPreferences, key) -> {
@@ -704,7 +704,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             version.saveVersion();
         }
 
-        if (externalImageLoad) {
+        if (isExternalImageLoaded) {
             startActivity(intent);
         }
     }
@@ -721,8 +721,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             currentImageUri = getIntent().getData();
             if (currentImageUri != null) {
-                externalImageLoad = true;
-                externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), currentImageUri);
+                isExternalImageLoaded = true;
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                   @SuppressWarnings("deprecation")
+                   Bitmap tempBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), currentImageUri);
+                   externalImageBitmap = tempBitmap;
+                } else {
+                    ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), currentImageUri);
+                    externalImageBitmap = ImageDecoder.decodeBitmap(source);
+                }
             }
         }
         catch (java.io.IOException e) {
@@ -738,7 +745,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
             if (imageUri != null) {
-                externalImageLoad = true;
+                isExternalImageLoaded = true;
                 externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
             }
         }
