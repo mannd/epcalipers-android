@@ -23,7 +23,7 @@ import android.widget.TextView;
  * GNU General Public License for more details.
  * <p/>
  * You should have received a copy of the GNU General Public License
- * along with org.epstudios.epcalipers.  If not, see <http://www.gnu.org/licenses/>.
+ * along with org.epstudios.epcalipers.  If not, see <<a href="http://www.gnu.org/licenses/">...</a>>.
  */
 public class About extends Activity {
     @Override

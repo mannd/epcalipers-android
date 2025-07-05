@@ -256,8 +256,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Bitmap bitmap;
                 currentImageUri = imageUri;
                 try {
-                    if (Build.VERSION.SDK_INT < 28) {
-                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                        @SuppressWarnings("deprecation")
+                        Bitmap tempBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                        bitmap = tempBitmap;
                     } else {
                         ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), imageUri);
                         bitmap = ImageDecoder.decodeBitmap(source);
@@ -648,7 +650,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
 
         PackageInfo packageInfo;
-        int versionCode = 0;
+        long versionCode = 0;
         String versionName = "";
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -656,7 +658,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 versionCode = (int)packageInfo.getLongVersionCode();
             } else {
-                versionCode = packageInfo.versionCode;
+                @SuppressWarnings("deprecation")
+                long tempVersionCode = packageInfo.versionCode;
+                versionCode = tempVersionCode;
             }
             versionName = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {

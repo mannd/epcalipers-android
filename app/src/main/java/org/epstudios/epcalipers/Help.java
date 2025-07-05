@@ -3,6 +3,7 @@ package org.epstudios.epcalipers;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
@@ -55,13 +56,17 @@ public class Help extends AppCompatActivity {
         // Anchors don't work properly off the shelf in Android.  Need to add
         // a delay for page rendering so that the anchors work.
         // See https://stackoverflow.com/questions/3039555/android-webview-anchor-link-jump-link-not-working
-        Handler handler = new Handler();
+        // Original deprecated code:
+        // Handler handler = new Handler();
+
+        // Fixed code:
+        Handler handler = new Handler(Looper.getMainLooper());
         final String finalUrl = url;
         // See https://stackoverflow.com/questions/57449900/letting-webview-on-android-work-with-prefers-color-scheme-dark
         int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
-            if(WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-                WebSettingsCompat.setForceDark(webView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
+            if(WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+                WebSettingsCompat.setAlgorithmicDarkeningAllowed(webView.getSettings(), true);
             }
         }
         // Variables inside closure must be final.
