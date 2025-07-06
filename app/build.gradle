@@ -1,6 +1,7 @@
 
 
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     compileSdkVersion 35
@@ -58,6 +59,8 @@ dependencies {
     // Required for instrumented tests
     androidTestImplementation 'androidx.annotation:annotation:1.3.0'
     androidTestImplementation 'androidx.test:runner:1.5.2'
+    // Required for kotlin activity edge to edge
+    implementation("androidx.activity:activity-ktx:1.10.1")
 }
 
 dependencies {

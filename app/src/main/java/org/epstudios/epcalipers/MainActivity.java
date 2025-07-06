@@ -92,6 +92,11 @@ import static org.epstudios.epcalipers.MyPreferenceFragment.FRAMINGHAM;
 import static org.epstudios.epcalipers.MyPreferenceFragment.FRIDERICIA;
 import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
 
+/// TODO: For Android 15 (SDK 35) we have to implement edge to edge functionality
+/// (as was done already for EP Mobile).
+/// Also see https://developer.android.com/guide/topics/ui/look-and-feel/edge-to-edge
+/// and https://developer.android.com/develop/ui/views/layout/display-cutout
+
 // Note EP Calipers is legacy software.  Ideally all variables that aren't UI related
 // would be moved to a view model class, but instead we rely still rely on onSaveInstanceState()
 // to save and reload these variables directly to this Activity.  Thus the imageView
