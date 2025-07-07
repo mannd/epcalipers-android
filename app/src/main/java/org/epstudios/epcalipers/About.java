@@ -1,41 +1,56 @@
 package org.epstudios.epcalipers;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
-/**
- * Copyright (C) 2015 EP Studios, Inc.
- * www.epstudiossoftware.com
- * <p/>
- * Created by mannd on 4/26/15.
- * <p/>
- * This file is part of org.epstudios.epcalipers.
- * <p/>
- * org.epstudios.epcalipers is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p/>
- * org.epstudios.epcalipers is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p/>
- * You should have received a copy of the GNU General Public License
- * along with org.epstudios.epcalipers.  If not, see <http://www.gnu.org/licenses/>.
- */
 public class About extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.about);
         TextView versionTextView = findViewById(R.id.version);
-        String versionNumber = getIntent().getStringExtra(getString(R.string.version_number));
-        int versionCode = getIntent().getIntExtra(getString(R.string.version_code), 0);
-        if (BuildConfig.DEBUG) {
-            versionNumber = versionNumber + "+" + versionCode;
+
+        String versionNumberString = ""; // Default to empty string
+        long appVersionCode = 0; // Use long for versionCode
+
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionNumberString = packageInfo.versionName;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                appVersionCode = packageInfo.getLongVersionCode();
+            } else {
+                // This is the deprecated way but necessary for API < 28
+                @SuppressWarnings("deprecation")
+                long tempVersionCode = packageInfo.versionCode;
+                appVersionCode = tempVersionCode;
+            }
+
+        } catch (PackageManager.NameNotFoundException e) {
+            // This should not happen if getPackageName() is correct
+            Log.e("AboutActivity", "Could not get package info", e);
+            // Optionally set versionNumberString to an error message or leave as default
+            versionNumberString = "N/A";
         }
-        versionTextView.setText(String.format(getString(R.string.app_version), versionNumber));
+
+        // Construct the final version string
+        String displayVersion = versionNumberString;
+        if (BuildConfig.DEBUG) {
+            // Only append versionCode in debug builds if it was successfully retrieved
+            if (appVersionCode > 0) {
+                displayVersion = versionNumberString + "+" + appVersionCode;
+            } else {
+                // If appVersionCode is still 0 (e.g., due to an error, though unlikely here)
+                // you might choose to not append it or handle it differently
+                displayVersion = versionNumberString + "+debug"; // Fallback for debug
+            }
+        }
+
+        versionTextView.setText(String.format(getString(R.string.app_version), displayVersion));
     }
 }

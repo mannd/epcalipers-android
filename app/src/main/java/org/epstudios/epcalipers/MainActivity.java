@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -90,6 +91,11 @@ import static org.epstudios.epcalipers.MyPreferenceFragment.BAZETT;
 import static org.epstudios.epcalipers.MyPreferenceFragment.FRAMINGHAM;
 import static org.epstudios.epcalipers.MyPreferenceFragment.FRIDERICIA;
 import static org.epstudios.epcalipers.MyPreferenceFragment.HODGES;
+
+/// TODO: For Android 15 (SDK 35) we have to implement edge to edge functionality
+/// (as was done already for EP Mobile).
+/// Also see https://developer.android.com/guide/topics/ui/look-and-feel/edge-to-edge
+/// and https://developer.android.com/develop/ui/views/layout/display-cutout
 
 // Note EP Calipers is legacy software.  Ideally all variables that aren't UI related
 // would be moved to a view model class, but instead we rely still rely on onSaveInstanceState()
@@ -210,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int shortAnimationDuration;
     private boolean noSavedInstance;
     private float totalRotation;
-    private boolean externalImageLoad;
+    private boolean isExternalImageLoaded;
     private Bitmap externalImageBitmap;
     private Uri currentPdfUri;
     private int numberOfPdfPages;
@@ -256,8 +262,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Bitmap bitmap;
                 currentImageUri = imageUri;
                 try {
-                    if (Build.VERSION.SDK_INT < 28) {
-                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                        @SuppressWarnings("deprecation")
+                        Bitmap tempBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                        bitmap = tempBitmap;
                     } else {
                         ImageDecoder.Source source = ImageDecoder.createSource(getContentResolver(), imageUri);
                         bitmap = ImageDecoder.decodeBitmap(source);
@@ -534,9 +542,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         selectMainMenu();
 
         // entry point to load external pics/PDFs
-        if (externalImageLoad) {
+        if (isExternalImageLoaded) {
             updateImageView(externalImageBitmap);
-            externalImageLoad = false;
+            isExternalImageLoaded = false;
         }
 
         onSharedPreferenceChangeListener = (sharedPreferences, key) -> {
@@ -648,7 +656,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
 
         PackageInfo packageInfo;
-        int versionCode = 0;
+        long versionCode = 0;
         String versionName = "";
         try {
             packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -656,7 +664,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 versionCode = (int)packageInfo.getLongVersionCode();
             } else {
-                versionCode = packageInfo.versionCode;
+                @SuppressWarnings("deprecation")
+                long tempVersionCode = packageInfo.versionCode;
+                versionCode = tempVersionCode;
             }
             versionName = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
@@ -700,7 +710,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             version.saveVersion();
         }
 
-        if (externalImageLoad) {
+        if (isExternalImageLoaded) {
             startActivity(intent);
         }
     }
@@ -714,14 +724,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void proceedToHandleImage() {
+        Intent intent = getIntent();
+        if (intent == null) {
+            Log.w("ImageHandling", "Intent is null, cannot handle image");
+            return;
+        }
         try {
-            currentImageUri = getIntent().getData();
+            currentImageUri = intent.getData();
             if (currentImageUri != null) {
-                externalImageLoad = true;
-                externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), currentImageUri);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                   @SuppressWarnings("deprecation")
+                   Bitmap tempBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), currentImageUri);
+                   externalImageBitmap = tempBitmap;
+                } else {
+                    ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), currentImageUri);
+                    externalImageBitmap = ImageDecoder.decodeBitmap(source);
+                }
+                isExternalImageLoaded = true;
+            } else {
+                isExternalImageLoaded = false;
             }
         }
         catch (java.io.IOException e) {
+            isExternalImageLoaded = false;
             showFileErrorAlert();
         }
         // Attempt to handle security exception without crashing app...
@@ -732,13 +757,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void proceedToHandleSentImage() {
         try {
-            Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
+            Uri imageUri = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM, Uri.class);
+            } else {
+                @SuppressWarnings("deprecation")
+                Uri tempImageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
+                if (tempImageUri != null) {
+                    imageUri = getTempUri(tempImageUri);
+                }
+            }
             if (imageUri != null) {
-                externalImageLoad = true;
-                externalImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                    @SuppressWarnings("deprecation")
+                    Bitmap tempBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), currentImageUri);
+                    externalImageBitmap = tempBitmap;
+                } else {
+                    ImageDecoder.Source source = ImageDecoder.createSource(this.getContentResolver(), currentImageUri);
+                    externalImageBitmap = ImageDecoder.decodeBitmap(source);
+                }
+                isExternalImageLoaded = true;
+            } else {
+                isExternalImageLoaded = false;
             }
         }
         catch (java.io.IOException e) {
+            isExternalImageLoaded = false;
             showFileErrorAlert();
         }
     }
