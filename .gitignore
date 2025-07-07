@@ -17,3 +17,4 @@
 /sample
 .idea
 *.iml
+*.hprof
