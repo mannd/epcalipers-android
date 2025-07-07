@@ -32,14 +32,14 @@ class Version {
         return versionName;
     }
 
-    public int getVersionCode() {
+    public long getVersionCode() {
         return versionCode;
     }
 
     private final String versionName;
-    private final int versionCode;
+    private final long versionCode;
 
-    Version(Context context, SharedPreferences prefs, String versionName, int versionCode) {
+    Version(Context context, SharedPreferences prefs, String versionName, long versionCode) {
         this.context = context;
         this.prefs = prefs;
         this.versionName = versionName;
